@@ -26,8 +26,9 @@ Các câu lạc bộ học thuật và công nghệ (như CLB trực thuộc HCM
 | Vai trò (Role) | Mô tả | Quyền hạn |
 | :--- | :--- | :--- |
 | **GUEST (Khách / Chờ duyệt)** | Khách vãng lai hoặc tài khoản mới đăng ký chưa được duyệt. | - Xem tất cả bài báo, dự án, thành tích đã xuất bản (`PUBLISHED`).<br>- Xem trang cá nhân công khai của thành viên.<br>- Đăng ký tài khoản (qua Email / Google). |
-| **MEMBER (Thành viên CLB)** | Sinh viên/thành viên đã được Admin xác nhận thuộc CLB. | - Tất cả quyền của `GUEST`.<br>- Tạo, sửa, xóa bài đăng của mình ở trạng thái `DRAFT`.<br>- Gửi bài đăng lên hệ thống kiểm duyệt (`PENDING_REVIEW`).<br>- Quản lý hồ sơ cá nhân (Avatar, Bio, GitHub, Scholar, LinkedIn).<br>- Được gắn tên làm đồng tác giả / người tham gia trong các bài đăng khác. |
-| **ADMIN (Ban chủ nhiệm CLB)** | Quản trị viên hệ thống. | - Tất cả quyền của `MEMBER`.<br>- Phê duyệt hoặc từ chối bài đăng (kèm ghi chú lý do).<br>- Phê duyệt hoặc hủy kích hoạt tài khoản thành viên (`PENDING` -> `ACTIVE`).<br>- Chỉnh sửa hoặc gỡ bỏ bất kỳ bài đăng nào vi phạm. |
+| **MEMBER (Thành viên CLB)** | Thành viên chính thức của CLB. | - Tất cả quyền của `GUEST`.<br>- Quản lý hồ sơ cá nhân (Avatar, Bio, GitHub, Scholar, LinkedIn).<br>- Được gắn tên làm đồng tác giả / thành viên tham gia trong các bài đăng.<br>- Xem danh mục thành quả mình đã tham gia trong Dashboard cá nhân.<br>- *Mặc định chưa có quyền tạo bài đăng mới* (tránh tình trạng spam bài). |
+| **EDITOR (Người được ủy quyền đăng)** | Trưởng ban Chuyên môn (Học thuật/Kỹ thuật), Lead dự án, hoặc Member được cấp quyền (`canUpload = true`). | - Tất cả quyền của `MEMBER`.<br>- Tạo, chỉnh sửa bài đăng mới (`DRAFT`).<br>- Tải lên hình ảnh thumbnail, file PDF tài liệu, video embed link.<br>- Gửi bài đăng lên hệ thống để Admin duyệt (`PENDING_REVIEW`). |
+| **ADMIN (Ban chủ nhiệm CLB)** | Quản trị viên cao nhất của hệ thống. | - Tất cả quyền của `EDITOR`.<br>- Cấp quyền đăng (`canUpload = true`) hoặc bổ nhiệm vai trò `EDITOR` cho thành viên.<br>- Phê duyệt hoặc từ chối bài đăng (`PENDING_REVIEW` -> `PUBLISHED` / `REJECTED`) kèm lý do.<br>- Phê duyệt tài khoản mới (`PENDING` -> `ACTIVE`).<br>- Chỉnh sửa hoặc gỡ bỏ bất kỳ bài đăng nào vi phạm. |
 
 ---
 
@@ -65,6 +66,7 @@ generator client {
 enum Role {
   GUEST
   MEMBER
+  EDITOR            // Trưởng ban / Lead dự án được ủy quyền
   ADMIN
 }
 
@@ -117,6 +119,7 @@ model User {
   googleScholarUrl String?
   portfolioUrl     String?
   role             Role            @default(GUEST)
+  canUpload        Boolean         @default(false) // Quyền upload riêng lẻ do Admin bật/tắt
   status           UserStatus      @default(PENDING)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -247,10 +250,14 @@ model ItemTag {
      * *Thành tích & Đóng góp cho CLB*
 
 ### 5.2. Khu Vực Thành Viên (`/dashboard`)
-1. **Quản lý bài viết của tôi (`/dashboard/items`)**:
-   * Danh sách các bài đã tạo với huy hiệu trạng thái rõ ràng: `Nháp`, `Chờ duyệt`, `Đã xuất bản`, `Bị từ chối`.
-   * Nếu bài bị từ chối (`REJECTED`): Hiển thị hộp thông báo màu đỏ ghi rõ lý do từ chối từ Ban chủ nhiệm để thành viên biết và sửa đổi.
-2. **Trình tạo & chỉnh sửa bài viết (`/dashboard/items/new` & `/dashboard/items/[id]/edit`)**:
+1. **Quản lý bài viết & thành quả (`/dashboard/items`)**:
+   * Danh sách các bài thành viên đã tạo hoặc được gắn tên tham gia.
+   * Huy hiệu trạng thái rõ ràng: `Nháp`, `Chờ duyệt`, `Đã xuất bản`, `Bị từ chối`.
+   * Nếu bài bị từ chối (`REJECTED`): Hiển thị hộp thông báo màu đỏ ghi rõ lý do từ chối từ Ban chủ nhiệm để tác giả biết và sửa đổi.
+2. **Kiểm soát quyền Tạo bài mới (`/dashboard/items/new`)**:
+   * **Điều kiện:** Chỉ người dùng có vai trò `EDITOR`, `ADMIN`, hoặc được cấp cờ `canUpload = true` mới nhìn thấy nút bấm *"Tạo bài mới"* và truy cập được vào trang tạo bài.
+   * Thành viên `MEMBER` thông thường: Hiển thị giao diện thông tin cá nhân và danh sách bài đã tham gia, kèm banner thông báo: *"Bạn chưa được cấp quyền đăng bài trực tiếp. Hãy liên hệ Ban chủ nhiệm để được ủy quyền hoặc trở thành Editor."*
+3. **Trình tạo & chỉnh sửa bài viết (`/dashboard/items/new` & `/dashboard/items/[id]/edit`)**:
    * Form trực quan chia thành các bước rõ ràng:
      * *Bước 1: Thông tin cơ bản* (Tiêu đề, tóm tắt, loại mục: Bài báo / Dự án / Thành tích, phạm vi: Nội bộ / Bên ngoài / Đóng góp CLB, đơn vị cấp, năm).
      * *Bước 2: Media & Tệp đính kèm* (Tải lên ảnh thumbnail; nhập link Video Demo YouTube/Drive/Loom; tải lên file PDF đính kèm).
@@ -264,10 +271,10 @@ model ItemTag {
    * Danh sách các bài đang ở trạng thái `PENDING_REVIEW`.
    * Xem trước bài viết như giao diện thật.
    * Nút bấm **"Phê duyệt"** (chuyển sang `PUBLISHED`) hoặc **"Từ chối"** (mở popup nhập lý do gửi lại cho tác giả).
-2. **Quản lý thành viên (`/admin/members`)**:
-   * Danh sách người dùng mới đăng ký ở trạng thái `PENDING`.
-   * Nút duyệt nâng cấp quyền từ `GUEST` lên `MEMBER`.
-   * Quản lý phân quyền (`MEMBER` / `ADMIN`).
+2. **Quản lý thành viên & Cấp quyền đăng (`/admin/members`)**:
+   * Danh sách người dùng mới đăng ký ở trạng thái `PENDING` -> Nút duyệt nâng cấp quyền từ `GUEST` lên `MEMBER`.
+   * **Công tắc cấp quyền đăng (Upload Permission Toggle):** Cho phép Admin bật/tắt nhanh quyền `canUpload` cho từng thành viên, hoặc nâng cấp thành viên lên vai trò `EDITOR` (Trưởng ban Học thuật/Kỹ thuật).
+   * Phân quyền quản trị viên (`ADMIN`).
 
 ---
 
@@ -279,9 +286,10 @@ model ItemTag {
    * Thumbnail: Giới hạn định dạng `image/jpeg`, `image/png`, `image/webp`; dung lượng tối đa 5MB.
    * File PDF: Giới hạn định dạng `application/pdf`; dung lượng tối đa 25MB.
    * Tạo tên file ngẫu nhiên an toàn (UUID/CUID) tránh ghi đè và tấn công Path Traversal.
-3. **Phân quyền truy cập (RBAC):**
+3. **Phân quyền truy cập & Chống đăng lậu (RBAC & Upload Authorization):**
    * Middleware Next.js kiểm tra phiên đăng nhập và vai trò người dùng trước khi vào `/dashboard/*` hoặc `/admin/*`.
-   * Server Actions kiểm tra chặt chẽ `creatorId` khi sửa/xóa bài đăng (chỉ tác giả bài viết hoặc Admin mới có quyền thao tác).
+   * **Chặn upload ở tầng Server Action / API:** Bất kỳ request tạo bài nào đều kiểm tra điều kiện `user.role === 'ADMIN' || user.role === 'EDITOR' || user.canUpload === true`. Nếu không thỏa mãn, trả về lỗi `403 Forbidden`.
+   * Server Actions kiểm tra chặt chẽ quyền sở hữu khi sửa/xóa bài đăng (chỉ tác giả bài viết hoặc Admin mới có quyền thao tác).
 4. **Bảo vệ nội dung:**
    * Sanitize nội dung Markdown chống các lỗ hổng XSS (Cross-Site Scripting).
 
@@ -292,11 +300,13 @@ model ItemTag {
 * **Unit & Validation Tests:** Kiểm tra schema Zod, logic parse URL video (YouTube, Drive, Loom), và logic phân loại item.
 * **Database & CRUD Tests:** Kiểm tra việc tạo bài viết kèm đa liên kết (`ItemLink`), đồng tác giả (`ItemContributor`), và kiểm tra tính toàn vẹn quan hệ cơ sở dữ liệu.
 * **RBAC & Authorization Tests:**
-  * Guest không thể vào Dashboard hoặc Admin.
-  * Member chỉ sửa được bài của chính mình.
-  * Chỉ Admin mới thực hiện được hành động duyệt bài (`PUBLISHED`) hoặc từ chối (`REJECTED`).
+   * Guest không thể vào Dashboard hoặc Admin.
+   * Member bình thường (chưa có quyền upload) không thấy form tạo bài và bị chặn nếu cố tình gọi API/Server Action tạo bài (`403 Forbidden`).
+   * Admin bật `canUpload` hoặc gán role `EDITOR` -> Người dùng có thể tạo bài và gửi duyệt thành công.
+   * Chỉ Admin mới thực hiện được hành động duyệt bài (`PUBLISHED`) hoặc từ chối (`REJECTED`).
 * **UI & Workflow End-to-End Verification:**
-  1. Đăng ký tài khoản -> Admin duyệt làm Member.
-  2. Tạo bài báo nghiên cứu (Upload thumbnail, dán link YouTube demo, đính kèm link arXiv & file PDF) -> Lưu nháp -> Gửi duyệt.
-  3. Admin đăng nhập -> Thấy thông báo bài chờ duyệt -> Duyệt bài.
-  4. Người ngoài vào trang chủ -> Thấy bài hiển thị trên Showcase -> Mở chi tiết -> Thử mở link, xem video embed, tải PDF -> Click vào profile tác giả xem toàn bộ thành tích.
+   1. Đăng ký tài khoản -> Admin duyệt làm Member.
+   2. Admin cấp quyền đăng (`canUpload: true`) hoặc chỉ định làm `EDITOR`.
+   3. Member/Editor tạo bài báo nghiên cứu (Upload thumbnail, dán link YouTube demo, đính kèm link arXiv & file PDF) -> Lưu nháp -> Gửi duyệt.
+   4. Admin đăng nhập -> Thấy thông báo bài chờ duyệt -> Duyệt bài.
+   5. Người ngoài vào trang chủ -> Thấy bài hiển thị trên Showcase -> Mở chi tiết -> Thử mở link, xem video embed, tải PDF -> Click vào profile tác giả xem toàn bộ thành tích.
