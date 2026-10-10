@@ -1,17 +1,33 @@
+'use client';
+
+import { useState } from 'react';
 import { parseVideoEmbedUrl } from '@/lib/video-parser';
+import { Play, Loader2 } from 'lucide-react';
 
 export function VideoPlayer({ url, title }: { url: string; title: string }) {
+  const [isLoaded, setIsLoaded] = useState(false);
   const embedUrl = parseVideoEmbedUrl(url);
+
   if (!embedUrl) return null;
 
   return (
-    <div className="aspect-video w-full rounded-xl overflow-hidden border border-slate-200 shadow-sm bg-black">
+    <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-slate-200/90 shadow-md bg-slate-950">
+      {!isLoaded && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 text-slate-400 gap-3">
+          <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+          <span className="text-xs font-medium text-slate-300">Đang tải video demo...</span>
+        </div>
+      )}
+
       <iframe
         src={embedUrl}
         title={title}
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
-        className="w-full h-full border-0"
+        onLoad={() => setIsLoaded(true)}
+        className={`w-full h-full border-0 transition-opacity duration-300 ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        }`}
       />
     </div>
   );
