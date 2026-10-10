@@ -6,6 +6,15 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '30mb',
     },
   },
+  async redirects() {
+    return [
+      {
+        source: '/api/auth/signin',
+        destination: '/login',
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
