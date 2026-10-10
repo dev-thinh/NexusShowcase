@@ -7,7 +7,10 @@ import Link from 'next/link';
 
 export default async function AdminReviewsPage() {
   const session = await auth();
-  if (!session?.user || (session.user as any).role !== 'ADMIN') redirect('/');
+  if (!session?.user || (session.user as any).role !== 'ADMIN' || !session.user.id) {
+    redirect('/');
+  }
+  const adminId = session.user.id;
 
   const pendingItems = await prisma.showcaseItem.findMany({
     where: { status: 'PENDING_REVIEW' },
@@ -56,7 +59,7 @@ export default async function AdminReviewsPage() {
                   </div>
                 </div>
 
-                <AdminReviewButton adminId={session.user.id} itemId={item.id} />
+                <AdminReviewButton adminId={adminId} itemId={item.id} />
               </div>
             ))}
           </div>

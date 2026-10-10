@@ -7,7 +7,10 @@ import Link from 'next/link';
 
 export default async function AdminMembersPage() {
   const session = await auth();
-  if (!session?.user || (session.user as any).role !== 'ADMIN') redirect('/');
+  if (!session?.user || (session.user as any).role !== 'ADMIN' || !session.user.id) {
+    redirect('/');
+  }
+  const adminId = session.user.id;
 
   const members = await prisma.user.findMany({
     orderBy: [{ role: 'asc' }, { fullName: 'asc' }],
@@ -56,7 +59,7 @@ export default async function AdminMembersPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <AdminRoleToggle
-                      adminId={session.user.id}
+                      adminId={adminId}
                       userId={member.id}
                       currentRole={member.role}
                     />
