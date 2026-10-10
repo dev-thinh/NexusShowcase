@@ -1,0 +1,181 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  GUEST
+  MEMBER
+  CORE_MEMBER
+  ADMIN
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+}
+
+enum ItemType {
+  RESEARCH_PAPER
+  PROJECT
+  ACHIEVEMENT
+}
+
+enum ItemScope {
+  INTERNAL
+  CLUB_CONTRIBUTION
+  EXTERNAL
+  OPEN_SOURCE
+}
+
+enum ItemStatus {
+  DRAFT
+  PENDING_REVIEW
+  PUBLISHED
+  REJECTED
+}
+
+enum ContributorRole {
+  ADVISOR
+  FIRST_AUTHOR
+  CO_FIRST_AUTHOR
+  CO_AUTHOR
+  CORRESPONDING_AUTHOR
+  PROJECT_LEAD
+  CONTRIBUTOR
+  CUSTOM
+}
+
+enum LinkType {
+  PAPER_URL
+  VIDEO_EMBED
+  GITHUB
+  LIVE_DEMO
+  SLIDES
+  CERTIFICATE
+  OTHER
+}
+
+model User {
+  id               String          @id @default(cuid())
+  email            String          @unique
+  passwordHash     String?
+  fullName         String
+  studentId        String?
+  avatarUrl        String?
+  bio              String?
+  githubUrl        String?
+  linkedinUrl      String?
+  googleScholarUrl String?
+  portfolioUrl     String?
+  role             Role            @default(GUEST)
+  status           UserStatus      @default(PENDING)
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  createdItems     ShowcaseItem[]  @relation("CreatedByUser")
+  contributions    ItemContributor[]
+
+  @@map("users")
+}
+
+model ShowcaseItem {
+  id              String            @id @default(cuid())
+  title           String
+  slug            String            @unique
+  summary         String
+  content         String?
+  type            ItemType
+  scope           ItemScope?
+  issuer          String?
+  thumbnailUrl    String?
+  status          ItemStatus        @default(DRAFT)
+  rejectionReason String?
+  publishedYear   Int
+  publishedAt     DateTime?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+
+  creatorId       String
+  creator         User              @relation("CreatedByUser", fields: [creatorId], references: [id], onDelete: Cascade)
+
+  contributors    ItemContributor[]
+  links           ItemLink[]
+  attachments     ItemAttachment[]
+  tags            ItemTag[]
+
+  @@index([type, status])
+  @@index([publishedYear])
+  @@map("showcase_items")
+}
+
+model ItemContributor {
+  id                  String           @id @default(cuid())
+  itemId              String
+  userId              String?
+  user                User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  externalName        String?
+  externalAffiliation String?
+  externalLink        String?
+
+  role                ContributorRole  @default(CONTRIBUTOR)
+  customRoleTitle     String?
+  displayOrder        Int              @default(0)
+
+  item                ShowcaseItem     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([userId])
+  @@map("item_contributors")
+}
+
+model ItemLink {
+  id       String       @id @default(cuid())
+  itemId   String
+  label    String
+  url      String
+  type     LinkType     @default(OTHER)
+
+  item     ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("item_links")
+}
+
+model ItemAttachment {
+  id       String       @id @default(cuid())
+  itemId   String
+  fileName String
+  fileUrl  String
+  fileSize Int
+  mimeType String
+
+  item     ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("item_attachments")
+}
+
+model Tag {
+  id    String    @id @default(cuid())
+  name  String    @unique
+  slug  String    @unique
+  items ItemTag[]
+
+  @@map("tags")
+}
+
+model ItemTag {
+  itemId String
+  tagId  String
+
+  item   ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  tag    Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([itemId, tagId])
+  @@map("item_tags")
+}
