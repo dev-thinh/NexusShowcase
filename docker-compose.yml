@@ -1,0 +1,22 @@
+services:
+  nexus-postgres:
+    image: postgres:16-alpine
+    container_name: nexusshowcase-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: nexus
+      POSTGRES_PASSWORD: nexus_secret_2026
+      POSTGRES_DB: nexus_showcase
+    ports:
+      - "5434:5432"
+    volumes:
+      - nexus_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nexus -d nexus_showcase"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  nexus_postgres_data:
+    name: nexus_postgres_data

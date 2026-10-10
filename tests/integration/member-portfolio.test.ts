@@ -17,6 +17,6 @@ describe('Member Automatic Portfolio', () => {
     });
 
     expect(contributions.length).toBeGreaterThan(0);
-    expect(contributions[0].item.title).toContain('Ảnh Y Tế');
+    expect(contributions[0].item.title).toContain('ViMed-Seg');
   });
 });
