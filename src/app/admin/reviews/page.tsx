@@ -17,7 +17,10 @@ import {
 
 export default async function AdminReviewsPage() {
   const session = await auth();
-  if (!session?.user || (session.user as any).role !== 'ADMIN' || !session.user.id) {
+  if (!session?.user || !session.user.id) {
+    redirect('/login');
+  }
+  if ((session.user as any).role !== 'ADMIN') {
     redirect('/');
   }
   const adminId = session.user.id;

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { Compass, LayoutDashboard, Shield, LogIn, Sparkles, BookOpen } from 'lucide-react';
+import { SignOutButton } from '@/components/sign-out-button';
 
 export async function Navbar() {
   const session = await auth();
@@ -68,10 +69,13 @@ export async function Navbar() {
                 </div>
                 <span className="hidden md:inline max-w-[100px] truncate">{user.name}</span>
               </Link>
+
+              {/* Sign Out Button */}
+              <SignOutButton />
             </div>
           ) : (
             <Link
-              href="/api/auth/signin"
+              href="/login"
               className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-semibold shadow-xs hover:shadow transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
             >
               <LogIn className="w-4 h-4" />

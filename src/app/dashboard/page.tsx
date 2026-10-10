@@ -17,7 +17,7 @@ import {
 
 export default async function DashboardPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect('/api/auth/signin');
+  if (!session?.user?.id) redirect('/login');
 
   const userId = session.user.id;
   const user = await prisma.user.findUnique({
@@ -32,7 +32,7 @@ export default async function DashboardPage() {
     },
   });
 
-  if (!user) redirect('/api/auth/signin');
+  if (!user) redirect('/login');
 
   const isUploader = canUserUpload(user);
 

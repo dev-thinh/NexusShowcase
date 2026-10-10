@@ -7,7 +7,7 @@ import { canUserUpload } from '@/lib/permissions';
 
 export default async function NewItemPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect('/api/auth/signin');
+  if (!session?.user?.id) redirect('/login');
 
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
