@@ -1,6 +1,17 @@
 import React from 'react';
 import { ItemType, ItemStatus, ContributorRole } from '@prisma/client';
-import { FileText, Code2, Trophy, CheckCircle2, Clock, XCircle, FileEdit, Award, GraduationCap, Users } from 'lucide-react';
+import {
+  FileText,
+  Code2,
+  Trophy,
+  CheckCircle2,
+  Clock,
+  XCircle,
+  FileEdit,
+  Award,
+  GraduationCap,
+  Users,
+} from 'lucide-react';
 
 interface StatusBadgeProps {
   status: ItemStatus;
@@ -11,22 +22,22 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
   const configs = {
     PUBLISHED: {
       label: 'Đã xuất bản',
-      classes: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
+      classes: 'bg-emerald-50 text-emerald-800 border-emerald-200',
       icon: CheckCircle2,
     },
     PENDING_REVIEW: {
       label: 'Chờ duyệt',
-      classes: 'bg-amber-50 text-amber-700 border-amber-200/80',
+      classes: 'bg-amber-50 text-amber-900 border-amber-200',
       icon: Clock,
     },
     REJECTED: {
       label: 'Cần sửa đổi',
-      classes: 'bg-rose-50 text-rose-700 border-rose-200/80',
+      classes: 'bg-rose-50 text-rose-800 border-rose-200',
       icon: XCircle,
     },
     DRAFT: {
       label: 'Bản nháp',
-      classes: 'bg-slate-100 text-slate-700 border-slate-200/80',
+      classes: 'bg-slate-100 text-slate-800 border-slate-200',
       icon: FileEdit,
     },
   };
@@ -37,7 +48,7 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-semibold border shadow-xs transition-colors ${sizeClasses} ${config.classes}`}
+      className={`inline-flex items-center gap-1.5 rounded-full font-semibold border shadow-2xs transition-colors ${sizeClasses} ${config.classes}`}
     >
       <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
       <span>{config.label}</span>
@@ -54,17 +65,17 @@ export function TypeBadge({ type, size = 'md' }: TypeBadgeProps) {
   const configs = {
     RESEARCH_PAPER: {
       label: 'Bài báo nghiên cứu',
-      classes: 'bg-indigo-50 text-indigo-700 border-indigo-200/80',
+      classes: 'bg-indigo-50 text-indigo-800 border-indigo-200',
       icon: FileText,
     },
     PROJECT: {
       label: 'Dự án công nghệ',
-      classes: 'bg-blue-50 text-blue-700 border-blue-200/80',
+      classes: 'bg-blue-50 text-blue-800 border-blue-200',
       icon: Code2,
     },
     ACHIEVEMENT: {
       label: 'Thành tích & Cống hiến',
-      classes: 'bg-amber-50 text-amber-700 border-amber-200/80',
+      classes: 'bg-amber-50 text-amber-900 border-amber-200',
       icon: Trophy,
     },
   };
@@ -75,7 +86,7 @@ export function TypeBadge({ type, size = 'md' }: TypeBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-medium border shadow-xs ${sizeClasses} ${config.classes}`}
+      className={`inline-flex items-center gap-1.5 rounded-full font-semibold border shadow-2xs ${sizeClasses} ${config.classes}`}
     >
       <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
       <span>{config.label}</span>
@@ -90,21 +101,59 @@ interface RoleBadgeProps {
 
 export function RoleBadge({ role, customTitle }: RoleBadgeProps) {
   const map: Record<string, { label: string; icon: any; color: string }> = {
-    ADVISOR: { label: 'Người hướng dẫn / Giảng viên', icon: GraduationCap, color: 'bg-purple-50 text-purple-700 border-purple-200' },
-    FIRST_AUTHOR: { label: 'Tác giả chính (First Author)', icon: Award, color: 'bg-blue-50 text-blue-700 border-blue-200' },
-    CO_FIRST_AUTHOR: { label: 'Đồng tác giả 1', icon: Award, color: 'bg-sky-50 text-sky-700 border-sky-200' },
-    CO_AUTHOR: { label: 'Đồng tác giả', icon: Users, color: 'bg-slate-100 text-slate-700 border-slate-200' },
-    CORRESPONDING_AUTHOR: { label: 'Tác giả liên hệ', icon: Users, color: 'bg-cyan-50 text-cyan-700 border-cyan-200' },
-    PROJECT_LEAD: { label: 'Trưởng nhóm dự án', icon: Award, color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
-    CONTRIBUTOR: { label: 'Thành viên đóng góp', icon: Users, color: 'bg-slate-100 text-slate-700 border-slate-200' },
-    CUSTOM: { label: customTitle || 'Đóng góp', icon: Users, color: 'bg-slate-100 text-slate-700 border-slate-200' },
+    ADVISOR: {
+      label: 'Người hướng dẫn / Giảng viên',
+      icon: GraduationCap,
+      color: 'bg-purple-50 text-purple-800 border-purple-200',
+    },
+    FIRST_AUTHOR: {
+      label: 'Tác giả chính (First Author)',
+      icon: Award,
+      color: 'bg-blue-50 text-blue-800 border-blue-200',
+    },
+    CO_FIRST_AUTHOR: {
+      label: 'Đồng tác giả 1',
+      icon: Award,
+      color: 'bg-sky-50 text-sky-800 border-sky-200',
+    },
+    CO_AUTHOR: {
+      label: 'Đồng tác giả',
+      icon: Users,
+      color: 'bg-slate-100 text-slate-800 border-slate-200',
+    },
+    CORRESPONDING_AUTHOR: {
+      label: 'Tác giả liên hệ',
+      icon: Users,
+      color: 'bg-cyan-50 text-cyan-800 border-cyan-200',
+    },
+    PROJECT_LEAD: {
+      label: 'Trưởng nhóm dự án',
+      icon: Award,
+      color: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    },
+    CONTRIBUTOR: {
+      label: 'Thành viên đóng góp',
+      icon: Users,
+      color: 'bg-slate-100 text-slate-800 border-slate-200',
+    },
+    CUSTOM: {
+      label: customTitle || 'Đóng góp',
+      icon: Users,
+      color: 'bg-slate-100 text-slate-800 border-slate-200',
+    },
   };
 
-  const current = map[role] || { label: customTitle || role, icon: Users, color: 'bg-slate-100 text-slate-700 border-slate-200' };
+  const current = map[role] || {
+    label: customTitle || role,
+    icon: Users,
+    color: 'bg-slate-100 text-slate-800 border-slate-200',
+  };
   const Icon = current.icon;
 
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold border ${current.color}`}>
+    <span
+      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold border ${current.color}`}
+    >
       <Icon className="w-3 h-3" />
       <span>{current.label}</span>
     </span>

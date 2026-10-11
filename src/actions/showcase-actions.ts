@@ -119,7 +119,7 @@ export async function reviewShowcaseItemAction(
 ) {
   const admin = await prisma.user.findUnique({ where: { id: adminId } });
   if (!admin || !canUserReview(admin)) {
-    return { success: false, error: 'Chỉ Thầy chủ nhiệm (Admin) mới có quyền kiểm duyệt bài.' };
+    return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền kiểm duyệt bài.' };
   }
 
   const isPublish = payload.action === 'PUBLISH';
@@ -205,5 +205,5 @@ export async function togglePinShowcaseItemAction(adminId: string, itemId: strin
     // Ignore in tests
   }
 
-  return { success: true, isPinned: true, message: 'Đã ghim công trình lên trang chủ (Tối đa 10 bài).' };
+  return { success: true, isPinned: true, message: 'Đã ghim công trình lên trang chủ.' };
 }

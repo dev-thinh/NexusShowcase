@@ -25,16 +25,16 @@ export default async function NewItemPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-10 max-w-4xl flex-1">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2 font-serif">Đăng tải công trình / dự án mới</h1>
-        <p className="text-xs sm:text-sm text-slate-500 mb-8">
-          Vui lòng điền thông tin đề tài, chọn các thành viên tham gia cùng và gửi để Thầy chủ nhiệm duyệt.
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-5xl flex-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 font-serif">Đăng tải công trình / dự án mới</h1>
+        <p className="text-sm sm:text-base text-slate-600 mb-8">
+          Điền thông tin đề tài, chọn các tác giả tham gia và gửi để ban quản trị xét duyệt xuất bản.
         </p>
 
-        <ItemForm currentUserId={user.id} clubMembers={members} />
+        <ItemForm currentUserId={user.id} currentUserRole={user.role} clubMembers={members} />
       </main>
 
       <AcademicFooter />

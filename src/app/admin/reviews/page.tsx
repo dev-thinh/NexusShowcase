@@ -5,15 +5,15 @@ import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
 import { AdminReviewButton } from '@/components/admin-review-button';
 import { TypeBadge } from '@/components/ui/badge';
+import { EmptyState } from '@/components/ui/empty-state';
 import Link from 'next/link';
 import {
   ArrowLeft,
   CheckCircle2,
-  Clock,
-  Inbox,
   User,
   Users,
   Calendar,
+  Eye,
 } from 'lucide-react';
 
 export default async function AdminReviewsPage() {
@@ -39,67 +39,74 @@ export default async function AdminReviewsPage() {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-10 max-w-5xl flex-1">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
         <Link
           href="/admin"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0F294A] mb-6 transition-colors group"
         >
-          <ArrowLeft className="w-4 h-4" />
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Quay lại bàn làm việc</span>
         </Link>
 
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-serif">
               Duyệt bài đăng công trình
             </h1>
-            <p className="text-xs text-slate-500 mt-1">
-              Thầy vui lòng xem xét nội dung, link tài liệu và danh sách tác giả trước khi xuất bản.
+            <p className="text-sm text-slate-600 mt-1">
+              Danh sách các công trình do sinh viên gửi lên đang chờ xét duyệt xuất bản.
             </p>
           </div>
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800">
+          <span className="text-sm font-bold px-3.5 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 self-start sm:self-center">
             {pendingItems.length} bài chờ duyệt
           </span>
         </div>
 
         {pendingItems.length === 0 ? (
-          <div className="p-16 bg-white rounded-3xl border border-slate-200 text-center flex flex-col items-center justify-center">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-3">
-              <CheckCircle2 className="w-7 h-7" />
-            </div>
-            <h2 className="text-sm font-bold text-slate-800">Không có bài đăng nào cần duyệt</h2>
-            <p className="text-xs text-slate-400 mt-1">Tất cả các bài nộp từ sinh viên đã được xử lý xong.</p>
-          </div>
+          <EmptyState
+            icon={CheckCircle2}
+            title="Không có bài đăng nào cần duyệt"
+            description="Tất cả các bài nộp từ sinh viên đã được thẩm định và xử lý xong."
+            actionLabel="Quay lại bàn làm việc"
+            actionHref="/admin"
+          />
         ) : (
           <div className="space-y-4">
             {pendingItems.map((item) => (
               <div
                 key={item.id}
-                className="p-6 bg-white rounded-3xl border border-slate-200/90 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-blue-200 transition-colors"
+                className="p-6 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-[#0F294A]/30 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
                     <TypeBadge type={item.type} size="sm" />
-                    <span className="text-xs text-slate-400 font-medium flex items-center gap-1">
-                      <Calendar className="w-3 h-3" />
+                    <span className="text-xs sm:text-sm text-slate-500 font-medium flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       {item.publishedYear}
                     </span>
-                    <span className="text-xs text-slate-500 font-semibold bg-slate-100 px-2 py-0.5 rounded-md flex items-center gap-1">
-                      <User className="w-3 h-3 text-slate-400" />
+                    <span className="text-xs sm:text-sm text-slate-600 font-semibold bg-slate-100 px-2.5 py-0.5 rounded-md flex items-center gap-1 border border-slate-200">
+                      <User className="w-3.5 h-3.5 text-slate-400" />
                       Người nộp: {item.creator.fullName}
                     </span>
                   </div>
 
-                  <h2 className="text-base font-bold text-slate-900 leading-snug">{item.title}</h2>
-                  <p className="text-xs text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
+                  <Link
+                    href={`/showcase/${item.slug}`}
+                    className="group/title block focus-visible:outline-none"
+                  >
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900 group-hover/title:text-[#0F294A] group-hover/title:underline leading-snug font-serif transition-colors">
+                      {item.title}
+                    </h2>
+                  </Link>
+                  <p className="text-sm text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
                     {item.summary}
                   </p>
 
-                  <div className="text-xs text-slate-500 mt-3 pt-3 border-t border-slate-100 flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                  <div className="text-xs sm:text-sm text-slate-500 mt-4 pt-3 border-t border-slate-100 flex items-center gap-2">
+                    <Users className="w-4 h-4 text-[#0F294A] shrink-0" />
                     <strong className="text-slate-700">Tác giả:</strong>
                     <span className="truncate">
                       {item.contributors
@@ -109,7 +116,14 @@ export default async function AdminReviewsPage() {
                   </div>
                 </div>
 
-                <div className="shrink-0">
+                <div className="shrink-0 flex flex-wrap items-center gap-2.5">
+                  <Link
+                    href={`/showcase/${item.slug}`}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 hover:border-[#0F294A] text-slate-700 hover:text-[#0F294A] bg-white hover:bg-slate-50 text-xs font-bold transition-all shadow-2xs"
+                  >
+                    <Eye className="w-4 h-4 text-slate-500" />
+                    <span>Xem chi tiết</span>
+                  </Link>
                   <AdminReviewButton adminId={adminId} itemId={item.id} />
                 </div>
               </div>

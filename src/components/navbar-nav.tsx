@@ -128,7 +128,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
                     <ShieldCheck className="w-4 h-4" />
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-slate-900">Bàn làm việc Thầy Chủ nhiệm</div>
+                    <div className="text-xs font-bold text-slate-900">Bàn làm việc Quản trị</div>
                     <div className="text-[11px] text-slate-500">Tổng quan &amp; công trình ghim</div>
                   </div>
                 </Link>
@@ -202,7 +202,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
               )}
               {user.role === 'CORE_MEMBER' && (
                 <span className="hidden xl:inline text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200">
-                  Core
+                  CORE MEMBER
                 </span>
               )}
             </Link>

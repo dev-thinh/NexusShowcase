@@ -51,10 +51,10 @@ export default async function AdminDashboardPage() {
               <span>Khu vực Quản trị Học thuật</span>
             </div>
             <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight font-serif">
-              Bàn làm việc của Thầy Chủ Nhiệm
+              Trung tâm Quản trị Học thuật
             </h1>
             <p className="text-sm sm:text-base text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
-              Thẩm định công trình nghiên cứu xuất bản, quản lý bài ghim trang chủ và phân quyền thành viên CLB.
+              Thẩm định công trình nghiên cứu xuất bản, quản lý bài ghim trang chủ và phân quyền thành viên.
             </p>
           </div>
         </div>
@@ -76,7 +76,7 @@ export default async function AdminDashboardPage() {
               </div>
               <h2 className="text-lg font-bold text-slate-900 font-serif">Bài nộp đang chờ duyệt</h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-                Xem chi tiết công trình, duyệt 1-click hoặc gửi yêu cầu chỉnh sửa cho nhóm nghiên cứu.
+                Xem chi tiết công trình, phê duyệt xuất bản hoặc gửi phản hồi chỉnh sửa.
               </p>
             </div>
 
@@ -104,7 +104,7 @@ export default async function AdminDashboardPage() {
               </div>
               <h2 className="text-lg font-bold text-slate-900 font-serif">Quản lý &amp; Phân quyền</h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-                Tạo tài khoản mới, thăng hạng lên Core Member để ủy quyền nộp bài cho nhóm.
+                Tạo tài khoản mới, phân quyền CORE MEMBER để đăng ký công trình.
               </p>
             </div>
 
@@ -129,12 +129,12 @@ export default async function AdminDashboardPage() {
               </div>
               <h2 className="text-lg font-bold text-slate-900 font-serif">Công trình đang ghim</h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
-                Tối đa 10 công trình được ghim nổi bật trên thanh cuộn phim của trang khám phá.
+                Các công trình nghiên cứu và sáng tạo được ghim nổi bật trên trang chủ.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-amber-600 font-serif">{pinnedCount} / 10 bài</span>
+              <span className="text-2xl font-black text-amber-600 font-serif">{pinnedCount} bài</span>
               <a
                 href="/"
                 target="_blank"
@@ -153,14 +153,14 @@ export default async function AdminDashboardPage() {
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 mb-1.5">
                 <Pin className="w-3.5 h-3.5" />
-                <span>Tuyển chọn Hội đồng</span>
+                <span>Tiêu điểm đã ghim</span>
               </div>
               <h2 className="text-xl font-bold text-slate-900 font-serif">
-                Danh Sách 10 Công Trình Tiêu Biểu Đang Ghim
+                Danh Sách Công Trình Đang Ghim Nổi Bật
               </h2>
             </div>
             <p className="text-xs sm:text-sm text-slate-500 max-w-sm">
-              Bạn có thể bấm vào công trình để xem chi tiết hoặc bấm nút Bỏ ghim để nhường chỗ cho công trình mới.
+              Quản lý trạng thái hiển thị công trình trên thanh cuộn tiêu điểm trang chủ.
             </p>
           </div>
 
@@ -169,7 +169,7 @@ export default async function AdminDashboardPage() {
               <Sparkles className="w-8 h-8 text-slate-400 mx-auto mb-2" />
               <h3 className="text-sm font-bold text-slate-700">Chưa có công trình nào được ghim riêng</h3>
               <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Hiện trang chủ đang tự động bù 10 công trình mới xuất bản nhất. Hãy vào trang chi tiết của một công trình bất kỳ để ghim lên trang chủ.
+                Chưa có công trình nào được ghim riêng. Các công trình mới xuất bản sẽ được tự động hiển thị làm tiêu điểm.
               </p>
             </div>
           ) : (

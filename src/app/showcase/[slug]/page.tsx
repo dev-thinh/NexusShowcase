@@ -82,9 +82,9 @@ export default async function ShowcaseDetailPage({
                 </div>
                 <p className="text-xs sm:text-sm text-amber-800">
                   {item.status === 'PENDING_REVIEW'
-                    ? 'Bài nộp đang chờ Thầy chủ nhiệm thẩm định học thuật và xét duyệt xuất bản.'
+                    ? 'Bài nộp đang chờ thẩm định học thuật và xét duyệt xuất bản.'
                     : item.status === 'DRAFT'
-                    ? 'Bản nháp cá nhân. Chưa gửi Thầy chủ nhiệm xét duyệt.'
+                    ? 'Bản nháp cá nhân. Chưa gửi yêu cầu xét duyệt xuất bản.'
                     : `Công trình cần chỉnh sửa bổ sung: ${item.rejectionReason || 'Vui lòng cập nhật lại theo yêu cầu.'}`}
                 </p>
               </div>

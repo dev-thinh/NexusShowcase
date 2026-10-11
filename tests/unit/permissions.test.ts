@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { canUserUpload, canUserReview, isMemberOrHigher } from '@/lib/permissions';
 
 describe('RBAC Permission Helpers', () => {
-  it('should only allow CORE_MEMBER to upload (Admin reviews only)', () => {
-    expect(canUserUpload({ role: 'ADMIN' })).toBe(false);
+  it('should allow CORE_MEMBER and ADMIN to upload (Member and Guest denied)', () => {
+    expect(canUserUpload({ role: 'ADMIN' })).toBe(true);
     expect(canUserUpload({ role: 'CORE_MEMBER' })).toBe(true);
     expect(canUserUpload({ role: 'MEMBER' })).toBe(false);
     expect(canUserUpload({ role: 'GUEST' })).toBe(false);

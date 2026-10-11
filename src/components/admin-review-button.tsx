@@ -56,7 +56,7 @@ export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId
             setError(null);
             setPublishModalOpen(true);
           }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white text-xs font-bold transition-all shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white text-xs font-bold transition-all shadow-xs cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
         >
           <CheckCircle2 className="w-4 h-4" />
           <span>Duyệt xuất bản</span>
@@ -67,7 +67,7 @@ export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId
             setError(null);
             setRejectModalOpen(true);
           }}
-          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200/80 active:scale-95 text-xs font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+          className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 active:scale-[0.98] text-xs font-bold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
         >
           <XCircle className="w-4 h-4" />
           <span>Yêu cầu sửa</span>
@@ -83,14 +83,14 @@ export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId
       >
         <div className="space-y-4">
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg text-xs flex items-center gap-2">
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Thầy đã kiểm tra kỹ nội dung, tính liêm chính học thuật và danh sách tác giả của công trình này chưa?
+          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            Vui lòng xác nhận công trình đã được kiểm tra tính liêm chính học thuật và thông tin tác giả trước khi xuất bản.
           </p>
 
           <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -122,7 +122,7 @@ export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId
       >
         <div className="space-y-4">
           {error && (
-            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-lg text-xs flex items-center gap-2">
+            <div className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
@@ -137,7 +137,7 @@ export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Ví dụ: Cần bổ sung link arXiv chính thức, kiểm tra lại thứ tự tác giả 2 và 3, cập nhật ảnh thumbnail rõ nét hơn..."
-              className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 leading-relaxed"
+              className="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-rose-500 leading-relaxed transition-colors"
             />
           </div>
 

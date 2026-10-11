@@ -1,26 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --background: #f8fafc;
+  --background: #edf2f7;
   --foreground: #0f172a;
   --navy-primary: #0f294a;
-  --navy-accent: #1e3a5f;
-  --gold-accent: #b45309;
+  --navy-hover: #1a3e6b;
+  --scholar-gold: #b45309;
 }
 
 body {
   color: var(--foreground);
-  background: var(--background);
+  background-color: var(--background);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(15, 41, 74, 0.025) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(180, 83, 9, 0.02) 0px, transparent 50%),
+    radial-gradient(#cbd5e1 0.85px, transparent 0.85px);
+  background-size: 100% 100%, 100% 100%, 28px 28px;
+  background-attachment: fixed;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Swiss Modernism 2.0 Typography Utilities */
+/* Clear, sharp custom focus rings for accessibility */
+*:focus-visible {
+  outline: 2px solid #0f294a;
+  outline-offset: 2px;
+}
+
+/* Academic Typography Classes */
 .academic-headline {
   font-family: 'Crimson Pro', Georgia, serif;
   letter-spacing: -0.015em;
@@ -32,5 +44,11 @@ body {
 }
 
 .academic-code {
-  font-family: 'JetBrains Mono', monospace;
+  font-family: 'JetBrains Mono', Menlo, monospace;
+}
+
+/* Smooth selection colors */
+::selection {
+  background-color: #dfeaf5;
+  color: #0f294a;
 }

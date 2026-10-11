@@ -16,7 +16,7 @@ export interface CreateMemberInput {
 export async function createMemberAction(adminId: string, input: CreateMemberInput) {
   const admin = await prisma.user.findUnique({ where: { id: adminId } });
   if (!admin || !canUserReview(admin)) {
-    return { success: false, error: 'Chỉ Thầy chủ nhiệm (Admin) mới có quyền tạo tài khoản thành viên.' };
+    return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền tạo tài khoản thành viên.' };
   }
 
   if (!input.fullName?.trim()) {
@@ -64,7 +64,7 @@ export async function createMemberAction(adminId: string, input: CreateMemberInp
 export async function updateUserRoleAction(adminId: string, targetUserId: string, newRole: Role) {
   const admin = await prisma.user.findUnique({ where: { id: adminId } });
   if (!admin || !canUserReview(admin)) {
-    return { success: false, error: 'Chỉ Thầy chủ nhiệm mới có quyền phân quyền thành viên.' };
+    return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền phân quyền thành viên.' };
   }
 
   const updatedUser = await prisma.user.update({
@@ -78,7 +78,7 @@ export async function updateUserRoleAction(adminId: string, targetUserId: string
 export async function deleteMemberAction(adminId: string, targetUserId: string) {
   const admin = await prisma.user.findUnique({ where: { id: adminId } });
   if (!admin || !canUserReview(admin)) {
-    return { success: false, error: 'Chỉ Thầy chủ nhiệm (Admin) mới có quyền xóa tài khoản thành viên.' };
+    return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền xóa tài khoản thành viên.' };
   }
 
   if (adminId === targetUserId) {

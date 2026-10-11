@@ -18,7 +18,7 @@ describe('Admin Create Member Action', () => {
       role: 'MEMBER',
     });
     expect(res.success).toBe(false);
-    expect(res.error).toContain('Chỉ Thầy chủ nhiệm (Admin) mới có quyền');
+    expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
   });
 
   it('should allow admin to create a new member with default password', async () => {

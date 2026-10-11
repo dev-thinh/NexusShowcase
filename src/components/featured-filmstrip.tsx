@@ -55,7 +55,7 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 max-w-md leading-relaxed">
-            Tuyển chọn tối đa 10 công trình khoa học và dự án công nghệ xuất sắc của thành viên CLB Nexus.
+            Công trình nghiên cứu khoa học và sáng tạo công nghệ tiêu biểu của thành viên Nexus.
           </p>
         </div>
       </div>

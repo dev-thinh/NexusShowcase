@@ -22,7 +22,7 @@ describe('Admin Delete Member Action', () => {
     const fakeNonAdminId = 'non-admin-id';
     const res = await deleteMemberAction(fakeNonAdminId, testMember.id);
     expect(res.success).toBe(false);
-    expect(res.error).toContain('Chỉ Thầy chủ nhiệm (Admin) mới có quyền');
+    expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
   });
 
   it('should prevent admin from deleting their own account', async () => {

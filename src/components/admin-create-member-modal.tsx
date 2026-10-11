@@ -76,9 +76,9 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
     <>
       <button
         onClick={handleOpen}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] active:scale-95 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] active:scale-[0.98] text-white text-xs font-bold shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
       >
-        <UserPlus className="w-4 h-4 text-blue-300" />
+        <UserPlus className="w-4 h-4 text-blue-200" />
         <span>Thêm thành viên mới</span>
       </button>
 
@@ -121,7 +121,7 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="VD: Nguyễn Văn A"
-                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-colors"
               />
             </div>
           </div>
@@ -139,7 +139,7 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="VD: 22120001 hoặc email..."
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-colors"
                 />
               </div>
             </div>
@@ -155,7 +155,7 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
                   value={studentId}
                   onChange={(e) => setStudentId(e.target.value)}
                   placeholder="VD: 22120001"
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-colors"
                 />
               </div>
             </div>
@@ -169,7 +169,7 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
               <label
                 className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                   role === 'MEMBER'
-                    ? 'bg-blue-50/50 border-blue-400 text-blue-900 font-semibold'
+                    ? 'bg-blue-50/60 border-blue-400 text-blue-900 font-semibold'
                     : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                 }`}
               >
@@ -179,11 +179,11 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
                   value="MEMBER"
                   checked={role === 'MEMBER'}
                   onChange={() => setRole('MEMBER')}
-                  className="mt-0.5 accent-blue-600"
+                  className="mt-0.5 accent-[#0F294A]"
                 />
                 <div>
                   <div className="flex items-center gap-1 font-bold text-slate-900">
-                    <UserCheck className="w-3.5 h-3.5 text-blue-600" />
+                    <UserCheck className="w-3.5 h-3.5 text-[#0F294A]" />
                     <span>MEMBER</span>
                   </div>
                   <p className="text-[11px] text-slate-500 font-normal mt-0.5">
@@ -195,7 +195,7 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
               <label
                 className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
                   role === 'CORE_MEMBER'
-                    ? 'bg-indigo-50/50 border-indigo-400 text-indigo-900 font-semibold'
+                    ? 'bg-indigo-50/60 border-indigo-400 text-indigo-900 font-semibold'
                     : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
                 }`}
               >
@@ -205,11 +205,11 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
                   value="CORE_MEMBER"
                   checked={role === 'CORE_MEMBER'}
                   onChange={() => setRole('CORE_MEMBER')}
-                  className="mt-0.5 accent-indigo-600"
+                  className="mt-0.5 accent-[#0F294A]"
                 />
                 <div>
                   <div className="flex items-center gap-1 font-bold text-slate-900">
-                    <Shield className="w-3.5 h-3.5 text-indigo-600" />
+                    <Shield className="w-3.5 h-3.5 text-indigo-700" />
                     <span>CORE MEMBER</span>
                   </div>
                   <p className="text-[11px] text-slate-500 font-normal mt-0.5">
@@ -231,10 +231,10 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Mặc định: member123"
-                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] font-mono"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] font-mono transition-colors"
               />
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
+            <p className="text-[11px] text-slate-500 mt-1">
               Thành viên có thể đổi mật khẩu sau khi đăng nhập.
             </p>
           </div>
@@ -251,7 +251,7 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
             >
               {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
               <span>{loading ? 'Đang tạo...' : 'Xác nhận tạo'}</span>
