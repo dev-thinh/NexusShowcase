@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,10 +7,30 @@
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
+  --navy-primary: #0f294a;
+  --navy-accent: #1e3a5f;
+  --gold-accent: #b45309;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Swiss Modernism 2.0 Typography Utilities */
+.academic-headline {
+  font-family: 'Crimson Pro', Georgia, serif;
+  letter-spacing: -0.015em;
+}
+
+.academic-subhead {
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: -0.01em;
+}
+
+.academic-code {
+  font-family: 'JetBrains Mono', monospace;
 }
