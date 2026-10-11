@@ -303,19 +303,20 @@ model ItemTag {
    * Thao tác 1-click:
      * **"Phê duyệt (Publish)"** -> Bài viết xuất hiện ngay lập tức trên trang chủ và trang cá nhân của tất cả các tác giả.
      * **"Yêu cầu chỉnh sửa (Reject with Note)"** -> Nhập nhận xét/yêu cầu sửa gửi lại cho Core Member.
-2. **Quản lý & Nâng cấp Thành viên (`/admin/members`):**
-   * Danh sách toàn bộ thành viên CLB.
-   * Duyệt đơn đăng ký tài khoản mới (`PENDING` -> `MEMBER`).
-   * **Nút bấm nâng cấp / hạ cấp:** Dễ dàng thăng hạng thành viên lên `CORE_MEMBER` để giao quyền phụ trách đăng bài cho nhóm, hoặc hạ về `MEMBER`.
+2. **Quản lý & Phân quyền Thành viên (`/admin/members`):**
+   * Danh sách toàn bộ thành viên CLB với thanh tìm kiếm thời gian thực (tên, MSSV, email) và bộ lọc vai trò (`ALL`, `CORE_MEMBER`, `MEMBER`, `ADMIN`).
+   * **Tạo tài khoản mới:** Modal tạo tài khoản cho thành viên kèm MSSV, vai trò và mật khẩu khởi tạo.
+   * **Nâng cấp / hạ cấp:** Thăng hạng thành viên lên `CORE_MEMBER` để ủy quyền nộp bài đại diện nhóm, hoặc hạ về `MEMBER`.
+   * **Xóa tài khoản:** Xóa tài khoản thành viên kèm hộp thoại xác nhận cảnh báo, cơ chế bảo vệ chống tự xóa tài khoản Admin và bảo vệ tài khoản Quản trị viên.
 
 ---
 
 ## 6. Xử lý Lỗi, Bảo Mật & Ràng Buộc Kỹ Thuật (Security & Error Handling)
 
-1. **Phân quyền chặt chẽ nhiều tầng (Multi-tier RBAC):**
+1. **Phân quyền chặt chẽ nhiều tầng (Strict RBAC):**
    * Middleware chặn truy cập trái phép vào `/dashboard` hoặc `/admin`.
-   * **Kiểm tra quyền tạo bài tại Server Action:** Chỉ người dùng có vai trò `CORE_MEMBER` hoặc `ADMIN` mới được phép tạo hoặc nộp bài. Người dùng `MEMBER` thông thường hoặc `GUEST` cố tình gọi API sẽ nhận mã lỗi `403 Forbidden`.
-   * Chỉ tác giả tạo bài hoặc Thầy chủ nhiệm (`ADMIN`) mới có quyền chỉnh sửa bài viết.
+   * **Quyền đăng tải bài viết:** Chỉ người dùng có vai trò `CORE_MEMBER` mới được phép tạo hoặc nộp bài đại diện cho nhóm nghiên cứu. Thầy chủ nhiệm (`ADMIN`) không trực tiếp đăng bài mà chỉ có thẩm quyền thẩm định, duyệt bài và quản lý tài khoản thành viên. Người dùng `MEMBER` thông thường hoặc `GUEST` cố tình gọi API sẽ nhận thông báo lỗi từ chối quyền.
+   * Chỉ tác giả tạo bài mới có quyền chỉnh sửa bản nháp trước khi được Thầy duyệt.
 2. **Upload an toàn:**
    * Thumbnail: Kiểm tra MIME type ảnh (`image/jpeg`, `image/png`, `image/webp`), giới hạn 5MB.
    * File PDF: Kiểm tra MIME type (`application/pdf`), giới hạn 25MB.

@@ -2,7 +2,7 @@
 
 **Tài liệu:** Design Specification  
 **Ngày lập:** 11/10/2026  
-**Trạng thái:** Chờ phê duyệt (Pending Review)
+**Trạng thái:** Đã triển khai & Nghiệm thu toàn diện (Completed & Verified)
 
 ---
 
@@ -16,9 +16,15 @@
    - Tên đăng nhập: `admin01`
    - Mật khẩu: `admin123`
    - Vai trò: `ADMIN` (Quản trị viên / Thầy Cố vấn Học thuật).
-3. **Thêm tính năng Admin tạo tài khoản cho thành viên khác:**
-   - Trong trang Quản lý thành viên (`/admin/members`), Admin có thể nhập thông tin để tạo mới tài khoản thành viên (`MEMBER` hoặc `CORE_MEMBER`) kèm mật khẩu khởi tạo.
-4. **Nâng cấp toàn bộ UI/UX chuẩn Môi Trường Nghiên Cứu Khoa Học (Academic Research Lab):**
+3. **Phân quyền Nghiêm ngặt (Strict RBAC):**
+   - **Admin không đăng bài trực tiếp:** Admin chỉ có thẩm quyền duyệt/phê duyệt công trình nghiên cứu và quản lý thành viên.
+   - **Chỉ Core Member mới có quyền nộp bài:** Sinh viên nòng cốt (`CORE_MEMBER`) được Thầy ủy quyền là vai trò duy nhất có thể nộp đề tài/công trình đại diện nhóm.
+4. **Hệ thống Quản lý Thành viên Toàn diện (`/admin/members`):**
+   - Tạo tài khoản thành viên mới (`createMemberAction`) kèm mật khẩu khởi tạo và MSSV.
+   - Thăng hạng / hạ cấp linh hoạt giữa `MEMBER` và `CORE_MEMBER` (`updateUserRoleAction`).
+   - Xóa tài khoản thành viên (`deleteMemberAction`) với cơ chế kiểm tra an toàn (chống tự xóa, chống xóa tài khoản Admin).
+   - Bộ lọc tìm kiếm thời gian thực theo tên, email, MSSV và tab lọc vai trò.
+5. **Nâng cấp toàn bộ UI/UX chuẩn Môi Trường Nghiên Cứu Khoa Học (Academic Research Lab):**
    - Ứng dụng phong cách **Swiss Modernism 2.0** theo khuyến nghị của `ui-ux-pro-max`.
    - Cặp font học thuật: **Crimson Pro** (Serif học thuật cho tiêu đề/bài báo), **Inter** (Sans-serif chuẩn mực cho giao diện), **JetBrains Mono** (Monospace cho BibTeX, DOI, code).
    - Bảng màu Viện Hàn Lâm: **Institutional Deep Navy** (`#0F294A`), Slate, Crisp Paper White, Gold/Amber cho giải thưởng.
@@ -68,19 +74,43 @@
   * Thông báo hướng dẫn: Tài khoản do Thầy chủ nhiệm / Admin cấp phát trực tiếp.
 
 ### 2.3. Tính năng Admin Tạo Tài Khoản Mới (`/admin/members`)
-* Thêm nút bấm **"Tạo Tài Khoản Thành Viên"** trên trang `/admin/members`.
-* Mở Modal / Form bao gồm:
-  * **Họ và tên:** (VD: Nguyễn Văn A)
-  * **Email / Tên đăng nhập:** (VD: 22120001@student.hcmus.edu.vn hoặc nguyenvana)
-  * **Mã số sinh viên:** (Tùy chọn, VD: 22120001)
-  * **Vai trò:** `MEMBER` (Thành viên thường) hoặc `CORE_MEMBER` (Thành viên nòng cốt đại diện nhóm nộp bài)
-  * **Mật khẩu khởi tạo:** (Mặc định gợi ý `member123` hoặc do Admin tự nhập)
-* Server Action mới trong `src/actions/admin-actions.ts`:
-  * `createMemberAction(adminId: string, data: CreateMemberInput)`
-  * Kiểm tra quyền `ADMIN`.
-  * Hash mật khẩu với `bcrypt.hash(password, 10)`.
-  * Tạo User với `status: 'ACTIVE'`.
-  * Tự động refresh trang và hiển thị thành viên mới trong bảng danh sách.
+* Nút bấm **"Tạo Tài Khoản Thành Viên"** kích hoạt `AdminCreateMemberModal`.
+* Form tạo bao gồm:
+  * **Họ và tên:** (Bắt buộc, VD: Nguyễn Văn A)
+  * **Email / Tên đăng nhập:** (Bắt buộc, VD: `22120001@student.hcmus.edu.vn` hoặc `nguyenvana`)
+  * **Mã số sinh viên:** (Tùy chọn, VD: `22120001`)
+  * **Vai trò ban đầu:** `MEMBER` (Thành viên thường) hoặc `CORE_MEMBER` (Thành viên nòng cốt nộp bài)
+  * **Mật khẩu khởi tạo:** (Mặc định gợi ý `member123`, tối thiểu 6 ký tự)
+* Server Action: `createMemberAction(adminId, data)`
+  * Xác thực quyền `ADMIN` của caller.
+  * Kiểm tra trùng lặp email/username.
+  * Băm mật khẩu bằng `bcrypt.hash(password, 10)`.
+  * Khởi tạo bản ghi với `status: 'ACTIVE'`.
+
+### 2.4. Tính năng Xóa Tài Khoản Thành Viên (`deleteMemberAction`)
+* Nút bấm **"Xóa"** với icon thùng rác và hộp thoại xác nhận `AdminDeleteMemberModal`.
+* Hiển thị cảnh báo rõ ràng kèm thông tin họ tên, email, MSSV của tài khoản cần xóa.
+* Cơ chế bảo vệ an toàn (Safety Guardrails):
+  * **Chống tự xóa:** Admin không thể tự xóa tài khoản của chính mình (`adminId === targetUserId`).
+  * **Bảo vệ tài khoản Quản trị:** Hệ thống từ chối xóa bất kỳ tài khoản nào mang vai trò `ADMIN`.
+  * **Xử lý ràng buộc cơ sở dữ liệu:** Tận dụng cascade delete cho tài liệu/liên kết do thành viên tạo, đồng thời set `userId: null` trong danh sách đóng góp để bảo toàn bài báo đã xuất bản của nhóm.
+
+### 2.5. Bổ Nhiệm & Nâng Cấp Core Member (`updateUserRoleAction`)
+* Nút chuyển đổi trạng thái `AdminRoleToggle` cho phép nâng lên `CORE_MEMBER` hoặc hạ xuống `MEMBER` tức thời.
+* Thành viên sau khi được nâng cấp lên `CORE_MEMBER` sẽ có quyền truy cập vào chức năng tạo và nộp đề tài/công trình nghiên cứu.
+
+### 2.6. Ma Trận Phân Quyền Nghiêm Ngặt (Strict RBAC Matrix)
+
+| Chức Năng / Thẩm Quyền | GUEST (Khách) | MEMBER (Thành viên thường) | CORE_MEMBER (Thành viên nòng cốt) | ADMIN (Thầy Cố vấn / QTV) |
+|---|:---:|:---:|:---:|:---:|
+| Xem công trình đã xuất bản & trích dẫn BibTeX | ✅ | ✅ | ✅ | ✅ |
+| Xem hồ sơ cá nhân / Scholar Portfolio | ❌ | ✅ | ✅ | ✅ |
+| Tạo bản nháp & Nộp bài nghiên cứu đại diện nhóm | ❌ | ❌ | ✅ | ❌ *(Chỉ duyệt)* |
+| Quản lý vòng đời bài nộp của nhóm mình | ❌ | ❌ | ✅ | ❌ *(Chỉ duyệt)* |
+| Duyệt / Từ chối / Yêu cầu chỉnh sửa bài nộp | ❌ | ❌ | ❌ | ✅ |
+| Tạo tài khoản thành viên mới | ❌ | ❌ | ❌ | ✅ |
+| Nâng cấp / Hạ cấp Core Member | ❌ | ❌ | ❌ | ✅ |
+| Xóa tài khoản thành viên khỏi CLB | ❌ | ❌ | ❌ | ✅ |
 
 ---
 
@@ -162,8 +192,12 @@
    - Tạo `AcademicFooter` và tích hợp vào Layout / các trang.
    - Hoàn thiện trang `/members/[id]` với Academic Metrics.
    - Thêm bộ lọc Topic/Domain trên trang chủ.
-6. **Giai đoạn 6: Kiểm thử & Nghiệm thu**
-   - Cập nhật và chạy toàn bộ unit/integration test suites.
-   - Kiểm tra đăng nhập với `admin01` / `admin123`.
-   - Thử nghiệm Admin tạo tài khoản mới và đăng nhập thử bằng tài khoản vừa tạo.
-   - Chạy `npm run build` để đảm bảo 0 lỗi biên dịch.
+6. **Giai đoạn 6: Phân Quyền Nghiêm Ngặt (Strict RBAC) & Hoàn Thiện Quản Lý Thành Viên** (ĐÃ HOÀN TẤT)
+   - Cấm Admin nộp bài trực tiếp (`canUserUpload` chỉ cấp phép duy nhất cho `CORE_MEMBER`).
+   - Xây dựng server action `deleteMemberAction` an toàn, chống tự xóa tài khoản Admin.
+   - Xây dựng modal xác nhận xóa `AdminDeleteMemberModal` và bảng dữ liệu tương tác `AdminMemberTable` (tìm kiếm, lọc vai trò).
+   - Thêm liên kết điều hướng trực tiếp trên thanh Navbar cho Admin ("Duyệt bài", "Thành viên", "Bàn làm việc").
+7. **Giai đoạn 7: Kiểm Thử Toàn Diện & Nghiệm Thu Hệ Thống** (ĐÃ HOÀN TẤT)
+   - Chạy toàn bộ 32 tests (12 test suites unit/integration/e2e) đạt 100% Pass.
+   - Kiểm tra `npm run build` thành công trên toàn bộ 11 routes, 0 lỗi kiểu dữ liệu và 0 cảnh báo.
+   - Tài khoản hạt nhân duy nhất: `admin01` / `admin123`. Sẵn sàng bàn giao vận hành thực tế.

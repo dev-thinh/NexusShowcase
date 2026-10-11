@@ -92,9 +92,9 @@ export default async function AdminDashboardPage() {
                   Thành viên
                 </span>
               </div>
-              <h2 className="text-base font-bold text-slate-900">Quản lý &amp; Bổ nhiệm Thành viên</h2>
+              <h2 className="text-base font-bold text-slate-900 font-serif">Quản lý &amp; Phân quyền Thành viên</h2>
               <p className="text-xs text-slate-500 mt-1">
-                Nâng cấp các bạn sinh viên nòng cốt lên Core Member để ủy quyền đại diện nhóm đăng bài.
+                Tạo tài khoản mới, thăng hạng lên Core Member (ủy quyền nộp bài cho nhóm) hoặc xóa tài khoản.
               </p>
             </div>
 

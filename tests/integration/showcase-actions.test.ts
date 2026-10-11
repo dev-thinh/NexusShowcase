@@ -56,7 +56,21 @@ describe('Showcase Server Actions', () => {
     });
 
     expect(result.success).toBe(false);
-    expect(result.error).toContain('Bạn không có quyền đăng tải bài viết');
+    expect(result.error).toContain('Chỉ Thành viên nòng cốt');
+  });
+
+  it('should forbid admin from creating showcase item (admin reviews only)', async () => {
+    const result = await createShowcaseItemAction(adminUser.id, {
+      title: 'Bài nộp thử từ tài khoản Admin',
+      summary: 'Admin không được đăng bài trực tiếp',
+      type: 'RESEARCH_PAPER',
+      publishedYear: 2026,
+      contributors: [],
+      links: [],
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Tài khoản Quản trị viên chỉ có thẩm quyền kiểm duyệt bài nộp');
   });
 
   it('should allow core member to create showcase item with mixed contributors', async () => {

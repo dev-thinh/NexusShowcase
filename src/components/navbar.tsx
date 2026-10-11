@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { auth } from '@/lib/auth';
-import { Compass, LayoutDashboard, Shield, LogIn, GraduationCap, BookOpen } from 'lucide-react';
+import { Compass, LayoutDashboard, Shield, LogIn, GraduationCap, BookOpen, Users, CheckSquare } from 'lucide-react';
 import { SignOutButton } from '@/components/sign-out-button';
 
 export async function Navbar() {
@@ -19,7 +19,7 @@ export async function Navbar() {
             <GraduationCap className="w-5 h-5 text-blue-200" />
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold text-base tracking-tight text-slate-900 group-hover:text-[#0F294A] transition-colors leading-tight">
+            <span className="font-extrabold text-base tracking-tight text-slate-900 group-hover:text-[#0F294A] transition-colors leading-tight font-serif">
               NexusShowcase
             </span>
             <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase">
@@ -29,7 +29,7 @@ export async function Navbar() {
         </Link>
 
         {/* Navigation Links */}
-        <nav className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm font-semibold">
+        <nav className="flex items-center gap-2 sm:gap-2.5 text-xs sm:text-sm font-semibold">
           <Link
             href="/"
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-slate-600 hover:text-[#0F294A] hover:bg-slate-100/80 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
@@ -39,7 +39,7 @@ export async function Navbar() {
           </Link>
 
           {user ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <Link
                 href="/dashboard"
                 className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-800 transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
@@ -49,13 +49,31 @@ export async function Navbar() {
               </Link>
 
               {user.role === 'ADMIN' && (
-                <Link
-                  href="/admin"
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                >
-                  <Shield className="w-4 h-4 text-amber-600" />
-                  <span>Quản trị</span>
-                </Link>
+                <>
+                  <Link
+                    href="/admin/reviews"
+                    className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-200/80 font-bold transition-all duration-150"
+                  >
+                    <CheckSquare className="w-4 h-4 text-amber-700" />
+                    <span>Duyệt bài</span>
+                  </Link>
+
+                  <Link
+                    href="/admin/members"
+                    className="hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200/80 font-bold transition-all duration-150"
+                  >
+                    <Users className="w-4 h-4 text-blue-700" />
+                    <span>Thành viên</span>
+                  </Link>
+
+                  <Link
+                    href="/admin"
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                  >
+                    <Shield className="w-4 h-4 text-amber-300" />
+                    <span>Bàn làm việc</span>
+                  </Link>
+                </>
               )}
 
               {/* User Avatar Chip */}

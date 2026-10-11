@@ -14,6 +14,7 @@ import {
   Layers,
   Sparkles,
   Info,
+  ShieldCheck,
 } from 'lucide-react';
 
 export default async function DashboardPage() {
@@ -53,7 +54,17 @@ export default async function DashboardPage() {
             </p>
           </div>
 
-          {isUploader ? (
+          {user.role === 'ADMIN' ? (
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <Link
+                href="/admin"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm transition-all"
+              >
+                <ShieldCheck className="w-4 h-4 text-slate-950" />
+                <span>Bàn làm việc Quản trị & Duyệt bài</span>
+              </Link>
+            </div>
+          ) : isUploader ? (
             <Link
               href="/dashboard/items/new"
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all cursor-pointer self-start"
@@ -88,13 +99,25 @@ export default async function DashboardPage() {
               <div className="w-14 h-14 rounded-2xl bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
                 <FolderPlus className="w-7 h-7" />
               </div>
-              <h3 className="text-sm font-bold text-slate-700">Bạn chưa tạo bài viết nào</h3>
+              <h3 className="text-sm font-bold text-slate-700">
+                {user.role === 'ADMIN' ? 'Quản trị viên không trực tiếp tạo bài' : 'Bạn chưa tạo bài viết nào'}
+              </h3>
               <p className="text-xs text-slate-400 mt-1 max-w-xs">
-                {isUploader
+                {user.role === 'ADMIN'
+                  ? 'Thầy chủ nhiệm phụ trách thẩm định, duyệt bài nộp của nhóm và quản lý phân quyền thành viên.'
+                  : isUploader
                   ? 'Bắt đầu đăng tải bài báo khoa học hoặc dự án công nghệ đầu tiên cho nhóm.'
                   : 'Khi được phân quyền Core Member, bạn có thể tạo và quản lý bài nộp tại đây.'}
               </p>
-              {isUploader && (
+              {user.role === 'ADMIN' ? (
+                <Link
+                  href="/admin/reviews"
+                  className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-amber-50 text-amber-900 border border-amber-300 hover:bg-amber-100 transition-colors"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                  <span>Xem danh sách bài chờ duyệt</span>
+                </Link>
+              ) : isUploader ? (
                 <Link
                   href="/dashboard/items/new"
                   className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors"
@@ -102,7 +125,7 @@ export default async function DashboardPage() {
                   <Plus className="w-3.5 h-3.5" />
                   <span>Tạo bài đầu tiên</span>
                 </Link>
-              )}
+              ) : null}
             </div>
           ) : (
             <div className="divide-y divide-slate-100">

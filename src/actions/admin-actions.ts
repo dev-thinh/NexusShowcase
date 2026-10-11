@@ -74,3 +74,35 @@ export async function updateUserRoleAction(adminId: string, targetUserId: string
 
   return { success: true, user: updatedUser };
 }
+
+export async function deleteMemberAction(adminId: string, targetUserId: string) {
+  const admin = await prisma.user.findUnique({ where: { id: adminId } });
+  if (!admin || !canUserReview(admin)) {
+    return { success: false, error: 'Chỉ Thầy chủ nhiệm (Admin) mới có quyền xóa tài khoản thành viên.' };
+  }
+
+  if (adminId === targetUserId) {
+    return { success: false, error: 'Quản trị viên không thể tự xóa tài khoản của chính mình.' };
+  }
+
+  const targetUser = await prisma.user.findUnique({
+    where: { id: targetUserId },
+  });
+
+  if (!targetUser) {
+    return { success: false, error: 'Không tìm thấy tài khoản thành viên cần xóa.' };
+  }
+
+  if (targetUser.role === 'ADMIN') {
+    return { success: false, error: 'Không thể xóa tài khoản Quản trị viên của hệ thống.' };
+  }
+
+  await prisma.user.delete({
+    where: { id: targetUserId },
+  });
+
+  return {
+    success: true,
+    message: `Đã xóa tài khoản "${targetUser.fullName}" thành công.`,
+  };
+}

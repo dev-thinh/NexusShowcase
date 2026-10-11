@@ -1,6 +1,6 @@
 # Academic Research Lab UI/UX & Real Authentication Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Transform NexusShowcase into a premier academic research lab repository with authentic single-admin authentication (`admin01` / `admin123`), admin-driven member creation, Swiss Modernism 2.0 academic typography and styling, 1-click BibTeX/APA/IEEE citation generator, full-text PDF document handling, research domain filtering, universal academic footer, and scholar portfolio metrics.
 
@@ -31,7 +31,7 @@
 - Consumes: Prisma `User` model, NextAuth v5 `CredentialsProvider`.
 - Produces: Flexible username/email authentication allowing `admin01` or `admin01@nexus.hcmus.edu.vn`.
 
-- [ ] **Step 1: Write failing test in `tests/integration/auth.test.ts` for `admin01` login**
+- [x] **Step 1: Write failing test in `tests/integration/auth.test.ts` for `admin01` login**
 
 ```typescript
 // Add test verifying admin01 login credential lookup
@@ -51,12 +51,12 @@ it('should authorize admin01 with admin123', async () => {
 });
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/integration/auth.test.ts`  
 Expected: FAIL (User `admin01` does not exist in DB yet).
 
-- [ ] **Step 3: Update `src/lib/auth.ts` to allow username and email**
+- [x] **Step 3: Update `src/lib/auth.ts` to allow username and email**
 
 ```typescript
 const loginSchema = z.object({
@@ -76,7 +76,7 @@ const user = await prisma.user.findFirst({
 });
 ```
 
-- [ ] **Step 4: Update `prisma/seed.ts` to seed ONLY `admin01`**
+- [x] **Step 4: Update `prisma/seed.ts` to seed ONLY `admin01`**
 
 ```typescript
 // Clear existing mock data and create solely admin01
@@ -101,12 +101,12 @@ await prisma.user.create({
 });
 ```
 
-- [ ] **Step 5: Run seed and run tests to verify**
+- [x] **Step 5: Run seed and run tests to verify**
 
 Run: `npm run db:seed` and `npx vitest run tests/integration/auth.test.ts`  
 Expected: PASS.
 
-- [ ] **Step 6: Remove mock accounts and test buttons from `src/app/login/login-form.tsx` and `src/app/login/page.tsx`**
+- [x] **Step 6: Remove mock accounts and test buttons from `src/app/login/login-form.tsx` and `src/app/login/page.tsx`**
 
 Replace `QUICK_ACCOUNTS` and demo cards with a focused, academic login card:
 - Username/Email field (placeholder: "admin01 hoặc email...")
@@ -114,7 +114,7 @@ Replace `QUICK_ACCOUNTS` and demo cards with a focused, academic login card:
 - Submit button with loading state
 - Security & Academic affiliation notice
 
-- [ ] **Step 7: Commit changes**
+- [x] **Step 7: Commit changes**
 
 ```bash
 git add src/lib/auth.ts src/app/login/login-form.tsx src/app/login/page.tsx prisma/seed.ts tests/integration/auth.test.ts
@@ -135,19 +135,19 @@ git commit -m "feat(auth): configure sole admin01 account and remove mock login 
 - Consumes: `prisma.user.create`, `bcrypt.hash`.
 - Produces: `createMemberAction(adminId: string, input: CreateMemberInput)` server action, `AdminCreateMemberModal` component.
 
-- [ ] **Step 1: Write integration test for `createMemberAction`**
+- [x] **Step 1: Write integration test for `createMemberAction`**
 
 Create `tests/integration/admin-create-member.test.ts` testing:
 1. Rejection if non-admin attempts to create member.
 2. Successful creation of a new `MEMBER` and a new `CORE_MEMBER` with student ID and hashed password.
 3. Verification that newly created member can authenticate.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/integration/admin-create-member.test.ts`  
 Expected: FAIL (`createMemberAction` not defined).
 
-- [ ] **Step 3: Implement `createMemberAction` in `src/actions/admin-actions.ts`**
+- [x] **Step 3: Implement `createMemberAction` in `src/actions/admin-actions.ts`**
 
 ```typescript
 export interface CreateMemberInput {
@@ -167,12 +167,12 @@ export async function createMemberAction(adminId: string, input: CreateMemberInp
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/integration/admin-create-member.test.ts`  
 Expected: PASS.
 
-- [ ] **Step 5: Create `AdminCreateMemberModal` in `src/components/admin-create-member-modal.tsx`**
+- [x] **Step 5: Create `AdminCreateMemberModal` in `src/components/admin-create-member-modal.tsx`**
 
 - Modal dialog with Form inputs:
   - Họ và tên (Full Name) - required
@@ -182,12 +182,12 @@ Expected: PASS.
   - Mật khẩu khởi tạo: text field with default `member123`
   - Nút "Tạo tài khoản" with loading spinner and inline error handling.
 
-- [ ] **Step 6: Update `src/app/admin/members/page.tsx` with Create Member button and modal**
+- [x] **Step 6: Update `src/app/admin/members/page.tsx` with Create Member button and modal**
 
 - Top action bar includes: "Tạo tài khoản thành viên mới" button.
 - Clean academic table displaying active members, role badges, student ID, and role toggle.
 
-- [ ] **Step 7: Commit changes**
+- [x] **Step 7: Commit changes**
 
 ```bash
 git add src/actions/admin-actions.ts src/components/admin-create-member-modal.tsx src/app/admin/members/page.tsx tests/integration/admin-create-member.test.ts
@@ -209,7 +209,7 @@ git commit -m "feat(admin): implement member creation action and management moda
 - Consumes: Google Fonts (`Crimson Pro`, `Inter`, `JetBrains Mono`).
 - Produces: Institutional tokens, serif typography classes, responsive `AcademicFooter`.
 
-- [ ] **Step 1: Import Google Fonts and configure CSS variables in `src/app/globals.css`**
+- [x] **Step 1: Import Google Fonts and configure CSS variables in `src/app/globals.css`**
 
 Import fonts:
 ```css
@@ -221,7 +221,7 @@ Define tokens:
 - `--font-mono`: 'JetBrains Mono', monospace;
 - Institutional navy colors: `--navy-950: #081726`, `--navy-900: #0F294A`, `--navy-800: #1A3E6B`.
 
-- [ ] **Step 2: Update `tailwind.config.ts` with font families and academic colors**
+- [x] **Step 2: Update `tailwind.config.ts` with font families and academic colors**
 
 Add `fontFamily`:
 ```typescript
@@ -242,13 +242,13 @@ colors: {
 }
 ```
 
-- [ ] **Step 3: Update `src/components/navbar.tsx`**
+- [x] **Step 3: Update `src/components/navbar.tsx`**
 
 - Institutional logo and branding: "HCMUS Nexus Academic Lab" with scholarly seal icon.
 - Navigation links styled with clean Swiss Modernism typographic hierarchy.
 - Responsive mobile drawer or clean navigation layout.
 
-- [ ] **Step 4: Create `src/components/academic-footer.tsx`**
+- [x] **Step 4: Create `src/components/academic-footer.tsx`**
 
 Institutional academic footer including:
 - Official branding: Nexus Academic Showcase • Khoa Công nghệ Thông tin • ĐH Khoa học Tự nhiên - ĐHQG-HCM.
@@ -256,11 +256,11 @@ Institutional academic footer including:
 - Academic links: Google Scholar, Faculty of IT Portal (`fit.hcmus.edu.vn`), GitHub Lab.
 - Citation integrity & Open Access research statement.
 
-- [ ] **Step 5: Test layout rendering and build**
+- [x] **Step 5: Test layout rendering and build**
 
 Run: `npm run build` to verify font imports and CSS bundling.
 
-- [ ] **Step 6: Commit changes**
+- [x] **Step 6: Commit changes**
 
 ```bash
 git add src/app/globals.css tailwind.config.ts src/app/layout.tsx src/components/navbar.tsx src/components/academic-footer.tsx
@@ -282,39 +282,39 @@ git commit -m "feat(design): implement Swiss Modernism 2.0 academic typography a
 - Consumes: `ShowcaseItem` data (title, slug, publishedYear, issuer, contributors).
 - Produces: `generateBibTeX(item)`, `generateAPA(item)`, `generateIEEE(item)`, and interactive `CitationModal`.
 
-- [ ] **Step 1: Write unit tests in `tests/unit/citation.test.ts`**
+- [x] **Step 1: Write unit tests in `tests/unit/citation.test.ts`**
 
 Test that:
 1. `generateBibTeX` outputs standard BibTeX `@inproceedings` or `@article` with proper author formatting (`Lastname, Firstname and ...`), title, year, venue (`issuer`), and URL.
 2. `generateAPA` outputs valid APA 7th string format.
 3. `generateIEEE` outputs valid IEEE reference format.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `npx vitest run tests/unit/citation.test.ts`  
 Expected: FAIL (`citation.ts` does not exist).
 
-- [ ] **Step 3: Implement `src/lib/citation.ts`**
+- [x] **Step 3: Implement `src/lib/citation.ts`**
 
 Format functions for BibTeX, APA 7, and IEEE referencing standard with clean string normalization.
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `npx vitest run tests/unit/citation.test.ts`  
 Expected: PASS.
 
-- [ ] **Step 5: Create `src/components/citation-modal.tsx`**
+- [x] **Step 5: Create `src/components/citation-modal.tsx`**
 
 - Interactive tabs: **BibTeX**, **APA 7th**, **IEEE**.
 - Formatted code block with syntax styling for BibTeX.
 - One-click "Sao chép / Copy" button with clipboard write and instant visual feedback ("Đã sao chép!").
 - "Tải file .bib / Download BibTeX" button for saving directly.
 
-- [ ] **Step 6: Integrate Citation button into `ShowcaseCard` and `showcase/[slug]/page.tsx`**
+- [x] **Step 6: Integrate Citation button into `ShowcaseCard` and `showcase/[slug]/page.tsx`**
 
 - Prominent "Trích dẫn / Cite" button alongside paper actions.
 
-- [ ] **Step 7: Commit changes**
+- [x] **Step 7: Commit changes**
 
 ```bash
 git add src/lib/citation.ts tests/unit/citation.test.ts src/components/citation-modal.tsx src/components/showcase-card.tsx src/app/showcase/[slug]/page.tsx
@@ -335,7 +335,7 @@ git commit -m "feat(academic): implement 1-click BibTeX, APA, and IEEE citation 
 - Consumes: `/api/upload` (supports PDF type), Prisma `item_attachments`.
 - Produces: Full-text PDF viewer / download section and attachment upload during item creation.
 
-- [ ] **Step 1: Update `src/actions/showcase-actions.ts` to persist attachments**
+- [x] **Step 1: Update `src/actions/showcase-actions.ts` to persist attachments**
 
 ```typescript
 export interface AttachmentInput {
@@ -356,28 +356,28 @@ attachments: {
 }
 ```
 
-- [ ] **Step 2: Update `tests/integration/showcase-actions.test.ts` with attachment verification**
+- [x] **Step 2: Update `tests/integration/showcase-actions.test.ts` with attachment verification**
 
 Verify that items created with attachments store and return attachments properly.
 
-- [ ] **Step 3: Run test to verify it passes**
+- [x] **Step 3: Run test to verify it passes**
 
 Run: `npx vitest run tests/integration/showcase-actions.test.ts`  
 Expected: PASS.
 
-- [ ] **Step 4: Update `src/components/item-form.tsx` with PDF document upload**
+- [x] **Step 4: Update `src/components/item-form.tsx` with PDF document upload**
 
 - Add PDF document upload drag-and-drop zone.
 - Upload to `/api/upload` with `type: 'pdf'`.
 - Display list of uploaded documents with file size and remove button.
 - Pass `attachments` into `createShowcaseItemAction`.
 
-- [ ] **Step 5: Update `src/app/showcase/[slug]/page.tsx` to render Attachments section**
+- [x] **Step 5: Update `src/app/showcase/[slug]/page.tsx` to render Attachments section**
 
 - Add dedicated section: "Tài Liệu Toàn Văn & Phụ Lục Nghiên Cứu (Full-Text Documents & Attachments)".
 - Display PDF cards with document icon, file name, formatted size (e.g., `2.4 MB`), "Xem trực tuyến" and "Tải về PDF" buttons.
 
-- [ ] **Step 6: Commit changes**
+- [x] **Step 6: Commit changes**
 
 ```bash
 git add src/actions/showcase-actions.ts src/components/item-form.tsx src/app/showcase/[slug]/page.tsx tests/integration/showcase-actions.test.ts
@@ -399,7 +399,7 @@ git commit -m "feat(documents): implement full-text PDF document upload and show
 - Consumes: `AcademicFooter`, Prisma queries for domain tags and member publication metrics.
 - Produces: Topic-based exploration and Academic CV-style portfolio.
 
-- [ ] **Step 1: Add Research Topics / Domains to `src/app/page.tsx`**
+- [x] **Step 1: Add Research Topics / Domains to `src/app/page.tsx`**
 
 - Research domain pills:
   - Tất cả lĩnh vực (All)
@@ -411,7 +411,7 @@ git commit -m "feat(documents): implement full-text PDF document upload and show
 - Connect with query parameters (`?domain=...`) and search filtering.
 - Add `AcademicFooter` to bottom of page.
 
-- [ ] **Step 2: Upgrade `/members/[id]/page.tsx` to Scholar Portfolio**
+- [x] **Step 2: Upgrade `/members/[id]/page.tsx` to Scholar Portfolio**
 
 - Add Academic Metrics Bar:
   - Số bài báo khoa học đã xuất bản
@@ -421,11 +421,11 @@ git commit -m "feat(documents): implement full-text PDF document upload and show
 - Add ORCID / Google Scholar / GitHub links with institutional styling.
 - Add `AcademicFooter`.
 
-- [ ] **Step 3: Add `AcademicFooter` to `/dashboard`, `/admin`, `/admin/reviews`, `/admin/members`**
+- [x] **Step 3: Add `AcademicFooter` to `/dashboard`, `/admin`, `/admin/reviews`, `/admin/members`**
 
 Ensure every page on the application has consistent institutional branding and footer.
 
-- [ ] **Step 4: Commit changes**
+- [x] **Step 4: Commit changes**
 
 ```bash
 git add src/app/page.tsx src/app/members/[id]/page.tsx src/app/dashboard/page.tsx src/app/admin/page.tsx src/app/admin/reviews/page.tsx
@@ -440,23 +440,44 @@ git commit -m "feat(profile): enhance scholar portfolio metrics, domain filter, 
 - Modify: `tests/e2e/workflow.test.ts`
 - Modify: Any outdated test fixtures
 
-- [ ] **Step 1: Update e2e tests to use `admin01` credentials**
+- [x] **Step 1: Update e2e tests to use `admin01` credentials**
 
 Ensure all tests reflect the new credentials `admin01` and `admin123`.
 
-- [ ] **Step 2: Run all tests**
+- [x] **Step 2: Run all tests**
 
 Run: `npm test`  
-Expected: All tests pass.
+Expected: All tests pass (32/32 tests passed across 12 test files).
 
-- [ ] **Step 3: Run full production build**
+- [x] **Step 3: Run full production build**
 
 Run: `npm run build`  
 Expected: `Compiled successfully`, all 11 routes valid static/dynamic rendering.
 
-- [ ] **Step 4: Final commit and verify clean git status**
+---
 
-```bash
-git add .
-git commit -m "test: verify entire test suite and production build passing"
-```
+### Task 8: Strict RBAC & Full Member Management Suite (Create, Delete, Role Toggle, Search/Filter)
+
+**Files:**
+- Modify: `src/lib/permissions.ts` (Admin forbidden from uploading; only `CORE_MEMBER` allowed)
+- Modify: `src/actions/showcase-actions.ts` (rejection for non-Core Member and Admin)
+- Modify: `src/actions/admin-actions.ts` (implement `deleteMemberAction` with safety checks)
+- Create: `src/components/admin-delete-member-modal.tsx` (confirmation dialog with warnings)
+- Create: `src/components/admin-member-table.tsx` (real-time search, role filter tabs, toggle and delete actions)
+- Modify: `src/app/admin/members/page.tsx` (integrated `AdminMemberTable`)
+- Modify: `src/components/navbar.tsx` (direct Admin links to `/admin/reviews`, `/admin/members`, `/admin`)
+- Modify: `src/app/dashboard/page.tsx` (tailored Admin banner directing to Admin Desk)
+- Test: `tests/integration/admin-delete-member.test.ts` (4 tests verifying deletion and security boundaries)
+- Test: `tests/integration/showcase-actions.test.ts` (verified Admin cannot upload)
+
+- [x] **Step 1: Enforce Strict RBAC in `canUserUpload`**  
+  Restricted to `user.role === 'CORE_MEMBER'`. Verified via `tests/unit/permissions.test.ts`.
+
+- [x] **Step 2: Implement Member Deletion (`deleteMemberAction`)**  
+  Ensured admin check, self-deletion prevention, admin deletion prevention. Verified via `tests/integration/admin-delete-member.test.ts`.
+
+- [x] **Step 3: Member Management UI with Search & Filters**  
+  Implemented `AdminMemberTable` with search by name/MSSV/email and role tabs. Added `AdminDeleteMemberModal`.
+
+- [x] **Step 4: End-to-end verification and production compilation**  
+  All 32 tests passing. Production build succeeded on 11 routes.

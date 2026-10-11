@@ -46,7 +46,10 @@ export interface CreateShowcaseItemInput {
 export async function createShowcaseItemAction(userId: string, input: CreateShowcaseItemInput) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || !canUserUpload(user)) {
-    return { success: false, error: 'Bạn không có quyền đăng tải bài viết. Vui lòng liên hệ Thầy chủ nhiệm để được nâng cấp.' };
+    if (user?.role === 'ADMIN') {
+      return { success: false, error: 'Tài khoản Quản trị viên chỉ có thẩm quyền kiểm duyệt bài nộp và quản lý thành viên, không trực tiếp đăng bài.' };
+    }
+    return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) mới có quyền đăng bài. Vui lòng liên hệ Thầy chủ nhiệm để được nâng cấp.' };
   }
 
   let slug = slugify(input.title);

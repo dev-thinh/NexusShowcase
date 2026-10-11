@@ -7,7 +7,7 @@ export interface UserSessionSubset {
 
 export function canUserUpload(user: UserSessionSubset | null | undefined): boolean {
   if (!user || !user.role) return false;
-  return user.role === 'ADMIN' || user.role === 'CORE_MEMBER';
+  return user.role === 'CORE_MEMBER';
 }
 
 export function canUserReview(user: UserSessionSubset | null | undefined): boolean {
