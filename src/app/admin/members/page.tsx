@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '@/components/navbar';
 import { AdminRoleToggle } from '@/components/admin-role-toggle';
+import { AdminCreateMemberModal } from '@/components/admin-create-member-modal';
 import Link from 'next/link';
 import { ArrowLeft, Users, ShieldCheck, UserCheck, User } from 'lucide-react';
 
@@ -39,12 +40,15 @@ export default async function AdminMembersPage() {
               Quản lý &amp; Bổ nhiệm Thành viên CLB
             </h1>
             <p className="text-xs text-slate-500 mt-1">
-              Thầy có thể thăng hạng thành viên lên <strong>Core Member</strong> để phân quyền nộp bài cho nhóm.
+              Thầy có thể tạo tài khoản mới và thăng hạng thành viên lên <strong>Core Member</strong> để phân quyền nộp bài cho nhóm.
             </p>
           </div>
-          <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-800 self-start">
-            {members.length} thành viên
-          </span>
+          <div className="flex items-center gap-3 self-start sm:self-center">
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-blue-100 text-blue-800">
+              {members.length} thành viên
+            </span>
+            <AdminCreateMemberModal adminId={adminId} />
+          </div>
         </div>
 
         {/* Member Table */}

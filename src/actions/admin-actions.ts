@@ -3,6 +3,63 @@
 import { prisma } from '@/lib/prisma';
 import { canUserReview } from '@/lib/permissions';
 import { Role } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+export interface CreateMemberInput {
+  fullName: string;
+  email: string;
+  studentId?: string;
+  role?: 'MEMBER' | 'CORE_MEMBER';
+  password?: string;
+}
+
+export async function createMemberAction(adminId: string, input: CreateMemberInput) {
+  const admin = await prisma.user.findUnique({ where: { id: adminId } });
+  if (!admin || !canUserReview(admin)) {
+    return { success: false, error: 'Chỉ Thầy chủ nhiệm (Admin) mới có quyền tạo tài khoản thành viên.' };
+  }
+
+  if (!input.fullName?.trim()) {
+    return { success: false, error: 'Vui lòng nhập họ và tên của thành viên.' };
+  }
+
+  if (!input.email?.trim()) {
+    return { success: false, error: 'Vui lòng nhập email hoặc tên đăng nhập của thành viên.' };
+  }
+
+  const emailTrimmed = input.email.trim();
+  const existing = await prisma.user.findFirst({
+    where: {
+      OR: [
+        { email: emailTrimmed },
+        { email: emailTrimmed.toLowerCase() },
+      ],
+    },
+  });
+
+  if (existing) {
+    return { success: false, error: `Tài khoản hoặc email "${emailTrimmed}" đã tồn tại trong hệ thống.` };
+  }
+
+  const rawPassword = input.password?.trim() || 'member123';
+  if (rawPassword.length < 6) {
+    return { success: false, error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.' };
+  }
+
+  const passwordHash = await bcrypt.hash(rawPassword, 10);
+  const newUser = await prisma.user.create({
+    data: {
+      fullName: input.fullName.trim(),
+      email: emailTrimmed,
+      studentId: input.studentId?.trim() || null,
+      role: input.role || 'MEMBER',
+      status: 'ACTIVE',
+      passwordHash,
+    },
+  });
+
+  return { success: true, user: newUser };
+}
 
 export async function updateUserRoleAction(adminId: string, targetUserId: string, newRole: Role) {
   const admin = await prisma.user.findUnique({ where: { id: adminId } });

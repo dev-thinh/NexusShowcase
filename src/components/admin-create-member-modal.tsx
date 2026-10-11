@@ -1,0 +1,264 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createMemberAction } from '@/actions/admin-actions';
+import { Modal } from '@/components/ui/modal';
+import {
+  UserPlus,
+  Loader2,
+  AlertCircle,
+  CheckCircle2,
+  User,
+  Mail,
+  KeyRound,
+  GraduationCap,
+  Shield,
+  UserCheck,
+} from 'lucide-react';
+
+export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
+  const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [studentId, setStudentId] = useState('');
+  const [role, setRole] = useState<'MEMBER' | 'CORE_MEMBER'>('MEMBER');
+  const [password, setPassword] = useState('member123');
+
+  const handleOpen = () => {
+    setError(null);
+    setSuccess(false);
+    setFullName('');
+    setEmail('');
+    setStudentId('');
+    setRole('MEMBER');
+    setPassword('member123');
+    setIsOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!fullName.trim() || !email.trim()) {
+      setError('Vui lòng nhập họ tên và tên đăng nhập/email.');
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    const res = await createMemberAction(adminId, {
+      fullName: fullName.trim(),
+      email: email.trim(),
+      studentId: studentId.trim() || undefined,
+      role,
+      password: password.trim() || 'member123',
+    });
+
+    setLoading(false);
+
+    if (!res.success) {
+      setError(res.error || 'Tạo tài khoản thất bại');
+    } else {
+      setSuccess(true);
+      router.refresh();
+      setTimeout(() => {
+        setIsOpen(false);
+      }, 1000);
+    }
+  };
+
+  return (
+    <>
+      <button
+        onClick={handleOpen}
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] active:scale-95 text-white text-xs font-bold shadow-md hover:shadow-lg transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+      >
+        <UserPlus className="w-4 h-4 text-blue-300" />
+        <span>Thêm thành viên mới</span>
+      </button>
+
+      <Modal
+        isOpen={isOpen}
+        onClose={() => !loading && setIsOpen(false)}
+        title="Tạo Tài Khoản Thành Viên Mới"
+        description="Cấp quyền truy cập hệ thống nghiên cứu cho sinh viên hoặc nghiên cứu viên."
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div
+              role="alert"
+              className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2"
+            >
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          {success && (
+            <div
+              role="status"
+              className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs flex items-center gap-2"
+            >
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+              <span>Đã tạo tài khoản thành công! Đang cập nhật...</span>
+            </div>
+          )}
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Họ và tên thành viên *
+            </label>
+            <div className="relative">
+              <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                required
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder="VD: Nguyễn Văn A"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Tên đăng nhập / Email *
+              </label>
+              <div className="relative">
+                <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="VD: 22120001 hoặc email..."
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Mã số sinh viên (MSSV)
+              </label>
+              <div className="relative">
+                <GraduationCap className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                  placeholder="VD: 22120001"
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              Phân quyền ban đầu *
+            </label>
+            <div className="grid grid-cols-2 gap-2.5">
+              <label
+                className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                  role === 'MEMBER'
+                    ? 'bg-blue-50/50 border-blue-400 text-blue-900 font-semibold'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="MEMBER"
+                  checked={role === 'MEMBER'}
+                  onChange={() => setRole('MEMBER')}
+                  className="mt-0.5 accent-blue-600"
+                />
+                <div>
+                  <div className="flex items-center gap-1 font-bold text-slate-900">
+                    <UserCheck className="w-3.5 h-3.5 text-blue-600" />
+                    <span>MEMBER</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                    Thành viên thông thường, sở hữu portfolio
+                  </p>
+                </div>
+              </label>
+
+              <label
+                className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                  role === 'CORE_MEMBER'
+                    ? 'bg-indigo-50/50 border-indigo-400 text-indigo-900 font-semibold'
+                    : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="role"
+                  value="CORE_MEMBER"
+                  checked={role === 'CORE_MEMBER'}
+                  onChange={() => setRole('CORE_MEMBER')}
+                  className="mt-0.5 accent-indigo-600"
+                />
+                <div>
+                  <div className="flex items-center gap-1 font-bold text-slate-900">
+                    <Shield className="w-3.5 h-3.5 text-indigo-600" />
+                    <span>CORE MEMBER</span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                    Được quyền đại diện nhóm nộp bài báo/dự án
+                  </p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-slate-700 mb-1">
+              Mật khẩu khởi tạo
+            </label>
+            <div className="relative">
+              <KeyRound className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Mặc định: member123"
+                className="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] font-mono"
+              />
+            </div>
+            <p className="text-[11px] text-slate-400 mt-1">
+              Thành viên có thể đổi mật khẩu sau khi đăng nhập.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => setIsOpen(false)}
+              className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] text-white text-xs font-bold transition-all shadow-md cursor-pointer disabled:opacity-50"
+            >
+              {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>{loading ? 'Đang tạo...' : 'Xác nhận tạo'}</span>
+            </button>
+          </div>
+        </form>
+      </Modal>
+    </>
+  );
+}
