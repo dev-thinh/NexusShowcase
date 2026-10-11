@@ -98,6 +98,8 @@ model ShowcaseItem {
   rejectionReason String?
   publishedYear   Int
   publishedAt     DateTime?
+  isPinned        Boolean           @default(false)
+  pinnedAt        DateTime?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
 
@@ -111,6 +113,7 @@ model ShowcaseItem {
 
   @@index([type, status])
   @@index([publishedYear])
+  @@index([isPinned, status])
   @@map("showcase_items")
 }
 

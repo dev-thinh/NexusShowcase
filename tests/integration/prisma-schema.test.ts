@@ -58,4 +58,29 @@ describe('Prisma Schema and Database Models', () => {
     // Clean up
     await prisma.showcaseItem.delete({ where: { id: item.id } });
   });
+
+  it('should support isPinned and pinnedAt on showcase items', async () => {
+    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (!admin) throw new Error('Admin not found');
+
+    const item = await prisma.showcaseItem.create({
+      data: {
+        title: 'Bài báo kiểm tra Ghim',
+        slug: `test-pin-schema-${Date.now()}`,
+        summary: 'Tóm tắt bài báo kiểm tra schema ghim',
+        type: 'RESEARCH_PAPER',
+        publishedYear: 2026,
+        status: 'PUBLISHED',
+        isPinned: true,
+        pinnedAt: new Date(),
+        creatorId: admin.id,
+      },
+    });
+
+    expect((item as any).isPinned).toBe(true);
+    expect((item as any).pinnedAt).not.toBeNull();
+
+    // Clean up
+    await prisma.showcaseItem.delete({ where: { id: item.id } });
+  });
 });
