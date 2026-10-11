@@ -176,10 +176,10 @@ export function NavbarNav({ user }: NavbarNavProps) {
       <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 z-10 ml-auto">
         {user ? (
           <>
-            {/* User Profile Card với max-width cố định, không làm xê dịch layout */}
+            {/* User Profile Card với tên gọn gàng & 3 huy hiệu Role chuẩn */}
             <Link
               href={`/members/${user.id}`}
-              className={`h-10 px-2.5 sm:px-3 rounded-xl inline-flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs max-w-[150px] sm:max-w-[210px] truncate ${
+              className={`h-10 px-2.5 sm:px-3 rounded-xl inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs shrink-0 ${
                 isProfileActive
                   ? 'bg-[#1A426F] text-white border-[#28578E] shadow-xs'
                   : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
@@ -195,8 +195,9 @@ export function NavbarNav({ user }: NavbarNavProps) {
                 {user.name?.charAt(0) || 'U'}
               </div>
 
-              <span className="truncate flex-1 min-w-0 font-medium hidden xs:inline">
-                {user.name}
+              {/* Tên người dùng được hiển thị và fit độ dài gọn gàng, tránh kéo dài thẻ */}
+              <span className="truncate max-w-[65px] sm:max-w-[85px] md:max-w-[95px] font-medium leading-none">
+                {user.name || 'Thành viên'}
               </span>
 
               {/* 3 THẺ ROLE CHUẨN HÓA: Admin, Core, Member */}
