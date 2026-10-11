@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '@/components/navbar';
+import { AcademicFooter } from '@/components/academic-footer';
 import { AdminRoleToggle } from '@/components/admin-role-toggle';
 import { AdminCreateMemberModal } from '@/components/admin-create-member-modal';
 import Link from 'next/link';
@@ -117,6 +118,8 @@ export default async function AdminMembersPage() {
           </div>
         </div>
       </main>
+
+      <AcademicFooter />
     </div>
   );
 }

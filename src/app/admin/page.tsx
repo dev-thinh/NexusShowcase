@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '@/components/navbar';
+import { AcademicFooter } from '@/components/academic-footer';
 import Link from 'next/link';
 import {
   ShieldCheck,
@@ -106,6 +107,8 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
       </main>
+
+      <AcademicFooter />
     </div>
   );
 }

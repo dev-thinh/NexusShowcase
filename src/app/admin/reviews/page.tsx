@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '@/components/navbar';
+import { AcademicFooter } from '@/components/academic-footer';
 import { AdminReviewButton } from '@/components/admin-review-button';
 import { TypeBadge } from '@/components/ui/badge';
 import Link from 'next/link';
@@ -116,6 +117,8 @@ export default async function AdminReviewsPage() {
           </div>
         )}
       </main>
+
+      <AcademicFooter />
     </div>
   );
 }

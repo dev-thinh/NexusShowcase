@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '@/components/navbar';
+import { AcademicFooter } from '@/components/academic-footer';
 import Link from 'next/link';
 import { canUserUpload } from '@/lib/permissions';
 import { StatusBadge, TypeBadge } from '@/components/ui/badge';
@@ -149,6 +150,8 @@ export default async function DashboardPage() {
           )}
         </section>
       </main>
+
+      <AcademicFooter />
     </div>
   );
 }
