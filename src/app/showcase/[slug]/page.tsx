@@ -1,10 +1,13 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
 import { VideoPlayer } from '@/components/video-player';
-import { TypeBadge, RoleBadge } from '@/components/ui/badge';
+import { StatusBadge, TypeBadge, RoleBadge } from '@/components/ui/badge';
 import { CitationModal } from '@/components/citation-modal';
+import { AdminReviewButton } from '@/components/admin-review-button';
+import { PinToggleButton } from '@/components/pin-toggle-button';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -19,6 +22,8 @@ import {
   Download,
   Eye,
   Paperclip,
+  Clock,
+  AlertTriangle,
 } from 'lucide-react';
 
 export default async function ShowcaseDetailPage({
@@ -27,6 +32,9 @@ export default async function ShowcaseDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const session = await auth();
+  const currentUser = session?.user as any;
+
   const item = await prisma.showcaseItem.findUnique({
     where: { slug },
     include: {
@@ -39,7 +47,11 @@ export default async function ShowcaseDetailPage({
     },
   });
 
-  if (!item || item.status !== 'PUBLISHED') {
+  const isAuthorizedToPreview =
+    currentUser &&
+    (currentUser.role === 'ADMIN' || currentUser.id === item?.creatorId);
+
+  if (!item || (item.status !== 'PUBLISHED' && !isAuthorizedToPreview)) {
     notFound();
   }
 
@@ -52,99 +64,149 @@ export default async function ShowcaseDetailPage({
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
 
-      <main className="container mx-auto px-4 py-10 max-w-4xl flex-1">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl flex-1">
+        {/* Preview Banner for Admin / Creator */}
+        {item.status !== 'PUBLISHED' && (
+          <div className="mb-6 p-5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+            <div className="flex items-start gap-3">
+              <Clock className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="font-extrabold text-sm sm:text-base font-serif">
+                    Chế độ xem trước công trình nghiên cứu
+                  </span>
+                  <StatusBadge status={item.status} />
+                </div>
+                <p className="text-xs sm:text-sm text-amber-800">
+                  {item.status === 'PENDING_REVIEW'
+                    ? 'Bài nộp đang chờ Thầy chủ nhiệm thẩm định học thuật và xét duyệt xuất bản.'
+                    : item.status === 'DRAFT'
+                    ? 'Bản nháp cá nhân. Chưa gửi Thầy chủ nhiệm xét duyệt.'
+                    : `Công trình cần chỉnh sửa bổ sung: ${item.rejectionReason || 'Vui lòng cập nhật lại theo yêu cầu.'}`}
+                </p>
+              </div>
+            </div>
+
+            {currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' && (
+              <div className="shrink-0 self-end sm:self-center">
+                <AdminReviewButton adminId={currentUser.id} itemId={item.id} />
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Breadcrumb Back Link */}
         <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#0F294A] mb-6 transition-colors group"
+          href={currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' ? '/admin/reviews' : '/'}
+          className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0F294A] mb-6 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Quay lại danh mục công trình</span>
+          <span>
+            {currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW'
+              ? 'Quay lại danh sách duyệt bài'
+              : 'Quay lại danh mục công trình'}
+          </span>
         </Link>
 
         {/* Paper Header Card */}
-        <header className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/90 shadow-sm mb-8">
+        <header className="bg-white p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xs mb-8">
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <TypeBadge type={item.type} />
-            <div className="flex items-center gap-1 text-xs font-semibold text-slate-500">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
+            <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-500">
+              <Calendar className="w-4 h-4 text-slate-400" />
               <span>Năm công bố: {item.publishedYear}</span>
             </div>
             {item.issuer && (
-              <div className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md bg-slate-100 text-slate-700">
-                <Building2 className="w-3.5 h-3.5 text-slate-400" />
+              <div className="flex items-center gap-1.5 text-sm font-semibold px-3 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                <Building2 className="w-4 h-4 text-slate-400" />
                 <span>{item.issuer}</span>
               </div>
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight font-serif">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight font-serif">
             {item.title}
           </h1>
 
-          <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
-            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+          <div className="mt-6 p-5 sm:p-6 rounded-xl bg-slate-50 border border-slate-200">
+            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
               Tóm tắt đề tài (Abstract)
             </h2>
-            <p className="text-sm text-slate-700 leading-relaxed font-normal">
+            <p className="text-base sm:text-lg text-slate-700 leading-relaxed font-normal">
               {item.summary}
             </p>
           </div>
 
-          {/* Action Buttons with CitationModal */}
+          {/* Standardized Uniform Action Cards Panel */}
           <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center gap-3">
             {/* Citation Generator */}
-            <CitationModal item={item} />
+            <CitationModal
+              item={item}
+              className="h-11 px-4 sm:px-5 rounded-xl bg-[#1A426F] hover:bg-[#235084] text-white text-sm font-bold transition-all shadow-xs border border-[#28578E] cursor-pointer inline-flex items-center justify-center gap-2.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A426F]"
+            />
+
+            {/* Admin Pin Toggle */}
+            {currentUser?.role === 'ADMIN' && item.status === 'PUBLISHED' && (
+              <PinToggleButton
+                adminId={currentUser.id}
+                itemId={item.id}
+                initialIsPinned={item.isPinned}
+                status={item.status}
+              />
+            )}
 
             {paperLink && (
               <a
                 href={paperLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-xs"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
-                <FileText className="w-4 h-4" />
+                <FileText className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>Đọc bài báo gốc</span>
-                <ExternalLink className="w-3 h-3 opacity-70" />
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1A426F] shrink-0" />
               </a>
             )}
+
             {githubLink && (
               <a
                 href={githubLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
-                <Github className="w-4 h-4" />
+                <Github className="w-4 h-4 text-slate-900 shrink-0" />
                 <span>Mã nguồn GitHub</span>
-                <ExternalLink className="w-3 h-3 opacity-70" />
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1A426F] shrink-0" />
               </a>
             )}
+
             {liveDemoLink && (
               <a
                 href={liveDemoLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-xs"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
-                <Globe className="w-4 h-4" />
+                <Globe className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Trang web chạy thử</span>
-                <ExternalLink className="w-3 h-3 opacity-70" />
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1A426F] shrink-0" />
               </a>
             )}
+
             {otherLinks.map((link) => (
               <a
                 key={link.id}
                 href={link.url}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-all"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
+                <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-[#1A426F] shrink-0" />
                 <span>{link.label}</span>
-                <ExternalLink className="w-3 h-3 opacity-60" />
               </a>
             ))}
           </div>
@@ -152,8 +214,8 @@ export default async function ShowcaseDetailPage({
 
         {/* Video Demo Section */}
         {videoLink && (
-          <section className="mb-8">
-            <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+          <section className="mb-8 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2 font-serif">
               <span>Video Trình Diễn &amp; Demo</span>
             </h2>
             <VideoPlayer url={videoLink.url} title={item.title} />
@@ -162,13 +224,13 @@ export default async function ShowcaseDetailPage({
 
         {/* Full-Text PDF & Attachments Section */}
         {item.attachments && item.attachments.length > 0 && (
-          <section className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm mb-8">
+          <section className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 font-serif">
                 <Paperclip className="w-5 h-5 text-[#0F294A]" />
                 <span>Tài Liệu Toàn Văn &amp; Phụ Lục Nghiên Cứu</span>
               </h2>
-              <span className="text-xs text-slate-400 font-semibold">
+              <span className="text-sm text-slate-500 font-semibold">
                 {item.attachments.length} tệp đính kèm
               </span>
             </div>
@@ -177,38 +239,38 @@ export default async function ShowcaseDetailPage({
               {item.attachments.map((att) => (
                 <div
                   key={att.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/50 transition-colors"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100/60 transition-colors"
                 >
                   <div className="flex items-center gap-3.5 truncate">
-                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 font-black text-xs flex items-center justify-center shrink-0 border border-rose-200">
                       PDF
                     </div>
                     <div className="truncate">
-                      <div className="font-bold text-slate-900 text-xs truncate">
+                      <div className="font-bold text-slate-900 text-sm sm:text-base truncate">
                         {att.fileName}
                       </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5">
+                      <div className="text-xs text-slate-500 mt-0.5">
                         {(att.fileSize / (1024 * 1024)).toFixed(2)} MB • {att.mimeType}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-2.5 shrink-0">
                     <a
                       href={att.fileUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors"
+                      className="h-10 px-3.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] text-xs sm:text-sm font-bold transition-all shadow-2xs inline-flex items-center gap-1.5 active:scale-[0.98]"
                     >
-                      <Eye className="w-3.5 h-3.5 text-slate-500" />
+                      <Eye className="w-4 h-4 text-slate-500" />
                       <span>Xem online</span>
                     </a>
                     <a
                       href={att.fileUrl}
                       download={att.fileName}
-                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] text-white text-xs font-bold transition-all shadow-xs"
+                      className="h-10 px-4 rounded-xl bg-[#1A426F] hover:bg-[#235084] text-white text-xs sm:text-sm font-bold transition-all shadow-xs border border-[#28578E] inline-flex items-center gap-1.5 active:scale-[0.98]"
                     >
-                      <Download className="w-3.5 h-3.5 text-blue-200" />
+                      <Download className="w-4 h-4 text-blue-200" />
                       <span>Tải về PDF</span>
                     </a>
                   </div>
@@ -219,13 +281,13 @@ export default async function ShowcaseDetailPage({
         )}
 
         {/* Authors Section */}
-        <section className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm mb-8">
+        <section className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 font-serif">
               <Users className="w-5 h-5 text-[#0F294A]" />
               <span>Tác giả &amp; Người hướng dẫn</span>
             </h2>
-            <span className="text-xs text-slate-400 font-semibold">{item.contributors.length} thành viên</span>
+            <span className="text-sm text-slate-500 font-semibold">{item.contributors.length} thành viên</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -236,14 +298,14 @@ export default async function ShowcaseDetailPage({
               return (
                 <div
                   key={c.id}
-                  className={`flex items-start gap-3.5 p-4 rounded-2xl border transition-all ${
+                  className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${
                     isAdvisor
                       ? 'bg-purple-50/40 border-purple-200 hover:border-purple-300'
-                      : 'bg-slate-50/60 border-slate-200/80 hover:bg-slate-50'
+                      : 'bg-slate-50/70 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   <div
-                    className={`w-11 h-11 rounded-full font-bold flex items-center justify-center text-sm shrink-0 shadow-xs ${
+                    className={`w-11 h-11 rounded-full font-bold flex items-center justify-center text-base shrink-0 shadow-2xs ${
                       isAdvisor
                         ? 'bg-purple-600 text-white'
                         : 'bg-[#0F294A]/10 text-[#0F294A]'
@@ -257,21 +319,21 @@ export default async function ShowcaseDetailPage({
                       {c.user ? (
                         <Link
                           href={`/members/${c.user.id}`}
-                          className="font-bold text-slate-900 hover:text-[#0F294A] transition-colors truncate block text-sm"
+                          className="font-bold text-slate-900 hover:text-[#0F294A] transition-colors truncate block text-sm sm:text-base"
                         >
                           {name}
                         </Link>
                       ) : (
-                        <span className="font-bold text-slate-900 truncate block text-sm">{name}</span>
+                        <span className="font-bold text-slate-900 truncate block text-sm sm:text-base">{name}</span>
                       )}
                     </div>
 
-                    <div className="mt-1">
+                    <div className="mt-1.5">
                       <RoleBadge role={c.role} customTitle={c.customRoleTitle} />
                     </div>
 
                     {c.externalAffiliation && (
-                      <p className="text-[11px] text-slate-500 mt-1 truncate">{c.externalAffiliation}</p>
+                      <p className="text-xs text-slate-500 mt-1.5 truncate">{c.externalAffiliation}</p>
                     )}
                   </div>
                 </div>
@@ -282,9 +344,9 @@ export default async function ShowcaseDetailPage({
 
         {/* Markdown Content Section */}
         {item.content && (
-          <section className="bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/90 shadow-sm">
-            <h2 className="text-lg font-bold text-slate-900 mb-4">Nội dung chi tiết</h2>
-            <div className="text-sm text-slate-700 leading-relaxed whitespace-pre-line font-sans">
+          <section className="bg-white p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xs">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 font-serif">Nội dung chi tiết</h2>
+            <div className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line font-sans">
               {item.content}
             </div>
           </section>
