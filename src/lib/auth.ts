@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 
 const loginSchema = z.object({
-  email: z.string().email(),
+  email: z.string().min(3),
   password: z.string().min(6),
 });
 
@@ -18,15 +18,22 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'email' },
-        password: { label: 'Password', type: 'password' },
+        email: { label: 'Tên đăng nhập hoặc Email', type: 'text' },
+        password: { label: 'Mật khẩu', type: 'password' },
       },
       async authorize(credentials) {
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const user = await prisma.user.findUnique({
-          where: { email: parsed.data.email },
+        const identifier = parsed.data.email.trim();
+        const user = await prisma.user.findFirst({
+          where: {
+            OR: [
+              { email: identifier },
+              { email: identifier.toLowerCase() },
+              { email: `${identifier.toLowerCase()}@nexus.hcmus.edu.vn` },
+            ],
+          },
         });
 
         if (!user || !user.passwordHash) return null;
