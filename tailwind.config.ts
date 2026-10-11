@@ -42,7 +42,7 @@ const config: Config = {
         },
       },
       animation: {
-        'filmstrip-roll': 'filmstrip-roll 45s linear infinite',
+        'filmstrip-roll': 'filmstrip-roll 32s linear infinite',
       },
     },
   },

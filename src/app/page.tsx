@@ -145,7 +145,7 @@ export default async function HomePage({
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-14 sm:py-20 border-b border-slate-200">
+      <section className="relative overflow-hidden py-14 sm:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100/90 text-[#0F294A] text-xs sm:text-sm font-bold mb-5 shadow-2xs border border-blue-200">
             <GraduationCap className="w-4 h-4 text-blue-700" />

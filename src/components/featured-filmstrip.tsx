@@ -42,7 +42,7 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
   const isShortList = items.length < 4;
 
   return (
-    <section className="py-8 sm:py-10 bg-slate-50/70 border-b border-slate-200 overflow-hidden">
+    <section className="py-10 sm:py-14 bg-slate-100/90 relative z-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl mb-6">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
           <div>
@@ -62,7 +62,7 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
 
       {isShortList ? (
         /* Static Grid View when fewer than 4 items */
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-center">
             {items.map((item) => (
               <FilmstripCard key={item.id} item={item} />
@@ -71,20 +71,20 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
         </div>
       ) : (
         /* Infinite Filmstrip Reel View */
-        <div className="relative w-full group py-3">
-          {/* Edge Gradient Fading Masks */}
-          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-slate-50 to-transparent z-10" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-slate-50 to-transparent z-10" />
+        <div className="relative w-full group py-2">
+          {/* Edge Gradient Fading Masks matching bg-slate-100 */}
+          <div className="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-28 bg-gradient-to-r from-slate-100 via-slate-100/80 to-transparent z-10" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-28 bg-gradient-to-l from-slate-100 via-slate-100/80 to-transparent z-10" />
 
-          {/* Marquee Track (Double Render for Seamless Continuous Roll) */}
-          <div className="flex gap-6 overflow-x-hidden py-3 px-4 scrollbar-none">
-            <div className="flex gap-6 animate-filmstrip-roll group-hover:[animation-play-state:paused] shrink-0 will-change-transform">
+          {/* Marquee Track with ample vertical clearance for zoom scale */}
+          <div className="flex gap-6 overflow-x-hidden py-8 px-4 scrollbar-none">
+            <div className="flex gap-6 animate-filmstrip-roll group-hover:[animation-play-state:paused] shrink-0 will-change-transform py-2">
               {items.map((item, idx) => (
                 <FilmstripCard key={`orig-${item.id}-${idx}`} item={item} />
               ))}
             </div>
             <div
-              className="flex gap-6 animate-filmstrip-roll group-hover:[animation-play-state:paused] shrink-0 will-change-transform"
+              className="flex gap-6 animate-filmstrip-roll group-hover:[animation-play-state:paused] shrink-0 will-change-transform py-2"
               aria-hidden="true"
             >
               {items.map((item, idx) => (
@@ -108,7 +108,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
   return (
     <Link
       href={`/showcase/${item.slug}`}
-      className="group/card block w-[310px] sm:w-[350px] shrink-0 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-2xl hover:border-[#0F294A] hover:scale-[1.06] -translate-y-0.5 hover:-translate-y-1.5 transition-all duration-300 ease-out overflow-hidden relative z-0 hover:z-20 flex flex-col h-[380px]"
+      className="group/card block w-[310px] sm:w-[350px] shrink-0 bg-white rounded-2xl border border-slate-200/90 shadow-sm hover:shadow-2xl hover:border-[#0F294A] hover:scale-[1.06] -translate-y-0.5 hover:-translate-y-2 transition-all duration-300 ease-out overflow-hidden relative z-10 hover:z-30 flex flex-col h-[380px]"
     >
       {/* Thumbnail Aspect 16/9 */}
       <div className="aspect-[16/9] w-full bg-slate-100 relative overflow-hidden border-b border-slate-100 shrink-0">
