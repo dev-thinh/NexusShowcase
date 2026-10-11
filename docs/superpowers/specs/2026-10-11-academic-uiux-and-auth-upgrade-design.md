@@ -1,0 +1,169 @@
+# Thiết Kế Nâng Cấp Hệ Thống NexusShowcase: Chuẩn Môi Trường Nghiên Cứu & Quản Trị Thành Viên Thực Tế
+
+**Tài liệu:** Design Specification  
+**Ngày lập:** 11/10/2026  
+**Trạng thái:** Chờ phê duyệt (Pending Review)
+
+---
+
+## 1. Mục Tiêu & Yêu Cầu Thiết Kế (Overview & Requirements)
+
+### 1.1. Yêu cầu từ Người Dùng
+1. **Loại bỏ toàn bộ Mock Data và các nút bấm giả lập:**
+   - Xóa bỏ các nút đăng nhập 1-click demo/mock trong trang Login (`QUICK_ACCOUNTS`).
+   - Xóa bỏ dữ liệu mẫu giả định, làm sạch database để sẵn sàng cho vận hành thực tế.
+2. **Khởi tạo duy nhất 1 tài khoản Admin mặc định:**
+   - Tên đăng nhập: `admin01`
+   - Mật khẩu: `admin123`
+   - Vai trò: `ADMIN` (Quản trị viên / Thầy Cố vấn Học thuật).
+3. **Thêm tính năng Admin tạo tài khoản cho thành viên khác:**
+   - Trong trang Quản lý thành viên (`/admin/members`), Admin có thể nhập thông tin để tạo mới tài khoản thành viên (`MEMBER` hoặc `CORE_MEMBER`) kèm mật khẩu khởi tạo.
+4. **Nâng cấp toàn bộ UI/UX chuẩn Môi Trường Nghiên Cứu Khoa Học (Academic Research Lab):**
+   - Ứng dụng phong cách **Swiss Modernism 2.0** theo khuyến nghị của `ui-ux-pro-max`.
+   - Cặp font học thuật: **Crimson Pro** (Serif học thuật cho tiêu đề/bài báo), **Inter** (Sans-serif chuẩn mực cho giao diện), **JetBrains Mono** (Monospace cho BibTeX, DOI, code).
+   - Bảng màu Viện Hàn Lâm: **Institutional Deep Navy** (`#0F294A`), Slate, Crisp Paper White, Gold/Amber cho giải thưởng.
+   - Tính năng **Trích dẫn Khoa học 1-Click (BibTeX / APA / IEEE Generator)**.
+   - Khối hiển thị **Tài Liệu Toàn Văn & Phụ Lục (PDF Documents & Attachments)** trên trang chi tiết và hỗ trợ upload PDF trong form đăng bài.
+   - Bộ lọc **Chủ đề Nghiên cứu (Research Topics / Domains)** trên trang chủ.
+   - **Universal Academic Footer** đồng bộ cho toàn bộ hệ thống (Khoa CNTT - ĐH KHTN ĐHQG-HCM).
+   - Hồ sơ thành viên chuẩn **Academic Scholar Portfolio** với các thẻ chỉ số khoa học (Publication, Project, Award Metrics).
+
+---
+
+## 2. Kiến Trúc Xác Thực & Quản Lý Thành Viên (Auth & Member Management)
+
+### 2.1. Xác thực linh hoạt (Username hoặc Email)
+* **Vấn đề:** Hiện tại `auth.ts` sử dụng `z.string().email()`, sẽ từ chối chuỗi không có `@` như `admin01`.
+* **Giải pháp:**
+  * Cập nhật `loginSchema` trong `src/lib/auth.ts`:
+    ```typescript
+    const loginSchema = z.object({
+      email: z.string().min(3),
+      password: z.string().min(6),
+    });
+    ```
+  * Truy vấn database hỗ trợ cả `admin01` lẫn địa chỉ email:
+    ```typescript
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { email: parsed.data.email.trim().toLowerCase() },
+          { email: `${parsed.data.email.trim().toLowerCase()}@nexus.hcmus.edu.vn` },
+        ],
+      },
+    });
+    ```
+* **Tài khoản Admin mặc định duy nhất:**
+  * `email`: `admin01`
+  * `fullName`: `Quản Trị Viên Học Thuật (Admin)`
+  * `role`: `ADMIN`
+  * `status`: `ACTIVE`
+  * Mật khẩu mã hóa bcrypt: `admin123`
+
+### 2.2. Giao diện Đăng nhập Tinh giản & Chuyên nghiệp
+* Loại bỏ hoàn toàn khối 3 tài khoản giả lập và nút 1-click test trong `src/app/login/login-form.tsx`.
+* Giữ form đăng nhập thanh lịch, tập trung:
+  * Trường "Tên đăng nhập hoặc Email" (hỗ trợ nhập `admin01` hoặc email).
+  * Trường "Mật khẩu" với nút ẩn/hiện mật khẩu.
+  * Thông báo hướng dẫn: Tài khoản do Thầy chủ nhiệm / Admin cấp phát trực tiếp.
+
+### 2.3. Tính năng Admin Tạo Tài Khoản Mới (`/admin/members`)
+* Thêm nút bấm **"Tạo Tài Khoản Thành Viên"** trên trang `/admin/members`.
+* Mở Modal / Form bao gồm:
+  * **Họ và tên:** (VD: Nguyễn Văn A)
+  * **Email / Tên đăng nhập:** (VD: 22120001@student.hcmus.edu.vn hoặc nguyenvana)
+  * **Mã số sinh viên:** (Tùy chọn, VD: 22120001)
+  * **Vai trò:** `MEMBER` (Thành viên thường) hoặc `CORE_MEMBER` (Thành viên nòng cốt đại diện nhóm nộp bài)
+  * **Mật khẩu khởi tạo:** (Mặc định gợi ý `member123` hoặc do Admin tự nhập)
+* Server Action mới trong `src/actions/admin-actions.ts`:
+  * `createMemberAction(adminId: string, data: CreateMemberInput)`
+  * Kiểm tra quyền `ADMIN`.
+  * Hash mật khẩu với `bcrypt.hash(password, 10)`.
+  * Tạo User với `status: 'ACTIVE'`.
+  * Tự động refresh trang và hiển thị thành viên mới trong bảng danh sách.
+
+---
+
+## 3. Thiết Kế UI/UX Môi Trường Nghiên Cứu (Academic Research Lab)
+
+### 3.1. Thiết Kế Typography & Hệ Thống Màu Sắc
+* **Font chữ:**
+  * Headings, Paper Titles, Abstract: `Crimson Pro` (Google Fonts, serif cổ điển, chuẩn học thuật).
+  * UI Navigation, Buttons, Cards, Forms: `Inter` (sans-serif rõ ràng, sạch sẽ, tỉ lệ chuẩn).
+  * Citation Blocks, DOI, BibTeX, Code: `JetBrains Mono` (monospace lập trình & trích dẫn).
+* **Bảng màu học thuật (Academic Tokens):**
+  * Primary: Deep Navy `#0F294A` (màu trường ĐHQG-HCM, tượng trưng cho chiều sâu học thuật).
+  * Accent / Award: Scholar Gold/Amber `#B45309` / `#D97706` (giải thưởng, vinh danh).
+  * Emerald: Lab Innovation `#059669` (dự án, mã nguồn mở).
+  * Background: Slate Ivory `#F8FAFC`, bề mặt Paper White `#FFFFFF`.
+  * Muted: `#64748B`, Border: `#E2E8F0`.
+
+### 3.2. Tính Năng Trích Dẫn Khoa Học 1-Click (BibTeX & Citation Modal)
+* Trên trang chi tiết công trình (`/showcase/[slug]`) và thẻ bài viết (`ShowcaseCard`):
+  * Thêm nút **"Trích dẫn / Cite"** với icon `Quote` / `BookOpen`.
+  * Mở Modal hiển thị:
+    * **Tab BibTeX:** Cú pháp chuẩn `@article{...}` hoặc `@inproceedings{...}` kèm tên tác giả, tiêu đề, năm, hội nghị (`issuer`), URL. Nút "Sao chép BibTeX" (Copy 1-click với thông báo Copied).
+    * **Tab APA 7th:** Format trích dẫn chuẩn tâm lý & khoa học xã hội.
+    * **Tab IEEE:** Format chuẩn hội kỹ sư điện & máy tính quốc tế.
+    * Nút "Tải file .bib".
+
+### 3.3. Khối Hiển Thị Toàn Văn & Tài Liệu PDF (Full-text PDF & Attachments)
+* Cập nhật `src/app/showcase/[slug]/page.tsx`:
+  * Hiển thị section **"Tài Liệu Toàn Văn & Phụ Lục Nghiên Cứu"**.
+  * Liệt kê các tài liệu PDF kèm thông tin dung lượng file (KB/MB), định dạng MIME.
+  * Các nút hành động: "Đọc trực tuyến" và "Tải về máy".
+* Cập nhật `src/components/item-form.tsx`:
+  * Bổ sung vùng upload tài liệu toàn văn PDF (tận dụng endpoint `/api/upload` đã hỗ trợ type `pdf`).
+  * Lưu danh sách attachment vào database khi bài viết được khởi tạo.
+
+### 3.4. Bộ Lọc Lĩnh Vực Nghiên Cứu (Research Domains / Topics)
+* Bổ sung các nhóm lĩnh vực học thuật tiêu biểu:
+  * Tất cả lĩnh vực (All Domains)
+  * Trí tuệ Nhân tạo & Thị giác Máy tính (AI & Computer Vision)
+  * Xử lý Ngôn ngữ Tự nhiên & LLM (NLP & Large Language Models)
+  * AI Y tế & Chẩn đoán Hình ảnh (Healthcare AI)
+  * Hệ thống Nhúng, IoT & Edge Computing
+  * Kỹ thuật Phần mềm & Mạng máy tính (Software Systems)
+* Tích hợp thanh lọc chủ đề mượt mà trên trang chủ.
+
+### 3.5. Universal Academic Footer
+* Tạo component `src/components/academic-footer.tsx` sử dụng trên tất cả các trang (`/`, `/showcase/[slug]`, `/members/[id]`, `/dashboard`, `/admin`):
+  * Logo và tên chính thức: **Nexus Academic Showcase — CLB Học thuật Nexus**.
+  * Đơn vị chủ quản: **Khoa Công nghệ Thông tin, Trường ĐH Khoa học Tự nhiên - ĐHQG-HCM**.
+  * Địa chỉ: 227 Nguyễn Văn Cừ, Phường 4, Quận 5, TP. Hồ Chí Minh.
+  * Liên kết học thuật: Cổng FIT HCMUS, Google Scholar Profile, GitHub Academic Org.
+
+### 3.6. Trang Hồ Sơ Thành Viên Học Thuật (Scholar Portfolio)
+* Nâng cấp `/members/[id]`:
+  * 3 thẻ thống kê chỉ số học thuật: Số bài báo nghiên cứu, Số dự án công nghệ, Số giải thưởng đạt được.
+  * Huy hiệu vai trò học thuật: Giảng viên hướng dẫn (`ADVISOR`), Trưởng nhóm nghiên cứu (`LEAD`), Tác giả chính (`FIRST_AUTHOR`).
+  * Danh sách công trình phân nhóm mạch lạc, trình bày theo cấu trúc trích dẫn học thuật.
+
+---
+
+## 4. Kế Hoạch Triển Khai Chi Tiết (Implementation Stages)
+
+1. **Giai đoạn 1: Chuẩn hóa Xác thực & Loại bỏ Mock Data**
+   - Cập nhật `auth.ts` hỗ trợ tên đăng nhập `admin01`.
+   - Làm sạch `seed.ts`, chỉ giữ lại duy nhất 1 tài khoản Admin `admin01` / `admin123`.
+   - Viết server action `createMemberAction` trong `admin-actions.ts`.
+   - Làm lại giao diện `login-form.tsx`, loại bỏ các nút giả lập mock accounts.
+2. **Giai đoạn 2: Bổ sung Quản lý Tạo Thành viên cho Admin**
+   - Thiết kế Modal và Form "Tạo Tài Khoản Thành Viên Mới" trên trang `/admin/members`.
+   - Tích hợp gọi action `createMemberAction`, xử lý validation và hiển thị tức thì.
+3. **Giai đoạn 3: Typography & Academic Design Tokens**
+   - Cập nhật `globals.css` và `tailwind.config.ts` nạp Google Fonts `Crimson Pro`, `Inter`, `JetBrains Mono`.
+   - Cấu hình bảng màu Institutional Deep Navy và các biến CSS học thuật.
+4. **Giai đoạn 4: Tính năng Học thuật Chuyên sâu**
+   - Xây dựng component `CitationModal` (BibTeX, APA, IEEE format).
+   - Cập nhật trang chi tiết `/showcase/[slug]` hiển thị nút Trích dẫn, khối PDF đính kèm.
+   - Nâng cấp `item-form.tsx` và `showcase-actions.ts` hỗ trợ upload file PDF đính kèm.
+5. **Giai đoạn 5: Universal Footer & Scholar Profile**
+   - Tạo `AcademicFooter` và tích hợp vào Layout / các trang.
+   - Hoàn thiện trang `/members/[id]` với Academic Metrics.
+   - Thêm bộ lọc Topic/Domain trên trang chủ.
+6. **Giai đoạn 6: Kiểm thử & Nghiệm thu**
+   - Cập nhật và chạy toàn bộ unit/integration test suites.
+   - Kiểm tra đăng nhập với `admin01` / `admin123`.
+   - Thử nghiệm Admin tạo tài khoản mới và đăng nhập thử bằng tài khoản vừa tạo.
+   - Chạy `npm run build` để đảm bảo 0 lỗi biên dịch.
