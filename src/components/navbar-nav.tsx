@@ -64,9 +64,9 @@ export function NavbarNav({ user }: NavbarNavProps) {
     'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-[#1A426F] hover:bg-slate-100 border border-transparent transition-all duration-150';
 
   return (
-    <div className="flex flex-1 items-center justify-between ml-4 sm:ml-8 lg:ml-12">
-      {/* CÁC TAB Ở GIỮA (CENTER NAVIGATION TABS) */}
-      <nav className="flex-1 flex items-center justify-center gap-2 sm:gap-2.5">
+    <>
+      {/* CÁC TAB CĂN GIỮA TUYỆT ĐỐI (DEAD CENTER - ĐỘC LẬP HOÀN TOÀN VỚI THẺ PROFILE) */}
+      <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 items-center gap-2 sm:gap-2.5 z-10 pointer-events-auto">
         {/* Tab: Khám phá */}
         <Link
           href="/"
@@ -163,7 +163,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
                   </div>
                   <div>
                     <div className="text-xs font-bold text-slate-900">Quản lý Thành viên</div>
-                    <div className="text-[11px] text-slate-500">Phân quyền Core Member</div>
+                    <div className="text-[11px] text-slate-500">Phân quyền CORE MEMBER</div>
                   </div>
                 </Link>
               </div>
@@ -172,19 +172,19 @@ export function NavbarNav({ user }: NavbarNavProps) {
         )}
       </nav>
 
-      {/* GÓC TRÊN BÊN PHẢI: PROFILE & ĐĂNG XUẤT */}
-      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+      {/* GÓC TRÊN BÊN PHẢI: PROFILE VỚI MAX-WIDTH CỐ ĐỊNH & ĐĂNG XUẤT */}
+      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 z-10 ml-auto">
         {user ? (
           <>
-            {/* User Profile Chip */}
+            {/* User Profile Card với max-width cố định, không làm xê dịch layout */}
             <Link
               href={`/members/${user.id}`}
-              className={`h-10 px-3 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs ${
+              className={`h-10 px-2.5 sm:px-3 rounded-xl inline-flex items-center gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs max-w-[150px] sm:max-w-[210px] truncate ${
                 isProfileActive
                   ? 'bg-[#1A426F] text-white border-[#28578E] shadow-xs'
                   : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
               }`}
-              title="Hồ sơ học thuật cá nhân"
+              title={`Hồ sơ: ${user.name}`}
               aria-current={isProfileActive ? 'page' : undefined}
             >
               <div
@@ -194,15 +194,23 @@ export function NavbarNav({ user }: NavbarNavProps) {
               >
                 {user.name?.charAt(0) || 'U'}
               </div>
-              <span className="hidden md:inline max-w-[120px] truncate">{user.name}</span>
-              {user.role === 'ADMIN' && (
-                <span className="hidden xl:inline text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
+
+              <span className="truncate flex-1 min-w-0 font-medium hidden xs:inline">
+                {user.name}
+              </span>
+
+              {/* 3 THẺ ROLE CHUẨN HÓA: Admin, Core, Member */}
+              {user.role === 'ADMIN' ? (
+                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
                   Admin
                 </span>
-              )}
-              {user.role === 'CORE_MEMBER' && (
-                <span className="hidden xl:inline text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200">
-                  CORE MEMBER
+              ) : user.role === 'CORE_MEMBER' ? (
+                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200">
+                  Core
+                </span>
+              ) : (
+                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                  Member
                 </span>
               )}
             </Link>
@@ -226,6 +234,6 @@ export function NavbarNav({ user }: NavbarNavProps) {
           </Link>
         )}
       </div>
-    </div>
+    </>
   );
 }
