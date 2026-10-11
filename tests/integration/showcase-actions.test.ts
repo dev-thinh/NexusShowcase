@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import { createShowcaseItemAction, reviewShowcaseItemAction } from '@/actions/showcase-actions';
 
@@ -12,37 +12,32 @@ describe('Showcase Server Actions', () => {
     if (!adminUser) {
       adminUser = await prisma.user.create({
         data: {
-          email: 'admin-test@nexus.hcmus.edu.vn',
-          fullName: 'Admin Test',
+          email: `admin-sc-${Date.now()}@nexus.hcmus.edu.vn`,
+          fullName: 'Admin Showcase Test',
           role: 'ADMIN',
           status: 'ACTIVE',
         },
       });
     }
 
-    coreUser = await prisma.user.findFirst({ where: { role: 'CORE_MEMBER' } });
-    if (!coreUser) {
-      coreUser = await prisma.user.create({
-        data: {
-          email: 'core-test@nexus.hcmus.edu.vn',
-          fullName: 'Core Member Test',
-          role: 'CORE_MEMBER',
-          status: 'ACTIVE',
-        },
-      });
-    }
+    const timestamp = Date.now();
+    coreUser = await prisma.user.create({
+      data: {
+        email: `core-sc-${timestamp}@nexus.hcmus.edu.vn`,
+        fullName: 'Core Showcase Test',
+        role: 'CORE_MEMBER',
+        status: 'ACTIVE',
+      },
+    });
 
-    regularUser = await prisma.user.findFirst({ where: { role: 'MEMBER' } });
-    if (!regularUser) {
-      regularUser = await prisma.user.create({
-        data: {
-          email: 'member-test@nexus.hcmus.edu.vn',
-          fullName: 'Regular Member Test',
-          role: 'MEMBER',
-          status: 'ACTIVE',
-        },
-      });
-    }
+    regularUser = await prisma.user.create({
+      data: {
+        email: `member-sc-${timestamp}@nexus.hcmus.edu.vn`,
+        fullName: 'Regular Showcase Test',
+        role: 'MEMBER',
+        status: 'ACTIVE',
+      },
+    });
   });
 
   it('should forbid regular member from creating showcase item', async () => {
@@ -59,18 +54,23 @@ describe('Showcase Server Actions', () => {
     expect(result.error).toContain('Chỉ Thành viên nòng cốt');
   });
 
-  it('should forbid admin from creating showcase item (admin reviews only)', async () => {
+  it('should allow admin to create and directly publish showcase item', async () => {
     const result = await createShowcaseItemAction(adminUser.id, {
-      title: 'Bài nộp thử từ tài khoản Admin',
-      summary: 'Admin không được đăng bài trực tiếp',
+      title: 'Công trình của Thầy Cố Vấn',
+      summary: 'Bài báo do Thầy chủ nhiệm trực tiếp đăng tải',
       type: 'RESEARCH_PAPER',
       publishedYear: 2026,
       contributors: [],
       links: [],
+      submitForReview: true,
     });
 
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('Tài khoản Quản trị viên chỉ có thẩm quyền kiểm duyệt bài nộp');
+    expect(result.success).toBe(true);
+    expect(result.item?.status).toBe('PUBLISHED');
+
+    if (result.item) {
+      await prisma.showcaseItem.delete({ where: { id: result.item.id } });
+    }
   });
 
   it('should allow core member to create showcase item with mixed contributors', async () => {
@@ -130,5 +130,14 @@ describe('Showcase Server Actions', () => {
 
     // Dọn dẹp
     await prisma.showcaseItem.delete({ where: { id: result.item!.id } });
+  });
+
+  afterAll(async () => {
+    if (coreUser?.id) {
+      await prisma.user.deleteMany({ where: { id: coreUser.id } });
+    }
+    if (regularUser?.id) {
+      await prisma.user.deleteMany({ where: { id: regularUser.id } });
+    }
   });
 });

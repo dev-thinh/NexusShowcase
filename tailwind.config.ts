@@ -35,6 +35,15 @@ const config: Config = {
           border: '#E2E8F0',
         },
       },
+      keyframes: {
+        'filmstrip-roll': {
+          '0%': { transform: 'translateX(0)' },
+          '100%': { transform: 'translateX(-50%)' },
+        },
+      },
+      animation: {
+        'filmstrip-roll': 'filmstrip-roll 45s linear infinite',
+      },
     },
   },
   plugins: [],
