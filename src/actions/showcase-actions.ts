@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { canUserUpload, canUserReview } from '@/lib/permissions';
 import { slugify } from '@/lib/slugify';
 import { ItemType, ItemScope, ContributorRole, LinkType } from '@prisma/client';
+import { revalidatePath } from 'next/cache';
 
 export interface ContributorInput {
   userId?: string | null;
@@ -46,10 +47,7 @@ export interface CreateShowcaseItemInput {
 export async function createShowcaseItemAction(userId: string, input: CreateShowcaseItemInput) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user || !canUserUpload(user)) {
-    if (user?.role === 'ADMIN') {
-      return { success: false, error: 'Tài khoản Quản trị viên chỉ có thẩm quyền kiểm duyệt bài nộp và quản lý thành viên, không trực tiếp đăng bài.' };
-    }
-    return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) mới có quyền đăng bài. Vui lòng liên hệ Thầy chủ nhiệm để được nâng cấp.' };
+    return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) và Quản trị viên mới có quyền đăng bài.' };
   }
 
   let slug = slugify(input.title);
@@ -58,7 +56,10 @@ export async function createShowcaseItemAction(userId: string, input: CreateShow
     slug = `${slug}-${Date.now().toString().slice(-4)}`;
   }
 
-  const status = input.submitForReview ? 'PENDING_REVIEW' : 'DRAFT';
+  const isAdmin = user.role === 'ADMIN';
+  const status = input.submitForReview
+    ? (isAdmin ? 'PUBLISHED' : 'PENDING_REVIEW')
+    : 'DRAFT';
 
   const item = await prisma.showcaseItem.create({
     data: {
@@ -71,6 +72,7 @@ export async function createShowcaseItemAction(userId: string, input: CreateShow
       issuer: input.issuer,
       thumbnailUrl: input.thumbnailUrl,
       status,
+      publishedAt: status === 'PUBLISHED' ? new Date() : null,
       publishedYear: input.publishedYear,
       creatorId: user.id,
       contributors: {
@@ -127,8 +129,81 @@ export async function reviewShowcaseItemAction(
       status: isPublish ? 'PUBLISHED' : 'REJECTED',
       publishedAt: isPublish ? new Date() : undefined,
       rejectionReason: isPublish ? null : payload.reason || 'Nội dung cần chỉnh sửa bổ sung.',
+      ...(isPublish ? {} : { isPinned: false, pinnedAt: null }),
     },
   });
 
+  try {
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidatePath('/admin/reviews');
+    if (updated.slug) revalidatePath(`/showcase/${updated.slug}`);
+  } catch {
+    // Ignore cache revalidation errors outside request context
+  }
+
   return { success: true, status: updated.status };
+}
+
+export async function togglePinShowcaseItemAction(adminId: string, itemId: string) {
+  const admin = await prisma.user.findUnique({ where: { id: adminId } });
+  if (!admin || !canUserReview(admin)) {
+    return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền ghim công trình lên trang chủ.' };
+  }
+
+  const targetItem = await prisma.showcaseItem.findUnique({ where: { id: itemId } });
+  if (!targetItem) {
+    return { success: false, error: 'Không tìm thấy công trình này.' };
+  }
+
+  if (targetItem.status !== 'PUBLISHED') {
+    return { success: false, error: 'Chỉ có thể ghim các công trình đã được xuất bản (PUBLISHED).' };
+  }
+
+  if (targetItem.isPinned) {
+    // Unpin item
+    await prisma.showcaseItem.update({
+      where: { id: itemId },
+      data: { isPinned: false, pinnedAt: null },
+    });
+
+    try {
+      revalidatePath('/');
+      revalidatePath('/admin');
+      if (targetItem.slug) revalidatePath(`/showcase/${targetItem.slug}`);
+    } catch {
+      // Ignore in tests
+    }
+
+    return { success: true, isPinned: false, message: 'Đã bỏ ghim công trình khỏi trang chủ.' };
+  }
+
+  // Pin item: check limit 10 FIFO
+  const pinnedItems = await prisma.showcaseItem.findMany({
+    where: { isPinned: true, status: 'PUBLISHED' },
+    orderBy: { pinnedAt: 'asc' },
+  });
+
+  if (pinnedItems.length >= 10) {
+    const oldest = pinnedItems[0];
+    await prisma.showcaseItem.update({
+      where: { id: oldest.id },
+      data: { isPinned: false, pinnedAt: null },
+    });
+  }
+
+  await prisma.showcaseItem.update({
+    where: { id: itemId },
+    data: { isPinned: true, pinnedAt: new Date() },
+  });
+
+  try {
+    revalidatePath('/');
+    revalidatePath('/admin');
+    if (targetItem.slug) revalidatePath(`/showcase/${targetItem.slug}`);
+  } catch {
+    // Ignore in tests
+  }
+
+  return { success: true, isPinned: true, message: 'Đã ghim công trình lên trang chủ (Tối đa 10 bài).' };
 }
