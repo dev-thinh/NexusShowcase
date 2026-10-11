@@ -1,8 +1,10 @@
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '@/components/navbar';
+import { AcademicFooter } from '@/components/academic-footer';
 import { VideoPlayer } from '@/components/video-player';
 import { TypeBadge, RoleBadge } from '@/components/ui/badge';
+import { CitationModal } from '@/components/citation-modal';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -14,6 +16,9 @@ import {
   Users,
   ExternalLink,
   GraduationCap,
+  Download,
+  Eye,
+  Paperclip,
 } from 'lucide-react';
 
 export default async function ShowcaseDetailPage({
@@ -54,7 +59,7 @@ export default async function ShowcaseDetailPage({
         {/* Breadcrumb Back Link */}
         <Link
           href="/"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-blue-600 mb-6 transition-colors group"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#0F294A] mb-6 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           <span>Quay lại danh mục công trình</span>
@@ -76,16 +81,24 @@ export default async function ShowcaseDetailPage({
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight">
+          <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight font-serif">
             {item.title}
           </h1>
 
-          <p className="mt-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
-            {item.summary}
-          </p>
+          <div className="mt-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">
+              Tóm tắt đề tài (Abstract)
+            </h2>
+            <p className="text-sm text-slate-700 leading-relaxed font-normal">
+              {item.summary}
+            </p>
+          </div>
 
-          {/* Action Buttons */}
-          <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap gap-3">
+          {/* Action Buttons with CitationModal */}
+          <div className="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center gap-3">
+            {/* Citation Generator */}
+            <CitationModal item={item} />
+
             {paperLink && (
               <a
                 href={paperLink.url}
@@ -147,11 +160,69 @@ export default async function ShowcaseDetailPage({
           </section>
         )}
 
+        {/* Full-Text PDF & Attachments Section */}
+        {item.attachments && item.attachments.length > 0 && (
+          <section className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <Paperclip className="w-5 h-5 text-[#0F294A]" />
+                <span>Tài Liệu Toàn Văn &amp; Phụ Lục Nghiên Cứu</span>
+              </h2>
+              <span className="text-xs text-slate-400 font-semibold">
+                {item.attachments.length} tệp đính kèm
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {item.attachments.map((att) => (
+                <div
+                  key={att.id}
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 hover:bg-slate-100/50 transition-colors"
+                >
+                  <div className="flex items-center gap-3.5 truncate">
+                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 font-black text-xs flex items-center justify-center shrink-0">
+                      PDF
+                    </div>
+                    <div className="truncate">
+                      <div className="font-bold text-slate-900 text-xs truncate">
+                        {att.fileName}
+                      </div>
+                      <div className="text-[11px] text-slate-500 mt-0.5">
+                        {(att.fileSize / (1024 * 1024)).toFixed(2)} MB • {att.mimeType}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0">
+                    <a
+                      href={att.fileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-slate-500" />
+                      <span>Xem online</span>
+                    </a>
+                    <a
+                      href={att.fileUrl}
+                      download={att.fileName}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] text-white text-xs font-bold transition-all shadow-xs"
+                    >
+                      <Download className="w-3.5 h-3.5 text-blue-200" />
+                      <span>Tải về PDF</span>
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Authors Section */}
         <section className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm mb-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Users className="w-5 h-5 text-blue-600" />
+              <Users className="w-5 h-5 text-[#0F294A]" />
               <span>Tác giả &amp; Người hướng dẫn</span>
             </h2>
             <span className="text-xs text-slate-400 font-semibold">{item.contributors.length} thành viên</span>
@@ -175,7 +246,7 @@ export default async function ShowcaseDetailPage({
                     className={`w-11 h-11 rounded-full font-bold flex items-center justify-center text-sm shrink-0 shadow-xs ${
                       isAdvisor
                         ? 'bg-purple-600 text-white'
-                        : 'bg-blue-600/10 text-blue-600'
+                        : 'bg-[#0F294A]/10 text-[#0F294A]'
                     }`}
                   >
                     {isAdvisor ? <GraduationCap className="w-5 h-5" /> : name.charAt(0)}
@@ -186,7 +257,7 @@ export default async function ShowcaseDetailPage({
                       {c.user ? (
                         <Link
                           href={`/members/${c.user.id}`}
-                          className="font-bold text-slate-900 hover:text-blue-600 transition-colors truncate block text-sm"
+                          className="font-bold text-slate-900 hover:text-[#0F294A] transition-colors truncate block text-sm"
                         >
                           {name}
                         </Link>
@@ -219,6 +290,9 @@ export default async function ShowcaseDetailPage({
           </section>
         )}
       </main>
+
+      {/* Institutional Academic Footer */}
+      <AcademicFooter />
     </div>
   );
 }

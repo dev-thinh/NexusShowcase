@@ -9,8 +9,40 @@ describe('Showcase Server Actions', () => {
 
   beforeAll(async () => {
     adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (!adminUser) {
+      adminUser = await prisma.user.create({
+        data: {
+          email: 'admin-test@nexus.hcmus.edu.vn',
+          fullName: 'Admin Test',
+          role: 'ADMIN',
+          status: 'ACTIVE',
+        },
+      });
+    }
+
     coreUser = await prisma.user.findFirst({ where: { role: 'CORE_MEMBER' } });
+    if (!coreUser) {
+      coreUser = await prisma.user.create({
+        data: {
+          email: 'core-test@nexus.hcmus.edu.vn',
+          fullName: 'Core Member Test',
+          role: 'CORE_MEMBER',
+          status: 'ACTIVE',
+        },
+      });
+    }
+
     regularUser = await prisma.user.findFirst({ where: { role: 'MEMBER' } });
+    if (!regularUser) {
+      regularUser = await prisma.user.create({
+        data: {
+          email: 'member-test@nexus.hcmus.edu.vn',
+          fullName: 'Regular Member Test',
+          role: 'MEMBER',
+          status: 'ACTIVE',
+        },
+      });
+    }
   });
 
   it('should forbid regular member from creating showcase item', async () => {
@@ -58,12 +90,22 @@ describe('Showcase Server Actions', () => {
           type: 'GITHUB',
         },
       ],
+      attachments: [
+        {
+          fileName: 'paper-manuscript.pdf',
+          fileUrl: '/uploads/documents/paper-manuscript.pdf',
+          fileSize: 1024000,
+          mimeType: 'application/pdf',
+        },
+      ],
       submitForReview: true,
     });
 
     expect(result.success).toBe(true);
     expect(result.item?.status).toBe('PENDING_REVIEW');
     expect(result.item?.contributors.length).toBe(3);
+    expect(result.item?.attachments?.length).toBe(1);
+    expect(result.item?.attachments?.[0].fileName).toBe('paper-manuscript.pdf');
 
     // Admin duyệt bài
     const reviewResult = await reviewShowcaseItemAction(adminUser.id, result.item!.id, {

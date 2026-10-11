@@ -21,6 +21,13 @@ export interface LinkInput {
   type: LinkType;
 }
 
+export interface AttachmentInput {
+  fileName: string;
+  fileUrl: string;
+  fileSize: number;
+  mimeType: string;
+}
+
 export interface CreateShowcaseItemInput {
   title: string;
   summary: string;
@@ -32,6 +39,7 @@ export interface CreateShowcaseItemInput {
   publishedYear: number;
   contributors: ContributorInput[];
   links: LinkInput[];
+  attachments?: AttachmentInput[];
   submitForReview?: boolean;
 }
 
@@ -80,10 +88,19 @@ export async function createShowcaseItemAction(userId: string, input: CreateShow
           type: l.type,
         })),
       },
+      attachments: {
+        create: (input.attachments || []).map((a) => ({
+          fileName: a.fileName,
+          fileUrl: a.fileUrl,
+          fileSize: a.fileSize,
+          mimeType: a.mimeType,
+        })),
+      },
     },
     include: {
       contributors: true,
       links: true,
+      attachments: true,
     },
   });
 
