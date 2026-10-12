@@ -44,9 +44,9 @@ export default async function AdminDashboardPage() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
         {/* Banner */}
-        <div className="bg-[#0F294A] text-white p-6 sm:p-10 rounded-2xl shadow-xs mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-[#163860]">
+        <div className="bg-[#0F294A] text-white p-6 sm:p-10 rounded-2xl shadow-xs mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-amber-300 text-xs sm:text-sm font-bold mb-3 border border-white/15">
+            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-amber-300 text-xs sm:text-sm font-semibold mb-3 border border-white/15">
               <ShieldCheck className="w-4 h-4 text-amber-400" />
               <span>Khu vực Quản trị Học thuật</span>
             </div>
@@ -63,14 +63,14 @@ export default async function AdminDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <Link
             href="/admin/reviews"
-            className="group p-6 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md hover:border-amber-300 transition-all flex flex-col justify-between"
+            className="group p-6 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200">
+                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
                   <Clock className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80">
                   Cần xử lý
                 </span>
               </div>
@@ -91,14 +91,14 @@ export default async function AdminDashboardPage() {
 
           <Link
             href="/admin/members"
-            className="group p-6 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between"
+            className="group p-6 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 text-[#0F294A] flex items-center justify-center font-bold border border-blue-200">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center font-bold border border-blue-200/80">
                   <Users className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-100 text-blue-800 border border-blue-200">
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200/80">
                   Thành viên
                 </span>
               </div>
@@ -120,10 +120,10 @@ export default async function AdminDashboardPage() {
           <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold border border-amber-200">
+                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
                   <Pin className="w-6 h-6" />
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800 border border-amber-200">
+                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80">
                   Trang chủ
                 </span>
               </div>
@@ -134,11 +134,11 @@ export default async function AdminDashboardPage() {
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-amber-600 font-serif">{pinnedCount} bài</span>
+              <span className="text-2xl font-black text-amber-700 font-serif">{pinnedCount} bài</span>
               <a
                 href="/"
                 target="_blank"
-                className="text-sm font-bold text-[#0F294A] hover:underline inline-flex items-center gap-1"
+                className="text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] hover:underline inline-flex items-center gap-1"
               >
                 <span>Xem trang chủ</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export default async function AdminDashboardPage() {
         <section className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 mb-6">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200 mb-1.5">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/80 mb-1.5">
                 <Pin className="w-3.5 h-3.5" />
                 <span>Tiêu điểm đã ghim</span>
               </div>
@@ -206,7 +206,7 @@ export default async function AdminDashboardPage() {
                   <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                     <Link
                       href={`/showcase/${item.slug}`}
-                      className="h-10 px-3.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 inline-flex items-center gap-1.5 transition-colors"
+                      className="h-10 px-3.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs inline-flex items-center gap-1.5 transition-colors"
                     >
                       <span>Xem</span>
                       <ExternalLink className="w-3.5 h-3.5" />

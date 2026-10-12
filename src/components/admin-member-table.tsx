@@ -65,7 +65,7 @@ export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Tìm theo họ tên, email, MSSV..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] focus:border-transparent transition-all placeholder:text-slate-400 shadow-2xs"
+            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-all placeholder:text-slate-400 shadow-2xs"
           />
           {searchQuery && (
             <button
@@ -79,12 +79,12 @@ export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
         </div>
 
         {/* Role Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-200/70 rounded-xl self-start sm:self-auto text-xs sm:text-sm font-semibold overflow-x-auto max-w-full">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/80 self-start sm:self-auto text-xs sm:text-sm font-semibold overflow-x-auto max-w-full">
           <button
             onClick={() => setRoleFilter('ALL')}
             className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'ALL'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -94,7 +94,7 @@ export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
             onClick={() => setRoleFilter('CORE_MEMBER')}
             className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'CORE_MEMBER'
-                ? 'bg-white text-blue-900 shadow-2xs font-bold'
+                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -104,7 +104,7 @@ export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
             onClick={() => setRoleFilter('MEMBER')}
             className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'MEMBER'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -114,7 +114,7 @@ export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
             onClick={() => setRoleFilter('ADMIN')}
             className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'ADMIN'
-                ? 'bg-white text-amber-900 shadow-2xs font-bold'
+                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
             }`}
           >
@@ -169,9 +169,9 @@ export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
                       <span
                         className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-bold border ${
                           member.role === 'ADMIN'
-                            ? 'bg-amber-100 text-amber-900 border-amber-300'
+                            ? 'bg-amber-50 text-amber-800 border-amber-200'
                             : member.role === 'CORE_MEMBER'
-                            ? 'bg-blue-100 text-blue-900 border-blue-300'
+                            ? 'bg-blue-50 text-blue-800 border-blue-200'
                             : 'bg-slate-100 text-slate-700 border-slate-200'
                         }`}
                       >

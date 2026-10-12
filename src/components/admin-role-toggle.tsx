@@ -29,7 +29,7 @@ export function AdminRoleToggle({
 
   if (currentRole === 'ADMIN') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-xs font-bold border border-amber-300">
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
         <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
         <span>Quản trị viên</span>
       </span>
@@ -46,7 +46,7 @@ export function AdminRoleToggle({
         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer disabled:opacity-50 ${
           isCore
             ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
-            : 'bg-[#0F294A] hover:bg-[#1A3E6B] text-white'
+            : 'bg-[#0F294A] hover:bg-[#1E3A5F] text-white'
         }`}
       >
         {loading ? (
@@ -54,7 +54,7 @@ export function AdminRoleToggle({
         ) : isCore ? (
           <ArrowDownCircle className="w-3.5 h-3.5" />
         ) : (
-          <ArrowUpCircle className="w-3.5 h-3.5 text-blue-200" />
+          <ArrowUpCircle className="w-3.5 h-3.5 text-white/80" />
         )}
         <span>{isCore ? 'Hạ xuống Member' : 'Nâng lên CORE MEMBER'}</span>
       </button>

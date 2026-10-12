@@ -60,7 +60,7 @@ export default async function AdminReviewsPage() {
               Danh sách các công trình do sinh viên gửi lên đang chờ xét duyệt xuất bản.
             </p>
           </div>
-          <span className="text-sm font-bold px-3.5 py-1.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 self-start sm:self-center">
+          <span className="text-sm font-bold px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 self-start sm:self-center">
             {pendingItems.length} bài chờ duyệt
           </span>
         </div>
