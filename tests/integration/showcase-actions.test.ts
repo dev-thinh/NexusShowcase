@@ -1,6 +1,23 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import { createShowcaseItemAction, reviewShowcaseItemAction } from '@/actions/showcase-actions';
+
+const currentUserMock = vi.hoisted(() => ({
+  actor: null as {
+    id: string;
+    fullName: string;
+    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
+    status: 'ACTIVE';
+  } | null,
+}));
+
+vi.mock('@/lib/current-user', () => ({
+  getCurrentUser: vi.fn(async (allowedRoles?: string[]) => {
+    const actor = currentUserMock.actor;
+    if (!actor || (allowedRoles && !allowedRoles.includes(actor.role))) return null;
+    return actor;
+  }),
+}));
 
 describe('Showcase Server Actions', () => {
   let adminUser: any;
@@ -41,6 +58,7 @@ describe('Showcase Server Actions', () => {
   });
 
   it('should forbid regular member from creating showcase item', async () => {
+    currentUserMock.actor = regularUser;
     const result = await createShowcaseItemAction({
       title: 'Bài báo trái phép của member thường',
       summary: 'Tóm tắt bài báo',
@@ -55,6 +73,7 @@ describe('Showcase Server Actions', () => {
   });
 
   it('should allow admin to create and directly publish showcase item', async () => {
+    currentUserMock.actor = adminUser;
     const result = await createShowcaseItemAction({
       title: 'Công trình của Thầy Cố Vấn',
       summary: 'Bài báo do Thầy chủ nhiệm trực tiếp đăng tải',
@@ -74,6 +93,7 @@ describe('Showcase Server Actions', () => {
   });
 
   it('should allow core member to create showcase item with mixed contributors', async () => {
+    currentUserMock.actor = coreUser;
     const result = await createShowcaseItemAction({
       title: 'Hệ thống Nhận diện Khuôn mặt CLB',
       summary: 'Dự án áp dụng FaceNet và YOLO',
@@ -122,6 +142,7 @@ describe('Showcase Server Actions', () => {
     expect(result.item?.attachments?.[0].fileName).toBe('paper-manuscript.pdf');
 
     // Admin duyệt bài
+    currentUserMock.actor = adminUser;
     const reviewResult = await reviewShowcaseItemAction(result.item!.id, {
       action: 'PUBLISH',
     });

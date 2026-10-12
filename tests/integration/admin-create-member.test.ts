@@ -1,7 +1,24 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import { createMemberAction } from '@/actions/admin-actions';
 import bcrypt from 'bcryptjs';
+
+const currentUserMock = vi.hoisted(() => ({
+  actor: null as {
+    id: string;
+    fullName: string;
+    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
+    status: 'ACTIVE';
+  } | null,
+}));
+
+vi.mock('@/lib/current-user', () => ({
+  getCurrentUser: vi.fn(async (allowedRoles?: string[]) => {
+    const actor = currentUserMock.actor;
+    if (!actor || (allowedRoles && !allowedRoles.includes(actor.role))) return null;
+    return actor;
+  }),
+}));
 
 describe('Admin Create Member Action', () => {
   let adminUser: any;
@@ -12,6 +29,12 @@ describe('Admin Create Member Action', () => {
 
   it('should reject creation if caller is not an ADMIN', async () => {
     const fakeNonAdminId = 'non-admin-user-id';
+    currentUserMock.actor = {
+      id: fakeNonAdminId,
+      fullName: 'Non-admin member',
+      role: 'MEMBER',
+      status: 'ACTIVE',
+    };
     const res = await createMemberAction({
       fullName: 'Sinh Viên Mới',
       email: 'sinhvien01@nexus.hcmus.edu.vn',
@@ -22,6 +45,7 @@ describe('Admin Create Member Action', () => {
   });
 
   it('should allow admin to create a new member with default password', async () => {
+    currentUserMock.actor = adminUser;
     const email = `test-member-${Date.now()}@student.hcmus.edu.vn`;
     const res = await createMemberAction({
       fullName: 'Trần Văn Nam',
@@ -46,6 +70,7 @@ describe('Admin Create Member Action', () => {
   });
 
   it('should reject creating a user with already existing email', async () => {
+    currentUserMock.actor = adminUser;
     const res = await createMemberAction({
       fullName: 'Trùng Lặp',
       email: adminUser.email,

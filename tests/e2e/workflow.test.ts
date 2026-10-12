@@ -1,8 +1,25 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import { createShowcaseItemAction, reviewShowcaseItemAction } from '@/actions/showcase-actions';
 import { updateUserRoleAction } from '@/actions/admin-actions';
 import bcrypt from 'bcryptjs';
+
+const currentUserMock = vi.hoisted(() => ({
+  actor: null as {
+    id: string;
+    fullName: string;
+    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
+    status: 'ACTIVE';
+  } | null,
+}));
+
+vi.mock('@/lib/current-user', () => ({
+  getCurrentUser: vi.fn(async (allowedRoles?: string[]) => {
+    const actor = currentUserMock.actor;
+    if (!actor || (allowedRoles && !allowedRoles.includes(actor.role))) return null;
+    return actor;
+  }),
+}));
 
 describe('End-to-End Club Showcase Workflow', () => {
   let admin: any;
@@ -37,6 +54,7 @@ describe('End-to-End Club Showcase Workflow', () => {
   });
 
   it('Step 1: Member thường không được phép nộp bài', async () => {
+    currentUserMock.actor = newStudent;
     const attempt = await createShowcaseItemAction({
       title: 'Đề tài chưa được cấp quyền',
       summary: 'Thử nghiệm nộp bài trái phép',
@@ -49,12 +67,14 @@ describe('End-to-End Club Showcase Workflow', () => {
   });
 
   it('Step 2: Thầy chủ nhiệm nâng cấp sinh viên lên CORE_MEMBER', async () => {
+    currentUserMock.actor = admin;
     const promotion = await updateUserRoleAction(newStudent.id, 'CORE_MEMBER');
     expect(promotion.success).toBe(true);
     expect(promotion.user?.role).toBe('CORE_MEMBER');
   });
 
   it('Step 3: Core Member nộp bài có Thầy hướng dẫn và đồng đội tham gia', async () => {
+    currentUserMock.actor = { ...newStudent, role: 'CORE_MEMBER' };
     const submission = await createShowcaseItemAction({
       title: 'Hệ Thống Trưng Bày Khoa Học NexusShowcase E2E',
       summary: 'Nền tảng trưng bày kết quả nghiên cứu sinh viên',
@@ -92,6 +112,7 @@ describe('End-to-End Club Showcase Workflow', () => {
     expect(submission.item?.status).toBe('PENDING_REVIEW');
 
     // Step 4: Thầy chủ nhiệm duyệt xuất bản
+    currentUserMock.actor = admin;
     const review = await reviewShowcaseItemAction(submission.item!.id, {
       action: 'PUBLISH',
     });

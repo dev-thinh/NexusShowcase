@@ -1,6 +1,23 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import { togglePinShowcaseItemAction } from '@/actions/showcase-actions';
+
+const currentUserMock = vi.hoisted(() => ({
+  actor: null as {
+    id: string;
+    fullName: string;
+    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
+    status: 'ACTIVE';
+  } | null,
+}));
+
+vi.mock('@/lib/current-user', () => ({
+  getCurrentUser: vi.fn(async (allowedRoles?: string[]) => {
+    const actor = currentUserMock.actor;
+    if (!actor || (allowedRoles && !allowedRoles.includes(actor.role))) return null;
+    return actor;
+  }),
+}));
 
 describe('Showcase Pinning Action', () => {
   let adminUser: any;
@@ -39,6 +56,7 @@ describe('Showcase Pinning Action', () => {
   });
 
   it('should forbid non-admin from pinning item', async () => {
+    currentUserMock.actor = regularUser;
     const item = await prisma.showcaseItem.create({
       data: {
         title: 'Bài báo test quyền',
@@ -58,6 +76,7 @@ describe('Showcase Pinning Action', () => {
   });
 
   it('should toggle pin and unpin successfully by admin', async () => {
+    currentUserMock.actor = adminUser;
     const item = await prisma.showcaseItem.create({
       data: {
         title: 'Bài báo test toggle pin',
@@ -91,6 +110,7 @@ describe('Showcase Pinning Action', () => {
   });
 
   it('should enforce FIFO eviction when pinning exceeds 10 items', async () => {
+    currentUserMock.actor = adminUser;
     // Reset all pinned items to ensure clean state
     await prisma.showcaseItem.updateMany({
       data: { isPinned: false, pinnedAt: null },
