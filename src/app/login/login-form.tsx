@@ -12,7 +12,7 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
-  Shield,
+
 } from 'lucide-react';
 
 export function LoginForm() {
@@ -179,12 +179,12 @@ export function LoginForm() {
           </button>
         </form>
 
-        <div className="mt-6 pt-5 border-t border-slate-100 flex items-start gap-2.5 text-slate-500 text-xs leading-relaxed">
-          <Shield className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
-          <div>
-            Hệ thống nội bộ phục vụ nghiên cứu khoa học. Vui lòng liên hệ Quản trị viên nếu bạn chưa được cấp tài khoản.
-          </div>
-        </div>
+
+
+
+
+
+
       </div>
     </div>
   );
