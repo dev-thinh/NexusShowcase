@@ -122,7 +122,7 @@ export function LoginForm() {
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="admin01 hoặc email..."
                 disabled={isPending}
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-slate-50 hover:bg-slate-100/60 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all font-medium disabled:opacity-50"
+                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
               />
             </div>
           </div>
@@ -147,7 +147,7 @@ export function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="w-full pl-10 pr-10 py-2.5 text-sm bg-slate-50 hover:bg-slate-100/60 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all font-medium disabled:opacity-50"
+                className="w-full pl-10 pr-10 py-2.5 text-sm bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
               />
               <button
                 type="button"
@@ -163,7 +163,7 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full mt-2 py-3 px-4 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            className="w-full mt-2 py-3 px-4 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
           >
             {isPending ? (
               <>

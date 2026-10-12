@@ -38,8 +38,8 @@ export default function LoginPage() {
       {/* Hero Header */}
       <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-200">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100 text-[#0F294A] text-xs sm:text-sm font-bold mb-4 shadow-2xs border border-blue-200">
-            <GraduationCap className="w-4 h-4 text-blue-700" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-800 text-xs sm:text-sm font-bold mb-4 shadow-2xs border border-slate-200">
+            <GraduationCap className="w-4 h-4 text-slate-600" />
             <span>KHOA CÔNG NGHỆ THÔNG TIN • ĐH KHOA HỌC TỰ NHIÊN - ĐHQG-HCM</span>
           </div>
 
