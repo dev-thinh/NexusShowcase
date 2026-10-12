@@ -17,7 +17,7 @@ export async function Navbar() {
             className="flex items-center gap-3 group rounded-xl p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
             aria-label="Trang chủ NexusShowcase"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0F294A] flex items-center justify-center text-white font-black text-lg shadow-xs group-hover:bg-[#1A3E6B] transition-colors shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0F294A] flex items-center justify-center text-white font-black text-lg shadow-xs group-hover:bg-[#1E3A5F] transition-colors shrink-0">
               <GraduationCap className="w-5 h-5 text-blue-200" />
             </div>
             <div className="flex flex-col">

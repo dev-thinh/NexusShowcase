@@ -57,11 +57,11 @@ export function NavbarNav({ user }: NavbarNavProps) {
 
   // Standard uniform active panel class
   const activeTabClass =
-    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#1A426F] text-white border border-[#28578E] shadow-xs transition-all duration-150';
+    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150';
 
   // Standard uniform inactive panel class
   const inactiveTabClass =
-    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold text-slate-700 hover:text-[#1A426F] hover:bg-slate-100 border border-transparent transition-all duration-150';
+    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150';
 
   return (
     <>
@@ -73,7 +73,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
           className={isExploreActive ? activeTabClass : inactiveTabClass}
           aria-current={isExploreActive ? 'page' : undefined}
         >
-          <Compass className={`w-4 h-4 shrink-0 ${isExploreActive ? 'text-blue-200' : 'text-slate-500'}`} />
+          <Compass className={`w-4 h-4 shrink-0 ${isExploreActive ? 'text-blue-200' : 'text-slate-400'}`} />
           <span>Khám phá</span>
         </Link>
 
@@ -84,7 +84,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
             className={isDashboardActive ? activeTabClass : inactiveTabClass}
             aria-current={isDashboardActive ? 'page' : undefined}
           >
-            <LayoutDashboard className={`w-4 h-4 shrink-0 ${isDashboardActive ? 'text-blue-200' : 'text-slate-500'}`} />
+            <LayoutDashboard className={`w-4 h-4 shrink-0 ${isDashboardActive ? 'text-blue-200' : 'text-slate-400'}`} />
             <span>Dashboard</span>
           </Link>
         )}
@@ -97,14 +97,14 @@ export function NavbarNav({ user }: NavbarNavProps) {
               onClick={() => setIsAdminDropdownOpen((prev) => !prev)}
               className={`h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-all duration-150 border cursor-pointer ${
                 isAdminActive
-                  ? 'bg-[#1A426F] text-white border-[#28578E] shadow-xs'
-                  : 'bg-white hover:bg-slate-100 text-slate-700 border-slate-200 shadow-2xs'
+                  ? 'bg-[#0F294A] text-white shadow-xs border-transparent'
+                  : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-2xs'
               }`}
               aria-expanded={isAdminDropdownOpen}
               aria-haspopup="true"
             >
               <ShieldCheck
-                className={`w-4 h-4 shrink-0 ${isAdminActive ? 'text-amber-300' : 'text-amber-600'}`}
+                className={`w-4 h-4 shrink-0 ${isAdminActive ? 'text-amber-300' : 'text-slate-500'}`}
               />
               <span>Quản trị</span>
               <ChevronDown
@@ -120,8 +120,8 @@ export function NavbarNav({ user }: NavbarNavProps) {
                   href="/admin"
                   className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
                     pathname === '/admin'
-                      ? 'bg-amber-50 text-amber-950 font-bold'
-                      : 'hover:bg-slate-50 text-slate-800'
+                      ? 'bg-slate-100 text-slate-900 font-bold'
+                      : 'hover:bg-slate-50 text-slate-700'
                   }`}
                 >
                   <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200">
@@ -137,11 +137,11 @@ export function NavbarNav({ user }: NavbarNavProps) {
                   href="/admin/reviews"
                   className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
                     pathname.startsWith('/admin/reviews')
-                      ? 'bg-amber-50 text-amber-950 font-bold'
-                      : 'hover:bg-slate-50 text-slate-800'
+                      ? 'bg-slate-100 text-slate-900 font-bold'
+                      : 'hover:bg-slate-50 text-slate-750 hover:text-slate-900'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-800 flex items-center justify-center shrink-0 border border-blue-200">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
                     <CheckSquare className="w-4 h-4" />
                   </div>
                   <div>
@@ -154,11 +154,11 @@ export function NavbarNav({ user }: NavbarNavProps) {
                   href="/admin/members"
                   className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
                     pathname.startsWith('/admin/members')
-                      ? 'bg-amber-50 text-amber-950 font-bold'
-                      : 'hover:bg-slate-50 text-slate-800'
+                      ? 'bg-slate-100 text-slate-900 font-bold'
+                      : 'hover:bg-slate-50 text-slate-750 hover:text-slate-900'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 border border-emerald-200">
+                  <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
                     <Users className="w-4 h-4" />
                   </div>
                   <div>
@@ -181,15 +181,15 @@ export function NavbarNav({ user }: NavbarNavProps) {
               href={`/members/${user.id}`}
               className={`h-10 px-2.5 sm:px-3 rounded-xl inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs shrink-0 ${
                 isProfileActive
-                  ? 'bg-[#1A426F] text-white border-[#28578E] shadow-xs'
-                  : 'bg-white hover:bg-slate-100 text-slate-800 border-slate-300'
+                  ? 'bg-[#0F294A] text-white border-transparent shadow-xs'
+                  : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
               }`}
               title={`Hồ sơ: ${user.name}`}
               aria-current={isProfileActive ? 'page' : undefined}
             >
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
-                  isProfileActive ? 'bg-white text-[#1A426F]' : 'bg-[#1A426F] text-white'
+                  isProfileActive ? 'bg-white text-[#0F294A]' : 'bg-[#0F294A] text-white'
                 }`}
               >
                 {user.name?.charAt(0) || 'U'}
@@ -202,15 +202,15 @@ export function NavbarNav({ user }: NavbarNavProps) {
 
               {/* 3 THẺ ROLE CHUẨN HÓA: Admin, Core, Member */}
               {user.role === 'ADMIN' ? (
-                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
+                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
                   Admin
                 </span>
               ) : user.role === 'CORE_MEMBER' ? (
-                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-800 border border-blue-200">
+                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200/80">
                   Core
                 </span>
               ) : (
-                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
+                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/80">
                   Member
                 </span>
               )}
@@ -226,7 +226,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
             className={
               isLoginActive
                 ? activeTabClass
-                : 'h-10 px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] hover:bg-[#1A3E6B] text-white shadow-xs transition-colors'
+                : 'h-10 px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white shadow-xs transition-colors'
             }
             aria-current={isLoginActive ? 'page' : undefined}
           >

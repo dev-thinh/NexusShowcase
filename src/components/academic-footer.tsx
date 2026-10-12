@@ -3,7 +3,7 @@ import { Shield, ExternalLink, GraduationCap, MapPin } from 'lucide-react';
 
 export function AcademicFooter() {
   return (
-    <footer className="mt-auto border-t border-slate-200 bg-white/80 backdrop-blur-xs py-10 text-slate-600 font-sans">
+    <footer className="mt-auto border-t border-slate-200 bg-white py-10 text-slate-600 font-sans">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 pb-8 border-b border-slate-100">
           {/* Institutional Info */}
@@ -43,7 +43,7 @@ export function AcademicFooter() {
                   href="https://www.fit.hcmus.edu.vn"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-[#0F294A] transition-colors inline-flex items-center gap-1.5"
+                  className="hover:text-slate-900 transition-colors inline-flex items-center gap-1.5"
                 >
                   <span>Cổng Khoa CNTT HCMUS</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
@@ -54,7 +54,7 @@ export function AcademicFooter() {
                   href="https://scholar.google.com"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-[#0F294A] transition-colors inline-flex items-center gap-1.5"
+                  className="hover:text-slate-900 transition-colors inline-flex items-center gap-1.5"
                 >
                   <span>Google Scholar</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
@@ -65,7 +65,7 @@ export function AcademicFooter() {
                   href="https://arxiv.org"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-[#0F294A] transition-colors inline-flex items-center gap-1.5"
+                  className="hover:text-slate-900 transition-colors inline-flex items-center gap-1.5"
                 >
                   <span>Kho bản thảo arXiv</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
@@ -97,11 +97,11 @@ export function AcademicFooter() {
             &copy; {new Date().getFullYear()} Nexus Academic Showcase • Trường Đại học Khoa học Tự nhiên - ĐHQG-HCM.
           </div>
           <div className="flex items-center gap-4 text-slate-500">
-            <Link href="/" className="hover:text-[#0F294A] transition-colors">
+            <Link href="/" className="hover:text-slate-900 transition-colors">
               Trang khám phá
             </Link>
             <span>•</span>
-            <Link href="/login" className="hover:text-[#0F294A] transition-colors">
+            <Link href="/login" className="hover:text-slate-900 transition-colors">
               Cổng đăng nhập
             </Link>
           </div>
