@@ -1,6 +1,7 @@
 import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
+import { adminMemberClientSelect } from '@/lib/public-user';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
 import { AdminMemberTable } from '@/components/admin-member-table';
@@ -19,12 +20,7 @@ export default async function AdminMembersPage() {
 
   const members = await prisma.user.findMany({
     orderBy: [{ role: 'asc' }, { fullName: 'asc' }],
-    select: {
-      id: true,
-      fullName: true,
-      role: true,
-      createdAt: true,
-    },
+    select: adminMemberClientSelect,
   });
 
   return (

@@ -12,6 +12,13 @@ export const publicUserSelect = {
   role: true,
 } satisfies Prisma.UserSelect;
 
+export const adminMemberClientSelect = {
+  id: true,
+  fullName: true,
+  role: true,
+  createdAt: true,
+} satisfies Prisma.UserSelect;
+
 export type PublicUser = {
   id: string;
   fullName: string;
