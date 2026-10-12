@@ -120,7 +120,7 @@ export function LoginForm() {
                 autoComplete="username"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="admin01 hoặc email..."
+                placeholder="Tên đăng nhập hoặc email..."
                 disabled={isPending}
                 className="w-full pl-10 pr-4 py-2.5 text-sm bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
               />
@@ -182,7 +182,7 @@ export function LoginForm() {
         <div className="mt-6 pt-5 border-t border-slate-100 flex items-start gap-2.5 text-slate-500 text-xs leading-relaxed">
           <Shield className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
           <div>
-            Tài khoản quản trị mặc định: <code className="font-mono font-semibold text-slate-800">admin01</code> (Mật khẩu: <code className="font-mono font-semibold text-slate-800">admin123</code>).
+            Hệ thống nội bộ phục vụ nghiên cứu khoa học. Vui lòng liên hệ Quản trị viên nếu bạn chưa được cấp tài khoản.
           </div>
         </div>
       </div>
