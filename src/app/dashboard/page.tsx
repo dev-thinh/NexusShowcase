@@ -159,6 +159,14 @@ export default async function DashboardPage() {
 
                   <div className="shrink-0 flex items-center gap-3">
                     <StatusBadge status={item.status} />
+                    {(item.status === 'DRAFT' || item.status === 'REJECTED' || user.role === 'ADMIN') && (
+                      <Link
+                        href={`/dashboard/items/${item.id}/edit`}
+                        className="text-xs sm:text-sm font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
+                      >
+                        {item.status === 'REJECTED' ? 'Sửa & Nộp lại' : 'Chỉnh sửa'}
+                      </Link>
+                    )}
                     <Link
                       href={`/showcase/${item.slug}`}
                       className="text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] inline-flex items-center gap-1 group/link"

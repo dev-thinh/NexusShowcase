@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { createShowcaseItemAction, ContributorInput, LinkInput, AttachmentInput } from '@/actions/showcase-actions';
+import { createShowcaseItemAction, updateShowcaseItemAction, ContributorInput, LinkInput, AttachmentInput } from '@/actions/showcase-actions';
 import { uploadFileAction } from '@/actions/upload-actions';
 import { ItemType, ItemScope, ContributorRole } from '@prisma/client';
 import {
@@ -24,14 +24,50 @@ import {
   BookOpen,
 } from 'lucide-react';
 
+export interface InitialItemData {
+  id: string;
+  title: string;
+  summary: string;
+  content?: string | null;
+  type: ItemType;
+  scope?: ItemScope | null;
+  issuer?: string | null;
+  publishedYear: number;
+  thumbnailUrl?: string | null;
+  status?: string;
+  rejectionReason?: string | null;
+  contributors?: {
+    userId?: string | null;
+    role: ContributorRole;
+    displayOrder: number;
+    externalName?: string | null;
+    externalAffiliation?: string | null;
+  }[];
+  links?: {
+    label: string;
+    url: string;
+    type: string;
+  }[];
+  attachments?: {
+    fileName: string;
+    fileUrl: string;
+    fileSize: number;
+    mimeType: string;
+  }[];
+}
+
 export function ItemForm({
   currentUserId,
   currentUserRole,
   clubMembers,
+  initialData,
+  isEdit = false,
 }: {
   currentUserId: string;
   currentUserRole?: string;
   clubMembers: { id: string; fullName: string }[];
+  initialData?: InitialItemData;
+  isEdit?: boolean;
 }) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -40,7 +76,9 @@ export function ItemForm({
   const [loading, setLoading] = useState(false);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [imageError, setImageError] = useState<string | null>(null);
-  const [thumbnailMode, setThumbnailMode] = useState<'upload' | 'url'>('upload');
+  const [thumbnailMode, setThumbnailMode] = useState<'upload' | 'url'>(
+    initialData?.thumbnailUrl ? 'url' : 'upload'
+  );
 
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [docError, setDocError] = useState<string | null>(null);
@@ -51,31 +89,56 @@ export function ItemForm({
   const [error, setError] = useState<string | null>(null);
 
   // Form Fields
-  const [title, setTitle] = useState('');
-  const [summary, setSummary] = useState('');
-  const [content, setContent] = useState('');
-  const [type, setType] = useState<ItemType>('RESEARCH_PAPER');
-  const [scope, setScope] = useState<ItemScope>('EXTERNAL');
-  const [issuer, setIssuer] = useState('');
-  const [publishedYear, setPublishedYear] = useState(new Date().getFullYear());
-  const [thumbnailUrl, setThumbnailUrl] = useState('');
-  const [attachments, setAttachments] = useState<AttachmentInput[]>([]);
+  const [title, setTitle] = useState(initialData?.title || '');
+  const [summary, setSummary] = useState(initialData?.summary || '');
+  const [content, setContent] = useState(initialData?.content || '');
+  const [type, setType] = useState<ItemType>(initialData?.type || 'RESEARCH_PAPER');
+  const [scope, setScope] = useState<ItemScope>(initialData?.scope || 'EXTERNAL');
+  const [issuer, setIssuer] = useState(initialData?.issuer || '');
+  const [publishedYear, setPublishedYear] = useState(initialData?.publishedYear || new Date().getFullYear());
+  const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnailUrl || '');
+  const [attachments, setAttachments] = useState<AttachmentInput[]>(
+    initialData?.attachments?.map((a) => ({
+      fileName: a.fileName,
+      fileUrl: a.fileUrl,
+      fileSize: a.fileSize,
+      mimeType: (a.mimeType as 'application/pdf') || 'application/pdf',
+    })) || []
+  );
 
   // Tác giả & Giảng viên
-  const [contributors, setContributors] = useState<ContributorInput[]>([
+  const [contributors, setContributors] = useState<ContributorInput[]>(
+    initialData?.contributors && initialData.contributors.length > 0
+      ? initialData.contributors.map((c, i) => ({
+          userId: c.userId ?? null,
+          role: c.role,
+          displayOrder: c.displayOrder ?? i + 1,
+          externalName: c.externalName ?? null,
+          externalAffiliation: c.externalAffiliation ?? null,
+        }))
+      : [
     {
       userId: currentUserId,
       role: 'FIRST_AUTHOR',
       displayOrder: 1,
     },
-  ]);
+  ]
+);
 
   // Links
-  const [links, setLinks] = useState<LinkInput[]>([
+  const [links, setLinks] = useState<LinkInput[]>(
+    initialData?.links && initialData.links.length > 0
+      ? initialData.links.map((l) => ({
+          label: l.label,
+          url: l.url,
+          type: l.type as any,
+        }))
+      : [
     { label: 'Liên kết bài báo gốc (arXiv/IEEE)', url: '', type: 'PAPER_URL' },
     { label: 'Video Demo (YouTube/Loom)', url: '', type: 'VIDEO_EMBED' },
     { label: 'Mã nguồn GitHub', url: '', type: 'GITHUB' },
-  ]);
+  ]
+);
 
   // Upload Ảnh
   const handleFileUpload = async (file: File) => {
@@ -232,7 +295,8 @@ export function ItemForm({
     setLoading(true);
     setError(null);
 
-    const result = await createShowcaseItemAction({
+    try {
+      const payload = {
       title: title.trim(),
       summary: summary.trim(),
       content: content.trim(),
@@ -245,9 +309,14 @@ export function ItemForm({
       links: links.filter((l) => l.url.trim() !== ''),
       attachments,
       submitForReview,
-    });
+      };
 
-    setLoading(false);
+      const result =
+        isEdit && initialData
+          ? await updateShowcaseItemAction(initialData.id, payload)
+          : await createShowcaseItemAction(payload);
+
+
 
     if (!result.success) {
       setError(result.error || 'Có lỗi xảy ra khi nộp bài.');
@@ -255,6 +324,12 @@ export function ItemForm({
     } else {
       router.push('/dashboard');
       router.refresh();
+    }
+    } catch {
+      setError('Đã xảy ra lỗi không mong muốn.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -266,6 +341,23 @@ export function ItemForm({
         <div className="p-4 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
           <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />
           <span className="font-medium">{error}</span>
+        </div>
+      )}
+
+      {initialData?.status === 'REJECTED' && (
+        <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-sm space-y-2 animate-in fade-in">
+          <div className="flex items-center gap-2 font-bold text-amber-800">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0" />
+            <span>Công trình này đã bị từ chối phê duyệt</span>
+          </div>
+          {initialData.rejectionReason && (
+            <p className="text-amber-800 pl-7">
+              <strong>Lý do từ chối:</strong> {initialData.rejectionReason}
+            </p>
+          )}
+          <p className="text-xs text-amber-700 pl-7">
+            Vui lòng chỉnh sửa các thông tin theo yêu cầu của hội đồng và nhấn &quot;Gửi lại xét duyệt&quot;.
+          </p>
         </div>
       )}
 
@@ -907,6 +999,12 @@ export function ItemForm({
           <span>
             {loading
               ? 'Đang xử lý...'
+              : isEdit
+              ? initialData?.status === 'REJECTED'
+                ? 'Gửi lại xét duyệt'
+                : isAdmin
+                ? 'Cập nhật & Đăng bài'
+                : 'Cập nhật & Gửi xét duyệt'
               : isAdmin
               ? 'Đăng xuất bản trực tiếp'
               : 'Gửi yêu cầu xét duyệt'}

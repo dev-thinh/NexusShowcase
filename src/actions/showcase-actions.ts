@@ -198,3 +198,116 @@ export async function togglePinShowcaseItemAction(itemId: string) {
 
   return { success: true, isPinned: true, message: 'Đã ghim công trình lên trang chủ.' };
 }
+
+export async function updateShowcaseItemAction(itemId: string, input: CreateShowcaseItemInput) {
+  const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
+  if (!user) {
+    return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) và Quản trị viên mới có quyền cập nhật bài.' };
+  }
+
+  const parsedItemId = showcaseItemIdSchema.safeParse(itemId);
+  if (!parsedItemId.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  itemId = parsedItemId.data;
+
+  const parsedInput = createShowcaseItemInputSchema.safeParse(input);
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  const values = parsedInput.data;
+
+  const targetItem = await prisma.showcaseItem.findUnique({
+    where: { id: itemId },
+  });
+  if (!targetItem) {
+    return { success: false, error: 'Không tìm thấy công trình này.' };
+  }
+
+  const isAdmin = user.role === 'ADMIN';
+  if (!isAdmin && targetItem.creatorId !== user.id) {
+    return { success: false, error: 'Bạn không có quyền chỉnh sửa công trình này.' };
+  }
+
+  if (!isAdmin && targetItem.status === 'PUBLISHED') {
+    return { success: false, error: 'Không thể chỉnh sửa công trình đã được xuất bản.' };
+  }
+
+  let newStatus = targetItem.status;
+  let newRejectionReason = targetItem.rejectionReason;
+
+  if (targetItem.status === 'REJECTED' || targetItem.status === 'DRAFT') {
+    if (values.submitForReview) {
+      newStatus = isAdmin ? 'PUBLISHED' : 'PENDING_REVIEW';
+      newRejectionReason = null;
+    } else {
+      newStatus = 'DRAFT';
+    }
+  } else if (targetItem.status === 'PENDING_REVIEW') {
+    if (values.submitForReview) {
+      newStatus = isAdmin ? 'PUBLISHED' : 'PENDING_REVIEW';
+    } else {
+      newStatus = 'DRAFT';
+    }
+  }
+
+  const updatedItem = await prisma.$transaction(async (tx) => {
+    await tx.itemContributor.deleteMany({ where: { itemId } });
+    await tx.itemLink.deleteMany({ where: { itemId } });
+    await tx.itemAttachment.deleteMany({ where: { itemId } });
+
+    return tx.showcaseItem.update({
+      where: { id: itemId },
+      data: {
+        title: values.title,
+        summary: values.summary,
+        content: values.content,
+        type: values.type,
+        scope: values.scope,
+        issuer: values.issuer,
+        thumbnailUrl: values.thumbnailUrl,
+        status: newStatus,
+        rejectionReason: newRejectionReason,
+        publishedYear: values.publishedYear,
+        contributors: {
+          create: values.contributors.map((c) => ({
+            userId: c.userId || null,
+            externalName: c.externalName || null,
+            externalAffiliation: c.externalAffiliation || null,
+            externalLink: c.externalLink || null,
+            role: c.role,
+            customRoleTitle: c.customRoleTitle || null,
+            displayOrder: c.displayOrder,
+          })),
+        },
+        links: {
+          create: values.links.map((l) => ({
+            label: l.label,
+            url: l.url,
+            type: l.type,
+          })),
+        },
+        attachments: {
+          create: (values.attachments || []).map((a) => ({
+            fileName: a.fileName,
+            fileUrl: a.fileUrl,
+            fileSize: a.fileSize,
+            mimeType: a.mimeType,
+          })),
+        },
+      },
+    });
+  });
+
+  try {
+    revalidatePath('/');
+    revalidatePath('/dashboard');
+    revalidatePath('/admin');
+    revalidatePath('/admin/reviews');
+    if (updatedItem.slug) revalidatePath(`/showcase/${updatedItem.slug}`);
+  } catch {
+    // Ignore in tests
+  }
+
+  return { success: true, item: { id: updatedItem.id, slug: updatedItem.slug, status: updatedItem.status } };
+}
