@@ -232,7 +232,7 @@ export function ItemForm({
     setLoading(true);
     setError(null);
 
-    const result = await createShowcaseItemAction(currentUserId, {
+    const result = await createShowcaseItemAction({
       title: title.trim(),
       summary: summary.trim(),
       content: content.trim(),

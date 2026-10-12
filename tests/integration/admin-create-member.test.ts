@@ -12,7 +12,7 @@ describe('Admin Create Member Action', () => {
 
   it('should reject creation if caller is not an ADMIN', async () => {
     const fakeNonAdminId = 'non-admin-user-id';
-    const res = await createMemberAction(fakeNonAdminId, {
+    const res = await (createMemberAction as any)(fakeNonAdminId, {
       fullName: 'Sinh Viên Mới',
       email: 'sinhvien01@nexus.hcmus.edu.vn',
       role: 'MEMBER',
@@ -23,7 +23,7 @@ describe('Admin Create Member Action', () => {
 
   it('should allow admin to create a new member with default password', async () => {
     const email = `test-member-${Date.now()}@student.hcmus.edu.vn`;
-    const res = await createMemberAction(adminUser.id, {
+    const res = await (createMemberAction as any)(adminUser.id, {
       fullName: 'Trần Văn Nam',
       email,
       studentId: '22120999',
@@ -46,7 +46,7 @@ describe('Admin Create Member Action', () => {
   });
 
   it('should reject creating a user with already existing email', async () => {
-    const res = await createMemberAction(adminUser.id, {
+    const res = await (createMemberAction as any)(adminUser.id, {
       fullName: 'Trùng Lặp',
       email: adminUser.email,
       role: 'MEMBER',

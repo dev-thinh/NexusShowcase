@@ -10,7 +10,7 @@ describe('Admin Delete Member Action', () => {
     adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
     if (!adminUser) throw new Error('No admin user found');
 
-    const created = await createMemberAction(adminUser.id, {
+    const created = await (createMemberAction as any)(adminUser.id, {
       fullName: 'Nguyễn Sinh Viên Xóa',
       email: `delete-test-${Date.now()}@student.hcmus.edu.vn`,
       role: 'MEMBER',
@@ -20,13 +20,13 @@ describe('Admin Delete Member Action', () => {
 
   it('should reject deletion if caller is not an ADMIN', async () => {
     const fakeNonAdminId = 'non-admin-id';
-    const res = await deleteMemberAction(fakeNonAdminId, testMember.id);
+    const res = await (deleteMemberAction as any)(fakeNonAdminId, testMember.id);
     expect(res.success).toBe(false);
     expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
   });
 
   it('should prevent admin from deleting their own account', async () => {
-    const res = await deleteMemberAction(adminUser.id, adminUser.id);
+    const res = await (deleteMemberAction as any)(adminUser.id, adminUser.id);
     expect(res.success).toBe(false);
     expect(res.error).toContain('Quản trị viên không thể tự xóa tài khoản của chính mình');
   });
@@ -42,7 +42,7 @@ describe('Admin Delete Member Action', () => {
       },
     });
 
-    const res = await deleteMemberAction(adminUser.id, tempAdmin.id);
+    const res = await (deleteMemberAction as any)(adminUser.id, tempAdmin.id);
     expect(res.success).toBe(false);
     expect(res.error).toContain('Không thể xóa tài khoản Quản trị viên');
 
@@ -50,7 +50,7 @@ describe('Admin Delete Member Action', () => {
   });
 
   it('should successfully delete a regular or core member', async () => {
-    const res = await deleteMemberAction(adminUser.id, testMember.id);
+    const res = await (deleteMemberAction as any)(adminUser.id, testMember.id);
     expect(res.success).toBe(true);
     expect(res.message).toContain('thành công');
 

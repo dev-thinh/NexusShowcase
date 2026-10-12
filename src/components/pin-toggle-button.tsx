@@ -6,14 +6,12 @@ import { Pin, Loader2 } from 'lucide-react';
 import { togglePinShowcaseItemAction } from '@/actions/showcase-actions';
 
 interface PinToggleButtonProps {
-  adminId: string;
   itemId: string;
   initialIsPinned: boolean;
   status: string;
 }
 
 export function PinToggleButton({
-  adminId,
   itemId,
   initialIsPinned,
   status,
@@ -30,7 +28,7 @@ export function PinToggleButton({
     if (loading) return;
     setLoading(true);
     try {
-      const res = await togglePinShowcaseItemAction(adminId, itemId);
+      const res = await togglePinShowcaseItemAction(itemId);
       if (res.success && res.isPinned !== undefined) {
         setIsPinned(res.isPinned);
         router.refresh();

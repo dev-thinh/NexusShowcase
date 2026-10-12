@@ -7,7 +7,6 @@ import { Trash2, Loader2, AlertTriangle, X } from 'lucide-react';
 import { Role } from '@prisma/client';
 
 interface AdminDeleteMemberModalProps {
-  adminId: string;
   member: {
     id: string;
     fullName: string;
@@ -17,13 +16,13 @@ interface AdminDeleteMemberModalProps {
   };
 }
 
-export function AdminDeleteMemberModal({ adminId, member }: AdminDeleteMemberModalProps) {
+export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (member.role === 'ADMIN' || member.id === adminId) {
+  if (member.role === 'ADMIN') {
     return null;
   }
 
@@ -31,7 +30,7 @@ export function AdminDeleteMemberModal({ adminId, member }: AdminDeleteMemberMod
     setLoading(true);
     setError(null);
 
-    const res = await deleteMemberAction(adminId, member.id);
+    const res = await deleteMemberAction(member.id);
     if (!res.success) {
       setError(res.error || 'Có lỗi xảy ra khi xóa tài khoản.');
       setLoading(false);

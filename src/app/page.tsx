@@ -5,6 +5,7 @@ import { ShowcaseCard } from '@/components/showcase-card';
 import { FeaturedFilmstrip } from '@/components/featured-filmstrip';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ItemType } from '@prisma/client';
+import { publicUserSelect } from '@/lib/public-user';
 import {
   Sparkles,
   BookOpen,
@@ -80,7 +81,7 @@ export default async function HomePage({
       where: whereClause,
       include: {
         contributors: {
-          include: { user: true },
+          include: { user: { select: publicUserSelect } },
           orderBy: { displayOrder: 'asc' },
         },
       },
@@ -93,7 +94,7 @@ export default async function HomePage({
       where: { status: 'PUBLISHED', isPinned: true },
       include: {
         contributors: {
-          include: { user: true },
+          include: { user: { select: publicUserSelect } },
           orderBy: { displayOrder: 'asc' },
         },
       },
@@ -113,7 +114,7 @@ export default async function HomePage({
       },
       include: {
         contributors: {
-          include: { user: true },
+          include: { user: { select: publicUserSelect } },
           orderBy: { displayOrder: 'asc' },
         },
       },

@@ -6,7 +6,7 @@ import { reviewShowcaseItemAction } from '@/actions/showcase-actions';
 import { Modal } from '@/components/ui/modal';
 import { CheckCircle2, XCircle, Loader2, AlertCircle } from 'lucide-react';
 
-export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId: string }) {
+export function AdminReviewButton({ itemId }: { itemId: string }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [publishModalOpen, setPublishModalOpen] = useState(false);
@@ -17,7 +17,7 @@ export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId
   const handlePublish = async () => {
     setLoading(true);
     setError(null);
-    const res = await reviewShowcaseItemAction(adminId, itemId, { action: 'PUBLISH' });
+    const res = await reviewShowcaseItemAction(itemId, { action: 'PUBLISH' });
     setLoading(false);
     if (!res.success) {
       setError(res.error || 'Có lỗi xảy ra khi phê duyệt');
@@ -34,7 +34,7 @@ export function AdminReviewButton({ adminId, itemId }: { adminId: string; itemId
     }
     setLoading(true);
     setError(null);
-    const res = await reviewShowcaseItemAction(adminId, itemId, {
+    const res = await reviewShowcaseItemAction(itemId, {
       action: 'REJECT',
       reason: rejectReason.trim(),
     });

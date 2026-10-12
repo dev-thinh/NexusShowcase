@@ -8,11 +8,9 @@ import { Loader2, ArrowUpCircle, ArrowDownCircle, ShieldCheck } from 'lucide-rea
 import { Tooltip } from '@/components/ui/tooltip';
 
 export function AdminRoleToggle({
-  adminId,
   userId,
   currentRole,
 }: {
-  adminId: string;
   userId: string;
   currentRole: Role;
 }) {
@@ -22,7 +20,7 @@ export function AdminRoleToggle({
   const toggleCoreMember = async () => {
     const nextRole = currentRole === 'CORE_MEMBER' ? 'MEMBER' : 'CORE_MEMBER';
     setLoading(true);
-    await updateUserRoleAction(adminId, userId, nextRole);
+    await updateUserRoleAction(userId, nextRole);
     setLoading(false);
     router.refresh();
   };

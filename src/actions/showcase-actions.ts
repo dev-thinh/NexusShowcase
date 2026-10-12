@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { canUserUpload, canUserReview } from '@/lib/permissions';
+import { getCurrentUser } from '@/lib/current-user';
 import { slugify } from '@/lib/slugify';
 import { ItemType, ItemScope, ContributorRole, LinkType } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
@@ -44,9 +44,9 @@ export interface CreateShowcaseItemInput {
   submitForReview?: boolean;
 }
 
-export async function createShowcaseItemAction(userId: string, input: CreateShowcaseItemInput) {
-  const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user || !canUserUpload(user)) {
+export async function createShowcaseItemAction(input: CreateShowcaseItemInput) {
+  const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
+  if (!user) {
     return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) và Quản trị viên mới có quyền đăng bài.' };
   }
 
@@ -113,12 +113,11 @@ export async function createShowcaseItemAction(userId: string, input: CreateShow
 }
 
 export async function reviewShowcaseItemAction(
-  adminId: string,
   itemId: string,
   payload: { action: 'PUBLISH' | 'REJECT'; reason?: string }
 ) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền kiểm duyệt bài.' };
   }
 
@@ -145,9 +144,9 @@ export async function reviewShowcaseItemAction(
   return { success: true, status: updated.status };
 }
 
-export async function togglePinShowcaseItemAction(adminId: string, itemId: string) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+export async function togglePinShowcaseItemAction(itemId: string) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền ghim công trình lên trang chủ.' };
   }
 

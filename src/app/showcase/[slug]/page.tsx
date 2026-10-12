@@ -8,6 +8,7 @@ import { StatusBadge, TypeBadge, RoleBadge } from '@/components/ui/badge';
 import { CitationModal } from '@/components/citation-modal';
 import { AdminReviewButton } from '@/components/admin-review-button';
 import { PinToggleButton } from '@/components/pin-toggle-button';
+import { publicUserSelect } from '@/lib/public-user';
 import Link from 'next/link';
 import {
   ArrowLeft,
@@ -39,7 +40,7 @@ export default async function ShowcaseDetailPage({
     where: { slug },
     include: {
       contributors: {
-        include: { user: true },
+        include: { user: { select: publicUserSelect } },
         orderBy: { displayOrder: 'asc' },
       },
       links: true,
@@ -92,7 +93,7 @@ export default async function ShowcaseDetailPage({
 
             {currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' && (
               <div className="shrink-0 self-end sm:self-center">
-                <AdminReviewButton adminId={currentUser.id} itemId={item.id} />
+                <AdminReviewButton itemId={item.id} />
               </div>
             )}
           </div>
@@ -151,7 +152,6 @@ export default async function ShowcaseDetailPage({
             {/* Admin Pin Toggle */}
             {currentUser?.role === 'ADMIN' && item.status === 'PUBLISHED' && (
               <PinToggleButton
-                adminId={currentUser.id}
                 itemId={item.id}
                 initialIsPinned={item.isPinned}
                 status={item.status}

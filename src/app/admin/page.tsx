@@ -212,7 +212,6 @@ export default async function AdminDashboardPage() {
                       <ExternalLink className="w-3.5 h-3.5" />
                     </Link>
                     <PinToggleButton
-                      adminId={(session.user as any).id}
                       itemId={item.id}
                       initialIsPinned={true}
                       status={item.status}

@@ -1,7 +1,7 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { canUserReview } from '@/lib/permissions';
+import { getCurrentUser } from '@/lib/current-user';
 import { Role } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
@@ -13,9 +13,9 @@ export interface CreateMemberInput {
   password?: string;
 }
 
-export async function createMemberAction(adminId: string, input: CreateMemberInput) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+export async function createMemberAction(input: CreateMemberInput) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền tạo tài khoản thành viên.' };
   }
 
@@ -61,9 +61,9 @@ export async function createMemberAction(adminId: string, input: CreateMemberInp
   return { success: true, user: newUser };
 }
 
-export async function updateUserRoleAction(adminId: string, targetUserId: string, newRole: Role) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+export async function updateUserRoleAction(targetUserId: string, newRole: Role) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền phân quyền thành viên.' };
   }
 
@@ -75,13 +75,13 @@ export async function updateUserRoleAction(adminId: string, targetUserId: string
   return { success: true, user: updatedUser };
 }
 
-export async function deleteMemberAction(adminId: string, targetUserId: string) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+export async function deleteMemberAction(targetUserId: string) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền xóa tài khoản thành viên.' };
   }
 
-  if (adminId === targetUserId) {
+  if (admin.id === targetUserId) {
     return { success: false, error: 'Quản trị viên không thể tự xóa tài khoản của chính mình.' };
   }
 

@@ -17,7 +17,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 
-export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
+export function AdminCreateMemberModal() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ export function AdminCreateMemberModal({ adminId }: { adminId: string }) {
     setLoading(true);
     setError(null);
 
-    const res = await createMemberAction(adminId, {
+    const res = await createMemberAction({
       fullName: fullName.trim(),
       email: email.trim(),
       studentId: studentId.trim() || undefined,

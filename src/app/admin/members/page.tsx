@@ -16,7 +16,6 @@ export default async function AdminMembersPage() {
   if ((session.user as any).role !== 'ADMIN') {
     redirect('/');
   }
-  const adminId = session.user.id;
 
   const members = await prisma.user.findMany({
     orderBy: [{ role: 'asc' }, { fullName: 'asc' }],
@@ -53,12 +52,12 @@ export default async function AdminMembersPage() {
             </p>
           </div>
           <div className="flex items-center gap-3 self-start sm:self-center">
-            <AdminCreateMemberModal adminId={adminId} />
+            <AdminCreateMemberModal />
           </div>
         </div>
 
         {/* Member Table with Search and Filters */}
-        <AdminMemberTable adminId={adminId} members={members} />
+        <AdminMemberTable members={members} />
       </main>
 
       <AcademicFooter />

@@ -4,6 +4,7 @@ import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
 import { ShowcaseCard } from '@/components/showcase-card';
 import { EmptyState } from '@/components/ui/empty-state';
+import { publicUserSelect } from '@/lib/public-user';
 import {
   FileText,
   Code2,
@@ -24,7 +25,8 @@ export default async function MemberProfilePage({
   const { id } = await params;
   const user = await prisma.user.findUnique({
     where: { id },
-    include: {
+    select: {
+      ...publicUserSelect,
       contributions: {
         where: {
           item: { status: 'PUBLISHED' },
@@ -33,7 +35,7 @@ export default async function MemberProfilePage({
           item: {
             include: {
               contributors: {
-                include: { user: true },
+                include: { user: { select: publicUserSelect } },
                 orderBy: { displayOrder: 'asc' },
               },
             },
@@ -84,12 +86,6 @@ export default async function MemberProfilePage({
                 <span>{currentRole.label}</span>
               </span>
             </div>
-
-            {user.studentId && (
-              <p className="text-sm text-slate-500 font-medium mb-3">
-                Mã số sinh viên: <span className="font-mono text-slate-800 font-semibold">{user.studentId}</span>
-              </p>
-            )}
 
             <p className="text-sm sm:text-base text-slate-700 max-w-3xl leading-relaxed mb-6 font-normal">
               {user.bio || 'Chưa cập nhật tiểu sử nghiên cứu khoa học.'}

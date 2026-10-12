@@ -16,11 +16,10 @@ interface MemberItem {
 }
 
 interface AdminMemberTableProps {
-  adminId: string;
   members: MemberItem[];
 }
 
-export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
+export function AdminMemberTable({ members }: AdminMemberTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<'ALL' | Role>('ALL');
 
@@ -184,15 +183,8 @@ export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
 
                     <td className="px-6 py-4 text-right">
                       <div className="inline-flex items-center justify-end gap-2">
-                        <AdminRoleToggle
-                          adminId={adminId}
-                          userId={member.id}
-                          currentRole={member.role}
-                        />
-                        <AdminDeleteMemberModal
-                          adminId={adminId}
-                          member={member}
-                        />
+                        <AdminRoleToggle userId={member.id} currentRole={member.role} />
+                        <AdminDeleteMemberModal member={member} />
                       </div>
                     </td>
                   </tr>

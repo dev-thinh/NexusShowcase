@@ -24,7 +24,6 @@ export default async function AdminReviewsPage() {
   if ((session.user as any).role !== 'ADMIN') {
     redirect('/');
   }
-  const adminId = session.user.id;
 
   const pendingItems = await prisma.showcaseItem.findMany({
     where: { status: 'PENDING_REVIEW' },
@@ -124,7 +123,7 @@ export default async function AdminReviewsPage() {
                     <Eye className="w-4 h-4 text-slate-500" />
                     <span>Xem chi tiết</span>
                   </Link>
-                  <AdminReviewButton adminId={adminId} itemId={item.id} />
+                  <AdminReviewButton itemId={item.id} />
                 </div>
               </div>
             ))}
