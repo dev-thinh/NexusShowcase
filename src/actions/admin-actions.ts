@@ -13,6 +13,10 @@ export interface CreateMemberInput {
   password?: string;
 }
 
+function toSafeMember(user: { id: string; fullName: string; role: Role; status: string }) {
+  return { id: user.id, fullName: user.fullName, role: user.role, status: user.status };
+}
+
 export async function createMemberAction(input: CreateMemberInput) {
   const admin = await getCurrentUser(['ADMIN']);
   if (!admin) {
@@ -56,9 +60,10 @@ export async function createMemberAction(input: CreateMemberInput) {
       status: 'ACTIVE',
       passwordHash,
     },
+    select: { id: true, fullName: true, role: true, status: true },
   });
 
-  return { success: true, user: newUser };
+  return { success: true, user: toSafeMember(newUser) };
 }
 
 export async function updateUserRoleAction(targetUserId: string, newRole: Role) {
@@ -70,9 +75,10 @@ export async function updateUserRoleAction(targetUserId: string, newRole: Role) 
   const updatedUser = await prisma.user.update({
     where: { id: targetUserId },
     data: { role: newRole },
+    select: { id: true, fullName: true, role: true, status: true },
   });
 
-  return { success: true, user: updatedUser };
+  return { success: true, user: toSafeMember(updatedUser) };
 }
 
 export async function deleteMemberAction(targetUserId: string) {

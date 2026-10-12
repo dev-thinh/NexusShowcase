@@ -10,7 +10,7 @@ interface AdminDeleteMemberModalProps {
   member: {
     id: string;
     fullName: string;
-    email: string;
+    email?: string;
     role: Role;
     studentId?: string | null;
   };

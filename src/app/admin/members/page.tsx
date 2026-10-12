@@ -22,9 +22,7 @@ export default async function AdminMembersPage() {
     select: {
       id: true,
       fullName: true,
-      email: true,
       role: true,
-      studentId: true,
       createdAt: true,
     },
   });

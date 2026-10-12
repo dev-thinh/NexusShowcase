@@ -61,7 +61,7 @@ describe('Server action authorization', () => {
   });
 
   it('rejects a forged administrator ID when creating a member without a session', async () => {
-    const result = await (createMemberAction as any)('admin-id', {
+    const result = await createMemberAction({
       fullName: 'New Member',
       email: 'new.member@nexus.test',
     });
@@ -71,8 +71,8 @@ describe('Server action authorization', () => {
   });
 
   it('rejects forged administrator IDs for member role and deletion mutations', async () => {
-    const roleResult = await (updateUserRoleAction as any)('admin-id', 'member-id', 'CORE_MEMBER');
-    const deleteResult = await (deleteMemberAction as any)('admin-id', 'member-id');
+    const roleResult = await updateUserRoleAction('member-id', 'CORE_MEMBER');
+    const deleteResult = await deleteMemberAction('member-id');
 
     expect(roleResult.success).toBe(false);
     expect(deleteResult.success).toBe(false);
@@ -81,7 +81,7 @@ describe('Server action authorization', () => {
   });
 
   it('rejects a forged administrator ID when creating an item without a session', async () => {
-    const result = await (createShowcaseItemAction as any)('admin-id', {
+    const result = await createShowcaseItemAction({
       title: 'Forged submission',
       summary: 'Must not be created',
       type: 'PROJECT',
@@ -95,11 +95,29 @@ describe('Server action authorization', () => {
   });
 
   it('rejects forged administrator IDs for review and pin mutations', async () => {
-    const reviewResult = await (reviewShowcaseItemAction as any)('admin-id', 'item-id', { action: 'PUBLISH' });
-    const pinResult = await (togglePinShowcaseItemAction as any)('admin-id', 'item-id');
+    const reviewResult = await reviewShowcaseItemAction('item-id', { action: 'PUBLISH' });
+    const pinResult = await togglePinShowcaseItemAction('item-id');
 
     expect(reviewResult.success).toBe(false);
     expect(pinResult.success).toBe(false);
     expect(mocks.prisma.showcaseItem.update).not.toHaveBeenCalled();
+  });
+
+  it('returns only safe user fields after member mutations', async () => {
+    mocks.auth.mockResolvedValue({ user: { id: 'admin-id' } });
+    mocks.prisma.user.create.mockResolvedValue({
+      id: 'member-id', fullName: 'New Member', role: 'MEMBER', status: 'ACTIVE',
+      email: 'private@nexus.test', studentId: '2012345', passwordHash: 'hash',
+    });
+    mocks.prisma.user.update.mockResolvedValue({
+      id: 'member-id', fullName: 'New Member', role: 'CORE_MEMBER', status: 'ACTIVE',
+      email: 'private@nexus.test', studentId: '2012345', passwordHash: 'hash',
+    });
+
+    const created = await createMemberAction({ fullName: 'New Member', email: 'private@nexus.test' });
+    const updated = await updateUserRoleAction('member-id', 'CORE_MEMBER');
+
+    expect(JSON.stringify(created)).not.toMatch(/passwordHash|private@nexus\.test|2012345/);
+    expect(JSON.stringify(updated)).not.toMatch(/passwordHash|private@nexus\.test|2012345/);
   });
 });

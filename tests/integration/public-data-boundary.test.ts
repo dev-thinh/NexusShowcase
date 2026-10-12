@@ -40,4 +40,11 @@ describe('public user data boundary', () => {
     expect(publicUserSelect).not.toHaveProperty('email');
     expect(publicUserSelect).not.toHaveProperty('studentId');
   });
+
+  it('keeps admin client member rows free of email and student ID', () => {
+    const memberRow = { id: 'member-id', fullName: 'Member', role: 'MEMBER', createdAt: new Date() };
+
+    expect(JSON.stringify(memberRow)).not.toContain('email');
+    expect(JSON.stringify(memberRow)).not.toContain('studentId');
+  });
 });

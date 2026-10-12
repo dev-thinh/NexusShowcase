@@ -9,9 +9,7 @@ import { Search, ShieldCheck, UserCheck, User, X } from 'lucide-react';
 interface MemberItem {
   id: string;
   fullName: string;
-  email: string;
   role: Role;
-  studentId: string | null;
   createdAt: Date | string;
 }
 
@@ -34,9 +32,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
       if (searchQuery.trim()) {
         const query = searchQuery.trim().toLowerCase();
         const matchName = member.fullName.toLowerCase().includes(query);
-        const matchEmail = member.email.toLowerCase().includes(query);
-        const matchMSSV = member.studentId?.toLowerCase().includes(query) || false;
-        return matchName || matchEmail || matchMSSV;
+        return matchName;
       }
 
       return true;
@@ -63,7 +59,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo họ tên, email, MSSV..."
+            placeholder="Tìm theo họ tên..."
             className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-all placeholder:text-slate-400 shadow-2xs"
           />
           {searchQuery && (
@@ -129,7 +125,6 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
             <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
               <tr>
                 <th className="px-6 py-4">Thành viên</th>
-                <th className="px-6 py-4">Email / Tên đăng nhập</th>
                 <th className="px-6 py-4">Vai trò</th>
                 <th className="px-6 py-4 text-right">Thao tác quản trị</th>
               </tr>
@@ -137,7 +132,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
             <tbody className="divide-y divide-slate-100">
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
+                  <td colSpan={3} className="px-6 py-12 text-center text-slate-400">
                     Không tìm thấy thành viên nào phù hợp với điều kiện tìm kiếm.
                   </td>
                 </tr>
@@ -151,17 +146,8 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
                         </div>
                         <div>
                           <div className="font-bold text-slate-900 text-sm sm:text-base">{member.fullName}</div>
-                          {member.studentId && (
-                            <div className="text-xs text-slate-500 font-medium">
-                              MSSV: {member.studentId}
-                            </div>
-                          )}
                         </div>
                       </div>
-                    </td>
-
-                    <td className="px-6 py-4 text-slate-600 font-mono text-xs sm:text-sm">
-                      {member.email}
                     </td>
 
                     <td className="px-6 py-4">
