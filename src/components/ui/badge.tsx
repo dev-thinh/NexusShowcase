@@ -22,22 +22,22 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
   const configs = {
     PUBLISHED: {
       label: 'Đã xuất bản',
-      classes: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      classes: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
       icon: CheckCircle2,
     },
     PENDING_REVIEW: {
       label: 'Chờ duyệt',
-      classes: 'bg-amber-50 text-amber-900 border-amber-200',
+      classes: 'bg-amber-50 text-amber-800 border-amber-200/80',
       icon: Clock,
     },
     REJECTED: {
       label: 'Cần sửa đổi',
-      classes: 'bg-rose-50 text-rose-800 border-rose-200',
+      classes: 'bg-rose-50 text-rose-700 border-rose-200/80',
       icon: XCircle,
     },
     DRAFT: {
       label: 'Bản nháp',
-      classes: 'bg-slate-100 text-slate-800 border-slate-200',
+      classes: 'bg-slate-100 text-slate-700 border-slate-200/80',
       icon: FileEdit,
     },
   };
@@ -65,17 +65,17 @@ export function TypeBadge({ type, size = 'md' }: TypeBadgeProps) {
   const configs = {
     RESEARCH_PAPER: {
       label: 'Bài báo nghiên cứu',
-      classes: 'bg-indigo-50 text-indigo-800 border-indigo-200',
+      classes: 'bg-blue-50/80 text-blue-900 border-blue-200/70',
       icon: FileText,
     },
     PROJECT: {
       label: 'Dự án công nghệ',
-      classes: 'bg-blue-50 text-blue-800 border-blue-200',
+      classes: 'bg-indigo-50/80 text-indigo-900 border-indigo-200/70',
       icon: Code2,
     },
     ACHIEVEMENT: {
       label: 'Thành tích & Cống hiến',
-      classes: 'bg-amber-50 text-amber-900 border-amber-200',
+      classes: 'bg-amber-50/80 text-amber-900 border-amber-200/70',
       icon: Trophy,
     },
   };
@@ -104,49 +104,49 @@ export function RoleBadge({ role, customTitle }: RoleBadgeProps) {
     ADVISOR: {
       label: 'Người hướng dẫn / Giảng viên',
       icon: GraduationCap,
-      color: 'bg-purple-50 text-purple-800 border-purple-200',
+      color: 'bg-slate-100 text-slate-800 border-slate-200',
     },
     FIRST_AUTHOR: {
       label: 'Tác giả chính (First Author)',
       icon: Award,
-      color: 'bg-blue-50 text-blue-800 border-blue-200',
+      color: 'bg-blue-50 text-blue-800 border-blue-200/80',
     },
     CO_FIRST_AUTHOR: {
       label: 'Đồng tác giả 1',
       icon: Award,
-      color: 'bg-sky-50 text-sky-800 border-sky-200',
+      color: 'bg-blue-50 text-blue-800 border-blue-200/80',
     },
     CO_AUTHOR: {
       label: 'Đồng tác giả',
       icon: Users,
-      color: 'bg-slate-100 text-slate-800 border-slate-200',
+      color: 'bg-slate-100 text-slate-700 border-slate-200',
     },
     CORRESPONDING_AUTHOR: {
       label: 'Tác giả liên hệ',
       icon: Users,
-      color: 'bg-cyan-50 text-cyan-800 border-cyan-200',
+      color: 'bg-slate-100 text-slate-700 border-slate-200',
     },
     PROJECT_LEAD: {
       label: 'Trưởng nhóm dự án',
       icon: Award,
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      color: 'bg-blue-50 text-blue-800 border-blue-200/80',
     },
     CONTRIBUTOR: {
       label: 'Thành viên đóng góp',
       icon: Users,
-      color: 'bg-slate-100 text-slate-800 border-slate-200',
+      color: 'bg-slate-100 text-slate-700 border-slate-200',
     },
     CUSTOM: {
       label: customTitle || 'Đóng góp',
       icon: Users,
-      color: 'bg-slate-100 text-slate-800 border-slate-200',
+      color: 'bg-slate-100 text-slate-700 border-slate-200',
     },
   };
 
   const current = map[role] || {
     label: customTitle || role,
     icon: Users,
-    color: 'bg-slate-100 text-slate-800 border-slate-200',
+    color: 'bg-slate-100 text-slate-700 border-slate-200',
   };
   const Icon = current.icon;
 

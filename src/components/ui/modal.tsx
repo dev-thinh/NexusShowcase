@@ -47,7 +47,7 @@ export function Modal({ isOpen, onClose, title, description, children }: ModalPr
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-3 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer ml-3 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20"
             aria-label="Đóng hộp thoại"
           >
             <X className="w-5 h-5" />

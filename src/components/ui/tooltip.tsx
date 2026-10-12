@@ -14,7 +14,7 @@ export function Tooltip({ content, children, iconOnly = false }: TooltipProps) {
 
   return (
     <div
-      className="relative inline-flex items-center group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] rounded-full p-0.5"
+      className="relative inline-flex items-center group cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20 rounded-full p-0.5"
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
       onFocus={() => setIsVisible(true)}
@@ -26,9 +26,9 @@ export function Tooltip({ content, children, iconOnly = false }: TooltipProps) {
       {children ? (
         children
       ) : iconOnly ? (
-        <Info className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#0F294A] transition-colors" />
+        <Info className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 transition-colors" />
       ) : (
-        <HelpCircle className="w-4 h-4 text-slate-400 group-hover:text-[#0F294A] transition-colors" />
+        <HelpCircle className="w-4 h-4 text-slate-400 group-hover:text-slate-700 transition-colors" />
       )}
 
       {isVisible && (
