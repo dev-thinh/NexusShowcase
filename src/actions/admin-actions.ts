@@ -11,6 +11,7 @@ import {
   type CreateMemberInput,
 } from '@/lib/action-schemas';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
 export type { CreateMemberInput };
 
@@ -52,7 +53,7 @@ export async function createMemberAction(input: CreateMemberInput) {
     return { success: false, error: `Tài khoản hoặc email "${emailTrimmed}" đã tồn tại trong hệ thống.` };
   }
 
-  const rawPassword = input.password?.trim() || 'member123';
+  const rawPassword = input.password?.trim() || crypto.randomBytes(6).toString('hex');
   if (rawPassword.length < 6) {
     return { success: false, error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.' };
   }
@@ -66,11 +67,13 @@ export async function createMemberAction(input: CreateMemberInput) {
       role: input.role || 'MEMBER',
       status: 'ACTIVE',
       passwordHash,
+      mustChangePassword: true,
+      sessionVersion: 1,
     },
     select: { id: true, fullName: true, role: true, status: true },
   });
 
-  return { success: true, user: toSafeMember(newUser) };
+  return { success: true, user: toSafeMember(newUser), temporaryPassword: rawPassword };
 }
 
 export async function updateUserRoleAction(targetUserId: string, newRole: Role) {
@@ -88,7 +91,10 @@ export async function updateUserRoleAction(targetUserId: string, newRole: Role) 
 
   const updatedUser = await prisma.user.update({
     where: { id: targetUserId },
-    data: { role: newRole },
+    data: {
+      role: newRole,
+      sessionVersion: { increment: 1 },
+    },
     select: { id: true, fullName: true, role: true, status: true },
   });
 
@@ -123,12 +129,17 @@ export async function deleteMemberAction(targetUserId: string) {
     return { success: false, error: 'Không thể xóa tài khoản Quản trị viên của hệ thống.' };
   }
 
-  await prisma.user.delete({
+  await prisma.user.update({
     where: { id: targetUserId },
+    data: {
+      status: 'SUSPENDED',
+      deletedAt: new Date(),
+      sessionVersion: { increment: 1 },
+    },
   });
 
   return {
     success: true,
-    message: `Đã xóa tài khoản "${targetUser.fullName}" thành công.`,
+    message: `Đã vô hiệu hóa tài khoản "${targetUser.fullName}" thành công.`,
   };
 }

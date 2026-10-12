@@ -24,6 +24,9 @@ export default async function AdminReviewsPage() {
   if ((session.user as any).role !== 'ADMIN') {
     redirect('/');
   }
+  if ((session.user as any).mustChangePassword) {
+    redirect('/account/change-password');
+  }
 
   const pendingItems = await prisma.showcaseItem.findMany({
     where: { status: 'PENDING_REVIEW' },

@@ -103,7 +103,7 @@ export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) 
             </div>
 
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 mb-5 leading-relaxed">
-              <strong>Lưu ý:</strong> Hành động này không thể hoàn tác. Dữ liệu thành viên sẽ được loại bỏ khỏi hệ thống cơ sở dữ liệu CLB.
+              <strong>Lưu ý:</strong> Hành động này sẽ vô hiệu hóa tài khoản thành viên. Các công trình và bài báo liên quan vẫn được bảo lưu an toàn.
             </div>
 
             {error && (

@@ -17,6 +17,9 @@ export default async function AdminMembersPage() {
   if ((session.user as any).role !== 'ADMIN') {
     redirect('/');
   }
+  if ((session.user as any).mustChangePassword) {
+    redirect('/account/change-password');
+  }
 
   const members = await prisma.user.findMany({
     orderBy: [{ role: 'asc' }, { fullName: 'asc' }],

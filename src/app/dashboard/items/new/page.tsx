@@ -17,6 +17,9 @@ export default async function NewItemPage() {
   if (!user || !canUserUpload(user)) {
     redirect('/dashboard');
   }
+  if (user.mustChangePassword) {
+    redirect('/account/change-password');
+  }
 
   const members = await prisma.user.findMany({
     where: { status: 'ACTIVE' },

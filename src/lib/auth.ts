@@ -37,7 +37,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
 
         if (!user || !user.passwordHash) return null;
-        if (user.status !== 'ACTIVE') return null;
+        if (user.status !== 'ACTIVE' || user.deletedAt) return null;
 
         const isPasswordMatch = await bcrypt.compare(parsed.data.password, user.passwordHash);
         if (!isPasswordMatch) return null;
@@ -47,6 +47,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email: user.email,
           name: user.fullName,
           role: user.role,
+          status: user.status,
+          mustChangePassword: user.mustChangePassword,
+          sessionVersion: user.sessionVersion,
         };
       },
     }),
@@ -56,13 +59,45 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.id = user.id;
         token.role = (user as unknown as { role: string }).role;
+        token.status = (user as unknown as { status: string }).status;
+        token.sessionVersion = (user as unknown as { sessionVersion: number }).sessionVersion;
+        token.mustChangePassword = (user as unknown as { mustChangePassword: boolean }).mustChangePassword;
+        return token;
+      }
+
+      if (token?.id) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: {
+            role: true,
+            status: true,
+            sessionVersion: true,
+            mustChangePassword: true,
+            deletedAt: true,
+          },
+        });
+
+        if (!dbUser || dbUser.status !== 'ACTIVE' || dbUser.deletedAt || dbUser.sessionVersion !== token.sessionVersion) {
+          token.id = undefined;
+          token.role = undefined;
+          token.status = 'SUSPENDED';
+          return token;
+        }
+
+        token.role = dbUser.role;
+        token.status = dbUser.status;
+        token.mustChangePassword = dbUser.mustChangePassword;
       }
       return token;
     },
     async session({ session, token }) {
-      if (token && session.user) {
+      if (!token?.id || token.status !== 'ACTIVE') {
+        return null as any;
+      }
+      if (session.user) {
         session.user.id = token.id as string;
         (session.user as unknown as { role: string }).role = token.role as string;
+        (session.user as unknown as { mustChangePassword: boolean }).mustChangePassword = Boolean(token.mustChangePassword);
       }
       return session;
     },

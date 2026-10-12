@@ -35,6 +35,7 @@ export default async function DashboardPage() {
   });
 
   if (!user) redirect('/login');
+  if (user.mustChangePassword) redirect('/account/change-password');
 
   const isUploader = canUserUpload(user);
 

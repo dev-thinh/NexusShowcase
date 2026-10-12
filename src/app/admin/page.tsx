@@ -25,6 +25,9 @@ export default async function AdminDashboardPage() {
   if ((session.user as any).role !== 'ADMIN') {
     redirect('/');
   }
+  if ((session.user as any).mustChangePassword) {
+    redirect('/account/change-password');
+  }
 
   const [pendingCount, totalMembers, pinnedItems] = await Promise.all([
     prisma.showcaseItem.count({ where: { status: 'PENDING_REVIEW' } }),
