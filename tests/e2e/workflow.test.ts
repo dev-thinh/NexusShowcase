@@ -37,7 +37,7 @@ describe('End-to-End Club Showcase Workflow', () => {
   });
 
   it('Step 1: Member thường không được phép nộp bài', async () => {
-    const attempt = await (createShowcaseItemAction as any)(newStudent.id, {
+    const attempt = await createShowcaseItemAction({
       title: 'Đề tài chưa được cấp quyền',
       summary: 'Thử nghiệm nộp bài trái phép',
       type: 'PROJECT',
@@ -49,13 +49,13 @@ describe('End-to-End Club Showcase Workflow', () => {
   });
 
   it('Step 2: Thầy chủ nhiệm nâng cấp sinh viên lên CORE_MEMBER', async () => {
-    const promotion = await (updateUserRoleAction as any)(admin.id, newStudent.id, 'CORE_MEMBER');
+    const promotion = await updateUserRoleAction(newStudent.id, 'CORE_MEMBER');
     expect(promotion.success).toBe(true);
     expect(promotion.user?.role).toBe('CORE_MEMBER');
   });
 
   it('Step 3: Core Member nộp bài có Thầy hướng dẫn và đồng đội tham gia', async () => {
-    const submission = await (createShowcaseItemAction as any)(newStudent.id, {
+    const submission = await createShowcaseItemAction({
       title: 'Hệ Thống Trưng Bày Khoa Học NexusShowcase E2E',
       summary: 'Nền tảng trưng bày kết quả nghiên cứu sinh viên',
       type: 'PROJECT',
@@ -92,7 +92,7 @@ describe('End-to-End Club Showcase Workflow', () => {
     expect(submission.item?.status).toBe('PENDING_REVIEW');
 
     // Step 4: Thầy chủ nhiệm duyệt xuất bản
-    const review = await (reviewShowcaseItemAction as any)(admin.id, submission.item!.id, {
+    const review = await reviewShowcaseItemAction(submission.item!.id, {
       action: 'PUBLISH',
     });
     expect(review.success).toBe(true);

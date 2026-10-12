@@ -52,7 +52,7 @@ describe('Showcase Pinning Action', () => {
     });
     createdItemIds.push(item.id);
 
-    const result = await (togglePinShowcaseItemAction as any)(regularUser.id, item.id);
+    const result = await togglePinShowcaseItemAction(item.id);
     expect(result.success).toBe(false);
     expect(result.error).toContain('Chỉ Quản trị viên');
   });
@@ -72,7 +72,7 @@ describe('Showcase Pinning Action', () => {
     createdItemIds.push(item.id);
 
     // Pin
-    const pinRes = await (togglePinShowcaseItemAction as any)(adminUser.id, item.id);
+    const pinRes = await togglePinShowcaseItemAction(item.id);
     expect(pinRes.success).toBe(true);
     expect(pinRes.isPinned).toBe(true);
 
@@ -81,7 +81,7 @@ describe('Showcase Pinning Action', () => {
     expect(pinnedItem?.pinnedAt).not.toBeNull();
 
     // Unpin
-    const unpinRes = await (togglePinShowcaseItemAction as any)(adminUser.id, item.id);
+    const unpinRes = await togglePinShowcaseItemAction(item.id);
     expect(unpinRes.success).toBe(true);
     expect(unpinRes.isPinned).toBe(false);
 
@@ -134,7 +134,7 @@ describe('Showcase Pinning Action', () => {
     });
     createdItemIds.push(item11.id);
 
-    const pin11Res = await (togglePinShowcaseItemAction as any)(adminUser.id, item11.id);
+    const pin11Res = await togglePinShowcaseItemAction(item11.id);
     expect(pin11Res.success).toBe(true);
     expect(pin11Res.isPinned).toBe(true);
 

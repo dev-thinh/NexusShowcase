@@ -41,7 +41,7 @@ describe('Showcase Server Actions', () => {
   });
 
   it('should forbid regular member from creating showcase item', async () => {
-    const result = await (createShowcaseItemAction as any)(regularUser.id, {
+    const result = await createShowcaseItemAction({
       title: 'Bài báo trái phép của member thường',
       summary: 'Tóm tắt bài báo',
       type: 'RESEARCH_PAPER',
@@ -55,7 +55,7 @@ describe('Showcase Server Actions', () => {
   });
 
   it('should allow admin to create and directly publish showcase item', async () => {
-    const result = await (createShowcaseItemAction as any)(adminUser.id, {
+    const result = await createShowcaseItemAction({
       title: 'Công trình của Thầy Cố Vấn',
       summary: 'Bài báo do Thầy chủ nhiệm trực tiếp đăng tải',
       type: 'RESEARCH_PAPER',
@@ -74,7 +74,7 @@ describe('Showcase Server Actions', () => {
   });
 
   it('should allow core member to create showcase item with mixed contributors', async () => {
-    const result = await (createShowcaseItemAction as any)(coreUser.id, {
+    const result = await createShowcaseItemAction({
       title: 'Hệ thống Nhận diện Khuôn mặt CLB',
       summary: 'Dự án áp dụng FaceNet và YOLO',
       type: 'PROJECT',
@@ -122,7 +122,7 @@ describe('Showcase Server Actions', () => {
     expect(result.item?.attachments?.[0].fileName).toBe('paper-manuscript.pdf');
 
     // Admin duyệt bài
-    const reviewResult = await (reviewShowcaseItemAction as any)(adminUser.id, result.item!.id, {
+    const reviewResult = await reviewShowcaseItemAction(result.item!.id, {
       action: 'PUBLISH',
     });
     expect(reviewResult.success).toBe(true);
