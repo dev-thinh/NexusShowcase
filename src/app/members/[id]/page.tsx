@@ -52,10 +52,10 @@ export default async function MemberProfilePage({
   const achievements = publishedItems.filter((i) => i.type === 'ACHIEVEMENT');
 
   const roleBadgeConfig = {
-    ADMIN: { label: 'Quản Trị Viên', color: 'bg-amber-100 text-amber-900 border-amber-300', icon: ShieldCheck },
-    CORE_MEMBER: { label: 'CORE MEMBER', color: 'bg-blue-100 text-blue-900 border-blue-300', icon: UserCheck },
-    MEMBER: { label: 'Thành viên', color: 'bg-slate-100 text-slate-800 border-slate-200', icon: UserCheck },
-    GUEST: { label: 'Khách', color: 'bg-slate-100 text-slate-600 border-slate-200', icon: UserCheck },
+    ADMIN: { label: 'Quản Trị Viên', color: 'bg-amber-50 text-amber-800 border-amber-200/80', icon: ShieldCheck },
+    CORE_MEMBER: { label: 'CORE MEMBER', color: 'bg-blue-50 text-blue-800 border-blue-200/80', icon: UserCheck },
+    MEMBER: { label: 'Thành viên', color: 'bg-slate-100 text-slate-700 border-slate-200/80', icon: UserCheck },
+    GUEST: { label: 'Khách', color: 'bg-slate-100 text-slate-600 border-slate-200/80', icon: UserCheck },
   };
 
   const currentRole = roleBadgeConfig[user.role] || roleBadgeConfig.MEMBER;
@@ -98,11 +98,11 @@ export default async function MemberProfilePage({
             {/* Academic Metrics Row */}
             <div className="grid grid-cols-3 gap-4 max-w-lg mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl text-center">
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-[#0F294A] font-serif">{papers.length}</div>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900 font-serif">{papers.length}</div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Bài Báo</div>
               </div>
               <div className="border-x border-slate-200">
-                <div className="text-2xl sm:text-3xl font-black text-emerald-700 font-serif">{projects.length}</div>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900 font-serif">{projects.length}</div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Dự Án</div>
               </div>
               <div>
@@ -118,9 +118,9 @@ export default async function MemberProfilePage({
                   href={user.googleScholarUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 transition-colors"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
-                  <GraduationCap className="w-4 h-4 text-purple-600" />
+                  <GraduationCap className="w-4 h-4 text-slate-500" />
                   <span>Google Scholar</span>
                 </a>
               )}
@@ -129,9 +129,9 @@ export default async function MemberProfilePage({
                   href={user.githubUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 transition-colors"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
-                  <Github className="w-4 h-4" />
+                  <Github className="w-4 h-4 text-slate-800" />
                   <span>GitHub</span>
                 </a>
               )}
@@ -140,7 +140,7 @@ export default async function MemberProfilePage({
                   href={user.linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 transition-colors"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
                   <Linkedin className="w-4 h-4 text-blue-600" />
                   <span>LinkedIn</span>
@@ -151,9 +151,9 @@ export default async function MemberProfilePage({
                   href={user.portfolioUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 transition-colors"
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
-                  <Globe className="w-4 h-4 text-emerald-600" />
+                  <Globe className="w-4 h-4 text-slate-500" />
                   <span>Trang cá nhân</span>
                 </a>
               )}

@@ -145,7 +145,7 @@ export default async function ShowcaseDetailPage({
             {/* Citation Generator */}
             <CitationModal
               item={item}
-              className="h-11 px-4 sm:px-5 rounded-xl bg-[#1A426F] hover:bg-[#235084] text-white text-sm font-bold transition-all shadow-xs border border-[#28578E] cursor-pointer inline-flex items-center justify-center gap-2.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1A426F]"
+              className="h-11 px-4 sm:px-5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-sm font-bold transition-all shadow-xs cursor-pointer inline-flex items-center justify-center gap-2.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
             />
 
             {/* Admin Pin Toggle */}
@@ -163,11 +163,11 @@ export default async function ShowcaseDetailPage({
                 href={paperLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
                 <FileText className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>Đọc bài báo gốc</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1A426F] shrink-0" />
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" />
               </a>
             )}
 
@@ -176,11 +176,11 @@ export default async function ShowcaseDetailPage({
                 href={githubLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
                 <Github className="w-4 h-4 text-slate-900 shrink-0" />
                 <span>Mã nguồn GitHub</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1A426F] shrink-0" />
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" />
               </a>
             )}
 
@@ -189,11 +189,11 @@ export default async function ShowcaseDetailPage({
                 href={liveDemoLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
                 <Globe className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Trang web chạy thử</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#1A426F] shrink-0" />
+                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" />
               </a>
             )}
 
@@ -203,9 +203,9 @@ export default async function ShowcaseDetailPage({
                 href={link.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] border border-slate-300 shadow-2xs text-sm font-bold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
+                className="h-11 px-4 sm:px-5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2.5 group cursor-pointer"
               >
-                <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-[#1A426F] shrink-0" />
+                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-600 shrink-0" />
                 <span>{link.label}</span>
               </a>
             ))}
@@ -227,7 +227,7 @@ export default async function ShowcaseDetailPage({
           <section className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs mb-8">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 font-serif">
-                <Paperclip className="w-5 h-5 text-[#0F294A]" />
+                <Paperclip className="w-5 h-5 text-slate-500" />
                 <span>Tài Liệu Toàn Văn &amp; Phụ Lục Nghiên Cứu</span>
               </h2>
               <span className="text-sm text-slate-500 font-semibold">
@@ -242,7 +242,7 @@ export default async function ShowcaseDetailPage({
                   className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:bg-slate-100/60 transition-colors"
                 >
                   <div className="flex items-center gap-3.5 truncate">
-                    <div className="w-10 h-10 rounded-xl bg-rose-100 text-rose-800 font-black text-xs flex items-center justify-center shrink-0 border border-rose-200">
+                    <div className="w-10 h-10 rounded-xl bg-rose-50 text-rose-700 font-bold text-xs flex items-center justify-center shrink-0 border border-rose-200/80">
                       PDF
                     </div>
                     <div className="truncate">
@@ -260,15 +260,15 @@ export default async function ShowcaseDetailPage({
                       href={att.fileUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="h-10 px-3.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 hover:text-[#1A426F] text-xs sm:text-sm font-bold transition-all shadow-2xs inline-flex items-center gap-1.5 active:scale-[0.98]"
+                      className="h-10 px-3.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs sm:text-sm font-semibold transition-all shadow-2xs inline-flex items-center gap-1.5 active:scale-[0.98]"
                     >
-                      <Eye className="w-4 h-4 text-slate-500" />
+                      <Eye className="w-4 h-4 text-slate-400" />
                       <span>Xem online</span>
                     </a>
                     <a
                       href={att.fileUrl}
                       download={att.fileName}
-                      className="h-10 px-4 rounded-xl bg-[#1A426F] hover:bg-[#235084] text-white text-xs sm:text-sm font-bold transition-all shadow-xs border border-[#28578E] inline-flex items-center gap-1.5 active:scale-[0.98]"
+                      className="h-10 px-4 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs sm:text-sm font-bold transition-all shadow-xs inline-flex items-center gap-1.5 active:scale-[0.98]"
                     >
                       <Download className="w-4 h-4 text-blue-200" />
                       <span>Tải về PDF</span>
