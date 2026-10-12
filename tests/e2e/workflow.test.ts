@@ -28,7 +28,18 @@ describe('End-to-End Club Showcase Workflow', () => {
 
   beforeAll(async () => {
     admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-    if (!admin) throw new Error('Admin not found in DB');
+    if (!admin) {
+      const adminHash = await bcrypt.hash('admin_fixture_pass', 10);
+      admin = await prisma.user.create({
+        data: {
+          email: `admin.e2e.${Date.now()}@nexus.test`,
+          fullName: 'E2E Fixture Admin',
+          passwordHash: adminHash,
+          role: 'ADMIN',
+          status: 'ACTIVE',
+        },
+      });
+    }
 
     // Tạo 2 sinh viên mới
     const passwordHash = await bcrypt.hash('pass123456', 10);

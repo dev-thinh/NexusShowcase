@@ -23,6 +23,7 @@ describe('Showcase Pinning Action', () => {
   let adminUser: any;
   let regularUser: any;
   const createdItemIds: string[] = [];
+  let preExistingPinnedIds: string[] = [];
 
   beforeAll(async () => {
     adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
@@ -51,6 +52,12 @@ describe('Showcase Pinning Action', () => {
     if (createdItemIds.length > 0) {
       await prisma.showcaseItem.deleteMany({
         where: { id: { in: createdItemIds } },
+      });
+    }
+    if (preExistingPinnedIds.length > 0) {
+      await prisma.showcaseItem.updateMany({
+        where: { id: { in: preExistingPinnedIds } },
+        data: { isPinned: true, pinnedAt: new Date() },
       });
     }
   });
@@ -112,9 +119,17 @@ describe('Showcase Pinning Action', () => {
   it('should enforce FIFO eviction when pinning exceeds 10 items', async () => {
     currentUserMock.actor = adminUser;
     // Reset all pinned items to ensure clean state
-    await prisma.showcaseItem.updateMany({
-      data: { isPinned: false, pinnedAt: null },
+    const previouslyPinned = await prisma.showcaseItem.findMany({
+      where: { isPinned: true },
+      select: { id: true },
     });
+    preExistingPinnedIds = previouslyPinned.map((p) => p.id);
+    if (preExistingPinnedIds.length > 0) {
+      await prisma.showcaseItem.updateMany({
+        where: { id: { in: preExistingPinnedIds } },
+      data: { isPinned: false, pinnedAt: null },
+      });
+    }
 
     // Create 10 pinned items with sequential pinnedAt
     const items: any[] = [];

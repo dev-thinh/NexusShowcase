@@ -10,17 +10,33 @@ describe('Prisma Schema and Database Models', () => {
     await prisma.$disconnect();
   });
 
-  it('should find seeded admin user', async () => {
-    const admin = await prisma.user.findFirst({
-      where: { role: 'ADMIN' },
+  it('should find or create admin user fixture', async () => {
+    const admin = await prisma.user.upsert({
+      where: { email: 'fixture-admin@nexus.test' },
+      update: {},
+      create: {
+        email: 'fixture-admin@nexus.test',
+        fullName: 'Fixture Admin',
+        role: 'ADMIN',
+        status: 'ACTIVE',
+      },
     });
     expect(admin).toBeDefined();
-    expect(admin?.role).toBe('ADMIN');
+    expect(admin.role).toBe('ADMIN');
   });
 
   it('should create and retrieve a showcase item with contributor', async () => {
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-    if (!admin) throw new Error('Admin not found');
+    let admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (!admin) {
+      admin = await prisma.user.create({
+        data: {
+          email: 'fixture-admin-showcase@nexus.test',
+          fullName: 'Fixture Admin Showcase',
+          role: 'ADMIN',
+          status: 'ACTIVE',
+        },
+      });
+    }
 
     const item = await prisma.showcaseItem.create({
       data: {
