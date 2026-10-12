@@ -35,11 +35,11 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
   const remainingCount = authorNames.length > 1 ? authorNames.length - 1 : 0;
 
   return (
-    <div className="group flex flex-col rounded-2xl border border-slate-200 bg-white shadow-xs hover:shadow-md hover:border-[#0F294A]/40 transition-all duration-200 overflow-hidden">
+    <div className="group flex flex-col rounded-2xl border border-slate-200/90 bg-white shadow-xs hover:shadow-md hover:border-slate-300 transition-all duration-200 overflow-hidden">
       {/* Thumbnail Container */}
       <Link
         href={`/showcase/${item.slug}`}
-        className="aspect-[16/9] w-full bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-200 block"
+        className="aspect-[16/9] w-full bg-slate-100 relative overflow-hidden flex items-center justify-center border-b border-slate-100 block"
         aria-label={`Xem chi tiết ${item.title}`}
       >
         {item.thumbnailUrl ? (
@@ -50,7 +50,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-slate-100 to-slate-200/60 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
+          <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
             <div className="w-11 h-11 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1.5 font-serif border border-slate-200">
               NX
             </div>
@@ -62,7 +62,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
           <TypeBadge type={item.type} size="sm" />
         </div>
 
-        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 backdrop-blur-xs p-1.5 rounded-full text-[#0F294A] shadow-xs border border-slate-200">
+        <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity bg-white/95 backdrop-blur-xs p-1.5 rounded-full text-slate-700 shadow-xs border border-slate-200">
           <ArrowUpRight className="w-4 h-4" />
         </div>
       </Link>
@@ -98,7 +98,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
         {/* Authors Footer with Citation Badge */}
         <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between text-xs sm:text-sm text-slate-500">
           <div className="flex items-center gap-1.5 truncate max-w-[220px]">
-            <Users className="w-4 h-4 text-[#0F294A] shrink-0" />
+            <Users className="w-4 h-4 text-slate-400 shrink-0" />
             <span className="font-semibold text-slate-700 truncate">{primaryAuthor}</span>
             {remainingCount > 0 && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold shrink-0 border border-slate-200">
@@ -111,7 +111,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
             <CitationModal item={item} triggerVariant="badge" />
             <Link
               href={`/showcase/${item.slug}`}
-              className="text-[#0F294A] text-sm font-bold hover:text-[#1A3E6B] inline-flex items-center gap-1 group/btn transition-colors"
+              className="text-[#0F294A] text-sm font-bold hover:text-[#1E3A5F] inline-flex items-center gap-1 group/btn transition-colors"
             >
               <span>Xem</span>
               <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />

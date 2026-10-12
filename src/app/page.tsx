@@ -147,8 +147,8 @@ export default async function HomePage({
       {/* Hero Section */}
       <section className="relative overflow-hidden py-14 sm:py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-100/90 text-[#0F294A] text-xs sm:text-sm font-bold mb-5 shadow-2xs border border-blue-200">
-            <GraduationCap className="w-4 h-4 text-blue-700" />
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-800 text-xs sm:text-sm font-semibold mb-5 shadow-2xs border border-slate-200">
+            <GraduationCap className="w-4 h-4 text-slate-700" />
             <span>Khoa Công Nghệ Thông Tin • ĐH Khoa Học Tự Nhiên - ĐHQG-HCM</span>
           </div>
 
@@ -161,18 +161,18 @@ export default async function HomePage({
           </p>
 
           {/* Institutional Stats Counters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto mt-10 p-5 bg-white/95 rounded-2xl border border-slate-200 shadow-xs backdrop-blur-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto mt-10 p-5 bg-white rounded-2xl border border-slate-200 shadow-xs">
             <div className="p-3 text-center">
-              <div className="text-3xl sm:text-4xl font-black text-[#0F294A] font-serif">{totalPapers}</div>
-              <div className="text-xs sm:text-sm text-slate-600 font-semibold mt-1">Bài Báo Khoa Học</div>
+              <div className="text-3xl sm:text-4xl font-black text-slate-900 font-serif">{totalPapers}</div>
+              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Bài Báo Khoa Học</div>
             </div>
             <div className="p-3 text-center sm:border-x sm:border-slate-100 border-y sm:border-y-0 border-slate-100 py-4 sm:py-3">
-              <div className="text-3xl sm:text-4xl font-black text-emerald-700 font-serif">{totalProjects}</div>
-              <div className="text-xs sm:text-sm text-slate-600 font-semibold mt-1">Dự Án Công Nghệ</div>
+              <div className="text-3xl sm:text-4xl font-black text-slate-900 font-serif">{totalProjects}</div>
+              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Dự Án Công Nghệ</div>
             </div>
             <div className="p-3 text-center">
               <div className="text-3xl sm:text-4xl font-black text-amber-700 font-serif">{totalAchievements}</div>
-              <div className="text-xs sm:text-sm text-slate-600 font-semibold mt-1">Giải Thưởng / Cống Hiến</div>
+              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Giải Thưởng / Cống Hiến</div>
             </div>
           </div>
         </div>
@@ -204,7 +204,7 @@ export default async function HomePage({
                     className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
                       isActive
                         ? 'bg-[#0F294A] text-white shadow-xs'
-                        : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200'
+                        : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -225,12 +225,12 @@ export default async function HomePage({
                   name="q"
                   defaultValue={searchQuery || ''}
                   placeholder="Tìm bài báo, dự án, tác giả..."
-                  className="w-full sm:w-72 pl-10 pr-4 py-2.5 text-sm bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A] focus:border-transparent transition-colors"
+                  className="w-full sm:w-72 pl-10 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
                 />
               </div>
               <button
                 type="submit"
-                className="px-5 py-2.5 text-sm font-bold bg-[#0F294A] hover:bg-[#1A3E6B] text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
+                className="px-5 py-2.5 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
               >
                 Tìm
               </button>
@@ -257,8 +257,8 @@ export default async function HomePage({
                   href={href}
                   className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                     isActive
-                      ? 'bg-blue-100 text-[#0F294A] border border-blue-300 font-bold'
-                      : 'bg-white/80 text-slate-700 hover:bg-white hover:text-slate-900 border border-slate-200'
+                      ? 'bg-blue-50 text-blue-900 border border-blue-200 font-bold shadow-2xs'
+                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5 text-slate-500" />
