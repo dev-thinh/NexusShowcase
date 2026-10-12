@@ -58,29 +58,29 @@ export default async function DashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
               <Link
                 href="/dashboard/items/new"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Đăng tải bài mới</span>
               </Link>
               <Link
                 href="/admin"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm shadow-xs transition-all"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 font-bold text-sm border border-slate-200 shadow-2xs transition-all"
               >
-                <ShieldCheck className="w-4 h-4 text-slate-950" />
+                <ShieldCheck className="w-4 h-4 text-amber-600" />
                 <span>Bàn làm việc Quản trị &amp; Duyệt bài</span>
               </Link>
             </div>
           ) : isUploader ? (
             <Link
               href="/dashboard/items/new"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer self-start"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer self-start"
             >
               <Plus className="w-4 h-4" />
               <span>Đăng tải bài mới cho nhóm</span>
             </Link>
           ) : (
-            <div className="p-3.5 bg-amber-50 border border-amber-200 rounded-xl text-xs sm:text-sm text-amber-900 max-w-md flex items-start gap-2.5">
+            <div className="p-3.5 bg-amber-50 border border-amber-200/80 rounded-xl text-xs sm:text-sm text-amber-800 max-w-md flex items-start gap-2.5">
               <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 Tài khoản thành viên. Để đăng tải công trình nghiên cứu, vui lòng liên hệ Quản trị viên để được cấp quyền <strong>CORE MEMBER</strong>.
@@ -160,7 +160,7 @@ export default async function DashboardPage() {
                     <StatusBadge status={item.status} />
                     <Link
                       href={`/showcase/${item.slug}`}
-                      className="text-sm font-bold text-[#0F294A] hover:text-[#1A3E6B] inline-flex items-center gap-1 group/link"
+                      className="text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] inline-flex items-center gap-1 group/link"
                     >
                       <span>{item.status === 'PUBLISHED' ? 'Xem bài' : 'Xem trước'}</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover/link:translate-x-0.5 transition-transform" />

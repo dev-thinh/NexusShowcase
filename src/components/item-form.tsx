@@ -284,7 +284,7 @@ export function ItemForm({
             required
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-colors"
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
             placeholder="Ví dụ: Ứng dụng học sâu trong phân đoạn ảnh y tế..."
           />
         </div>
@@ -297,7 +297,7 @@ export function ItemForm({
             <select
               value={type}
               onChange={(e) => setType(e.target.value as ItemType)}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] font-medium"
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-medium"
             >
               <option value="RESEARCH_PAPER">Bài báo khoa học</option>
               <option value="PROJECT">Dự án công nghệ</option>
@@ -312,7 +312,7 @@ export function ItemForm({
             <select
               value={scope}
               onChange={(e) => setScope(e.target.value as ItemScope)}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] font-medium"
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-medium"
             >
               <option value="EXTERNAL">Bên ngoài (NCKH, ICPC...)</option>
               <option value="INTERNAL">Nội bộ CLB</option>
@@ -328,7 +328,7 @@ export function ItemForm({
               type="number"
               value={publishedYear}
               onChange={(e) => setPublishedYear(parseInt(e.target.value) || new Date().getFullYear())}
-              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] font-medium"
+              className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-medium"
             />
           </div>
         </div>
@@ -341,7 +341,7 @@ export function ItemForm({
             type="text"
             value={issuer}
             onChange={(e) => setIssuer(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
             placeholder="Ví dụ: Hội nghị Khoa học Trẻ 2026, CLB Nexus, Khoa CNTT..."
           />
         </div>
@@ -355,7 +355,7 @@ export function ItemForm({
             rows={4}
             value={summary}
             onChange={(e) => setSummary(e.target.value)}
-            className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm sm:text-base text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] leading-relaxed"
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 leading-relaxed transition-colors"
             placeholder="Tóm tắt mục tiêu, phương pháp, kết quả và ý nghĩa của công trình..."
           />
         </div>
@@ -435,9 +435,9 @@ export function ItemForm({
                       type="button"
                       disabled={uploadingImage}
                       onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-300 hover:border-[#0F294A] text-slate-800 text-sm font-bold shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-800 text-sm font-semibold shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
                     >
-                      {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin text-[#0F294A]" /> : <Upload className="w-4 h-4 text-[#0F294A]" />}
+                      {uploadingImage ? <Loader2 className="w-4 h-4 animate-spin text-slate-600" /> : <Upload className="w-4 h-4 text-slate-500" />}
                       <span>{uploadingImage ? 'Đang tải ảnh...' : 'Chọn file ảnh từ máy'}</span>
                     </button>
                     {thumbnailUrl && (
@@ -460,7 +460,7 @@ export function ItemForm({
                       value={thumbnailUrl}
                       onChange={(e) => setThumbnailUrl(e.target.value)}
                       placeholder="https://example.com/images/paper-thumbnail.png"
-                      className="flex-1 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                      className="flex-1 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
                     />
                     {thumbnailUrl && (
                       <button
@@ -586,7 +586,7 @@ export function ItemForm({
                           next[idx].userId = e.target.value;
                           setContributors(next);
                         }}
-                        className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                        className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
                       >
                         {clubMembers.map((m) => (
                           <option key={m.id} value={m.id}>
@@ -611,7 +611,7 @@ export function ItemForm({
                             next[idx].externalName = e.target.value;
                             setContributors(next);
                           }}
-                          className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                          className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
                         />
                       </div>
                       <div className="lg:col-span-3">
@@ -627,7 +627,7 @@ export function ItemForm({
                             next[idx].externalAffiliation = e.target.value;
                             setContributors(next);
                           }}
-                          className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                          className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
                         />
                       </div>
                     </>
@@ -644,7 +644,7 @@ export function ItemForm({
                         next[idx].role = e.target.value as ContributorRole;
                         setContributors(next);
                       }}
-                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white font-bold text-[#0F294A] focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                      className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm bg-white font-bold text-[#0F294A] focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
                     >
                       <option value="FIRST_AUTHOR">Tác giả chính (First Author)</option>
                       <option value="CO_FIRST_AUTHOR">Đồng tác giả 1</option>
@@ -698,7 +698,7 @@ export function ItemForm({
                   next[idx].label = e.target.value;
                   setLinks(next);
                 }}
-                className="w-full sm:w-1/3 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                className="w-full sm:w-1/3 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
               />
               <input
                 type="url"
@@ -709,7 +709,7 @@ export function ItemForm({
                   next[idx].url = e.target.value;
                   setLinks(next);
                 }}
-                className="w-full sm:flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-600 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                className="w-full sm:flex-1 px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
               />
               <button
                 type="button"
@@ -737,7 +737,7 @@ export function ItemForm({
               type="button"
               disabled={uploadingDoc}
               onClick={() => docInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm bg-[#0F294A] hover:bg-[#1A3E6B] text-white rounded-xl font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-xl font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
             >
               {uploadingDoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               <span>{uploadingDoc ? 'Đang tải lên...' : 'Tải lên PDF'}</span>
@@ -785,20 +785,20 @@ export function ItemForm({
                 placeholder="Tên tài liệu (VD: Full-paper-manuscript.pdf)"
                 value={directDocName}
                 onChange={(e) => setDirectDocName(e.target.value)}
-                className="sm:col-span-5 px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                className="sm:col-span-5 px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
               />
               <input
                 type="url"
                 placeholder="https://arxiv.org/pdf/..."
                 value={directDocUrl}
                 onChange={(e) => setDirectDocUrl(e.target.value)}
-                className="sm:col-span-5 px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+                className="sm:col-span-5 px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400"
               />
               <button
                 type="button"
                 onClick={handleAddDirectDoc}
                 disabled={!directDocUrl.trim()}
-                className="sm:col-span-2 px-4 py-2 bg-[#0F294A] hover:bg-[#1A3E6B] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+                className="sm:col-span-2 px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
               >
                 Xác nhận
               </button>
@@ -817,7 +817,7 @@ export function ItemForm({
         {attachments.length === 0 ? (
           <div
             onClick={() => docInputRef.current?.click()}
-            className="border-2 border-dashed border-slate-200 hover:border-[#0F294A]/40 rounded-xl p-8 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-slate-50"
+            className="border-2 border-dashed border-slate-200 hover:border-slate-300 rounded-xl p-8 text-center cursor-pointer transition-colors bg-slate-50/50 hover:bg-slate-50"
           >
             <FileText className="w-8 h-8 text-slate-400 mx-auto mb-2" />
             <p className="text-sm font-bold text-slate-700">Chưa có tệp PDF nào được đính kèm</p>
@@ -833,7 +833,7 @@ export function ItemForm({
                 className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-xl hover:bg-slate-100/70 transition-colors"
               >
                 <div className="flex items-center gap-3 truncate">
-                  <div className="w-10 h-10 rounded-lg bg-rose-50 text-rose-700 font-extrabold text-xs flex items-center justify-center shrink-0 border border-rose-200">
+                  <div className="w-10 h-10 rounded-lg bg-rose-50 text-rose-700 font-extrabold text-xs flex items-center justify-center shrink-0 border border-rose-200/80">
                     PDF
                   </div>
                   <div className="truncate">
@@ -882,7 +882,7 @@ export function ItemForm({
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="Mô tả phương pháp, kiến trúc, kết quả thử nghiệm chi tiết..."
-          className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A] leading-relaxed"
+          className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 leading-relaxed text-slate-900"
         />
       </section>
 
@@ -892,7 +892,7 @@ export function ItemForm({
           type="button"
           disabled={loading}
           onClick={() => handleSubmit(false)}
-          className="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-all cursor-pointer disabled:opacity-50"
+          className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-sm hover:bg-slate-50 hover:text-slate-900 transition-all cursor-pointer disabled:opacity-50 shadow-2xs"
         >
           {loading ? 'Đang lưu...' : 'Lưu bản nháp'}
         </button>
@@ -901,7 +901,7 @@ export function ItemForm({
           type="button"
           disabled={loading}
           onClick={() => handleSubmit(true)}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1A3E6B] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
           <span>
