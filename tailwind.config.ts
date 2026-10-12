@@ -14,6 +14,37 @@ const config: Config = {
         mono: ['JetBrains Mono', 'Menlo', 'monospace'],
       },
       colors: {
+        // Semantic Token Mapping
+        background: 'var(--background)',
+        surface: {
+          DEFAULT: 'var(--surface)',
+          subtle: 'var(--surface-subtle)',
+          hover: 'var(--surface-hover)',
+          active: 'var(--surface-active)',
+        },
+        foreground: {
+          DEFAULT: 'var(--foreground)',
+          secondary: 'var(--foreground-secondary)',
+          muted: 'var(--foreground-muted)',
+        },
+        border: {
+          DEFAULT: 'var(--border)',
+          subtle: 'var(--border-subtle)',
+          strong: 'var(--border-strong)',
+        },
+        primary: {
+          DEFAULT: 'var(--primary)',
+          hover: 'var(--primary-hover)',
+          active: 'var(--primary-active)',
+          foreground: 'var(--primary-foreground)',
+          subtle: 'var(--primary-subtle)',
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          hover: 'var(--accent-hover)',
+          foreground: 'var(--accent-foreground)',
+          subtle: 'var(--accent-subtle)',
+        },
         navy: {
           50: '#F0F5FA',
           100: '#DFEAF5',
@@ -38,11 +69,11 @@ const config: Config = {
       keyframes: {
         'filmstrip-roll': {
           '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(-100%)' },
         },
       },
       animation: {
-        'filmstrip-roll': 'filmstrip-roll 32s linear infinite',
+        'filmstrip-roll': 'filmstrip-roll 40s linear infinite',
       },
     },
   },
