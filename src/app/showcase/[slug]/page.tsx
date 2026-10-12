@@ -91,11 +91,27 @@ export default async function ShowcaseDetailPage({
               </div>
             </div>
 
+            <div className="shrink-0 self-end sm:self-center flex items-center gap-2">
             {currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' && (
-              <div className="shrink-0 self-end sm:self-center">
+
                 <AdminReviewButton itemId={item.id} />
-              </div>
+
             )}
+            {(item.status === 'DRAFT' || item.status === 'REJECTED') && (
+              ((currentUser?.id === item.creatorId && (currentUser?.role === 'CORE_MEMBER' || currentUser?.role === 'ADMIN')) || currentUser?.role === 'ADMIN') ? (
+                <Link
+                  href={`/dashboard/items/${item.id}/edit`}
+                  className="px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-xl text-xs font-bold transition-all shadow-xs"
+                >
+                  {item.status === 'REJECTED' ? 'Sửa & Gửi lại duyệt' : 'Chỉnh sửa bài viết'}
+                </Link>
+              ) : currentUser?.id === item.creatorId && currentUser?.role === 'MEMBER' ? (
+                <span className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 border border-amber-200">
+                  Chỉ xem (Cần quyền Core Member để sửa)
+                </span>
+              ) : null
+            )}
+            </div>
           </div>
         )}
 

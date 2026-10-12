@@ -155,18 +155,29 @@ export default async function DashboardPage() {
                         </div>
                       </div>
                     )}
+
+                    {!isUploader && (item.status === 'DRAFT' || item.status === 'REJECTED') && (
+                      <div className="mt-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200/70 text-xs text-amber-800 flex items-center gap-2">
+                        <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        <span>Bài viết chỉ xem. Tài khoản cần được cấp quyền Core Member để tiếp tục chỉnh sửa &amp; gửi xét duyệt.</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="shrink-0 flex items-center gap-3">
                     <StatusBadge status={item.status} />
-                    {(item.status === 'DRAFT' || item.status === 'REJECTED' || user.role === 'ADMIN') && (
+                    {isUploader && (item.status === 'DRAFT' || item.status === 'REJECTED' || user.role === 'ADMIN') ? (
                       <Link
                         href={`/dashboard/items/${item.id}/edit`}
                         className="text-xs sm:text-sm font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
                         {item.status === 'REJECTED' ? 'Sửa & Nộp lại' : 'Chỉnh sửa'}
                       </Link>
-                    )}
+                    ) : !isUploader && (item.status === 'DRAFT' || item.status === 'REJECTED') ? (
+                      <span className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed">
+                        Chỉ xem
+                      </span>
+                    ) : null}
                     <Link
                       href={`/showcase/${item.slug}`}
                       className="text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] inline-flex items-center gap-1 group/link"
