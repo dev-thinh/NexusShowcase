@@ -3,15 +3,16 @@
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/current-user';
 import { Role } from '@prisma/client';
+import {
+  createMemberInputSchema,
+  deleteMemberInputSchema,
+  INVALID_ACTION_INPUT_ERROR,
+  userRoleUpdateInputSchema,
+  type CreateMemberInput,
+} from '@/lib/action-schemas';
 import bcrypt from 'bcryptjs';
 
-export interface CreateMemberInput {
-  fullName: string;
-  email: string;
-  studentId?: string;
-  role?: 'MEMBER' | 'CORE_MEMBER';
-  password?: string;
-}
+export type { CreateMemberInput };
 
 function toSafeMember(user: { id: string; fullName: string; role: Role; status: string }) {
   return { id: user.id, fullName: user.fullName, role: user.role, status: user.status };
@@ -22,6 +23,12 @@ export async function createMemberAction(input: CreateMemberInput) {
   if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền tạo tài khoản thành viên.' };
   }
+
+  const parsedInput = createMemberInputSchema.safeParse(input);
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  input = parsedInput.data;
 
   if (!input.fullName?.trim()) {
     return { success: false, error: 'Vui lòng nhập họ và tên của thành viên.' };
@@ -72,6 +79,13 @@ export async function updateUserRoleAction(targetUserId: string, newRole: Role) 
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền phân quyền thành viên.' };
   }
 
+  const parsedInput = userRoleUpdateInputSchema.safeParse({ targetUserId, newRole });
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  targetUserId = parsedInput.data.targetUserId;
+  newRole = parsedInput.data.newRole;
+
   const updatedUser = await prisma.user.update({
     where: { id: targetUserId },
     data: { role: newRole },
@@ -86,6 +100,12 @@ export async function deleteMemberAction(targetUserId: string) {
   if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền xóa tài khoản thành viên.' };
   }
+
+  const parsedInput = deleteMemberInputSchema.safeParse({ targetUserId });
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  targetUserId = parsedInput.data.targetUserId;
 
   if (admin.id === targetUserId) {
     return { success: false, error: 'Quản trị viên không thể tự xóa tài khoản của chính mình.' };

@@ -3,46 +3,19 @@
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/current-user';
 import { slugify } from '@/lib/slugify';
-import { ItemType, ItemScope, ContributorRole, LinkType } from '@prisma/client';
+import {
+  createShowcaseItemInputSchema,
+  INVALID_ACTION_INPUT_ERROR,
+  reviewShowcaseItemInputSchema,
+  showcaseItemIdSchema,
+  type AttachmentInput,
+  type ContributorInput,
+  type CreateShowcaseItemInput,
+  type LinkInput,
+} from '@/lib/action-schemas';
 import { revalidatePath } from 'next/cache';
 
-export interface ContributorInput {
-  userId?: string | null;
-  externalName?: string | null;
-  externalAffiliation?: string | null;
-  externalLink?: string | null;
-  role: ContributorRole;
-  customRoleTitle?: string | null;
-  displayOrder: number;
-}
-
-export interface LinkInput {
-  label: string;
-  url: string;
-  type: LinkType;
-}
-
-export interface AttachmentInput {
-  fileName: string;
-  fileUrl: string;
-  fileSize: number;
-  mimeType: string;
-}
-
-export interface CreateShowcaseItemInput {
-  title: string;
-  summary: string;
-  content?: string;
-  type: ItemType;
-  scope?: ItemScope;
-  issuer?: string;
-  thumbnailUrl?: string;
-  publishedYear: number;
-  contributors: ContributorInput[];
-  links: LinkInput[];
-  attachments?: AttachmentInput[];
-  submitForReview?: boolean;
-}
+export type { AttachmentInput, ContributorInput, CreateShowcaseItemInput, LinkInput };
 
 export async function createShowcaseItemAction(input: CreateShowcaseItemInput) {
   const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
@@ -50,33 +23,39 @@ export async function createShowcaseItemAction(input: CreateShowcaseItemInput) {
     return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) và Quản trị viên mới có quyền đăng bài.' };
   }
 
-  let slug = slugify(input.title);
+  const parsedInput = createShowcaseItemInputSchema.safeParse(input);
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  const values = parsedInput.data;
+
+  let slug = slugify(values.title);
   const existing = await prisma.showcaseItem.findUnique({ where: { slug } });
   if (existing) {
     slug = `${slug}-${Date.now().toString().slice(-4)}`;
   }
 
   const isAdmin = user.role === 'ADMIN';
-  const status = input.submitForReview
+  const status = values.submitForReview
     ? (isAdmin ? 'PUBLISHED' : 'PENDING_REVIEW')
     : 'DRAFT';
 
   const item = await prisma.showcaseItem.create({
     data: {
-      title: input.title,
+      title: values.title,
       slug,
-      summary: input.summary,
-      content: input.content,
-      type: input.type,
-      scope: input.scope,
-      issuer: input.issuer,
-      thumbnailUrl: input.thumbnailUrl,
+      summary: values.summary,
+      content: values.content,
+      type: values.type,
+      scope: values.scope,
+      issuer: values.issuer,
+      thumbnailUrl: values.thumbnailUrl,
       status,
       publishedAt: status === 'PUBLISHED' ? new Date() : null,
-      publishedYear: input.publishedYear,
+      publishedYear: values.publishedYear,
       creatorId: user.id,
       contributors: {
-        create: input.contributors.map((c) => ({
+        create: values.contributors.map((c) => ({
           userId: c.userId || null,
           externalName: c.externalName || null,
           externalAffiliation: c.externalAffiliation || null,
@@ -87,14 +66,14 @@ export async function createShowcaseItemAction(input: CreateShowcaseItemInput) {
         })),
       },
       links: {
-        create: input.links.map((l) => ({
+        create: values.links.map((l) => ({
           label: l.label,
           url: l.url,
           type: l.type,
         })),
       },
       attachments: {
-        create: (input.attachments || []).map((a) => ({
+        create: (values.attachments || []).map((a) => ({
           fileName: a.fileName,
           fileUrl: a.fileUrl,
           fileSize: a.fileSize,
@@ -120,6 +99,13 @@ export async function reviewShowcaseItemAction(
   if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền kiểm duyệt bài.' };
   }
+
+  const parsedInput = reviewShowcaseItemInputSchema.safeParse({ itemId, payload });
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  itemId = parsedInput.data.itemId;
+  payload = parsedInput.data.payload;
 
   const isPublish = payload.action === 'PUBLISH';
   const updated = await prisma.showcaseItem.update({
@@ -149,6 +135,12 @@ export async function togglePinShowcaseItemAction(itemId: string) {
   if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền ghim công trình lên trang chủ.' };
   }
+
+  const parsedItemId = showcaseItemIdSchema.safeParse(itemId);
+  if (!parsedItemId.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  itemId = parsedItemId.data;
 
   const targetItem = await prisma.showcaseItem.findUnique({ where: { id: itemId } });
   if (!targetItem) {

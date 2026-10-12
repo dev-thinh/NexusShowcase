@@ -127,7 +127,7 @@ export function ItemForm({
             fileName: res.fileName || file.name,
             fileUrl: res.url!,
             fileSize: res.fileSize || file.size,
-            mimeType: res.mimeType || 'application/pdf',
+            mimeType: 'application/pdf',
           },
         ]);
       }
