@@ -21,13 +21,13 @@ describe('Home Page Minimalist Revamp', () => {
     expect(content).toContain('auth');
   });
 
-  it('matches login page brand panel design and includes 4 core pillar filter tabs', () => {
+  it('matches brand panel design with dark navy #0F294A chip and includes 4 core pillar filter tabs', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
 
-    // Brand panel matching login page structure & styling
-    expect(content).toContain('rounded-lg bg-white border border-slate-200 shadow-2xs mb-4');
-    expect(content).toContain('rounded-md bg-slate-900 text-white text-xs font-bold tracking-wide shadow-2xs');
+    // Brand panel with dark navy chip and slightly larger home page scale
+    expect(content).toContain('rounded-xl bg-white border border-slate-200 shadow-xs mb-5 sm:mb-6');
+    expect(content).toContain('rounded-lg bg-[#0F294A] text-white text-xs sm:text-sm font-bold tracking-wide shadow-2xs');
     expect(content).toContain('bg-emerald-400 animate-pulse');
     expect(content).toContain('Robotics &amp; IoT Lab');
     expect(content).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');

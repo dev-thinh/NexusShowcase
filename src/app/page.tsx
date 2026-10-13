@@ -153,14 +153,14 @@ export default async function HomePage({
       {/* Compact Academic Header (Không chiếm diện tích, không rườm rà) */}
       <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-100 bg-slate-50/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-          {/* Tech-badge Panel tinh xảo đồng bộ trang đăng nhập */}
-          <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 p-1.5 pr-3.5 sm:pr-4 rounded-lg bg-white border border-slate-200 shadow-2xs mb-4">
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900 text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          {/* Tech-badge Panel tinh xảo kích thước rộng rãi cho trang chủ */}
+          <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-3.5 p-2 pr-4 sm:pr-5 rounded-xl bg-white border border-slate-200 shadow-xs mb-5 sm:mb-6">
+            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#0F294A] text-white text-xs sm:text-sm font-bold tracking-wide shadow-2xs shrink-0">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span>Robotics &amp; IoT Lab</span>
             </div>
-            <div className="hidden sm:block h-3.5 w-px bg-slate-200" />
-            <span className="text-xs sm:text-[13px] font-semibold text-slate-700 tracking-tight">
+            <div className="hidden sm:block h-4 w-px bg-slate-200" />
+            <span className="text-xs sm:text-sm font-semibold text-slate-700 tracking-tight">
               Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
             </span>
           </div>
