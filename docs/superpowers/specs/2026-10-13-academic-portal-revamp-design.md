@@ -25,8 +25,9 @@ Tài liệu này thiết kế lại toàn diện hệ thống theo hướng: **T
   - `PRIVATE`: Chỉ người dùng đã đăng nhập tài khoản vào hệ thống mới có quyền xem.
 - Admin có nút công tắc 1-click chuyển đổi qua lại giữa `PUBLIC` và `PRIVATE` bất kỳ lúc nào.
 
-### 2.3. Quản lý Danh mục Động (Curated Categories & Navigation Tabs)
-- Bảng `Category` quản lý tập trung, có cờ `isNavFeatured` để Admin chủ động đưa các danh mục nổi bật lên thanh menu chính (ví dụ: `Home` • `Publications` • `Robotics` • `Datasets` • `Awards`).
+### 2.3. Quản lý Danh mục Động & Quy tắc Zero Empty State
+- Bảng `Category` quản lý tập trung, có cờ `isNavFeatured` để Admin chủ động đưa các danh mục nổi bật lên thanh menu chính.
+- **Quy tắc Zero Empty State**: Chỉ những tab danh mục nổi bật (`isNavFeatured = true`) mà **có số lượng bài viết xuất bản > 0** mới được hiển thị trên thanh Navigation. Nếu một danh mục chưa có bài nào, nó sẽ tự động ẩn khỏi menu để tránh việc người dùng bấm vào ra trang trống rỗng gây cảm giác thiếu chuyên nghiệp.
 - Thành viên nộp bài có thể chọn danh mục có sẵn hoặc đề xuất danh mục mới. Khi duyệt bài, Admin quyết định có đưa danh mục đề xuất vào hệ thống chính thức hay không, tránh tình trạng phình to và rác danh mục.
 
 ### 2.4. Trùng tu Giao diện Học thuật Tối giản (Academic Minimalist UI)
@@ -216,16 +217,18 @@ Tất cả các query hiển thị công khai (Trang chủ, danh mục, trang ch
 - **Không animation**: Xóa toàn bộ hiệu ứng chuyển động, cuộn ngang, rung lắc.
 - **Bo góc vừa phải**: `rounded-lg` hoặc `rounded-xl` chuẩn mực (bỏ `rounded-3xl` phồng to).
 
-### 5.2. Thanh Navigation Động
-- Header cố định trên cùng, chiều cao vừa phải (60px).
-- Hiển thị logo CLB Nexus & Khoa CNTT.
-- Tự động hiển thị các tab danh mục có `isNavFeatured = true`:
-  - `Trang chủ` (`/`)
-  - `Bài báo khoa học` (`/category/publications`)
-  - `Dự án công nghệ` (`/category/projects`)
-  - `Dữ liệu & Tài nguyên` (`/category/datasets`)
-  - `Giải thưởng` (`/category/awards`)
-- Nút `Tìm kiếm` và nút `Bảng điều khiển / Đăng nhập`.
+### 5.2. Cấu trúc Thanh Navigation Bar Chuẩn Mực
+- Header cố định trên cùng, chiều cao vừa phải (60px), nền sạch sẽ, viền mảnh.
+- **Thứ tự các phần tử trên Navigation Bar chính xác:**
+  1. `[Logo]`: Logo CLB Nexus & Khoa CNTT - ĐHKHTN.
+  2. `[Trang chủ]`: Liên kết về `/` (active state rõ nét).
+  3. `[Thành viên]`: Liên kết về `/members` - danh bạ thành viên, ban chủ nhiệm, sinh viên nghiên cứu.
+  4. `[Các tab nổi bật]`: Các tab danh mục do Admin ghim (`isNavFeatured = true`) VÀ thỏa mãn điều kiện có bài viết (`count > 0`), ví dụ: `Bài báo khoa học`, `Dự án công nghệ`...
+  5. `[Bài đăng]`: Tab quản lý bài nộp (thay thế tên cũ "Dashboard", đúng 2 chữ), liên kết về `/dashboard`. Tab này chỉ xuất hiện khi người dùng **đã đăng nhập**.
+  6. `[Liên hệ]`: Liên kết về `/contact` - thông tin liên lạc lab, địa chỉ, kênh trao đổi học thuật.
+  7. `[Profile / Đăng nhập]`:
+     - Nếu chưa đăng nhập: Nút `Đăng nhập` dẫn tới `/login`.
+     - Nếu đã đăng nhập: Avatar / Tên người dùng kèm dropdown menu (Thông tin cá nhân, Đăng xuất, Admin Review nếu là Admin).
 
 ### 5.3. Trang chủ (`/`)
 - **Xóa bỏ hoàn toàn**:
@@ -257,6 +260,19 @@ Tất cả các query hiển thị công khai (Trang chủ, danh mục, trang ch
     `[ 🌐 Công khai cho Guest ]` $\leftrightarrow$ `[ 🔒 Chỉ nội bộ CLB ]`.
   - Khối nút liên kết nhanh (Action Pills): `[Mã nguồn GitHub]`, `[Tải Dataset]`, `[Xem Demo]`, `[Tệp CAD]`, `[Tài liệu PDF]`.
   - Thân bài: Nội dung Markdown chuẩn với heading, hình ảnh có chú thích, khối code font JetBrains Mono.
+
+### 5.6. Trang Danh bạ Thành viên (`/members`)
+- Bố cục danh bạ học thuật (Academic Directory):
+  - Nhóm theo vai trò / ban: Ban Cố vấn & Giảng viên, Ban Chủ nhiệm CLB, Nhóm Nghiên cứu & Kỹ thuật.
+  - Card thành viên tối giản: Avatar, Họ tên, Vai trò trong CLB, Khóa/Chuyên ngành, Lĩnh vực quan tâm (Tags), Liên kết (GitHub, LinkedIn, Email).
+  - Không hiệu ứng thừa, tải nhanh, trực quan.
+
+### 5.7. Trang Thông tin Liên hệ (`/contact`)
+- Bố cục liên hệ trang nhã:
+  - Thông tin đơn vị: CLB Nghiên cứu & Sáng tạo Nexus, Khoa Công nghệ Thông tin, Trường ĐH Khoa học Tự nhiên - ĐHQG-HCM.
+  - Văn phòng / Lab: Địa chỉ cơ sở 1 (227 Nguyễn Văn Cừ, P.4, Q.5) / cơ sở 2 (Linh Trung, TP. Thủ Đức).
+  - Email học thuật / hợp tác: `contact@nexusclub.edu.vn` (hoặc email ban chủ nhiệm).
+  - Khối biểu mẫu liên hệ / kết nối hợp tác nghiên cứu nhanh (Họ tên, Email, Tiêu đề, Nội dung nhắn, Nút gửi).
 
 ---
 
