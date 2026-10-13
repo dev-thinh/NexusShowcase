@@ -50,12 +50,20 @@ enum ItemVisibility {
   PRIVATE   // Chỉ tài khoản đã đăng nhập mới xem được
 }
 
+enum CategoryLayout {
+  SHOWCASE_GRID   // Lưới card sản phẩm trực quan (Robotics, Dự án công nghệ)
+  BIBLIOGRAPHY    // Thư mục bài báo học thuật & trích dẫn BibTeX (Bài báo khoa học)
+  DATA_CATALOG    // Bảng tra cứu thông số kỹ thuật (Dữ liệu & Tài nguyên)
+  HONOR_ROLL      // Bảng vàng vinh danh thành tích (Giải thưởng & Cống hiến)
+}
+
 model Category {
   id            String         @id @default(cuid())
   name          String         @unique // "Bài báo khoa học", "Robotics", "Datasets", "Giải thưởng"...
   slug          String         @unique // "publications", "robotics", "datasets", "awards"...
   description   String?
-  isNavFeatured Boolean        @default(false) // Ghim lên thanh Navigation Bar
+  layoutType    CategoryLayout @default(SHOWCASE_GRID)
+  isNavFeatured Boolean        @default(false) // Ghim lên thanh Navigation Bar (Top 3)
   displayOrder  Int            @default(0)     // Thứ tự hiển thị trên thanh menu
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
@@ -223,7 +231,7 @@ Tất cả các query hiển thị công khai (Trang chủ, danh mục, trang ch
   1. `[Logo]`: Logo CLB Nexus & Khoa CNTT - ĐHKHTN.
   2. `[Trang chủ]`: Liên kết về `/` (active state rõ nét).
   3. `[Thành viên]`: Liên kết về `/members` - danh bạ thành viên, ban chủ nhiệm, sinh viên nghiên cứu.
-  4. `[Các tab nổi bật]`: Các tab danh mục do Admin ghim (`isNavFeatured = true`) VÀ thỏa mãn điều kiện có bài viết (`count > 0`), ví dụ: `Bài báo khoa học`, `Dự án công nghệ`...
+  4. `[Các tab nổi bật]`: **Tối đa 3 tab nổi bật nhất (Top 3)** do Admin ghim (`isNavFeatured = true`) VÀ thỏa mãn điều kiện có bài viết (`count > 0`), sắp xếp theo `displayOrder: 'asc'`. Giới hạn 3 tab giúp thanh menu không bao giờ bị tràn (overflow) trên màn hình laptop nhỏ.
   5. `[Bài đăng]`: Tab quản lý bài nộp (thay thế tên cũ "Dashboard", đúng 2 chữ), liên kết về `/dashboard`. Tab này chỉ xuất hiện khi người dùng **đã đăng nhập**.
   6. `[Liên hệ]`: Liên kết về `/contact` - thông tin liên lạc lab, địa chỉ, kênh trao đổi học thuật.
   7. `[Profile / Đăng nhập]`:
@@ -247,11 +255,16 @@ Tất cả các query hiển thị công khai (Trang chủ, danh mục, trang ch
     - Tác giả & Năm.
     - Huy hiệu `[🔒 Nội bộ]` hoặc `[🌐 Công khai]`.
 
-### 5.4. Trang Danh mục Chuyên đề (`/category/[slug]`)
-- Bố cục danh bạ kỹ thuật tối giản (Technical Directory View):
-  - Dòng tiêu đề danh mục mỏng gọn: ví dụ *"Dữ liệu & Tài nguyên (Datasets) • 8 mục"*.
-  - Bảng / danh sách dòng tinh gọn: Tiêu đề | Tác giả | Năm | Các link nhanh (GitHub, Data, Demo) | Huy hiệu Public/Private.
-  - Phục vụ tra cứu học thuật tốc độ cao, không có khoảng trắng thừa thãi.
+### 5.4. Trang Danh mục Chuyên đề (`/category/[slug]`) Đa Layout
+Trang tự động render layout tương ứng với trường `layoutType` của Category đó:
+1. **`BIBLIOGRAPHY` (Bài báo khoa học)**:
+   - Layout dạng thư mục trích dẫn học thuật (Academic Citation Index): Tên bài báo font Serif in đậm, danh sách Tác giả & Đơn vị, Kỷ yếu hội nghị / Tạp chí & Năm, nút Sao chép trích dẫn nhanh `[BibTeX]` / `[APA]` / `[IEEE]`, link tải PDF. Không dùng ảnh to choán chỗ.
+2. **`SHOWCASE_GRID` (Dự án công nghệ & Robotics)**:
+   - Layout dạng lưới card trực quan (Visual Showcase Grid): Ảnh bìa tỉ lệ 16:9 sắc nét, tags công nghệ (`#ROS2`, `#LiDAR`, `#STM32`), liên kết nhanh `[GitHub]`, `[Demo]`, `[CAD 3D]`.
+3. **`DATA_CATALOG` (Dữ liệu & Tài nguyên)**:
+   - Layout dạng bảng tra cứu thông số kỹ thuật (Data Catalog Table): Cột Tên dataset, Định dạng tệp (CSV, H5, Parquet, Zip), Kích thước/Số mẫu, Giấy phép bản quyền, Nút tải nhanh từ Google Drive / Hugging Face.
+4. **`HONOR_ROLL` (Giải thưởng & Cống hiến)**:
+   - Layout dạng bảng vàng vinh danh (Honor Timeline): Huy hiệu thành tích (Giải Nhất, Giải Nhì, Vô địch), tên Cuộc thi/Hội thảo, Nhóm sinh viên đạt giải, Năm đạt giải.
 
 ### 5.5. Trang Chi tiết Công trình (`/showcase/[slug]`)
 - Layout dạng Technical Report:
