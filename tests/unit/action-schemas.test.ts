@@ -4,6 +4,7 @@ import {
   createShowcaseItemInputSchema,
   safeHttpUrlSchema,
   showcaseItemIdSchema,
+  toggleItemVisibilityInputSchema,
 } from '@/lib/action-schemas';
 
 const validShowcaseItem = {
@@ -51,5 +52,32 @@ describe('action schemas', () => {
       email: 'new.member@nexus.test',
       role: 'ADMIN',
     }).success).toBe(false);
+  });
+
+  it('validates flexible submission fields: tags, mediaDriveUrl, categoryId, proposedCategory', () => {
+    const validFlexible = {
+      title: 'Robotics Autonomous Rover',
+      summary: 'Dự án xe tự hành với LiDAR và STM32.',
+      type: 'PROJECT' as const,
+      categoryId: 'cjr012345678901234567890',
+      proposedCategory: 'Robotics',
+      tags: ['Robotics', 'LiDAR', 'STM32'],
+      mediaDriveUrl: 'https://drive.google.com/drive/folders/test123456',
+      visibility: 'PUBLIC' as const,
+      contributors: [],
+      links: [{ label: 'GitHub Repo', url: 'https://github.com/nexus/rover', type: 'OTHER' as const }],
+    };
+
+    const parsed = createShowcaseItemInputSchema.safeParse(validFlexible);
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.tags).toEqual(['Robotics', 'LiDAR', 'STM32']);
+      expect(parsed.data.mediaDriveUrl).toBe('https://drive.google.com/drive/folders/test123456');
+    }
+  });
+
+  it('validates toggleItemVisibilityInputSchema requires valid cuid', () => {
+    expect((toggleItemVisibilityInputSchema as any)?.safeParse?.({ itemId: 'not-a-cuid' })?.success).toBe(false);
+    expect((toggleItemVisibilityInputSchema as any)?.safeParse?.({ itemId: 'cjr012345678901234567890' })?.success).toBe(true);
   });
 });

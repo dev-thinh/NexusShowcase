@@ -58,11 +58,16 @@ export const createShowcaseItemInputSchema = z.object({
   title: trimmedText(200).min(1),
   summary: trimmedText(2_000).min(1),
   content: trimmedText(50_000).optional(),
-  type: z.enum(['RESEARCH_PAPER', 'PROJECT', 'ACHIEVEMENT']),
+  type: z.enum(['RESEARCH_PAPER', 'PROJECT', 'ACHIEVEMENT']).default('PROJECT'),
+  categoryId: cuidSchema.optional(),
+  proposedCategory: trimmedText(100).optional(),
+  tags: z.array(trimmedText(50)).max(20).default([]),
   scope: z.enum(['INTERNAL', 'CLUB_CONTRIBUTION', 'EXTERNAL', 'OPEN_SOURCE']).optional(),
   issuer: trimmedText(200).optional(),
   thumbnailUrl: storedFileUrlSchema.optional(),
-  publishedYear: z.number().int().min(1900).max(MAX_CURRENT_YEAR),
+  mediaDriveUrl: safeHttpUrlSchema.optional(),
+  visibility: z.enum(['PUBLIC', 'PRIVATE']).default('PRIVATE'),
+  publishedYear: z.number().int().min(1900).max(MAX_CURRENT_YEAR).optional(),
   contributors: z.array(contributorInputSchema).max(20),
   links: z.array(linkInputSchema).max(20),
   attachments: z.array(attachmentInputSchema).max(10).optional(),
@@ -70,6 +75,10 @@ export const createShowcaseItemInputSchema = z.object({
 });
 
 export const showcaseItemIdSchema = cuidSchema;
+
+export const toggleItemVisibilityInputSchema = z.object({
+  itemId: showcaseItemIdSchema,
+});
 export const reviewShowcaseItemInputSchema = z.object({
   itemId: showcaseItemIdSchema,
   payload: z.object({
