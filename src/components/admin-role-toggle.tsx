@@ -44,7 +44,7 @@ export function AdminRoleToggle({
         className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer disabled:opacity-50 ${
           isCore
             ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
-            : 'bg-[#0F294A] hover:bg-[#1E3A5F] text-white'
+            : 'bg-[#2B4C6F] hover:bg-[#1F3750] text-white'
         }`}
       >
         {loading ? (

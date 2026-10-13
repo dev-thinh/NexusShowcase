@@ -9,7 +9,7 @@ export function AcademicFooter() {
           {/* Institutional Info */}
           <div className="md:col-span-6 space-y-3">
             <div className="flex items-center gap-2.5 text-slate-900">
-              <div className="w-8 h-8 rounded-lg bg-[#0F294A] text-white flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#2B4C6F] text-white flex items-center justify-center shrink-0">
                 <GraduationCap className="w-4 h-4 text-blue-200" />
               </div>
               <div>

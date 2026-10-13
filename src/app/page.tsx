@@ -153,7 +153,7 @@ export default async function HomePage({
                     href={href}
                     className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                       isActive
-                        ? 'bg-[#0F294A] text-white shadow-xs'
+                        ? 'bg-[#2B4C6F] text-white shadow-xs'
                         : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200'
                     }`}
                   >
@@ -175,12 +175,12 @@ export default async function HomePage({
                   name="q"
                   defaultValue={searchQuery || ''}
                   placeholder="Tìm bài báo, dự án, robot, tác giả..."
-                  className="w-full sm:w-72 pl-9 pr-3.5 py-2 text-sm bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
+                  className="w-full sm:w-72 pl-9 pr-3.5 py-2 text-sm bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#2B4C6F]/15 focus:border-slate-400 transition-colors shadow-2xs"
                 />
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg shadow-xs transition-colors cursor-pointer shrink-0"
+                className="px-4 py-2 text-sm font-bold bg-[#2B4C6F] hover:bg-[#1F3750] text-white rounded-lg shadow-xs transition-colors cursor-pointer shrink-0"
               >
                 Tìm
               </button>

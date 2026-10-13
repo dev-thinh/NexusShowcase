@@ -14,7 +14,7 @@ export function ContactForm() {
   return (
     <div className="bg-white p-5 sm:p-6 rounded-lg border border-slate-200 shadow-2xs">
       <div className="flex items-center gap-2 mb-2">
-        <MessageSquare className="w-5 h-5 text-blue-600 shrink-0" />
+        <MessageSquare className="w-5 h-5 text-[#2B4C6F] shrink-0" />
         <h2 className="text-base sm:text-lg font-bold text-slate-900">
           Gửi Tin Nhắn Kết Nối
         </h2>
@@ -50,7 +50,7 @@ export function ContactForm() {
               type="text"
               required
               placeholder="Nguyễn Văn A"
-              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
+              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B4C6F] transition-all"
             />
           </div>
 
@@ -62,7 +62,7 @@ export function ContactForm() {
               type="email"
               required
               placeholder="example@student.hcmus.edu.vn"
-              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
+              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B4C6F] transition-all"
             />
           </div>
 
@@ -73,7 +73,7 @@ export function ContactForm() {
             <input
               type="text"
               placeholder="Khóa 2022 / Doanh nghiệp đối tác"
-              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
+              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B4C6F] transition-all"
             />
           </div>
 
@@ -85,7 +85,7 @@ export function ContactForm() {
               type="text"
               required
               placeholder="Hợp tác nghiên cứu / Đóng góp đề tài..."
-              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
+              className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B4C6F] transition-all"
             />
           </div>
 
@@ -97,13 +97,13 @@ export function ContactForm() {
               rows={4}
               required
               placeholder="Mô tả chi tiết nội dung bạn muốn trao đổi cùng Robotics &amp; IoT Lab..."
-              className="w-full p-3 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all resize-none"
+              className="w-full p-3 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#2B4C6F] transition-all resize-none"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full h-10 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm inline-flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer"
+            className="w-full h-10 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] text-white font-bold text-sm inline-flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer"
           >
             <Send className="w-4 h-4" />
             <span>Gửi lời nhắn</span>

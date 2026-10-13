@@ -70,7 +70,7 @@ export function LoginForm() {
       <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 sm:p-8">
         {/* Header với icon trần to bằng tiêu đề */}
         <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-          <LogIn className="w-7 h-7 text-blue-600 shrink-0" />
+          <LogIn className="w-7 h-7 text-[#2B4C6F] shrink-0" />
           <h1 className="text-2xl font-extrabold text-slate-900 leading-tight">
             Đăng nhập
           </h1>
@@ -117,7 +117,7 @@ export function LoginForm() {
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="Nhập tên đăng nhập hoặc email..."
                 disabled={isPending}
-                className="w-full pl-10 pr-4 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
+                className="w-full pl-10 pr-4 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2B4C6F]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
               />
             </div>
           </div>
@@ -140,7 +140,7 @@ export function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="w-full pl-10 pr-10 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
+                className="w-full pl-10 pr-10 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2B4C6F]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
               />
               <button
                 type="button"
@@ -156,7 +156,7 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full mt-3 py-3 px-5 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+            className="w-full mt-3 py-3 px-5 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4C6F]"
           >
             {isPending ? (
               <>
@@ -176,7 +176,7 @@ export function LoginForm() {
           <span>Chưa có tài khoản? </span>
           <Link
             href="/contact"
-            className="font-bold text-blue-600 hover:underline"
+            className="font-bold text-[#2B4C6F] hover:underline"
           >
             Liên hệ ban quản trị
           </Link>

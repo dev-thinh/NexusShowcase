@@ -62,9 +62,9 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
   const isProfileActive = user ? pathname === `/members/${user.id}` : false;
   const isLoginActive = pathname === '/login';
 
-  // Standard uniform active panel class (Academic Royal Blue)
+  // Standard uniform active panel class (Muted Steel Navy #2B4C6F)
   const activeTabClass =
-    'h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-blue-600 text-white shadow-xs transition-all duration-150 shrink-0';
+    'h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#2B4C6F] text-white shadow-xs transition-all duration-150 shrink-0';
 
   // Standard uniform inactive panel class (nguyên bản chuẩn đẹp ban đầu)
   const inactiveTabClass =
@@ -149,7 +149,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                   onClick={() => setIsAdminMenuOpen((prev) => !prev)}
                   className={`h-9 px-2.5 sm:px-3 rounded-lg inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs shrink-0 cursor-pointer ${
                     isAdminActive || isProfileActive
-                      ? 'bg-blue-600 text-white border-transparent shadow-xs'
+                      ? 'bg-[#2B4C6F] text-white border-transparent shadow-xs'
                       : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
                   }`}
                   aria-expanded={isAdminMenuOpen}
@@ -158,7 +158,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                 >
                   <div
                     className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
-                      isAdminActive || isProfileActive ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
+                      isAdminActive || isProfileActive ? 'bg-white text-[#2B4C6F]' : 'bg-[#2B4C6F] text-white'
                     }`}
                   >
                     {user.name?.charAt(0) || 'U'}
@@ -260,7 +260,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                 href={`/members/${user.id}`}
                 className={`h-9 px-2.5 sm:px-3 rounded-lg inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs shrink-0 ${
                   isProfileActive
-                    ? 'bg-blue-600 text-white border-transparent shadow-xs'
+                    ? 'bg-[#2B4C6F] text-white border-transparent shadow-xs'
                     : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
                 }`}
                 title={`Hồ sơ: ${user.name}`}
@@ -268,7 +268,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
               >
                 <div
                   className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
-                    isProfileActive ? 'bg-white text-blue-600' : 'bg-blue-600 text-white'
+                    isProfileActive ? 'bg-white text-[#2B4C6F]' : 'bg-[#2B4C6F] text-white'
                   }`}
                 >
                   {user.name?.charAt(0) || 'U'}
@@ -300,7 +300,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             className={
               isLoginActive
                 ? activeTabClass
-                : 'h-9 px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white shadow-xs transition-colors'
+                : 'h-9 px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#2B4C6F] hover:bg-[#1F3750] active:scale-[0.98] text-white shadow-xs transition-colors'
             }
             aria-current={isLoginActive ? 'page' : undefined}
           >
@@ -315,7 +315,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
         <aside className="fixed bottom-5 right-5 z-40 print:hidden animate-in fade-in duration-200" aria-label="Lối tắt Quản trị">
           <Link
             href="/admin"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white border border-blue-500/80 shadow-lg hover:shadow-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 group"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#2B4C6F] hover:bg-[#1F3750] text-white border border-[#3A5D82]/60 shadow-lg hover:shadow-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 group"
             title="Lối tắt mở Bàn làm việc Quản trị"
           >
             <ShieldCheck className="w-4 h-4 text-amber-300 group-hover:rotate-12 transition-transform" />

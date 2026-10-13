@@ -173,7 +173,7 @@ export default async function CategoryPage({
                       <div className="flex flex-wrap items-center gap-3 pt-3.5 border-t border-slate-100">
                         <CitationModal
                           item={item}
-                          className="h-9 px-3 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-2 cursor-pointer"
+                          className="h-9 px-3 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-2 cursor-pointer"
                         />
                         {paperLink && (
                           <a
@@ -363,7 +363,7 @@ export default async function CategoryPage({
                       )}
                       <Link
                         href={`/showcase/${item.slug}`}
-                        className="h-9 px-3 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors"
+                        className="h-9 px-3 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] text-white text-xs font-bold inline-flex items-center gap-1.5 transition-colors"
                       >
                         <span>Mô tả & Thông số</span>
                         <ArrowRight className="w-3.5 h-3.5" />

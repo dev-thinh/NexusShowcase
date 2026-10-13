@@ -12,7 +12,7 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).not.toContain('<span>Dashboard</span>');
     expect(content).toContain('{user && (');
     expect(content).toContain('href="/dashboard"');
-    expect(content).toContain('bg-blue-600');
+    expect(content).toContain('bg-[#2B4C6F]');
 
     // Contains links to members and contact
     expect(content).toContain('href="/members"');

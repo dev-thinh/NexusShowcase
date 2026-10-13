@@ -106,7 +106,7 @@ export default async function ShowcaseDetailPage({
               ((currentUser?.id === item.creatorId && (currentUser?.role === 'CORE_MEMBER' || currentUser?.role === 'ADMIN')) || currentUser?.role === 'ADMIN') ? (
                 <Link
                   href={`/dashboard/items/${item.id}/edit`}
-                  className="px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg text-xs font-bold transition-all shadow-xs"
+                  className="px-4 py-2 bg-[#2B4C6F] hover:bg-[#1F3750] text-white rounded-lg text-xs font-bold transition-all shadow-xs"
                 >
                   {item.status === 'REJECTED' ? 'Sửa & Gửi lại duyệt' : 'Chỉnh sửa bài viết'}
                 </Link>
@@ -188,7 +188,7 @@ export default async function ShowcaseDetailPage({
             {/* Citation Generator */}
             <CitationModal
               item={item}
-              className="h-10 px-3.5 sm:px-4 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer inline-flex items-center justify-center gap-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
+              className="h-10 px-3.5 sm:px-4 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] text-white text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer inline-flex items-center justify-center gap-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4C6F]"
             />
 
             {/* Admin Visibility Toggle */}
@@ -318,7 +318,7 @@ export default async function ShowcaseDetailPage({
                     <a
                       href={att.fileUrl}
                       download={att.fileName}
-                      className="h-9 px-3.5 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 active:scale-[0.98]"
+                      className="h-9 px-3.5 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 active:scale-[0.98]"
                     >
                       <Download className="w-3.5 h-3.5 text-blue-200" />
                       <span>Tải về PDF</span>
@@ -358,7 +358,7 @@ export default async function ShowcaseDetailPage({
                     className={`w-10 h-10 rounded-full font-bold flex items-center justify-center text-sm shrink-0 shadow-2xs ${
                       isAdvisor
                         ? 'bg-purple-600 text-white'
-                        : 'bg-[#0F294A]/10 text-[#0F294A]'
+                        : 'bg-[#2B4C6F]/10 text-[#2B4C6F]'
                     }`}
                   >
                     {isAdvisor ? <GraduationCap className="w-4 h-4" /> : name.charAt(0)}
@@ -369,7 +369,7 @@ export default async function ShowcaseDetailPage({
                       {c.user ? (
                         <Link
                           href={`/members/${c.user.id}`}
-                          className="font-bold text-slate-900 hover:text-[#0F294A] transition-colors truncate block text-sm sm:text-base"
+                          className="font-bold text-slate-900 hover:text-[#2B4C6F] transition-colors truncate block text-sm sm:text-base"
                         >
                           {name}
                         </Link>
