@@ -11,8 +11,11 @@ import {
   Users,
   CheckSquare,
   ChevronDown,
+  Mail,
+  Layers,
 } from 'lucide-react';
 import { SignOutButton } from '@/components/sign-out-button';
+import type { FeaturedNavCategory } from '@/lib/nav-categories';
 
 interface NavbarNavProps {
   user?: {
@@ -20,9 +23,10 @@ interface NavbarNavProps {
     name?: string | null;
     role: string;
   } | null;
+  featuredCategories?: FeaturedNavCategory[];
 }
 
-export function NavbarNav({ user }: NavbarNavProps) {
+export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
   const pathname = usePathname();
   const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
   const adminDropdownRef = useRef<HTMLDivElement>(null);
@@ -47,7 +51,9 @@ export function NavbarNav({ user }: NavbarNavProps) {
   }, [pathname]);
 
   const isExploreActive = pathname === '/';
+  const isMembersActive = pathname === '/members';
   const isDashboardActive = pathname.startsWith('/dashboard');
+  const isContactActive = pathname === '/contact';
   const isAdminActive =
     pathname === '/admin' ||
     pathname.startsWith('/admin/reviews') ||
@@ -57,27 +63,53 @@ export function NavbarNav({ user }: NavbarNavProps) {
 
   // Standard uniform active panel class
   const activeTabClass =
-    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150';
+    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150 shrink-0';
 
   // Standard uniform inactive panel class
   const inactiveTabClass =
-    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150';
+    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 shrink-0';
 
   return (
     <>
       {/* CÁC TAB CĂN GIỮA TUYỆT ĐỐI (DEAD CENTER - ĐỘC LẬP HOÀN TOÀN VỚI THẺ PROFILE) */}
-      <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 items-center gap-2 sm:gap-2.5 z-10 pointer-events-auto">
-        {/* Tab: Khám phá */}
+      <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
+        {/* 1. Tab: Trang chủ */}
         <Link
           href="/"
           className={isExploreActive ? activeTabClass : inactiveTabClass}
           aria-current={isExploreActive ? 'page' : undefined}
         >
           <Compass className={`w-4 h-4 shrink-0 ${isExploreActive ? 'text-blue-200' : 'text-slate-400'}`} />
-          <span>Khám phá</span>
+          <span>Trang chủ</span>
         </Link>
 
-        {/* Tab: Dashboard (Dành cho thành viên đã đăng nhập) */}
+        {/* 2. Tab: Thành viên */}
+        <Link
+          href="/members"
+          className={isMembersActive ? activeTabClass : inactiveTabClass}
+          aria-current={isMembersActive ? 'page' : undefined}
+        >
+          <Users className={`w-4 h-4 shrink-0 ${isMembersActive ? 'text-blue-200' : 'text-slate-400'}`} />
+          <span>Thành viên</span>
+        </Link>
+
+        {/* 3. Các tab nổi bật (Admin ghim & có bài > 0, tối đa 3) */}
+        {featuredCategories.map((cat) => {
+          const isCatActive = pathname === `/category/${cat.slug}`;
+          return (
+            <Link
+              key={cat.id}
+              href={`/category/${cat.slug}`}
+              className={isCatActive ? activeTabClass : inactiveTabClass}
+              aria-current={isCatActive ? 'page' : undefined}
+            >
+              <Layers className={`w-4 h-4 shrink-0 ${isCatActive ? 'text-blue-200' : 'text-slate-400'}`} />
+              <span>{cat.name}</span>
+            </Link>
+          );
+        })}
+
+        {/* 4. Tab: Bài đăng (Dành cho thành viên đã đăng nhập) */}
         {user && (
           <Link
             href="/dashboard"
@@ -85,9 +117,19 @@ export function NavbarNav({ user }: NavbarNavProps) {
             aria-current={isDashboardActive ? 'page' : undefined}
           >
             <LayoutDashboard className={`w-4 h-4 shrink-0 ${isDashboardActive ? 'text-blue-200' : 'text-slate-400'}`} />
-            <span>Dashboard</span>
+            <span>Bài đăng</span>
           </Link>
         )}
+
+        {/* 5. Tab: Liên hệ */}
+        <Link
+          href="/contact"
+          className={isContactActive ? activeTabClass : inactiveTabClass}
+          aria-current={isContactActive ? 'page' : undefined}
+        >
+          <Mail className={`w-4 h-4 shrink-0 ${isContactActive ? 'text-blue-200' : 'text-slate-400'}`} />
+          <span>Liên hệ</span>
+        </Link>
 
         {/* Menu Thả Quản trị (Dành riêng cho ADMIN) */}
         {user?.role === 'ADMIN' && (

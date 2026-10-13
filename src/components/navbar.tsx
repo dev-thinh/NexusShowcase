@@ -2,10 +2,12 @@ import Link from 'next/link';
 import { auth } from '@/lib/auth';
 import { GraduationCap } from 'lucide-react';
 import { NavbarNav } from '@/components/navbar-nav';
+import { getFeaturedNavCategories } from '@/lib/nav-categories';
 
 export async function Navbar() {
   const session = await auth();
   const user = session?.user as any;
+  const featuredCategories = await getFeaturedNavCategories(!!user);
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-2xs w-full">
@@ -32,7 +34,7 @@ export async function Navbar() {
         </div>
 
         {/* Các tab ở giữa & Profile/Đăng xuất bên phải */}
-        <NavbarNav user={user} />
+        <NavbarNav user={user} featuredCategories={featuredCategories} />
       </div>
     </header>
   );
