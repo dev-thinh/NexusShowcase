@@ -34,6 +34,10 @@ export interface InitialItemData {
   issuer?: string | null;
   publishedYear: number;
   thumbnailUrl?: string | null;
+  mediaDriveUrl?: string | null;
+  tags?: string[];
+  categoryId?: string | null;
+  proposedCategory?: string;
   status?: string;
   rejectionReason?: string | null;
   contributors?: {
@@ -97,6 +101,10 @@ export function ItemForm({
   const [issuer, setIssuer] = useState(initialData?.issuer || '');
   const [publishedYear, setPublishedYear] = useState(initialData?.publishedYear || new Date().getFullYear());
   const [thumbnailUrl, setThumbnailUrl] = useState(initialData?.thumbnailUrl || '');
+  const [mediaDriveUrl, setMediaDriveUrl] = useState(initialData?.mediaDriveUrl || '');
+  const [tags, setTags] = useState(initialData?.tags ? initialData.tags.join(', ') : '');
+  const [categoryId, setCategoryId] = useState(initialData?.categoryId || '');
+  const [proposedCategory, setProposedCategory] = useState(initialData?.proposedCategory || '');
   const [attachments, setAttachments] = useState<AttachmentInput[]>(
     initialData?.attachments?.map((a) => ({
       fileName: a.fileName,
@@ -296,19 +304,28 @@ export function ItemForm({
     setError(null);
 
     try {
+      const tagList = tags
+        .split(',')
+        .map((t) => t.trim())
+        .filter(Boolean);
+
       const payload = {
-      title: title.trim(),
-      summary: summary.trim(),
-      content: content.trim(),
-      type,
-      scope,
-      issuer: issuer.trim() || undefined,
-      thumbnailUrl: thumbnailUrl.trim() || undefined,
-      publishedYear,
-      contributors,
-      links: links.filter((l) => l.url.trim() !== ''),
-      attachments,
-      submitForReview,
+        title: title.trim(),
+        summary: summary.trim(),
+        content: content.trim(),
+        type,
+        scope,
+        issuer: issuer.trim() || undefined,
+        thumbnailUrl: thumbnailUrl.trim() || undefined,
+        mediaDriveUrl: mediaDriveUrl.trim() || undefined,
+        categoryId: categoryId.trim() || undefined,
+        proposedCategory: proposedCategory.trim() || undefined,
+        tags: tagList,
+        publishedYear,
+        contributors,
+        links: links.filter((l) => l.url.trim() !== ''),
+        attachments,
+        submitForReview,
       };
 
       const result =
@@ -451,6 +468,37 @@ export function ItemForm({
             placeholder="Tóm tắt mục tiêu, phương pháp, kết quả và ý nghĩa của công trình..."
           />
         </div>
+
+        {/* Đề xuất danh mục mới */}
+        <div>
+          <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">
+            Đề xuất danh mục / Chủ đề mới (Tùy chọn)
+          </label>
+          <input
+            type="text"
+            value={proposedCategory}
+            onChange={(e) => setProposedCategory(e.target.value)}
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
+            placeholder="Ví dụ: Robotics & Xe tự hành, Internet of Things, Công cụ kiểm thử..."
+          />
+        </div>
+
+        {/* Thẻ nhãn tags tự do */}
+        <div>
+          <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">
+            Thẻ nhãn chuyên môn / Tags (Phân tách bằng dấu phẩy)
+          </label>
+          <input
+            type="text"
+            value={tags}
+            onChange={(e) => setTags(e.target.value)}
+            className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
+            placeholder="Ví dụ: Robotics, ROS2, LiDAR, STM32, YOLOv8"
+          />
+          <p className="text-xs text-slate-500 mt-1.5">
+            Nhập các công nghệ, thuật toán hoặc thiết bị để người dùng dễ dàng tra cứu trên hệ thống.
+          </p>
+        </div>
       </section>
 
       {/* 2. Hình ảnh đại diện (Thumbnail) */}
@@ -575,6 +623,23 @@ export function ItemForm({
               )}
             </div>
           </div>
+        </div>
+
+        {/* Google Drive Raw Assets for Media Team */}
+        <div className="p-4 rounded-xl bg-blue-50/60 border border-blue-200/80 space-y-2">
+          <label className="block text-xs sm:text-sm font-bold text-[#0F294A] uppercase tracking-wider">
+            Google Drive tư liệu thô (Dành cho Ban Truyền thông hỗ trợ thiết kế ảnh bìa)
+          </label>
+          <input
+            type="url"
+            value={mediaDriveUrl}
+            onChange={(e) => setMediaDriveUrl(e.target.value)}
+            className="w-full px-4 py-2.5 bg-white border border-blue-200 rounded-xl text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
+            placeholder="https://drive.google.com/drive/folders/..."
+          />
+          <p className="text-xs text-blue-800">
+            Dán đường dẫn thư mục Google Drive chứa ảnh chụp gốc, clip demo hoặc bản vẽ 3D. Ban Truyền thông sẽ trau chuốt và thay thế ảnh bìa chuẩn nhận diện trước khi xuất bản.
+          </p>
         </div>
       </section>
 
