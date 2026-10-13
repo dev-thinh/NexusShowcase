@@ -8,6 +8,7 @@ import {
   INVALID_ACTION_INPUT_ERROR,
   reviewShowcaseItemInputSchema,
   showcaseItemIdSchema,
+  toggleItemVisibilityInputSchema,
   type AttachmentInput,
   type ContributorInput,
   type CreateShowcaseItemInput,
@@ -50,9 +51,13 @@ export async function createShowcaseItemAction(input: CreateShowcaseItemInput) {
       scope: values.scope,
       issuer: values.issuer,
       thumbnailUrl: values.thumbnailUrl,
+      mediaDriveUrl: values.mediaDriveUrl || null,
+      tags: values.tags || [],
+      categoryId: values.categoryId || null,
+      visibility: values.visibility || 'PRIVATE',
       status,
       publishedAt: status === 'PUBLISHED' ? new Date() : null,
-      publishedYear: values.publishedYear,
+      publishedYear: values.publishedYear || new Date().getFullYear(),
       creatorId: user.id,
       contributors: {
         create: values.contributors.map((c) => ({
@@ -199,6 +204,46 @@ export async function togglePinShowcaseItemAction(itemId: string) {
   return { success: true, isPinned: true, message: 'Đã ghim công trình lên trang chủ.' };
 }
 
+export async function toggleItemVisibilityAction(itemId: string) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
+    return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền thay đổi chế độ hiển thị.' };
+  }
+
+  const parsed = toggleItemVisibilityInputSchema.safeParse({ itemId });
+  if (!parsed.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  itemId = parsed.data.itemId;
+
+  const targetItem = await prisma.showcaseItem.findUnique({
+    where: { id: itemId },
+    select: { id: true, visibility: true, slug: true },
+  });
+
+  if (!targetItem) {
+    return { success: false, error: 'Không tìm thấy công trình này.' };
+  }
+
+  const nextVisibility = targetItem.visibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+  const updated = await prisma.showcaseItem.update({
+    where: { id: itemId },
+    data: { visibility: nextVisibility },
+    select: { id: true, visibility: true, slug: true },
+  });
+
+  try {
+    revalidatePath('/');
+    revalidatePath('/dashboard');
+    revalidatePath('/admin');
+    if (updated.slug) revalidatePath(`/showcase/${updated.slug}`);
+  } catch {
+    // Ignore in tests
+  }
+
+  return { success: true, visibility: updated.visibility };
+}
+
 export async function updateShowcaseItemAction(itemId: string, input: CreateShowcaseItemInput) {
   const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
   if (!user) {
@@ -266,9 +311,13 @@ export async function updateShowcaseItemAction(itemId: string, input: CreateShow
         scope: values.scope,
         issuer: values.issuer,
         thumbnailUrl: values.thumbnailUrl,
+        mediaDriveUrl: values.mediaDriveUrl !== undefined ? values.mediaDriveUrl : targetItem.mediaDriveUrl,
+        tags: values.tags !== undefined ? values.tags : targetItem.tags,
+        categoryId: values.categoryId !== undefined ? values.categoryId : targetItem.categoryId,
+        visibility: values.visibility || targetItem.visibility,
         status: newStatus,
         rejectionReason: newRejectionReason,
-        publishedYear: values.publishedYear,
+        publishedYear: values.publishedYear || targetItem.publishedYear || new Date().getFullYear(),
         contributors: {
           create: values.contributors.map((c) => ({
             userId: c.userId || null,
