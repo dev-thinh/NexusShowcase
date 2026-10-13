@@ -13,41 +13,78 @@ import {
   Trophy,
   Search,
   Layers,
-  GraduationCap,
   Cpu,
   Brain,
   MessageSquare,
   Activity,
   Server,
+  Bot,
 } from 'lucide-react';
 
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; year?: string; q?: string; domain?: string }>;
+  searchParams: Promise<{ type?: string; tab?: string; year?: string; q?: string; domain?: string }>;
 }) {
   const session = await auth();
   const isAuthenticated = !!session?.user;
 
   const params = await searchParams;
-  const typeFilter = params.type as ItemType | undefined;
+  const rawTab = params.tab;
+  const rawType = params.type;
   const yearFilter = params.year ? parseInt(params.year) : undefined;
   const searchQuery = params.q;
   const domainFilter = params.domain;
+
+  // Resolve active tab from tab or type param
+  let activeTab: string | undefined = undefined;
+  if (rawTab) {
+    activeTab = rawTab;
+  } else if (rawType === 'RESEARCH_PAPER') {
+    activeTab = 'research';
+  } else if (rawType === 'PROJECT' || rawType === 'ACHIEVEMENT') {
+    activeTab = 'projects';
+  }
 
   const whereClause: any = {
     status: 'PUBLISHED',
     ...(isAuthenticated ? {} : { visibility: 'PUBLIC' }),
   };
 
-  if (typeFilter && ['RESEARCH_PAPER', 'PROJECT', 'ACHIEVEMENT'].includes(typeFilter)) {
-    whereClause.type = typeFilter;
-  }
   if (yearFilter) {
     whereClause.publishedYear = yearFilter;
   }
 
   const andConditions: any[] = [];
+
+  if (activeTab === 'robotics-iot') {
+    andConditions.push({
+      OR: [
+        { category: { slug: 'robotics-iot' } },
+        { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
+        { title: { contains: 'robot', mode: 'insensitive' } },
+        { title: { contains: 'iot', mode: 'insensitive' } },
+        { title: { contains: 'nhúng', mode: 'insensitive' } },
+        { summary: { contains: 'robot', mode: 'insensitive' } },
+        { summary: { contains: 'iot', mode: 'insensitive' } },
+        { summary: { contains: 'nhúng', mode: 'insensitive' } },
+      ],
+    });
+  } else if (activeTab === 'research') {
+    andConditions.push({
+      OR: [
+        { type: 'RESEARCH_PAPER' },
+        { category: { slug: 'bai-bao-khoa-hoc' } },
+      ],
+    });
+  } else if (activeTab === 'projects') {
+    andConditions.push({
+      OR: [
+        { type: { in: ['PROJECT', 'ACHIEVEMENT'] } },
+        { category: { slug: { in: ['tap-du-lieu-ai', 'vinh-danh-giai-thuong'] } } },
+      ],
+    });
+  }
 
   if (searchQuery) {
     andConditions.push({
@@ -94,10 +131,10 @@ export default async function HomePage({
   });
 
   const categories = [
-    { type: undefined, label: 'Tất cả công trình', icon: Layers },
-    { type: 'RESEARCH_PAPER', label: 'Bài báo nghiên cứu', icon: BookOpen },
-    { type: 'PROJECT', label: 'Dự án công nghệ', icon: Code2 },
-    { type: 'ACHIEVEMENT', label: 'Thành tích & Cống hiến', icon: Trophy },
+    { key: undefined, label: 'Tất cả công trình', icon: Layers },
+    { key: 'robotics-iot', label: 'Robotics & IoT', icon: Bot },
+    { key: 'research', label: 'Nghiên cứu khoa học', icon: BookOpen },
+    { key: 'projects', label: 'Dự án & Sáng tạo', icon: Code2 },
   ];
 
   const domains = [
@@ -116,17 +153,24 @@ export default async function HomePage({
       {/* Compact Academic Header (Không chiếm diện tích, không rườm rà) */}
       <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-100 bg-slate-50/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white text-slate-800 text-xs sm:text-sm font-semibold mb-3 shadow-2xs border border-slate-200">
-            <GraduationCap className="w-4 h-4 text-[#0F294A]" />
-            <span>Robotics &amp; IoT Lab • Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM</span>
+          {/* Tech-badge Panel tinh xảo đồng bộ trang đăng nhập */}
+          <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 p-1.5 pr-3.5 sm:pr-4 rounded-lg bg-white border border-slate-200 shadow-2xs mb-4">
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900 text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <span>Robotics &amp; IoT Lab</span>
+            </div>
+            <div className="hidden sm:block h-3.5 w-px bg-slate-200" />
+            <span className="text-xs sm:text-[13px] font-semibold text-slate-700 tracking-tight">
+              Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
+            </span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Kho Lưu Trữ Công Trình &amp; Sáng Tạo Học Thuật
+            Nghiên Cứu Khoa Học &amp; Công Nghệ Robotics · IoT
           </h1>
 
-          <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Lưu trữ và công bố các công trình nghiên cứu khoa học, dự án công nghệ, robot và tài nguyên học thuật của sinh viên.
+          <p className="mt-3.5 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Không gian công bố các công trình nghiên cứu khoa học xuất bản, hệ thống nhúng thông minh và dự án robot của thành viên CLB Robotics &amp; IoT HCMUS.
           </p>
         </div>
       </section>
@@ -140,12 +184,12 @@ export default async function HomePage({
             <div className="flex flex-wrap gap-2">
               {categories.map((c) => {
                 const Icon = c.icon;
-                const isActive = typeFilter === c.type;
+                const isActive = activeTab === c.key || (!activeTab && !c.key);
                 const searchParamsObj = new URLSearchParams();
-                if (c.type) searchParamsObj.set('type', c.type);
+                if (c.key) searchParamsObj.set('tab', c.key);
                 if (domainFilter) searchParamsObj.set('domain', domainFilter);
                 if (searchQuery) searchParamsObj.set('q', searchQuery);
-                const href = `/?${searchParamsObj.toString()}`;
+                const href = searchParamsObj.toString() ? `/?${searchParamsObj.toString()}` : '/';
 
                 return (
                   <a
@@ -166,7 +210,7 @@ export default async function HomePage({
 
             {/* Search Form */}
             <form method="GET" action="/" className="flex items-center gap-2">
-              {typeFilter && <input type="hidden" name="type" value={typeFilter} />}
+              {activeTab && <input type="hidden" name="tab" value={activeTab} />}
               {domainFilter && <input type="hidden" name="domain" value={domainFilter} />}
               <div className="relative flex-1 sm:flex-initial">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -196,10 +240,10 @@ export default async function HomePage({
               const Icon = d.icon;
               const isActive = domainFilter === d.key;
               const searchParamsObj = new URLSearchParams();
-              if (typeFilter) searchParamsObj.set('type', typeFilter);
+              if (activeTab) searchParamsObj.set('tab', activeTab);
               if (d.key) searchParamsObj.set('domain', d.key);
               if (searchQuery) searchParamsObj.set('q', searchQuery);
-              const href = `/?${searchParamsObj.toString()}`;
+              const href = searchParamsObj.toString() ? `/?${searchParamsObj.toString()}` : '/';
 
               return (
                 <a
