@@ -7,10 +7,12 @@ describe('Navbar Nav Component Structure', () => {
     const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
     const content = fs.readFileSync(navbarNavPath, 'utf-8');
 
-    // Tab renamed to 'Bài đăng' (2 words)
+    // Tab renamed to 'Bài đăng' (2 words), only shown when authenticated
     expect(content).toContain('Bài đăng');
     expect(content).not.toContain('<span>Dashboard</span>');
-    expect(content).toContain('/login?callbackUrl=/dashboard');
+    expect(content).toContain('{user && (');
+    expect(content).toContain('href="/dashboard"');
+    expect(content).toContain('bg-blue-600');
 
     // Contains links to members and contact
     expect(content).toContain('href="/members"');

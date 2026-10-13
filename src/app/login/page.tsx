@@ -43,8 +43,8 @@ export default async function LoginPage() {
           {/* Panel nhận diện thương hiệu Robotics & IoT Lab */}
           <div className="mb-6 lg:mb-8">
             <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 p-1.5 pr-3.5 sm:pr-4 rounded-lg bg-white border border-slate-200 shadow-2xs">
-              <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900 text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-blue-600 text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse" />
                 <span>Robotics &amp; IoT Lab</span>
               </div>
               <div className="hidden sm:block h-3.5 w-px bg-slate-200" />
@@ -79,9 +79,9 @@ export default async function LoginPage() {
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 <Link
                   href="/"
-                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold shadow-xs transition-all active:scale-[0.98]"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-bold shadow-xs transition-all active:scale-[0.98]"
                 >
-                  <ArrowLeft className="w-4 h-4 text-slate-300" />
+                  <ArrowLeft className="w-4 h-4 text-white" />
                   <span>Trang chủ</span>
                 </Link>
 

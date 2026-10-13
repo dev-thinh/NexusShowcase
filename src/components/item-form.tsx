@@ -1025,7 +1025,7 @@ export function ItemForm({
               type="button"
               disabled={uploadingDoc}
               onClick={() => docInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
             >
               {uploadingDoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               <span>{uploadingDoc ? 'Đang tải lên...' : 'Tải lên PDF'}</span>
@@ -1086,7 +1086,7 @@ export function ItemForm({
                 type="button"
                 onClick={handleAddDirectDoc}
                 disabled={!directDocUrl.trim()}
-                className="sm:col-span-2 px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+                className="sm:col-span-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
               >
                 Xác nhận
               </button>
@@ -1190,7 +1190,7 @@ export function ItemForm({
           type="button"
           disabled={loading}
           onClick={() => handleSubmit(true)}
-          className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
           <span>
