@@ -687,14 +687,14 @@ export default async function HomePage({
                   Dự Án Sáng Tạo &amp; Giải Pháp Khác
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                  Các sản phẩm phần mềm, tập dữ liệu mã nguồn mở và sáng kiến công nghệ ứng dụng của sinh viên.
+                  Các sản phẩm phần mềm, sáng kiến công nghệ ứng dụng và giải pháp sáng tạo của sinh viên.
                 </p>
               </div>
             </div>
 
             {creativeCount > 0 && (
               <Link
-                href="/category/tap-du-lieu-ai"
+                href="/category/du-an-sang-tao"
                 className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] transition-colors shrink-0 group self-start sm:self-auto"
               >
                 <span>Xem tất cả ({creativeCount})</span>

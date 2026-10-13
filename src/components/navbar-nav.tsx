@@ -12,7 +12,6 @@ import {
   CheckSquare,
   ChevronDown,
   Mail,
-  Layers,
   User,
 } from 'lucide-react';
 import { SignOutButton } from '@/components/sign-out-button';
@@ -73,9 +72,9 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
   return (
     <>
       {/* 
-        CÁC TAB CĂN GIỮA TUYỆT ĐỐI (DEAD CENTER - NGUYÊN BẢN CHUẨN ĐẸP)
-        Thứ tự chuẩn hóa: Trang chủ -> Thành viên -> Các tab nổi bật -> Bài đăng (khi đăng nhập) -> Liên hệ
-        (Nút Quản trị được tách riêng khỏi thanh navigate để giữ nguyên bố cục hoàn hảo và không che bất kỳ tab nào)
+        CÁC TAB CĂN GIỮA TUYỆT ĐỐI (DEAD CENTER - TINH GỌN CHUẨN ĐẸP)
+        Thứ tự chuẩn hóa: Trang chủ -> Thành viên -> Bài đăng (khi đăng nhập) -> Liên hệ
+        (3 chuyên mục nghiên cứu & dự án được khám phá trực tiếp trên Trang chủ với giao diện chuyên biệt)
       */}
       <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
         {/* 1. Tab: Trang chủ */}
@@ -98,23 +97,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
           <span>Thành viên</span>
         </Link>
 
-        {/* 3. Các tab nổi bật (Admin ghim & có bài > 0, tối đa 3) */}
-        {featuredCategories.map((cat) => {
-          const isCatActive = pathname === `/category/${cat.slug}`;
-          return (
-            <Link
-              key={cat.id}
-              href={`/category/${cat.slug}`}
-              className={isCatActive ? activeTabClass : inactiveTabClass}
-              aria-current={isCatActive ? 'page' : undefined}
-            >
-              <Layers className={`w-4 h-4 shrink-0 ${isCatActive ? 'text-white' : 'text-slate-400'}`} />
-              <span>{cat.name}</span>
-            </Link>
-          );
-        })}
-
-        {/* 4. Tab: Bài đăng (Chỉ hiển thị cho thành viên đã đăng nhập: MEMBER, CORE_MEMBER, ADMIN) */}
+        {/* 3. Tab: Bài đăng (Chỉ hiển thị cho thành viên đã đăng nhập: MEMBER, CORE_MEMBER, ADMIN) */}
         {user && (
           <Link
             href="/dashboard"

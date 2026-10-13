@@ -25,11 +25,15 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain('right-0');
   });
 
-  it('receives and renders featured categories in navbar', () => {
+  it('streamlines center navigation to core tabs while passing featured categories', () => {
     const navbarPath = path.resolve(process.cwd(), 'src/components/navbar.tsx');
     const content = fs.readFileSync(navbarPath, 'utf-8');
 
     expect(content).toContain('getFeaturedNavCategories');
     expect(content).toContain('featuredCategories');
+
+    const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
+    const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
+    expect(navContent).not.toContain('{featuredCategories.map');
   });
 });

@@ -48,7 +48,7 @@ describe('Home Page Minimalist Revamp', () => {
     // Direct Category navigation links
     expect(content).toContain('/category/bai-bao-khoa-hoc');
     expect(content).toContain('/category/robotics-iot');
-    expect(content).toContain('/category/tap-du-lieu-ai');
+    expect(content).toContain('/category/du-an-sang-tao');
 
     // Academic tools
     expect(content).toContain('<CitationModal');
