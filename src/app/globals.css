@@ -58,7 +58,7 @@
 body {
   color: var(--foreground);
   background-color: var(--background);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -73,12 +73,13 @@ body {
 
 /* Academic Typography Classes */
 .academic-headline {
-  font-family: 'Crimson Pro', Georgia, serif;
-  letter-spacing: -0.015em;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  letter-spacing: -0.02em;
+  font-weight: 700;
 }
 
 .academic-subhead {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   letter-spacing: -0.01em;
 }
 
