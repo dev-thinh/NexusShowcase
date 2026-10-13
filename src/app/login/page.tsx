@@ -40,18 +40,30 @@ export default async function LoginPage() {
       {/* 2. Main Hero Layout: Căn lề 2 bên chuẩn container */}
       <main className="flex-1 flex items-center justify-center py-8 sm:py-10 lg:py-12 relative z-10">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+          {/* Panel nhận diện thương hiệu Robotics & IoT Lab */}
+          <div className="mb-6 lg:mb-8">
+            <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 p-1.5 pr-3.5 sm:pr-4 rounded-lg bg-white border border-slate-200 shadow-2xs">
+              <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-slate-900 text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <span>Robotics &amp; IoT Lab</span>
+              </div>
+              <div className="hidden sm:block h-3.5 w-px bg-slate-200" />
+              <span className="text-xs sm:text-[13px] font-semibold text-slate-700 tracking-tight">
+                Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
+              </span>
+            </div>
+          </div>
+
+          {/* 
+            Lưới 2 cột: Căn ngang mép trên giữa Tiêu đề và Form đăng nhập 
+            (items-start đảm bảo tiêu đề in đậm căn ngang mép trên của form)
+          */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
             {/* 
-              CỘT BÊN TRÁI: MỤC TIÊU ROBOTICS & IOT LAB
-              (Cùng tone màu sáng đồng nhất, typography đậm rõ nét, 2 nút bên dưới)
+              CỘT BÊN TRÁI: TIÊU ĐỀ & NỘI DUNG GIỚI THIỆU
+              (Tiêu đề h1 bắt đầu ngay từ mép trên, căn ngang với mép trên của form)
             */}
             <aside className="lg:col-span-7 xl:col-span-7 space-y-6">
-              {/* Pill tag nhận diện Robotics & IoT Lab */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/90 border border-slate-200/80 text-xs sm:text-[13px] font-semibold text-slate-800 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-slate-900 shrink-0" />
-                <span>Robotics &amp; IoT Lab · Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM</span>
-              </div>
-
               {/* Tiêu đề lớn tạo điểm nhấn học thuật & công nghệ */}
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-[52px] font-black text-slate-900 tracking-tight leading-[1.12]">
                 Ươm mầm nghiên cứu <br className="hidden sm:inline" />
@@ -85,7 +97,7 @@ export default async function LoginPage() {
 
             {/* 
               CỘT BÊN PHẢI: FORM ĐĂNG NHẬP
-              (Thay thế hình minh họa bằng thẻ đăng nhập nổi bật)
+              (Mép trên của form căn ngang với mép trên của tiêu đề h1)
             */}
             <div className="lg:col-span-5 xl:col-span-5 w-full">
               <Suspense fallback={<LoginFormFallback />}>
