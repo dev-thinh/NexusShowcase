@@ -109,17 +109,15 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
           );
         })}
 
-        {/* 4. Tab: Bài đăng (Dành cho thành viên đã đăng nhập) */}
-        {user && (
-          <Link
-            href="/dashboard"
-            className={isDashboardActive ? activeTabClass : inactiveTabClass}
-            aria-current={isDashboardActive ? 'page' : undefined}
-          >
-            <LayoutDashboard className={`w-4 h-4 shrink-0 ${isDashboardActive ? 'text-blue-200' : 'text-slate-400'}`} />
-            <span>Bài đăng</span>
-          </Link>
-        )}
+        {/* 4. Tab: Bài đăng (Hiển thị cho tất cả, chuyển hướng login nếu chưa đăng nhập) */}
+        <Link
+          href={user ? '/dashboard' : '/login?callbackUrl=/dashboard'}
+          className={isDashboardActive ? activeTabClass : inactiveTabClass}
+          aria-current={isDashboardActive ? 'page' : undefined}
+        >
+          <LayoutDashboard className={`w-4 h-4 shrink-0 ${isDashboardActive ? 'text-blue-200' : 'text-slate-400'}`} />
+          <span>Bài đăng</span>
+        </Link>
 
         {/* 5. Tab: Liên hệ */}
         <Link

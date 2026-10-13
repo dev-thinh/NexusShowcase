@@ -10,6 +10,7 @@ describe('Navbar Nav Component Structure', () => {
     // Tab renamed to 'Bài đăng' (2 words)
     expect(content).toContain('Bài đăng');
     expect(content).not.toContain('<span>Dashboard</span>');
+    expect(content).toContain('/login?callbackUrl=/dashboard');
 
     // Contains links to members and contact
     expect(content).toContain('href="/members"');

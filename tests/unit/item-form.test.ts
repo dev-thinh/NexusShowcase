@@ -10,5 +10,7 @@ describe('Item Form Component', () => {
     expect(content).toContain('mediaDriveUrl');
     expect(content).toContain('proposedCategory');
     expect(content).toContain('tags');
+    expect(content).toContain('categoryId');
+    expect(content).toContain('FormCategoryOption');
   });
 });

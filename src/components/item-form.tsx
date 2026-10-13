@@ -22,6 +22,9 @@ import {
   Users,
   Building2,
   BookOpen,
+  Info,
+  Layers,
+  Sparkles,
 } from 'lucide-react';
 
 export interface InitialItemData {
@@ -60,16 +63,27 @@ export interface InitialItemData {
   }[];
 }
 
+export interface FormCategoryOption {
+  id: string;
+  name: string;
+  slug: string;
+  layoutType: string;
+  description?: string | null;
+  isNavFeatured?: boolean;
+}
+
 export function ItemForm({
   currentUserId,
   currentUserRole,
   clubMembers,
+  categories = [],
   initialData,
   isEdit = false,
 }: {
   currentUserId: string;
   currentUserRole?: string;
   clubMembers: { id: string; fullName: string }[];
+  categories?: FormCategoryOption[];
   initialData?: InitialItemData;
   isEdit?: boolean;
 }) {
@@ -105,6 +119,7 @@ export function ItemForm({
   const [tags, setTags] = useState(initialData?.tags ? initialData.tags.join(', ') : '');
   const [categoryId, setCategoryId] = useState(initialData?.categoryId || '');
   const [proposedCategory, setProposedCategory] = useState(initialData?.proposedCategory || '');
+  const selectedCategory = categories.find((c) => c.id === categoryId);
   const [attachments, setAttachments] = useState<AttachmentInput[]>(
     initialData?.attachments?.map((a) => ({
       fileName: a.fileName,
@@ -380,7 +395,8 @@ export function ItemForm({
 
       {/* 1. Thông tin chung */}
       <section className="space-y-4">
-        <div className="border-b border-slate-100 pb-3">
+        <div className="border-b border-slate-100 pb-3 flex items-center gap-2.5">
+          <FileText className="w-5 h-5 text-[#0F294A]" />
           <h2 className="text-lg sm:text-xl font-bold text-slate-900">1. Thông tin công trình</h2>
         </div>
 
@@ -401,22 +417,22 @@ export function ItemForm({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Phân loại *
+              Phân loại công trình *
             </label>
             <select
               value={type}
               onChange={(e) => setType(e.target.value as ItemType)}
               className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-medium"
             >
-              <option value="RESEARCH_PAPER">Bài báo khoa học</option>
-              <option value="PROJECT">Dự án công nghệ</option>
-              <option value="ACHIEVEMENT">Thành tích / Cống hiến</option>
+              <option value="RESEARCH_PAPER">📄 Bài báo khoa học</option>
+              <option value="PROJECT">🚀 Dự án công nghệ</option>
+              <option value="ACHIEVEMENT">🏆 Thành tích / Cống hiến</option>
             </select>
           </div>
 
           <div>
             <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">
-              Phạm vi *
+              Phạm vi công bố *
             </label>
             <select
               value={scope}
@@ -440,6 +456,90 @@ export function ItemForm({
               className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm sm:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-medium"
             />
           </div>
+        </div>
+
+        {/* Cụm chọn Danh mục học thuật (Category) & Tab nổi bật */}
+        <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+            <div>
+              <label className="block text-xs sm:text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-[#0F294A]" />
+                <span>Danh mục học thuật &amp; Giao diện Layout hiển thị</span>
+              </label>
+              <p className="text-xs text-slate-500 mt-0.5">
+                Chọn danh mục để đưa công trình vào các Tab nổi bật trên thanh điều hướng với layout chuyên biệt tương ứng.
+              </p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Chọn danh mục học thuật:
+              </label>
+              <select
+                value={categoryId}
+                onChange={(e) => setCategoryId(e.target.value)}
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-medium"
+              >
+                <option value="">-- Chưa phân danh mục (Chỉ xuất hiện ở Trang chủ) --</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name} {c.isNavFeatured ? '★ [Tab ghim Menu]' : ''} — Layout:{' '}
+                    {c.layoutType === 'SHOWCASE_GRID'
+                      ? 'Lưới dự án'
+                      : c.layoutType === 'BIBLIOGRAPHY'
+                      ? 'Trích dẫn bài báo'
+                      : c.layoutType === 'DATA_CATALOG'
+                      ? 'Mục lục dữ liệu'
+                      : 'Bảng vàng vinh danh'}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                Đề xuất danh mục / chủ đề mới (Tùy chọn):
+              </label>
+              <input
+                type="text"
+                value={proposedCategory}
+                onChange={(e) => setProposedCategory(e.target.value)}
+                className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
+                placeholder="Ví dụ: Robotics & Xe tự hành, Internet of Things..."
+              />
+            </div>
+          </div>
+
+          {selectedCategory && (
+            <div className="p-3 rounded-md bg-white border border-blue-200/90 text-xs text-slate-700 flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <div className="font-bold text-slate-900 flex items-center gap-2">
+                  <span>Liên kết vào: {selectedCategory.name}</span>
+                  {selectedCategory.isNavFeatured && (
+                    <span className="text-[11px] font-bold px-2 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200">
+                      ★ Tab ghim nổi bật trên thanh Menu
+                    </span>
+                  )}
+                </div>
+                <p className="text-slate-600">
+                  <strong>Layout hiển thị:</strong>{' '}
+                  <span className="text-[#0F294A] font-semibold">
+                    {selectedCategory.layoutType === 'SHOWCASE_GRID'
+                      ? 'Lưới dự án công nghệ đa phương tiện'
+                      : selectedCategory.layoutType === 'BIBLIOGRAPHY'
+                      ? 'Trích dẫn bài báo khoa học chuẩn thư mục'
+                      : selectedCategory.layoutType === 'DATA_CATALOG'
+                      ? 'Danh mục tài nguyên, tập dữ liệu & Model'
+                      : 'Bảng vàng vinh danh thành tích'}
+                  </span>
+                  {selectedCategory.description ? ` • ${selectedCategory.description}` : ''}
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         <div>
@@ -469,20 +569,6 @@ export function ItemForm({
           />
         </div>
 
-        {/* Đề xuất danh mục mới */}
-        <div>
-          <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">
-            Đề xuất danh mục / Chủ đề mới (Tùy chọn)
-          </label>
-          <input
-            type="text"
-            value={proposedCategory}
-            onChange={(e) => setProposedCategory(e.target.value)}
-            className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
-            placeholder="Ví dụ: Robotics & Xe tự hành, Internet of Things, Công cụ kiểm thử..."
-          />
-        </div>
-
         {/* Thẻ nhãn tags tự do */}
         <div>
           <label className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2">
@@ -504,7 +590,10 @@ export function ItemForm({
       {/* 2. Hình ảnh đại diện (Thumbnail) */}
       <section className="space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900">2. Hình ảnh đại diện (Thumbnail)</h2>
+          <div className="flex items-center gap-2">
+            <ImageIcon className="w-5 h-5 text-[#0F294A]" />
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">2. Hình ảnh đại diện (Thumbnail)</h2>
+          </div>
 
           {/* Toggle Upload vs URL */}
           <div className="inline-flex rounded-lg p-0.5 bg-slate-100 border border-slate-200">
@@ -646,9 +735,12 @@ export function ItemForm({
       {/* 3. Danh sách Tác giả & Giảng viên */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">3. Danh sách Tác giả &amp; Giảng viên</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Xếp theo thứ tự xuất bản học thuật. Có thể chọn thành viên CLB hoặc nhập tác giả ngoài.</p>
+          <div className="flex items-center gap-2.5">
+            <Users className="w-5 h-5 text-[#0F294A]" />
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">3. Danh sách Tác giả &amp; Giảng viên</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Xếp theo thứ tự xuất bản học thuật. Có thể chọn thành viên CLB hoặc nhập tác giả ngoài.</p>
+            </div>
           </div>
           <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
             {contributors.length} tác giả
@@ -831,8 +923,11 @@ export function ItemForm({
 
       {/* 4. Liên kết liên quan */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Liên kết (arXiv, Video, GitHub...)</h2>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+          <div className="flex items-center gap-2">
+            <Link2 className="w-5 h-5 text-[#0F294A]" />
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Liên kết (arXiv, Video, GitHub...)</h2>
+          </div>
           <button
             type="button"
             onClick={addLink}
@@ -840,6 +935,39 @@ export function ItemForm({
           >
             <Plus className="w-4 h-4" />
             <span>Thêm liên kết</span>
+          </button>
+        </div>
+
+        {/* Quick presets */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs text-slate-500 font-medium">Gợi ý liên kết nhanh:</span>
+          <button
+            type="button"
+            onClick={() => setLinks((prev) => [...prev, { label: 'arXiv Paper', url: '', type: 'PAPER_URL' }])}
+            className="text-xs px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium transition-colors cursor-pointer shadow-2xs"
+          >
+            + arXiv Paper
+          </button>
+          <button
+            type="button"
+            onClick={() => setLinks((prev) => [...prev, { label: 'GitHub Repository', url: '', type: 'GITHUB' }])}
+            className="text-xs px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium transition-colors cursor-pointer shadow-2xs"
+          >
+            + GitHub Repository
+          </button>
+          <button
+            type="button"
+            onClick={() => setLinks((prev) => [...prev, { label: 'Video Demo', url: '', type: 'VIDEO_EMBED' }])}
+            className="text-xs px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium transition-colors cursor-pointer shadow-2xs"
+          >
+            + Video Demo
+          </button>
+          <button
+            type="button"
+            onClick={() => setLinks((prev) => [...prev, { label: 'Dataset / Kaggle', url: '', type: 'OTHER' }])}
+            className="text-xs px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 font-medium transition-colors cursor-pointer shadow-2xs"
+          >
+            + Dataset / Kaggle
           </button>
         </div>
 
@@ -884,9 +1012,12 @@ export function ItemForm({
       {/* 5. Tài liệu toàn văn & Phụ lục nghiên cứu (PDF) */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900">5. Tài liệu toàn văn &amp; Phụ lục (PDF)</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Tải lên file PDF từ máy hoặc dán link tài liệu trực tiếp.</p>
+          <div className="flex items-center gap-2.5">
+            <FileText className="w-5 h-5 text-[#0F294A] shrink-0" />
+            <div>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">5. Tài liệu toàn văn &amp; Phụ lục (PDF)</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Tải lên file PDF từ máy hoặc dán link tài liệu trực tiếp.</p>
+            </div>
           </div>
 
           <div className="flex items-center gap-2">
@@ -1031,7 +1162,8 @@ export function ItemForm({
 
       {/* 6. Nội dung Markdown chi tiết */}
       <section className="space-y-4">
-        <div className="border-b border-slate-100 pb-3">
+        <div className="border-b border-slate-100 pb-3 flex items-center gap-2.5">
+          <BookOpen className="w-5 h-5 text-[#0F294A] shrink-0" />
           <h2 className="text-lg sm:text-xl font-bold text-slate-900">6. Nội dung chi tiết (Markdown)</h2>
         </div>
         <textarea
