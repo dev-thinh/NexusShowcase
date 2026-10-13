@@ -1,4 +1,4 @@
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
@@ -8,6 +8,7 @@ import { StatusBadge, TypeBadge, RoleBadge } from '@/components/ui/badge';
 import { CitationModal } from '@/components/citation-modal';
 import { AdminReviewButton } from '@/components/admin-review-button';
 import { PinToggleButton } from '@/components/pin-toggle-button';
+import { VisibilityToggleButton } from '@/components/visibility-toggle-button';
 import { publicUserSelect } from '@/lib/public-user';
 import Link from 'next/link';
 import {
@@ -54,6 +55,10 @@ export default async function ShowcaseDetailPage({
 
   if (!item || (item.status !== 'PUBLISHED' && !isAuthorizedToPreview)) {
     notFound();
+  }
+
+  if (item.visibility === 'PRIVATE' && !currentUser) {
+    redirect(`/login?callbackUrl=/showcase/${slug}`);
   }
 
   const videoLink = item.links.find((l) => l.type === 'VIDEO_EMBED');
@@ -132,6 +137,15 @@ export default async function ShowcaseDetailPage({
         <header className="bg-white p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xs mb-8">
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <TypeBadge type={item.type} />
+            <span
+              className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-md border ${
+                item.visibility === 'PUBLIC'
+                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                  : 'bg-amber-50 text-amber-700 border-amber-200'
+              }`}
+            >
+              {item.visibility === 'PUBLIC' ? '🌐 Công khai' : '🔒 Nội bộ'}
+            </span>
             <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-500">
               <Calendar className="w-4 h-4 text-slate-400" />
               <span>Năm công bố: {item.publishedYear}</span>
@@ -140,6 +154,18 @@ export default async function ShowcaseDetailPage({
               <div className="flex items-center gap-1.5 text-sm font-semibold px-3 py-1 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
                 <Building2 className="w-4 h-4 text-slate-400" />
                 <span>{item.issuer}</span>
+              </div>
+            )}
+            {item.tags && item.tags.length > 0 && (
+              <div className="flex flex-wrap items-center gap-1.5 ml-auto">
+                {item.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="text-xs px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium border border-slate-200"
+                  >
+                    #{tag}
+                  </span>
+                ))}
               </div>
             )}
           </div>
@@ -164,6 +190,14 @@ export default async function ShowcaseDetailPage({
               item={item}
               className="h-11 px-4 sm:px-5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-sm font-bold transition-all shadow-xs cursor-pointer inline-flex items-center justify-center gap-2.5 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
             />
+
+            {/* Admin Visibility Toggle */}
+            {currentUser?.role === 'ADMIN' && (
+              <VisibilityToggleButton
+                itemId={item.id}
+                initialVisibility={item.visibility}
+              />
+            )}
 
             {/* Admin Pin Toggle */}
             {currentUser?.role === 'ADMIN' && item.status === 'PUBLISHED' && (
