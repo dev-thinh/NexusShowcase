@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { loginAction } from './actions';
 import {
   Lock,
@@ -12,7 +13,7 @@ import {
   CheckCircle2,
   Eye,
   EyeOff,
-
+  LogIn,
 } from 'lucide-react';
 
 export function LoginForm() {
@@ -30,7 +31,7 @@ export function LoginForm() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!identifier.trim()) {
-      setError('Vui lòng nhập tên đăng nhập hoặc email.');
+      setError('Vui lòng nhập tài khoản hoặc email.');
       return;
     }
     if (!password) {
@@ -59,24 +60,23 @@ export function LoginForm() {
           setSuccess(true);
           return;
         }
-        setError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
+        setError('Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.');
       }
     });
   };
 
   return (
-    <div className="max-w-md mx-auto w-full">
-      <div className="bg-white rounded-lg border border-slate-200 shadow-2xs p-5 sm:p-6">
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-          <div className="w-10 h-10 rounded-lg bg-[#0F294A] text-white flex items-center justify-center shadow-xs">
-            <Lock className="w-5 h-5 text-blue-200" />
-          </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
-              Xác Thực Thành Viên
-            </h2>
-            <p className="text-xs text-slate-500">
-              Cổng quản trị &amp; công bố nghiên cứu
+    <div className="max-w-md w-full mx-auto">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-5 sm:p-6">
+        {/* Header với icon trần to bằng tiêu đề và subtitle 1 dòng căn theo tiêu đề */}
+        <div className="flex items-start gap-3 pb-4 border-b border-slate-100">
+          <LogIn className="w-6 h-6 text-[#0F294A] shrink-0 mt-0.5" />
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-extrabold text-slate-900 leading-tight">
+              Đăng nhập
+            </h1>
+            <p className="text-xs text-slate-500 truncate mt-0.5">
+              Nhập thông tin tài khoản để tiếp tục
             </p>
           </div>
         </div>
@@ -84,10 +84,10 @@ export function LoginForm() {
         {error && (
           <div
             role="alert"
-            className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-start gap-2.5 animate-in fade-in"
+            className="mt-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-xs sm:text-sm flex items-center gap-2.5 animate-in fade-in"
           >
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <div className="font-medium leading-relaxed">{error}</div>
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            <div className="font-medium">{error}</div>
           </div>
         )}
 
@@ -98,18 +98,18 @@ export function LoginForm() {
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <div className="font-semibold">
-              Xác thực thành công! Đang chuyển hướng...
+              Đăng nhập thành công! Đang chuyển hướng...
             </div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-3.5">
+        <form onSubmit={handleSubmit} className="mt-4 space-y-3.5">
           <div>
             <label
               htmlFor="identifier"
-              className="block text-xs font-bold text-slate-700 mb-1"
+              className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5"
             >
-              Tên đăng nhập hoặc Email
+              Tài khoản hoặc Email
             </label>
             <div className="relative">
               <User className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
@@ -120,22 +120,20 @@ export function LoginForm() {
                 autoComplete="username"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
-                placeholder="Tên đăng nhập hoặc email..."
+                placeholder="Nhập tên đăng nhập hoặc email..."
                 disabled={isPending}
-                className="w-full pl-9 pr-3.5 py-2 text-sm bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
+                className="w-full pl-9 pr-3.5 py-2.5 text-sm bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
               />
             </div>
           </div>
 
           <div>
-            <div className="flex items-center justify-between mb-1">
-              <label
-                htmlFor="password"
-                className="block text-xs font-bold text-slate-700"
-              >
-                Mật khẩu
-              </label>
-            </div>
+            <label
+              htmlFor="password"
+              className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5"
+            >
+              Mật khẩu
+            </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -147,7 +145,7 @@ export function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="w-full pl-9 pr-9 py-2 text-sm bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
+                className="w-full pl-9 pr-9 py-2.5 text-sm bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
               />
               <button
                 type="button"
@@ -168,23 +166,26 @@ export function LoginForm() {
             {isPending ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Đang xác thực...</span>
+                <span>Đang đăng nhập...</span>
               </>
             ) : (
               <>
-                <span>Đăng nhập hệ thống</span>
+                <span>Đăng nhập</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
           </button>
         </form>
 
-
-
-
-
-
-
+        <div className="mt-4 pt-3.5 border-t border-slate-100 text-center text-xs text-slate-500">
+          <span>Chưa có tài khoản? </span>
+          <Link
+            href="/contact"
+            className="font-bold text-[#0F294A] hover:underline"
+          >
+            Liên hệ ban quản trị
+          </Link>
+        </div>
       </div>
     </div>
   );
