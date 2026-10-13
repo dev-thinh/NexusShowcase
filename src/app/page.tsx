@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
 import { ShowcaseCard } from '@/components/showcase-card';
-import { FeaturedFilmstrip } from '@/components/featured-filmstrip';
 import { EmptyState } from '@/components/ui/empty-state';
 import { ItemType } from '@prisma/client';
 import { publicUserSelect } from '@/lib/public-user';
@@ -26,6 +26,9 @@ export default async function HomePage({
 }: {
   searchParams: Promise<{ type?: string; year?: string; q?: string; domain?: string }>;
 }) {
+  const session = await auth();
+  const isAuthenticated = !!session?.user;
+
   const params = await searchParams;
   const typeFilter = params.type as ItemType | undefined;
   const yearFilter = params.year ? parseInt(params.year) : undefined;
@@ -34,6 +37,7 @@ export default async function HomePage({
 
   const whereClause: any = {
     status: 'PUBLISHED',
+    ...(isAuthenticated ? {} : { visibility: 'PUBLIC' }),
   };
 
   if (typeFilter && ['RESEARCH_PAPER', 'PROJECT', 'ACHIEVEMENT'].includes(typeFilter)) {
@@ -50,6 +54,7 @@ export default async function HomePage({
       OR: [
         { title: { contains: searchQuery, mode: 'insensitive' } },
         { summary: { contains: searchQuery, mode: 'insensitive' } },
+        { tags: { has: searchQuery } },
       ],
     });
   }
@@ -59,7 +64,7 @@ export default async function HomePage({
       ai: ['AI', 'Transformer', 'CNN', 'Deep Learning', 'Thị giác', 'Vision', 'Khuôn mặt'],
       nlp: ['NLP', 'Ngôn ngữ', 'LLM', 'PhoLLM', 'Truy xuất', 'Retrieval', 'Văn bản'],
       medical: ['Y tế', 'MRI', 'Não', 'Bệnh viện', 'Chẩn đoán', 'Medical'],
-      iot: ['IoT', 'Edge', 'Jetson', 'Nhúng', 'SmartLab', 'Phần cứng'],
+      iot: ['IoT', 'Edge', 'Jetson', 'Nhúng', 'SmartLab', 'Phần cứng', 'Robotics'],
       systems: ['Server', 'Hạ tầng', 'GPU', 'Web', 'Cơ sở', 'Cluster'],
     };
 
@@ -76,54 +81,17 @@ export default async function HomePage({
     whereClause.AND = andConditions;
   }
 
-  const [items, totalPapers, totalProjects, totalAchievements, pinnedItems] = await Promise.all([
-    prisma.showcaseItem.findMany({
-      where: whereClause,
-      include: {
-        contributors: {
-          include: { user: { select: publicUserSelect } },
-          orderBy: { displayOrder: 'asc' },
-        },
+  const items = await prisma.showcaseItem.findMany({
+    where: whereClause,
+    include: {
+      contributors: {
+        include: { user: { select: publicUserSelect } },
+        orderBy: { displayOrder: 'asc' },
       },
-      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }],
-    }),
-    prisma.showcaseItem.count({ where: { status: 'PUBLISHED', type: 'RESEARCH_PAPER' } }),
-    prisma.showcaseItem.count({ where: { status: 'PUBLISHED', type: 'PROJECT' } }),
-    prisma.showcaseItem.count({ where: { status: 'PUBLISHED', type: 'ACHIEVEMENT' } }),
-    prisma.showcaseItem.findMany({
-      where: { status: 'PUBLISHED', isPinned: true },
-      include: {
-        contributors: {
-          include: { user: { select: publicUserSelect } },
-          orderBy: { displayOrder: 'asc' },
-        },
-      },
-      orderBy: { pinnedAt: 'desc' },
-      take: 10,
-    }),
-  ]);
-
-  const needed = 10 - pinnedItems.length;
-  let fillItems: typeof pinnedItems = [];
-  if (needed > 0) {
-    const pinnedIds = pinnedItems.map((item) => item.id);
-    fillItems = await prisma.showcaseItem.findMany({
-      where: {
-        status: 'PUBLISHED',
-        id: { notIn: pinnedIds },
-      },
-      include: {
-        contributors: {
-          include: { user: { select: publicUserSelect } },
-          orderBy: { displayOrder: 'asc' },
-        },
-      },
-      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }],
-      take: needed,
-    });
-  }
-
-  const featuredItems = [...pinnedItems, ...fillItems];
+      category: { select: { id: true, name: true, slug: true } },
+    },
+    orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }],
+  });
 
   const categories = [
     { type: undefined, label: 'Tất cả công trình', icon: Layers },
@@ -137,53 +105,34 @@ export default async function HomePage({
     { key: 'ai', label: 'AI & Computer Vision', icon: Brain },
     { key: 'nlp', label: 'NLP & Large Language Models', icon: MessageSquare },
     { key: 'medical', label: 'Healthcare & Medical AI', icon: Activity },
-    { key: 'iot', label: 'IoT & Edge Computing', icon: Cpu },
+    { key: 'iot', label: 'IoT & Robotics', icon: Cpu },
     { key: 'systems', label: 'Systems & Infrastructure', icon: Server },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans bg-white">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-14 sm:py-20">
+      {/* Compact Academic Header (Không chiếm diện tích, không rườm rà) */}
+      <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-100 bg-slate-50/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-800 text-xs sm:text-sm font-semibold mb-5 shadow-2xs border border-slate-200">
-            <GraduationCap className="w-4 h-4 text-slate-700" />
-            <span>Khoa Công Nghệ Thông Tin • ĐH Khoa Học Tự Nhiên - ĐHQG-HCM</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white text-slate-800 text-xs sm:text-sm font-semibold mb-3 shadow-2xs border border-slate-200">
+            <GraduationCap className="w-4 h-4 text-[#0F294A]" />
+            <span>CLB Nghiên cứu &amp; Sáng tạo Nexus • Khoa CNTT - ĐHKHTN</span>
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight font-serif">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight font-serif">
             Kho Lưu Trữ Công Trình &amp; Sáng Tạo Học Thuật
           </h1>
 
-          <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Lưu trữ và công bố các công trình nghiên cứu khoa học xuất bản, dự án công nghệ và thành tích của sinh viên CLB Nexus.
+          <p className="mt-3 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+            Lưu trữ và công bố các công trình nghiên cứu khoa học, dự án công nghệ, robot và tài nguyên học thuật của sinh viên.
           </p>
-
-          {/* Institutional Stats Counters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto mt-10 p-5 bg-white rounded-2xl border border-slate-200 shadow-xs">
-            <div className="p-3 text-center">
-              <div className="text-3xl sm:text-4xl font-black text-slate-900 font-serif">{totalPapers}</div>
-              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Bài Báo Khoa Học</div>
-            </div>
-            <div className="p-3 text-center sm:border-x sm:border-slate-100 border-y sm:border-y-0 border-slate-100 py-4 sm:py-3">
-              <div className="text-3xl sm:text-4xl font-black text-slate-900 font-serif">{totalProjects}</div>
-              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Dự Án Công Nghệ</div>
-            </div>
-            <div className="p-3 text-center">
-              <div className="text-3xl sm:text-4xl font-black text-amber-700 font-serif">{totalAchievements}</div>
-              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Giải Thưởng / Cống Hiến</div>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* Featured Showcase Filmstrip Reel */}
-      <FeaturedFilmstrip items={featuredItems} />
-
-      {/* Main Showcase Feed */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
+      {/* Main Showcase Feed: Trình bày ngay trên màn hình đầu tiên */}
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl flex-1">
         {/* Filter Navigation Bar */}
         <div className="flex flex-col gap-4 pb-6 border-b border-slate-200 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -202,7 +151,7 @@ export default async function HomePage({
                   <a
                     key={c.label}
                     href={href}
-                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                       isActive
                         ? 'bg-[#0F294A] text-white shadow-xs'
                         : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200'
@@ -225,13 +174,13 @@ export default async function HomePage({
                   type="text"
                   name="q"
                   defaultValue={searchQuery || ''}
-                  placeholder="Tìm bài báo, dự án, tác giả..."
-                  className="w-full sm:w-72 pl-10 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
+                  placeholder="Tìm bài báo, dự án, robot, tác giả..."
+                  className="w-full sm:w-72 pl-10 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
                 />
               </div>
               <button
                 type="submit"
-                className="px-5 py-2.5 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
+                className="px-4 py-2 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
               >
                 Tìm
               </button>
@@ -256,7 +205,7 @@ export default async function HomePage({
                 <a
                   key={d.label}
                   href={href}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
                     isActive
                       ? 'bg-blue-50 text-blue-900 border border-blue-200 font-bold shadow-2xs'
                       : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
@@ -279,7 +228,7 @@ export default async function HomePage({
             actionHref="/"
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
             {items.map((item) => (
               <ShowcaseCard key={item.id} item={item} />
             ))}
