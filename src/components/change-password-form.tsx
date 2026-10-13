@@ -54,7 +54,7 @@ export function ChangePasswordForm() {
             <KeyRound className="w-6 h-6 text-blue-200" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight font-serif">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
               Đổi Mật Khẩu
             </h2>
             <p className="text-xs sm:text-sm text-slate-500">

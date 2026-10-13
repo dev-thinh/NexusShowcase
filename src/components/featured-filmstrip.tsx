@@ -67,7 +67,7 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
               <Sparkles className="w-3.5 h-3.5 text-amber-600" />
               <span>TIÊU ĐIỂM HỌC THUẬT</span>
             </div>
-            <h2 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight font-serif">
+            <h2 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight">
               Công Trình Nghiên Cứu &amp; Sáng Tạo Nổi Bật
             </h2>
           </div>
@@ -142,7 +142,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
           />
         ) : (
           <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-            <div className="w-10 h-10 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1 font-serif border border-slate-200">
+            <div className="w-10 h-10 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1 border border-slate-200">
               NX
             </div>
             <span className="text-[11px] font-semibold text-slate-500">Nexus Academic Showcase</span>
@@ -187,7 +187,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
           </div>
 
           {/* Title */}
-          <h3 className="text-base font-bold text-slate-900 group-hover/card:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2 font-serif">
+          <h3 className="text-base font-bold text-slate-900 group-hover/card:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2">
             {item.title}
           </h3>
 

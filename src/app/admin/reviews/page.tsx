@@ -57,7 +57,7 @@ export default async function AdminReviewsPage() {
 
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-serif">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
               Duyệt bài đăng công trình
             </h1>
             <p className="text-sm text-slate-600 mt-1">
@@ -101,7 +101,7 @@ export default async function AdminReviewsPage() {
                     href={`/showcase/${item.slug}`}
                     className="group/title block focus-visible:outline-none"
                   >
-                    <h2 className="text-lg sm:text-xl font-bold text-slate-900 group-hover/title:text-[#0F294A] group-hover/title:underline leading-snug font-serif transition-colors">
+                    <h2 className="text-lg sm:text-xl font-bold text-slate-900 group-hover/title:text-[#0F294A] group-hover/title:underline leading-snug transition-colors">
                       {item.title}
                     </h2>
                   </Link>

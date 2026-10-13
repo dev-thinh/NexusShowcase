@@ -23,7 +23,7 @@ export async function Navbar() {
               <GraduationCap className="w-5 h-5 text-blue-200" />
             </div>
             <div className="flex flex-col">
-              <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 group-hover:text-[#0F294A] transition-colors leading-tight font-serif">
+              <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 group-hover:text-[#0F294A] transition-colors leading-tight">
                 NexusShowcase
               </span>
               <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase hidden sm:block">

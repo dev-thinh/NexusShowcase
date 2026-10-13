@@ -1,7 +1,6 @@
-'use client';
-
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
+import { ContactForm } from '@/components/contact-form';
 import {
   Mail,
   MapPin,
@@ -9,8 +8,6 @@ import {
   Phone,
   Building,
   GraduationCap,
-  Send,
-  MessageSquare,
   Globe,
   ExternalLink,
 } from 'lucide-react';
@@ -31,7 +28,7 @@ export default function ContactPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 Kết nối &amp; Hợp tác
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                 Liên hệ Ban Điều Hành CLB Nexus
               </h1>
             </div>
@@ -149,93 +146,8 @@ export default function ContactPage() {
           </div>
 
           {/* Contact Inquiry Form (5 cols) */}
-          <div className="lg:col-span-5 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs">
-            <div className="flex items-center gap-2 mb-2">
-              <MessageSquare className="w-5 h-5 text-[#0F294A]" />
-              <h2 className="text-lg font-bold text-slate-900 font-serif">
-                Gửi Tin Nhắn Kết Nối
-              </h2>
-            </div>
-            <p className="text-xs text-slate-500 mb-6">
-              Vui lòng điền thông tin để gửi tin nhắn trực tiếp đến Ban Chủ nhiệm CLB Nexus.
-            </p>
-
-            <form
-              action="#"
-              method="POST"
-              className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                alert('Cảm ơn bạn đã liên hệ! Thông điệp sẽ được gửi đến Ban Điều Hành CLB Nexus.');
-              }}
-            >
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 tracking-wider mb-1.5">
-                  Họ và tên
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Nguyễn Văn A"
-                  className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 tracking-wider mb-1.5">
-                  Địa chỉ Email
-                </label>
-                <input
-                  type="email"
-                  required
-                  placeholder="example@student.hcmus.edu.vn"
-                  className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 tracking-wider mb-1.5">
-                  Đơn vị / Lớp / Doanh nghiệp
-                </label>
-                <input
-                  type="text"
-                  placeholder="Khoa CNTT - Khóa 2022 / Doanh nghiệp đối tác"
-                  className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 tracking-wider mb-1.5">
-                  Chủ đề
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Hợp tác nghiên cứu / Đóng góp đề tài..."
-                  className="w-full h-11 px-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 tracking-wider mb-1.5">
-                  Nội dung trao đổi
-                </label>
-                <textarea
-                  rows={4}
-                  required
-                  placeholder="Mô tả chi tiết nội dung bạn muốn trao đổi cùng CLB Nexus..."
-                  className="w-full p-3.5 rounded-xl border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all resize-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full h-11 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white font-bold text-sm inline-flex items-center justify-center gap-2 transition-all shadow-xs active:scale-[0.98] cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
-                <span>Gửi lời nhắn</span>
-              </button>
-            </form>
+          <div className="lg:col-span-5">
+            <ContactForm />
           </div>
         </div>
       </main>

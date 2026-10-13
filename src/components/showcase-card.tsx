@@ -51,7 +51,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
           />
         ) : (
           <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-            <div className="w-11 h-11 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1.5 font-serif border border-slate-200">
+            <div className="w-11 h-11 rounded-xl bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1.5 border border-slate-200">
               NX
             </div>
             <span className="text-xs font-semibold text-slate-500">Nexus Academic Showcase</span>
@@ -88,7 +88,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
         </div>
 
         <Link href={`/showcase/${item.slug}`} className="block group-hover:text-[#0F294A] transition-colors">
-          <h3 className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2.5 font-serif">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2.5">
             {item.title}
           </h3>
         </Link>

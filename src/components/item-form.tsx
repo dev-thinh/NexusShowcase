@@ -381,7 +381,7 @@ export function ItemForm({
       {/* 1. Thông tin chung */}
       <section className="space-y-4">
         <div className="border-b border-slate-100 pb-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-serif">1. Thông tin công trình</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">1. Thông tin công trình</h2>
         </div>
 
         <div>
@@ -504,7 +504,7 @@ export function ItemForm({
       {/* 2. Hình ảnh đại diện (Thumbnail) */}
       <section className="space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-serif">2. Hình ảnh đại diện (Thumbnail)</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">2. Hình ảnh đại diện (Thumbnail)</h2>
 
           {/* Toggle Upload vs URL */}
           <div className="inline-flex rounded-lg p-0.5 bg-slate-100 border border-slate-200">
@@ -647,7 +647,7 @@ export function ItemForm({
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-serif">3. Danh sách Tác giả &amp; Giảng viên</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">3. Danh sách Tác giả &amp; Giảng viên</h2>
             <p className="text-xs text-slate-500 mt-0.5">Xếp theo thứ tự xuất bản học thuật. Có thể chọn thành viên CLB hoặc nhập tác giả ngoài.</p>
           </div>
           <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
@@ -832,7 +832,7 @@ export function ItemForm({
       {/* 4. Liên kết liên quan */}
       <section className="space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-serif">4. Liên kết (arXiv, Video, GitHub...)</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Liên kết (arXiv, Video, GitHub...)</h2>
           <button
             type="button"
             onClick={addLink}
@@ -885,7 +885,7 @@ export function ItemForm({
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-serif">5. Tài liệu toàn văn &amp; Phụ lục (PDF)</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900">5. Tài liệu toàn văn &amp; Phụ lục (PDF)</h2>
             <p className="text-xs text-slate-500 mt-0.5">Tải lên file PDF từ máy hoặc dán link tài liệu trực tiếp.</p>
           </div>
 
@@ -1032,7 +1032,7 @@ export function ItemForm({
       {/* 6. Nội dung Markdown chi tiết */}
       <section className="space-y-4">
         <div className="border-b border-slate-100 pb-3">
-          <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-serif">6. Nội dung chi tiết (Markdown)</h2>
+          <h2 className="text-lg sm:text-xl font-bold text-slate-900">6. Nội dung chi tiết (Markdown)</h2>
         </div>
         <textarea
           rows={7}

@@ -43,7 +43,7 @@ export default function LoginPage() {
             <span>KHOA CÔNG NGHỆ THÔNG TIN • ĐH KHOA HỌC TỰ NHIÊN - ĐHQG-HCM</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight font-serif">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Cổng Đăng Nhập &amp; Xác Thực Thành Viên
           </h1>
 

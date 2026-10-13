@@ -81,7 +81,7 @@ export default async function ShowcaseDetailPage({
               <Clock className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-extrabold text-sm sm:text-base font-serif">
+                  <span className="font-extrabold text-sm sm:text-base">
                     Chế độ xem trước công trình nghiên cứu
                   </span>
                   <StatusBadge status={item.status} />
@@ -170,7 +170,7 @@ export default async function ShowcaseDetailPage({
             )}
           </div>
 
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight font-serif">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 leading-tight tracking-tight">
             {item.title}
           </h1>
 
@@ -265,7 +265,7 @@ export default async function ShowcaseDetailPage({
         {/* Video Demo Section */}
         {videoLink && (
           <section className="mb-8 bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2 font-serif">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
               <span>Video Trình Diễn &amp; Demo</span>
             </h2>
             <VideoPlayer url={videoLink.url} title={item.title} />
@@ -276,7 +276,7 @@ export default async function ShowcaseDetailPage({
         {item.attachments && item.attachments.length > 0 && (
           <section className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 font-serif">
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
                 <Paperclip className="w-5 h-5 text-slate-500" />
                 <span>Tài Liệu Toàn Văn &amp; Phụ Lục Nghiên Cứu</span>
               </h2>
@@ -333,7 +333,7 @@ export default async function ShowcaseDetailPage({
         {/* Authors Section */}
         <section className="bg-white p-6 sm:p-8 rounded-2xl border border-slate-200 shadow-xs mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2 font-serif">
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 flex items-center gap-2">
               <Users className="w-5 h-5 text-[#0F294A]" />
               <span>Tác giả &amp; Người hướng dẫn</span>
             </h2>
@@ -395,7 +395,7 @@ export default async function ShowcaseDetailPage({
         {/* Markdown Content Section */}
         {item.content && (
           <section className="bg-white p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xs">
-            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4 font-serif">Nội dung chi tiết</h2>
+            <h2 className="text-lg sm:text-xl font-bold text-slate-900 mb-4">Nội dung chi tiết</h2>
             <div className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line font-sans">
               {item.content}
             </div>

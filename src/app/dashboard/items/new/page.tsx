@@ -32,7 +32,7 @@ export default async function NewItemPage() {
       <Navbar />
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-5xl flex-1">
-        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 font-serif">Đăng tải công trình / dự án mới</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">Đăng tải công trình / dự án mới</h1>
         <p className="text-sm sm:text-base text-slate-600 mb-8">
           Điền thông tin đề tài, chọn các tác giả tham gia và gửi để ban quản trị xét duyệt xuất bản.
         </p>

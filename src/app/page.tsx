@@ -121,7 +121,7 @@ export default async function HomePage({
             <span>CLB Nghiên cứu &amp; Sáng tạo Nexus • Khoa CNTT - ĐHKHTN</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight font-serif">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
             Kho Lưu Trữ Công Trình &amp; Sáng Tạo Học Thuật
           </h1>
 

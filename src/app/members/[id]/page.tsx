@@ -70,13 +70,13 @@ export default async function MemberProfilePage({
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
         {/* Profile Header */}
         <header className="bg-white p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xs mb-10 flex flex-col md:flex-row items-center md:items-start gap-8">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#0F294A] text-white font-black text-3xl sm:text-4xl flex items-center justify-center shadow-xs shrink-0 font-serif border-4 border-slate-100">
+          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#0F294A] text-white font-black text-3xl sm:text-4xl flex items-center justify-center shadow-xs shrink-0 border-4 border-slate-100">
             {user.fullName.charAt(0)}
           </div>
 
           <div className="flex-1 text-center md:text-left">
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-serif">
+              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                 {user.fullName}
               </h1>
               <span
@@ -94,15 +94,15 @@ export default async function MemberProfilePage({
             {/* Academic Metrics Row */}
             <div className="grid grid-cols-3 gap-4 max-w-lg mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl text-center">
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-slate-900 font-serif">{papers.length}</div>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900">{papers.length}</div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Bài Báo</div>
               </div>
               <div className="border-x border-slate-200">
-                <div className="text-2xl sm:text-3xl font-black text-slate-900 font-serif">{projects.length}</div>
+                <div className="text-2xl sm:text-3xl font-black text-slate-900">{projects.length}</div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Dự Án</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-amber-700 font-serif">{achievements.length}</div>
+                <div className="text-2xl sm:text-3xl font-black text-amber-700">{achievements.length}</div>
                 <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Giải Thưởng</div>
               </div>
             </div>
@@ -163,7 +163,7 @@ export default async function MemberProfilePage({
           <section>
             <div className="flex items-center gap-2.5 mb-5">
               <FileText className="w-5 h-5 text-[#0F294A]" />
-              <h2 className="text-xl font-bold text-slate-900 font-serif">Bài báo khoa học</h2>
+              <h2 className="text-xl font-bold text-slate-900">Bài báo khoa học</h2>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold ml-1 border border-blue-200">
                 {papers.length}
               </span>
@@ -187,7 +187,7 @@ export default async function MemberProfilePage({
           <section>
             <div className="flex items-center gap-2.5 mb-5">
               <Code2 className="w-5 h-5 text-emerald-700" />
-              <h2 className="text-xl font-bold text-slate-900 font-serif">Dự án công nghệ</h2>
+              <h2 className="text-xl font-bold text-slate-900">Dự án công nghệ</h2>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold ml-1 border border-emerald-200">
                 {projects.length}
               </span>
@@ -211,7 +211,7 @@ export default async function MemberProfilePage({
           <section>
             <div className="flex items-center gap-2.5 mb-5">
               <Trophy className="w-5 h-5 text-amber-700" />
-              <h2 className="text-xl font-bold text-slate-900 font-serif">Giải thưởng &amp; Đóng góp</h2>
+              <h2 className="text-xl font-bold text-slate-900">Giải thưởng &amp; Đóng góp</h2>
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold ml-1 border border-amber-200">
                 {achievements.length}
               </span>

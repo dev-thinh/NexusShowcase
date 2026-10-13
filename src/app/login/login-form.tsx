@@ -72,7 +72,7 @@ export function LoginForm() {
             <Lock className="w-6 h-6 text-blue-200" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight font-serif">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
               Xác Thực Thành Viên
             </h2>
             <p className="text-xs sm:text-sm text-slate-500">

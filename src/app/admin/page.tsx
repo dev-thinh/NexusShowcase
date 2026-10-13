@@ -53,7 +53,7 @@ export default async function AdminDashboardPage() {
               <ShieldCheck className="w-4 h-4 text-amber-400" />
               <span>Khu vực Quản trị Học thuật</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight font-serif">
+            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
               Trung tâm Quản trị Học thuật
             </h1>
             <p className="text-sm sm:text-base text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
@@ -77,14 +77,14 @@ export default async function AdminDashboardPage() {
                   Cần xử lý
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-slate-900 font-serif">Bài nộp đang chờ duyệt</h2>
+              <h2 className="text-lg font-bold text-slate-900">Bài nộp đang chờ duyệt</h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
                 Xem chi tiết công trình, phê duyệt xuất bản hoặc gửi phản hồi chỉnh sửa.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-amber-700 font-serif">{pendingCount} bài</span>
+              <span className="text-2xl font-black text-amber-700">{pendingCount} bài</span>
               <span className="text-sm font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
                 <span>Vào duyệt ngay</span>
                 <ArrowRight className="w-4 h-4" />
@@ -105,14 +105,14 @@ export default async function AdminDashboardPage() {
                   Thành viên
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-slate-900 font-serif">Quản lý &amp; Phân quyền</h2>
+              <h2 className="text-lg font-bold text-slate-900">Quản lý &amp; Phân quyền</h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
                 Tạo tài khoản mới, phân quyền CORE MEMBER để đăng ký công trình.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-slate-900 font-serif">{totalMembers} thành viên</span>
+              <span className="text-2xl font-black text-slate-900">{totalMembers} thành viên</span>
               <span className="text-sm font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
                 <span>Quản lý danh sách</span>
                 <ArrowRight className="w-4 h-4" />
@@ -130,14 +130,14 @@ export default async function AdminDashboardPage() {
                   Trang chủ
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-slate-900 font-serif">Công trình đang ghim</h2>
+              <h2 className="text-lg font-bold text-slate-900">Công trình đang ghim</h2>
               <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
                 Các công trình nghiên cứu và sáng tạo được ghim nổi bật trên trang chủ.
               </p>
             </div>
 
             <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-amber-700 font-serif">{pinnedCount} bài</span>
+              <span className="text-2xl font-black text-amber-700">{pinnedCount} bài</span>
               <a
                 href="/"
                 target="_blank"
@@ -158,7 +158,7 @@ export default async function AdminDashboardPage() {
                 <Pin className="w-3.5 h-3.5" />
                 <span>Tiêu điểm đã ghim</span>
               </div>
-              <h2 className="text-xl font-bold text-slate-900 font-serif">
+              <h2 className="text-xl font-bold text-slate-900">
                 Danh Sách Công Trình Đang Ghim Nổi Bật
               </h2>
             </div>
@@ -196,7 +196,7 @@ export default async function AdminDashboardPage() {
                       </div>
                       <Link
                         href={`/showcase/${item.slug}`}
-                        className="text-base font-bold text-slate-900 hover:text-[#0F294A] font-serif transition-colors line-clamp-1"
+                        className="text-base font-bold text-slate-900 hover:text-[#0F294A] transition-colors line-clamp-1"
                       >
                         {item.title}
                       </Link>

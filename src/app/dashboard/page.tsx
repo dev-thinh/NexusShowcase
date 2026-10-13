@@ -47,7 +47,7 @@ export default async function DashboardPage() {
         {/* Top Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight font-serif">
+            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
               Bảng điều khiển thành viên
             </h1>
             <p className="text-sm sm:text-base text-slate-600 mt-1">
@@ -94,7 +94,7 @@ export default async function DashboardPage() {
         <section className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
             <div>
-              <h2 className="text-lg sm:text-xl font-bold text-slate-900 font-serif">Các bài đã khởi tạo</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Các bài đã khởi tạo</h2>
               <p className="text-xs sm:text-sm text-slate-500 mt-0.5">Quản lý vòng đời bài nộp từ bản nháp đến xuất bản</p>
             </div>
             <span className="text-xs sm:text-sm font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
@@ -144,7 +144,7 @@ export default async function DashboardPage() {
                       </span>
                     </div>
 
-                    <h3 className="font-bold text-slate-900 text-base sm:text-lg truncate font-serif">{item.title}</h3>
+                    <h3 className="font-bold text-slate-900 text-base sm:text-lg truncate">{item.title}</h3>
                     <p className="text-sm text-slate-600 line-clamp-1 mt-1">{item.summary}</p>
 
                     {item.status === 'REJECTED' && item.rejectionReason && (

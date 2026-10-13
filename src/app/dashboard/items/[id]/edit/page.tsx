@@ -63,7 +63,7 @@ export default async function EditItemPage({
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-5xl flex-1">
         <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2 font-serif">
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
             {item.status === 'REJECTED' ? 'Chỉnh sửa & Gửi lại xét duyệt' : 'Chỉnh sửa công trình'}
           </h1>
           <p className="text-sm sm:text-base text-slate-600">

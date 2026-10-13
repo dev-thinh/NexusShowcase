@@ -13,7 +13,7 @@ export function AcademicFooter() {
                 <GraduationCap className="w-4 h-4 text-blue-200" />
               </div>
               <div>
-                <div className="font-extrabold text-base tracking-tight text-slate-900 font-serif">
+                <div className="font-extrabold text-base tracking-tight text-slate-900">
                   NexusShowcase Academic Repository
                 </div>
                 <div className="text-xs font-semibold text-slate-500">

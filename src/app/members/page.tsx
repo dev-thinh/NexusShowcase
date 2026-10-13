@@ -51,7 +51,7 @@ export default async function MembersDirectoryPage() {
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 Nhân sự &amp; Nghiên cứu viên
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                 Danh bạ Thành viên CLB Nexus
               </h1>
             </div>
@@ -76,7 +76,7 @@ export default async function MembersDirectoryPage() {
         <section className="mb-14">
           <div className="flex items-center gap-2.5 mb-6">
             <GraduationCap className="w-5 h-5 text-purple-600" />
-            <h2 className="text-xl font-bold font-serif text-slate-900">
+            <h2 className="text-xl font-bold text-slate-900">
               Ban Cố Vấn &amp; Giảng Viên Phụ Trách
             </h2>
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
@@ -137,7 +137,7 @@ export default async function MembersDirectoryPage() {
         <section className="mb-14">
           <div className="flex items-center gap-2.5 mb-6">
             <ShieldCheck className="w-5 h-5 text-blue-600" />
-            <h2 className="text-xl font-bold font-serif text-slate-900">
+            <h2 className="text-xl font-bold text-slate-900">
               Ban Chủ Nhiệm &amp; Thành Viên Nòng Cốt
             </h2>
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
@@ -225,7 +225,7 @@ export default async function MembersDirectoryPage() {
         <section className="mb-10">
           <div className="flex items-center gap-2.5 mb-6">
             <UserCheck className="w-5 h-5 text-emerald-600" />
-            <h2 className="text-xl font-bold font-serif text-slate-900">
+            <h2 className="text-xl font-bold text-slate-900">
               Thành Viên Nghiên Cứu &amp; Kỹ Thuật
             </h2>
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">

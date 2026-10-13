@@ -40,7 +40,7 @@ export function Modal({ isOpen, onClose, title, description, children }: ModalPr
       >
         <div className="flex items-start justify-between px-6 py-5 border-b border-slate-200">
           <div>
-            <h3 id="modal-title" className="text-base sm:text-lg font-bold text-slate-900 font-serif">
+            <h3 id="modal-title" className="text-base sm:text-lg font-bold text-slate-900">
               {title}
             </h3>
             {description && <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{description}</p>}

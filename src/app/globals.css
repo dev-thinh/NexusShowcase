@@ -55,10 +55,38 @@
   --info-border: #bfdbfe;
 }
 
+/* 100% Uniform Typography across all elements */
+*,
+*::before,
+*::after,
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+a,
+button,
+input,
+textarea,
+select {
+  font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono), 'JetBrains Mono', Menlo, monospace !important;
+}
+
 body {
   color: var(--foreground);
   background-color: var(--background);
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   font-size: 15px;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
@@ -73,18 +101,18 @@ body {
 
 /* Academic Typography Classes */
 .academic-headline {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, sans-serif;
   letter-spacing: -0.02em;
   font-weight: 700;
 }
 
 .academic-subhead {
-  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans), 'Plus Jakarta Sans', system-ui, sans-serif;
   letter-spacing: -0.01em;
 }
 
 .academic-code {
-  font-family: 'JetBrains Mono', Menlo, monospace;
+  font-family: var(--font-mono), 'JetBrains Mono', Menlo, monospace;
 }
 
 /* Smooth selection colors */

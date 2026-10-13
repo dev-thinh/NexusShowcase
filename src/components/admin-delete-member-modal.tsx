@@ -73,7 +73,7 @@ export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) 
               </button>
             </div>
 
-            <h3 className="text-base font-bold text-slate-900 mb-1 font-serif">
+            <h3 className="text-base font-bold text-slate-900 mb-1">
               Xác nhận xóa tài khoản thành viên
             </h3>
             <p className="text-xs text-slate-500 mb-4 leading-relaxed">

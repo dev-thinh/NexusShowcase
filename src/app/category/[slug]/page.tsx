@@ -90,7 +90,7 @@ export default async function CategoryPage({
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                 Chuyên mục công trình
               </span>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 font-serif">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
                 {category.name}
               </h1>
             </div>
@@ -145,7 +145,7 @@ export default async function CategoryPage({
                         )}
                       </div>
 
-                      <h2 className="text-xl sm:text-2xl font-bold font-serif text-slate-900 leading-snug">
+                      <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-snug">
                         <Link
                           href={`/showcase/${item.slug}`}
                           className="hover:text-blue-800 transition-colors"
@@ -395,7 +395,7 @@ export default async function CategoryPage({
                             Năm {item.publishedYear}
                           </span>
                         </div>
-                        <h2 className="text-lg font-serif font-bold text-slate-900">
+                        <h2 className="text-lg font-bold text-slate-900">
                           <Link
                             href={`/showcase/${item.slug}`}
                             className="hover:text-amber-900 transition-colors"
