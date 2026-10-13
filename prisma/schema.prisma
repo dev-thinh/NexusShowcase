@@ -40,6 +40,34 @@ enum ItemStatus {
   REJECTED
 }
 
+enum ItemVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum CategoryLayout {
+  SHOWCASE_GRID
+  BIBLIOGRAPHY
+  DATA_CATALOG
+  HONOR_ROLL
+}
+
+model Category {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  slug          String         @unique
+  description   String?
+  layoutType    CategoryLayout @default(SHOWCASE_GRID)
+  isNavFeatured Boolean        @default(false)
+  displayOrder  Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  items         ShowcaseItem[]
+
+  @@map("categories")
+}
+
 enum ContributorRole {
   ADVISOR
   FIRST_AUTHOR
@@ -98,13 +126,19 @@ model ShowcaseItem {
   issuer          String?
   thumbnailUrl    String?
   status          ItemStatus        @default(DRAFT)
+  visibility      ItemVisibility    @default(PRIVATE)
   rejectionReason String?
-  publishedYear   Int
+  publishedYear   Int?              @default(2026)
   publishedAt     DateTime?
   isPinned        Boolean           @default(false)
   pinnedAt        DateTime?
+  mediaDriveUrl   String?
+  tags            String[]          @default([])
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
+
+  categoryId      String?
+  category        Category?         @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   creatorId       String
   creator         User              @relation("CreatedByUser", fields: [creatorId], references: [id], onDelete: Restrict)
@@ -112,9 +146,11 @@ model ShowcaseItem {
   contributors    ItemContributor[]
   links           ItemLink[]
   attachments     ItemAttachment[]
-  tags            ItemTag[]
+  itemTags        ItemTag[]
 
   @@index([type, status])
+  @@index([status, visibility])
+  @@index([categoryId])
   @@index([publishedYear])
   @@index([isPinned, status])
   @@map("showcase_items")
