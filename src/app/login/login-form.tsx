@@ -68,17 +68,12 @@ export function LoginForm() {
   return (
     <div className="max-w-md w-full mx-auto">
       <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-5 sm:p-6">
-        {/* Header với icon trần to bằng tiêu đề và subtitle 1 dòng căn theo tiêu đề */}
-        <div className="flex items-start gap-3 pb-4 border-b border-slate-100">
-          <LogIn className="w-6 h-6 text-[#0F294A] shrink-0 mt-0.5" />
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-extrabold text-slate-900 leading-tight">
-              Đăng nhập
-            </h1>
-            <p className="text-xs text-slate-500 truncate mt-0.5">
-              Nhập thông tin tài khoản để tiếp tục
-            </p>
-          </div>
+        {/* Header với icon trần to bằng tiêu đề */}
+        <div className="flex items-center gap-2.5 pb-3.5 border-b border-slate-100">
+          <LogIn className="w-6 h-6 text-[#0F294A] shrink-0" />
+          <h1 className="text-xl font-extrabold text-slate-900 leading-tight">
+            Đăng nhập
+          </h1>
         </div>
 
         {error && (

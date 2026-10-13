@@ -22,7 +22,7 @@ describe('Login Page Single-Screen and Neutral Language', () => {
 
     // Neutral titles and labels
     expect(content).toContain('Đăng nhập');
-    expect(content).toContain('Nhập thông tin tài khoản để tiếp tục');
+    expect(content).not.toContain('Nhập thông tin tài khoản để tiếp tục');
     expect(content).toContain('Tài khoản hoặc Email');
     expect(content).toContain('Mật khẩu');
 
