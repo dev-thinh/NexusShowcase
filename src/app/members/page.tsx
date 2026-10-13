@@ -20,6 +20,7 @@ export default async function MembersDirectoryPage() {
     where: { status: 'ACTIVE' },
     select: {
       ...publicUserSelect,
+      studentId: true,
       _count: {
         select: {
           contributions: {

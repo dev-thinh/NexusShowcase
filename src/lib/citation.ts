@@ -1,7 +1,7 @@
 export interface CitationItem {
   title: string;
   slug: string;
-  publishedYear: number;
+  publishedYear?: number | null;
   issuer?: string | null;
   contributors: Array<{
     user?: { fullName: string } | null;
@@ -37,12 +37,13 @@ export function getCitationKey(item: CitationItem): string {
   const firstAuthor = authors[0] || 'nexus';
   const firstWord = firstAuthor.split(' ')[0] || 'author';
   const cleanFirstWord = removeDiacritics(firstWord).toLowerCase().replace(/[^a-z0-9]/g, '');
+  const year = item.publishedYear ?? new Date().getFullYear();
 
   const titleWord = removeDiacritics(item.title.split(' ')[0] || 'paper')
     .toLowerCase()
     .replace(/[^a-z0-9]/g, '');
 
-  return `${cleanFirstWord || 'paper'}${item.publishedYear}${titleWord || 'work'}`;
+  return `${cleanFirstWord || 'paper'}${year}${titleWord || 'work'}`;
 }
 
 export function generateBibTeX(item: CitationItem): string {
@@ -50,12 +51,13 @@ export function generateBibTeX(item: CitationItem): string {
   const authors = normalizeAuthorNames(item);
   const authorsBib = authors.join(' and ');
   const venue = item.issuer || 'Nexus Academic Showcase, Khoa CNTT - ĐH KHTN ĐHQG-HCM';
+  const year = item.publishedYear ?? new Date().getFullYear();
 
   return `@inproceedings{${key},
   title = {{${item.title}}},
   author = {${authorsBib}},
   booktitle = {${venue}},
-  year = {${item.publishedYear}},
+  year = {${year}},
   organization = {Khoa CNTT - ĐH Khoa học Tự nhiên, ĐHQG-HCM},
   url = {https://nexus.fit.hcmus.edu.vn/showcase/${item.slug}}
 }`;
@@ -81,7 +83,8 @@ export function generateAPA(item: CitationItem): string {
   }
 
   const venue = item.issuer || 'Nexus Academic Showcase';
-  return `${authorString} (${item.publishedYear}). ${item.title}. ${venue}. https://nexus.fit.hcmus.edu.vn/showcase/${item.slug}`;
+  const year = item.publishedYear ?? new Date().getFullYear();
+  return `${authorString} (${year}). ${item.title}. ${venue}. https://nexus.fit.hcmus.edu.vn/showcase/${item.slug}`;
 }
 
 export function generateIEEE(item: CitationItem): string {
@@ -98,5 +101,6 @@ export function generateIEEE(item: CitationItem): string {
     : formattedAuthors.slice(0, -1).join(', ') + ' and ' + formattedAuthors[formattedAuthors.length - 1];
 
   const venue = item.issuer || 'Nexus Academic Showcase';
-  return `${authorStr}, "${item.title}," ${venue}, ${item.publishedYear}.`;
+  const year = item.publishedYear ?? new Date().getFullYear();
+  return `${authorStr}, "${item.title}," ${venue}, ${year}.`;
 }

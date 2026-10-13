@@ -32,7 +32,7 @@ export interface InitialItemData {
   type: ItemType;
   scope?: ItemScope | null;
   issuer?: string | null;
-  publishedYear: number;
+  publishedYear?: number | null;
   thumbnailUrl?: string | null;
   mediaDriveUrl?: string | null;
   tags?: string[];

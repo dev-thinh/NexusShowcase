@@ -21,7 +21,7 @@ interface ShowcaseCardProps {
     type: ItemType;
     scope?: ItemScope | null;
     issuer?: string | null;
-    publishedYear: number;
+    publishedYear?: number | null;
     contributors: Contributor[];
   };
 }
@@ -70,10 +70,12 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
       {/* Card Content */}
       <div className="p-5 sm:p-6 flex flex-col flex-1">
         <div className="flex items-center gap-3 text-xs sm:text-sm text-slate-500 mb-2.5">
-          <span className="flex items-center gap-1 font-medium">
-            <Calendar className="w-4 h-4 text-slate-400" />
-            {item.publishedYear}
-          </span>
+          {item.publishedYear && (
+            <span className="flex items-center gap-1 font-medium">
+              <Calendar className="w-4 h-4 text-slate-400" />
+              {item.publishedYear}
+            </span>
+          )}
           {item.issuer && (
             <span
               className="flex items-center gap-1 font-medium truncate max-w-[200px]"
