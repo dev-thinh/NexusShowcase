@@ -21,7 +21,7 @@ describe('Home Page Minimalist Revamp', () => {
     expect(content).toContain('auth');
   });
 
-  it('matches brand panel design with dark navy #0F294A chip and includes 4 core pillar filter tabs', () => {
+  it('matches brand panel design and implements Academic Lab Portal structure', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
 
@@ -36,15 +36,23 @@ describe('Home Page Minimalist Revamp', () => {
     expect(content).toContain('Nghiên Cứu Khoa Học &amp; Công Nghệ Robotics · IoT');
     expect(content).toContain('CLB Robotics &amp; IoT HCMUS');
 
-    // 4 Pillar filter tabs
-    expect(content).toContain('Tất cả công trình');
-    expect(content).toContain('Robotics & IoT');
-    expect(content).toContain('Nghiên cứu khoa học');
-    expect(content).toContain('Dự án & Sáng tạo');
+    // Central search bar
+    expect(content).toContain('name="q"');
+    expect(content).toContain('Tìm kiếm bài báo, dự án robot, tác giả...');
 
-    // Domains filter row removed for clean minimalist layout
-    expect(content).not.toContain('Research Domain Topics Filter');
-    expect(content).not.toContain('Tất cả lĩnh vực');
+    // Academic Lab Portal Sections
+    expect(content).toContain('Công Trình &amp; Bài Báo Khoa Học Mới Xuất Bản');
+    expect(content).toContain('Dự Án Robotics &amp; Hệ Thống Nhúng Tiêu Biểu');
+    expect(content).toContain('Tài Nguyên Khoa Học &amp; Bảng Vàng Vinh Danh');
+
+    // Direct Category navigation links
+    expect(content).toContain('/category/bai-bao-khoa-hoc');
+    expect(content).toContain('/category/robotics-iot');
+    expect(content).toContain('/category/tap-du-lieu-ai');
+    expect(content).toContain('/category/vinh-danh-giai-thuong');
+
+    // Academic tools
+    expect(content).toContain('<CitationModal');
   });
 });
 
