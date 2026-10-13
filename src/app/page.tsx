@@ -14,12 +14,10 @@ import {
   FileText,
   ExternalLink,
   ArrowRight,
-  Database,
-  Award,
+  Code2,
   Github,
   Globe,
-  Sparkles,
-  Layers,
+  Cpu,
 } from 'lucide-react';
 
 export default async function HomePage({
@@ -224,7 +222,15 @@ export default async function HomePage({
   }
 
   // Portal Mode (Default Homepage)
-  const [researchPapers, publishedPapersCount, roboticsProjects, activeProjectsCount] = await Promise.all([
+  const [
+    researchPapers,
+    publishedPapersCount,
+    roboticsProjects,
+    activeProjectsCount,
+    creativeProjects,
+    creativeCount,
+  ] = await Promise.all([
+    // 1. Research Papers
     prisma.showcaseItem.findMany({
       where: {
         ...baseWhere,
@@ -253,13 +259,19 @@ export default async function HomePage({
         ],
       },
     }),
+    // 2. Robotics & IoT Projects
     prisma.showcaseItem.findMany({
       where: {
         ...baseWhere,
         OR: [
-          { type: 'PROJECT' },
           { category: { slug: 'robotics-iot' } },
-          { tags: { hasSome: ['Robotics', 'IoT', 'Robot', 'Nhúng', 'Embedded'] } },
+          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
+          { title: { contains: 'robot', mode: 'insensitive' } },
+          { title: { contains: 'iot', mode: 'insensitive' } },
+        ],
+        NOT: [
+          { type: 'RESEARCH_PAPER' },
+          { category: { slug: 'bai-bao-khoa-hoc' } },
         ],
       },
       include: {
@@ -277,13 +289,181 @@ export default async function HomePage({
       where: {
         ...baseWhere,
         OR: [
-          { type: 'PROJECT' },
           { category: { slug: 'robotics-iot' } },
-          { tags: { hasSome: ['Robotics', 'IoT', 'Robot', 'Nhúng', 'Embedded'] } },
+          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
+          { title: { contains: 'robot', mode: 'insensitive' } },
+          { title: { contains: 'iot', mode: 'insensitive' } },
+        ],
+        NOT: [
+          { type: 'RESEARCH_PAPER' },
+          { category: { slug: 'bai-bao-khoa-hoc' } },
+        ],
+      },
+    }),
+    // 3. Creative & Other Projects
+    prisma.showcaseItem.findMany({
+      where: {
+        ...baseWhere,
+        NOT: [
+          { type: 'RESEARCH_PAPER' },
+          { category: { slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } } },
+          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
+          { title: { contains: 'robot', mode: 'insensitive' } },
+          { title: { contains: 'iot', mode: 'insensitive' } },
+        ],
+      },
+      include: {
+        contributors: {
+          include: { user: { select: publicUserSelect } },
+          orderBy: { displayOrder: 'asc' },
+        },
+        links: true,
+        category: { select: { id: true, name: true, slug: true } },
+      },
+      orderBy: [{ isPinned: 'desc' }, { publishedYear: 'desc' }, { createdAt: 'desc' }],
+      take: 3,
+    }),
+    prisma.showcaseItem.count({
+      where: {
+        ...baseWhere,
+        NOT: [
+          { type: 'RESEARCH_PAPER' },
+          { category: { slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } } },
+          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
+          { title: { contains: 'robot', mode: 'insensitive' } },
+          { title: { contains: 'iot', mode: 'insensitive' } },
         ],
       },
     }),
   ]);
+
+  // Reusable Project Card Renderer (for Block 2 & Block 3)
+  const renderProjectCard = (item: any) => {
+    const demoLink = item.links?.find((l: any) => l.type === 'LIVE_DEMO');
+    const githubLink = item.links?.find((l: any) => l.type === 'GITHUB');
+
+    return (
+      <article
+        key={item.id}
+        className="rounded-xl bg-white border border-slate-200 overflow-hidden shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all flex flex-col group"
+      >
+        {item.thumbnailUrl ? (
+          <div className="aspect-[16/10] w-full bg-slate-100 relative overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={item.thumbnailUrl}
+              alt={item.title}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            />
+          </div>
+        ) : (
+          <div className="h-24 w-full bg-slate-50 border-b border-slate-100 flex items-center justify-center gap-2 text-slate-400">
+            <Cpu className="w-5 h-5 text-slate-400" />
+            <span className="text-xs font-semibold text-slate-500">Mô hình kỹ thuật Lab</span>
+          </div>
+        )}
+
+        <div className="p-4 sm:p-5 flex flex-col flex-1">
+          {/* Meta line */}
+          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 mb-2">
+            <TypeBadge type={item.type} size="sm" />
+            {item.publishedYear && (
+              <>
+                <span>•</span>
+                <span>Năm {item.publishedYear}</span>
+              </>
+            )}
+            {item.issuer && (
+              <>
+                <span>•</span>
+                <span className="text-slate-700 font-medium truncate max-w-[140px]">{item.issuer}</span>
+              </>
+            )}
+          </div>
+
+          {/* Title */}
+          <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug line-clamp-2 mb-1.5">
+            <Link
+              href={`/showcase/${item.slug}`}
+              className="hover:text-[#0F294A] transition-colors"
+            >
+              {item.title}
+            </Link>
+          </h3>
+
+          {/* Engineers / Contributors */}
+          {item.contributors.length > 0 && (
+            <p className="text-xs text-slate-700 font-medium mb-2 truncate">
+              <span className="text-slate-500 font-normal">Kỹ sư: </span>
+              {item.contributors.map((c: any, idx: number) => (
+                <span key={c.id}>
+                  {c.user?.fullName || c.externalName}
+                  {idx < item.contributors.length - 1 ? ', ' : ''}
+                </span>
+              ))}
+            </p>
+          )}
+
+          {/* Summary */}
+          <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed flex-1">
+            {item.summary}
+          </p>
+
+          {/* Tags */}
+          {item.tags && item.tags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mt-2.5">
+              {item.tags.slice(0, 3).map((tag: string) => (
+                <span
+                  key={tag}
+                  className="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium"
+                >
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Action Footer */}
+          <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 text-xs">
+            <div className="flex items-center gap-2.5">
+              {githubLink && (
+                <a
+                  href={githubLink.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-slate-600 hover:text-slate-900 inline-flex items-center gap-1 font-semibold"
+                  title="Mã nguồn GitHub"
+                >
+                  <Github className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Code</span>
+                </a>
+              )}
+              {demoLink && (
+                <a
+                  href={demoLink.url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1 font-semibold"
+                  title="Demo thực tế"
+                >
+                  <Globe className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Demo</span>
+                </a>
+              )}
+            </div>
+
+            <Link
+              href={`/showcase/${item.slug}`}
+              className="text-xs font-bold text-[#0F294A] hover:text-[#1E3A5F] inline-flex items-center gap-1 ml-auto group/btn"
+            >
+              <span>Chi tiết</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
+            </Link>
+          </div>
+        </div>
+      </article>
+    );
+  };
 
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white">
@@ -334,45 +514,45 @@ export default async function HomePage({
       </section>
 
       {/* Main Academic Portal Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12 max-w-5xl flex-1 space-y-12 sm:space-y-16">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 max-w-6xl flex-1 space-y-14 sm:space-y-16">
         
-        {/* KHỐI 1: Công Trình & Bài Báo Khoa Học Mới Xuất Bản */}
-        <section className="space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-blue-50 text-blue-700 flex items-center justify-center shrink-0 border border-blue-100">
-                <BookOpen className="w-5 h-5" />
-              </div>
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-                  Xuất bản khoa học
-                </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
-                  Công Trình &amp; Bài Báo Khoa Học Mới Xuất Bản
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                  Các nghiên cứu được công bố tại hội thảo và tạp chí khoa học chuyên ngành.
-                </p>
-              </div>
+        {/* PHÂN KHU 1: NGHIÊN CỨU KHOA HỌC (Layout Ngang: Bất đối xứng 2 cột Trái - Phải) */}
+        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start pb-12 sm:pb-16 border-b border-slate-200">
+          {/* Cột Trái (lg:col-span-4): Tiêu đề, Định hướng & Link xem tất cả */}
+          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
+            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold uppercase tracking-wider">
+              <BookOpen className="w-3.5 h-3.5 text-blue-700" />
+              <span>Xuất bản khoa học</span>
             </div>
 
-            <Link
-              href="/category/bai-bao-khoa-hoc"
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] transition-colors shrink-0 group self-start sm:self-auto"
-            >
-              <span>Xem tất cả bài báo ({publishedPapersCount})</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
+              Công Trình &amp; Bài Báo Khoa Học Mới Xuất Bản
+            </h2>
+
+            <p className="text-sm text-slate-600 leading-relaxed">
+              Các công trình nghiên cứu khoa học của thành viên Lab được công bố tại các hội thảo và tạp chí chuyên ngành uy tín trong nước và quốc tế.
+            </p>
+
+            <div className="pt-2">
+              <Link
+                href="/category/bai-bao-khoa-hoc"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs sm:text-sm font-bold shadow-xs transition-colors group"
+              >
+                <span>Xem tất cả bài báo ({publishedPapersCount})</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
           </div>
 
-          {researchPapers.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50/60 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
-              Chưa có bài báo khoa học nào được công bố công khai.
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {researchPapers.map((item) => {
-                const paperLink = item.links.find((l) => l.type === 'PAPER_URL');
+          {/* Cột Phải (lg:col-span-8): Danh sách bài báo theo Card Ngang học thuật */}
+          <div className="lg:col-span-8 space-y-4">
+            {researchPapers.length === 0 ? (
+              <div className="text-center py-10 bg-slate-50/60 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
+                Chưa có bài báo khoa học nào được công bố công khai.
+              </div>
+            ) : (
+              researchPapers.map((item) => {
+                const paperLink = item.links?.find((l: any) => l.type === 'PAPER_URL');
                 return (
                   <article
                     key={item.id}
@@ -406,7 +586,7 @@ export default async function HomePage({
                     {item.contributors.length > 0 && (
                       <p className="text-xs sm:text-sm text-slate-700 font-medium">
                         <span className="text-slate-500 font-normal">Tác giả: </span>
-                        {item.contributors.map((c, idx) => (
+                        {item.contributors.map((c: any, idx: number) => (
                           <span key={c.id}>
                             {c.user?.fullName || c.externalName}
                             {c.role === 'ADVISOR' ? ' (GVHD)' : ''}
@@ -441,19 +621,19 @@ export default async function HomePage({
                         href={`/showcase/${item.slug}`}
                         className="ml-auto text-xs font-bold text-[#0F294A] hover:text-[#1E3A5F] inline-flex items-center gap-1 group"
                       >
-                        <span>Xem chi tiết</span>
+                        <span>Xem chi tiết đề tài</span>
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </Link>
                     </div>
                   </article>
                 );
-              })}
-            </div>
-          )}
+              })
+            )}
+          </div>
         </section>
 
-        {/* KHỐI 2: Dự Án Robotics & Hệ Thống Nhúng Tiêu Biểu */}
-        <section className="space-y-5">
+        {/* PHÂN KHU 2: ROBOTICS & IOT (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
+        <section className="space-y-6 pb-12 sm:pb-16 border-b border-slate-200">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-100">
@@ -467,7 +647,7 @@ export default async function HomePage({
                   Dự Án Robotics &amp; Hệ Thống Nhúng Tiêu Biểu
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                  Robot tự hành, giải pháp vi điều khiển và thiết bị IoT thông minh của thành viên CLB.
+                  Robot tự hành, giải pháp vi điều khiển và thiết bị IoT thông minh do thành viên CLB chế tạo.
                 </p>
               </div>
             </div>
@@ -486,157 +666,52 @@ export default async function HomePage({
               Chưa có dự án kỹ thuật nào được công bố công khai.
             </div>
           ) : (
-            <div className="space-y-4">
-              {roboticsProjects.map((item) => {
-                const demoLink = item.links.find((l) => l.type === 'LIVE_DEMO');
-                const githubLink = item.links.find((l) => l.type === 'GITHUB');
-
-                return (
-                  <article
-                    key={item.id}
-                    className="p-5 sm:p-6 rounded-xl bg-white border border-slate-200 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all flex flex-col gap-3.5"
-                  >
-                    <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
-                      <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
-                        Robotics &amp; IoT
-                      </span>
-                      {item.publishedYear && (
-                        <>
-                          <span>•</span>
-                          <span>Năm {item.publishedYear}</span>
-                        </>
-                      )}
-                      {item.issuer && (
-                        <>
-                          <span>•</span>
-                          <span className="text-slate-700 font-medium">{item.issuer}</span>
-                        </>
-                      )}
-                    </div>
-
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
-                      <Link
-                        href={`/showcase/${item.slug}`}
-                        className="hover:text-[#0F294A] transition-colors"
-                      >
-                        {item.title}
-                      </Link>
-                    </h3>
-
-                    {item.contributors.length > 0 && (
-                      <p className="text-xs sm:text-sm text-slate-700 font-medium">
-                        <span className="text-slate-500 font-normal">Kỹ sư thực hiện: </span>
-                        {item.contributors.map((c, idx) => (
-                          <span key={c.id}>
-                            {c.user?.fullName || c.externalName}
-                            {idx < item.contributors.length - 1 ? ', ' : ''}
-                          </span>
-                        ))}
-                      </p>
-                    )}
-
-                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
-                      {item.summary}
-                    </p>
-
-                    <div className="flex flex-wrap items-center gap-3 pt-3.5 border-t border-slate-100">
-                      {githubLink && (
-                        <a
-                          href={githubLink.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="h-8.5 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold transition-all inline-flex items-center gap-1.5"
-                        >
-                          <Github className="w-3.5 h-3.5 text-slate-700" />
-                          <span>Mã nguồn</span>
-                          <ExternalLink className="w-3 h-3 text-slate-400" />
-                        </a>
-                      )}
-                      {demoLink && (
-                        <a
-                          href={demoLink.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="h-8.5 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold transition-all inline-flex items-center gap-1.5"
-                        >
-                          <Globe className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Demo thực tế</span>
-                          <ExternalLink className="w-3 h-3 text-slate-400" />
-                        </a>
-                      )}
-                      <Link
-                        href={`/showcase/${item.slug}`}
-                        className="ml-auto text-xs font-bold text-[#0F294A] hover:text-[#1E3A5F] inline-flex items-center gap-1 group"
-                      >
-                        <span>Xem chi tiết đề tài</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {roboticsProjects.map((item) => renderProjectCard(item))}
             </div>
           )}
         </section>
 
-        {/* KHỐI 3: Trung Tâm Dữ Liệu & Vinh Danh Thành Tích */}
-        <section className="space-y-4 pt-2">
-          <div className="pb-3 border-b border-slate-200">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-              Tài nguyên &amp; Cột mốc
-            </span>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
-              Tài Nguyên Khoa Học &amp; Bảng Vàng Vinh Danh
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Hub 1: Tập Dữ Liệu & AI */}
-            <Link
-              href="/category/tap-du-lieu-ai"
-              className="p-5 sm:p-6 rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50/50 hover:border-slate-300 hover:shadow-xs transition-all group flex flex-col justify-between"
-            >
-              <div className="space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center border border-indigo-100">
-                  <Database className="w-5 h-5" />
-                </div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#0F294A] transition-colors">
-                  Tập Dữ Liệu &amp; AI Model Mở
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Các bộ dữ liệu học thuật, pre-trained model và công cụ mã nguồn mở phục vụ cộng đồng nghiên cứu.
+        {/* PHÂN KHU 3: DỰ ÁN & SÁNG TẠO (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
+        <section className="space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0 border border-indigo-100">
+                <Code2 className="w-5 h-5" />
+              </div>
+              <div>
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
+                  Đổi mới &amp; Ứng dụng
+                </span>
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
+                  Dự Án Sáng Tạo &amp; Giải Pháp Khác
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
+                  Các sản phẩm phần mềm, tập dữ liệu mã nguồn mở và sáng kiến công nghệ ứng dụng của sinh viên.
                 </p>
               </div>
+            </div>
 
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#0F294A]">
-                <span>Khám phá kho dữ liệu</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-
-            {/* Hub 2: Bảng Vàng Giải Thưởng */}
-            <Link
-              href="/category/vinh-danh-giai-thuong"
-              className="p-5 sm:p-6 rounded-xl border border-slate-200 bg-gradient-to-br from-white to-slate-50/50 hover:border-slate-300 hover:shadow-xs transition-all group flex flex-col justify-between"
-            >
-              <div className="space-y-2.5">
-                <div className="w-9 h-9 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center border border-amber-100">
-                  <Award className="w-5 h-5" />
-                </div>
-                <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#0F294A] transition-colors">
-                  Giải Thưởng &amp; Bảng Vàng Thành Tích
-                </h3>
-                <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                  Ghi nhận các giải thưởng nghiên cứu khoa học, Olympic Tin học và cuộc thi công nghệ của sinh viên CLB.
-                </p>
-              </div>
-
-              <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-[#0F294A]">
-                <span>Xem bảng vinh danh</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
+            {creativeCount > 0 && (
+              <Link
+                href="/category/tap-du-lieu-ai"
+                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] transition-colors shrink-0 group self-start sm:self-auto"
+              >
+                <span>Xem tất cả ({creativeCount})</span>
+                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            )}
           </div>
+
+          {creativeProjects.length === 0 ? (
+            <div className="text-center py-10 bg-slate-50/60 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
+              Chưa có công trình sáng tạo nào được công bố công khai.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {creativeProjects.map((item) => renderProjectCard(item))}
+            </div>
+          )}
         </section>
 
       </main>

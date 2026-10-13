@@ -43,13 +43,12 @@ describe('Home Page Minimalist Revamp', () => {
     // Academic Lab Portal Sections
     expect(content).toContain('Công Trình &amp; Bài Báo Khoa Học Mới Xuất Bản');
     expect(content).toContain('Dự Án Robotics &amp; Hệ Thống Nhúng Tiêu Biểu');
-    expect(content).toContain('Tài Nguyên Khoa Học &amp; Bảng Vàng Vinh Danh');
+    expect(content).toContain('Dự Án Sáng Tạo &amp; Giải Pháp Khác');
 
     // Direct Category navigation links
     expect(content).toContain('/category/bai-bao-khoa-hoc');
     expect(content).toContain('/category/robotics-iot');
     expect(content).toContain('/category/tap-du-lieu-ai');
-    expect(content).toContain('/category/vinh-danh-giai-thuong');
 
     // Academic tools
     expect(content).toContain('<CitationModal');
