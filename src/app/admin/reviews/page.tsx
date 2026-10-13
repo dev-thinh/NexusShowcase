@@ -14,6 +14,8 @@ import {
   Users,
   Calendar,
   Eye,
+  ExternalLink,
+  Tag,
 } from 'lucide-react';
 
 export default async function AdminReviewsPage() {
@@ -106,6 +108,33 @@ export default async function AdminReviewsPage() {
                   <p className="text-sm text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
                     {item.summary}
                   </p>
+
+                  {item.mediaDriveUrl && (
+                    <div className="mt-3">
+                      <a
+                        href={item.mediaDriveUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-900 border border-blue-200 text-xs font-bold hover:bg-blue-100 transition-colors"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5 text-blue-700" />
+                        <span>Mở Google Drive tư liệu thô (cho Ban Truyền thông)</span>
+                      </a>
+                    </div>
+                  )}
+
+                  {item.tags && item.tags.length > 0 && (
+                    <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+                      {item.tags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 border border-slate-200"
+                        >
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
 
                   <div className="text-xs sm:text-sm text-slate-500 mt-4 pt-3 border-t border-slate-100 flex items-center gap-2">
                     <Users className="w-4 h-4 text-[#0F294A] shrink-0" />
