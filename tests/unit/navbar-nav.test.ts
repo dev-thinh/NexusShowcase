@@ -17,6 +17,10 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain('href="/contact"');
     expect(content).toContain('Thành viên');
     expect(content).toContain('Liên hệ');
+
+    // Layout uses flex-1 instead of absolute dead-center to avoid overlapping profile/admin
+    expect(content).not.toContain('absolute left-1/2 -translate-x-1/2');
+    expect(content).toContain('right-0');
   });
 
   it('receives and renders featured categories in navbar', () => {

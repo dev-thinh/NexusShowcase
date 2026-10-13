@@ -13,6 +13,8 @@ import {
   ChevronDown,
   Mail,
   Layers,
+  Menu,
+  X,
 } from 'lucide-react';
 import { SignOutButton } from '@/components/sign-out-button';
 import type { FeaturedNavCategory } from '@/lib/nav-categories';
@@ -29,9 +31,11 @@ interface NavbarNavProps {
 export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
   const pathname = usePathname();
   const [isAdminDropdownOpen, setIsAdminDropdownOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const adminDropdownRef = useRef<HTMLDivElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
@@ -40,14 +44,21 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
       ) {
         setIsAdminDropdownOpen(false);
       }
+      if (
+        mobileMenuRef.current &&
+        !mobileMenuRef.current.contains(event.target as Node)
+      ) {
+        setIsMobileMenuOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Close dropdown on route change
+  // Close dropdowns on route change
   useEffect(() => {
     setIsAdminDropdownOpen(false);
+    setIsMobileMenuOpen(false);
   }, [pathname]);
 
   const isExploreActive = pathname === '/';
@@ -63,16 +74,19 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
 
   // Standard uniform active panel class
   const activeTabClass =
-    'h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150 shrink-0';
+    'h-9 px-2.5 xl:px-3.5 rounded-lg inline-flex items-center justify-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150 shrink-0';
 
   // Standard uniform inactive panel class
   const inactiveTabClass =
-    'h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 shrink-0';
+    'h-9 px-2.5 xl:px-3.5 rounded-lg inline-flex items-center justify-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 shrink-0';
 
   return (
-    <>
-      {/* CÁC TAB CĂN GIỮA TUYỆT ĐỐI (DEAD CENTER - ĐỘC LẬP HOÀN TOÀN VỚI THẺ PROFILE) */}
-      <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
+    <div className="flex items-center justify-end lg:justify-between flex-1 min-w-0 gap-2 sm:gap-4">
+      {/* 
+        CÁC TAB NỘI DUNG Ở GIỮA (FLEX FLOW, KHÔNG BAO GIỜ BỊ OVERLAP BỞI PROFILE HOẶC LOGO)
+        Thứ tự chuẩn hóa: Trang chủ -> Thành viên -> Các tab nổi bật -> Bài đăng -> Liên hệ
+      */}
+      <nav className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-1 min-w-0 px-1 overflow-x-auto no-scrollbar">
         {/* 1. Tab: Trang chủ */}
         <Link
           href="/"
@@ -128,14 +142,17 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
           <Mail className={`w-4 h-4 shrink-0 ${isContactActive ? 'text-blue-200' : 'text-slate-400'}`} />
           <span>Liên hệ</span>
         </Link>
+      </nav>
 
-        {/* Menu Thả Quản trị (Dành riêng cho ADMIN) */}
+      {/* GÓC BÊN PHẢI: QUẢN TRỊ (NẾU ADMIN), PROFILE & ĐĂNG XUẤT */}
+      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 z-10">
+        {/* Menu Thả Quản trị (Dành riêng cho ADMIN, đặt bên cạnh Profile để không che các tab điều hướng) */}
         {user?.role === 'ADMIN' && (
           <div className="relative" ref={adminDropdownRef}>
             <button
               type="button"
               onClick={() => setIsAdminDropdownOpen((prev) => !prev)}
-              className={`h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-all duration-150 border cursor-pointer ${
+              className={`h-9 px-2.5 sm:px-3 rounded-lg inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold transition-all duration-150 border cursor-pointer ${
                 isAdminActive
                   ? 'bg-[#0F294A] text-white shadow-xs border-transparent'
                   : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-2xs'
@@ -146,7 +163,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
               <ShieldCheck
                 className={`w-4 h-4 shrink-0 ${isAdminActive ? 'text-amber-300' : 'text-slate-500'}`}
               />
-              <span>Quản trị</span>
+              <span className="hidden sm:inline">Quản trị</span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-200 opacity-70 ${
                   isAdminDropdownOpen ? 'rotate-180' : ''
@@ -155,7 +172,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             </button>
 
             {isAdminDropdownOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white rounded-lg border border-slate-200 shadow-xl p-1.5 z-50 animate-in fade-in slide-from-top-2 duration-150">
+              <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg border border-slate-200 shadow-xl p-1.5 z-50 animate-in fade-in slide-from-top-2 duration-150">
                 <Link
                   href="/admin"
                   className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
@@ -210,10 +227,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             )}
           </div>
         )}
-      </nav>
 
-      {/* GÓC TRÊN BÊN PHẢI: PROFILE VỚI MAX-WIDTH CỐ ĐỊNH & ĐĂNG XUẤT */}
-      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 z-10 ml-auto">
         {user ? (
           <>
             {/* User Profile Card với tên gọn gàng & 3 huy hiệu Role chuẩn */}
@@ -235,7 +249,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                 {user.name?.charAt(0) || 'U'}
               </div>
 
-              {/* Tên người dùng được hiển thị và fit độ dài gọn gàng, tránh kéo dài thẻ */}
+              {/* Tên người dùng */}
               <span className="truncate max-w-[65px] sm:max-w-[85px] md:max-w-[95px] font-medium leading-none">
                 {user.name || 'Thành viên'}
               </span>
@@ -274,7 +288,110 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             <span>Đăng nhập</span>
           </Link>
         )}
+
+        {/* Nút Hamburger Menu (Mobile & Tablet < lg) */}
+        <button
+          type="button"
+          onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          className="lg:hidden h-9 w-9 rounded-lg inline-flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+          aria-label={isMobileMenuOpen ? 'Đóng menu' : 'Mở menu điều hướng'}
+          aria-expanded={isMobileMenuOpen}
+        >
+          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
-    </>
+
+      {/* Menu thả di động / máy tính bảng (< lg) */}
+      {isMobileMenuOpen && (
+        <div
+          ref={mobileMenuRef}
+          className="lg:hidden absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-xl p-3 sm:p-4 z-50 animate-in fade-in slide-from-top-2 duration-150 space-y-3"
+        >
+          <div className="space-y-1">
+            <Link
+              href="/"
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
+                isExploreActive ? 'bg-[#0F294A] text-white' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Compass className="w-4 h-4 shrink-0" />
+              <span>Trang chủ</span>
+            </Link>
+            <Link
+              href="/members"
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
+                isMembersActive ? 'bg-[#0F294A] text-white' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Users className="w-4 h-4 shrink-0" />
+              <span>Thành viên</span>
+            </Link>
+            {featuredCategories.map((cat) => {
+              const isCatActive = pathname === `/category/${cat.slug}`;
+              return (
+                <Link
+                  key={cat.id}
+                  href={`/category/${cat.slug}`}
+                  className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
+                    isCatActive ? 'bg-[#0F294A] text-white' : 'text-slate-700 hover:bg-slate-100'
+                  }`}
+                >
+                  <Layers className="w-4 h-4 shrink-0" />
+                  <span>{cat.name}</span>
+                </Link>
+              );
+            })}
+            <Link
+              href={user ? '/dashboard' : '/login?callbackUrl=/dashboard'}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
+                isDashboardActive ? 'bg-[#0F294A] text-white' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <LayoutDashboard className="w-4 h-4 shrink-0" />
+              <span>Bài đăng</span>
+            </Link>
+            <Link
+              href="/contact"
+              className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-bold transition-colors ${
+                isContactActive ? 'bg-[#0F294A] text-white' : 'text-slate-700 hover:bg-slate-100'
+              }`}
+            >
+              <Mail className="w-4 h-4 shrink-0" />
+              <span>Liên hệ</span>
+            </Link>
+          </div>
+
+          {/* Nhóm liên kết Quản trị trong Menu di động */}
+          {user?.role === 'ADMIN' && (
+            <div className="pt-2.5 border-t border-slate-200 space-y-1">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 block mb-1">
+                Khu vực Quản trị
+              </span>
+              <Link
+                href="/admin"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100"
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>Bàn làm việc Quản trị</span>
+              </Link>
+              <Link
+                href="/admin/reviews"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100"
+              >
+                <CheckSquare className="w-4 h-4 text-slate-500 shrink-0" />
+                <span>Thẩm định bài nộp</span>
+              </Link>
+              <Link
+                href="/admin/members"
+                className="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium text-slate-700 hover:bg-slate-100"
+              >
+                <Users className="w-4 h-4 text-slate-500 shrink-0" />
+                <span>Quản lý Thành viên</span>
+              </Link>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }
