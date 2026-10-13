@@ -137,7 +137,7 @@ export default async function HomePage({
         <div className="flex flex-col gap-4 pb-6 border-b border-slate-200 mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             {/* Category Pills Tabs */}
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2">
               {categories.map((c) => {
                 const Icon = c.icon;
                 const isActive = typeFilter === c.type;
@@ -151,7 +151,7 @@ export default async function HomePage({
                   <a
                     key={c.label}
                     href={href}
-                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+                    className={`inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
                       isActive
                         ? 'bg-[#0F294A] text-white shadow-xs'
                         : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200'
@@ -169,18 +169,18 @@ export default async function HomePage({
               {typeFilter && <input type="hidden" name="type" value={typeFilter} />}
               {domainFilter && <input type="hidden" name="domain" value={domainFilter} />}
               <div className="relative flex-1 sm:flex-initial">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
                   type="text"
                   name="q"
                   defaultValue={searchQuery || ''}
                   placeholder="Tìm bài báo, dự án, robot, tác giả..."
-                  className="w-full sm:w-72 pl-10 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
+                  className="w-full sm:w-72 pl-9 pr-3.5 py-2 text-sm bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
                 />
               </div>
               <button
                 type="submit"
-                className="px-4 py-2 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
+                className="px-4 py-2 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg shadow-xs transition-colors cursor-pointer shrink-0"
               >
                 Tìm
               </button>
@@ -228,7 +228,7 @@ export default async function HomePage({
             actionHref="/"
           />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {items.map((item) => (
               <ShowcaseCard key={item.id} item={item} />
             ))}

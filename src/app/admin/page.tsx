@@ -47,101 +47,101 @@ export default async function AdminDashboardPage() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
         {/* Banner */}
-        <div className="bg-[#0F294A] text-white p-6 sm:p-10 rounded-2xl shadow-xs mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-800">
+        <div className="bg-[#0F294A] text-white p-5 sm:p-8 rounded-lg shadow-2xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-800">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/10 text-amber-300 text-xs sm:text-sm font-semibold mb-3 border border-white/15">
-              <ShieldCheck className="w-4 h-4 text-amber-400" />
+            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-md bg-white/10 text-amber-300 text-xs font-semibold mb-2.5 border border-white/15">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
               <span>Khu vực Quản trị Học thuật</span>
             </div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
               Trung tâm Quản trị Học thuật
             </h1>
-            <p className="text-sm sm:text-base text-slate-300 mt-1.5 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
               Thẩm định công trình nghiên cứu xuất bản, quản lý bài ghim trang chủ và phân quyền thành viên.
             </p>
           </div>
         </div>
 
         {/* Action Widgets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Link
             href="/admin/reviews"
-            className="group p-6 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between"
+            className="group p-4 sm:p-5 bg-white rounded-lg border border-slate-200 shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
           >
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
-                  <Clock className="w-6 h-6" />
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
+                  <Clock className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
                   Cần xử lý
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-slate-900">Bài nộp đang chờ duyệt</h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">Bài nộp đang chờ duyệt</h2>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Xem chi tiết công trình, phê duyệt xuất bản hoặc gửi phản hồi chỉnh sửa.
               </p>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-amber-700">{pendingCount} bài</span>
-              <span className="text-sm font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
+            <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-xl sm:text-2xl font-black text-amber-700">{pendingCount} bài</span>
+              <span className="text-xs font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                 <span>Vào duyệt ngay</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
           </Link>
 
           <Link
             href="/admin/members"
-            className="group p-6 bg-white rounded-2xl border border-slate-200 shadow-xs hover:shadow-md hover:border-slate-300 transition-all flex flex-col justify-between"
+            className="group p-4 sm:p-5 bg-white rounded-lg border border-slate-200 shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
           >
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-blue-50 text-blue-800 flex items-center justify-center font-bold border border-blue-200/80">
-                  <Users className="w-6 h-6" />
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-800 flex items-center justify-center font-bold border border-blue-200/80">
+                  <Users className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-800 border border-blue-200/80">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200/80">
                   Thành viên
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-slate-900">Quản lý &amp; Phân quyền</h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">Quản lý &amp; Phân quyền</h2>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Tạo tài khoản mới, phân quyền CORE MEMBER để đăng ký công trình.
               </p>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-slate-900">{totalMembers} thành viên</span>
-              <span className="text-sm font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
+            <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-xl sm:text-2xl font-black text-slate-900">{totalMembers} thành viên</span>
+              <span className="text-xs font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
                 <span>Quản lý danh sách</span>
-                <ArrowRight className="w-4 h-4" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </span>
             </div>
           </Link>
 
-          <div className="p-6 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col justify-between">
+          <div className="p-4 sm:p-5 bg-white rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-12 h-12 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
-                  <Pin className="w-6 h-6" />
+              <div className="flex items-center justify-between mb-3.5">
+                <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
+                  <Pin className="w-5 h-5" />
                 </div>
-                <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200/80">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
                   Trang chủ
                 </span>
               </div>
-              <h2 className="text-lg font-bold text-slate-900">Công trình đang ghim</h2>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1 leading-relaxed">
+              <h2 className="text-base sm:text-lg font-bold text-slate-900">Công trình đang ghim</h2>
+              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
                 Các công trình nghiên cứu và sáng tạo được ghim nổi bật trên trang chủ.
               </p>
             </div>
 
-            <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-2xl font-black text-amber-700">{pinnedCount} bài</span>
+            <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
+              <span className="text-xl sm:text-2xl font-black text-amber-700">{pinnedCount} bài</span>
               <a
                 href="/"
                 target="_blank"
-                className="text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] hover:underline inline-flex items-center gap-1"
+                className="text-xs font-bold text-[#0F294A] hover:text-[#1E3A5F] hover:underline inline-flex items-center gap-1"
               >
                 <span>Xem trang chủ</span>
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -151,7 +151,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Pinned Showcase Management Panel */}
-        <section className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8">
+        <section className="bg-white rounded-lg border border-slate-200 shadow-2xs p-5 sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 mb-6">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/80 mb-1.5">

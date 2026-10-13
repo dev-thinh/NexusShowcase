@@ -63,11 +63,11 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
 
   // Standard uniform active panel class
   const activeTabClass =
-    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150 shrink-0';
+    'h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150 shrink-0';
 
   // Standard uniform inactive panel class
   const inactiveTabClass =
-    'h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 shrink-0';
+    'h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 shrink-0';
 
   return (
     <>
@@ -137,7 +137,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             <button
               type="button"
               onClick={() => setIsAdminDropdownOpen((prev) => !prev)}
-              className={`h-10 px-3.5 sm:px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-all duration-150 border cursor-pointer ${
+              className={`h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold transition-all duration-150 border cursor-pointer ${
                 isAdminActive
                   ? 'bg-[#0F294A] text-white shadow-xs border-transparent'
                   : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-2xs'
@@ -157,17 +157,17 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             </button>
 
             {isAdminDropdownOpen && (
-              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white rounded-2xl border border-slate-200 shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+              <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-64 bg-white rounded-lg border border-slate-200 shadow-xl p-1.5 z-50 animate-in fade-in slide-from-top-2 duration-150">
                 <Link
                   href="/admin"
-                  className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
+                  className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
                     pathname === '/admin'
                       ? 'bg-slate-100 text-slate-900 font-bold'
                       : 'hover:bg-slate-50 text-slate-700'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200">
-                    <ShieldCheck className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200">
+                    <ShieldCheck className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="text-xs font-bold text-slate-900">Bàn làm việc Quản trị</div>
@@ -177,14 +177,14 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
 
                 <Link
                   href="/admin/reviews"
-                  className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
+                  className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
                     pathname.startsWith('/admin/reviews')
                       ? 'bg-slate-100 text-slate-900 font-bold'
-                      : 'hover:bg-slate-50 text-slate-750 hover:text-slate-900'
+                      : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
-                    <CheckSquare className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
+                    <CheckSquare className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="text-xs font-bold text-slate-900">Thẩm định bài nộp</div>
@@ -194,14 +194,14 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
 
                 <Link
                   href="/admin/members"
-                  className={`flex items-center gap-3 p-2.5 rounded-xl transition-colors ${
+                  className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
                     pathname.startsWith('/admin/members')
                       ? 'bg-slate-100 text-slate-900 font-bold'
-                      : 'hover:bg-slate-50 text-slate-750 hover:text-slate-900'
+                      : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
                   }`}
                 >
-                  <div className="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
-                    <Users className="w-4 h-4" />
+                  <div className="w-7 h-7 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
+                    <Users className="w-3.5 h-3.5" />
                   </div>
                   <div>
                     <div className="text-xs font-bold text-slate-900">Quản lý Thành viên</div>
@@ -221,7 +221,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             {/* User Profile Card với tên gọn gàng & 3 huy hiệu Role chuẩn */}
             <Link
               href={`/members/${user.id}`}
-              className={`h-10 px-2.5 sm:px-3 rounded-xl inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs shrink-0 ${
+              className={`h-9 px-2.5 sm:px-3 rounded-lg inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs shrink-0 ${
                 isProfileActive
                   ? 'bg-[#0F294A] text-white border-transparent shadow-xs'
                   : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
@@ -230,7 +230,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
               aria-current={isProfileActive ? 'page' : undefined}
             >
               <div
-                className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
+                className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
                   isProfileActive ? 'bg-white text-[#0F294A]' : 'bg-[#0F294A] text-white'
                 }`}
               >
@@ -268,7 +268,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             className={
               isLoginActive
                 ? activeTabClass
-                : 'h-10 px-4 rounded-xl inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white shadow-xs transition-colors'
+                : 'h-9 px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white shadow-xs transition-colors'
             }
             aria-current={isLoginActive ? 'page' : undefined}
           >

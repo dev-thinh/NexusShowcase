@@ -10,7 +10,17 @@ const loginSchema = z.object({
 });
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  trustHost: true,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET || 'nexus-showcase-super-secret-key-32-chars-length',
   session: { strategy: 'jwt' },
+  logger: {
+    error(error: Error) {
+      if (error?.name === 'JWTSessionError') {
+        return;
+      }
+      console.error(error);
+    },
+  },
   pages: {
     signIn: '/login',
   },

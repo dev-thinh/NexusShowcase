@@ -17,6 +17,8 @@ import {
   ArrowRight,
 } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
@@ -45,28 +47,28 @@ export default async function DashboardPage() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
         {/* Top Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight leading-tight">
               Bảng điều khiển thành viên
             </h1>
-            <p className="text-sm sm:text-base text-slate-600 mt-1">
+            <p className="text-sm text-slate-600 truncate max-w-3xl mt-1">
               Xin chào, <strong className="text-slate-900">{user.fullName}</strong> • Vai trò: <strong className="text-[#0F294A]">{user.role}</strong>
             </p>
           </div>
 
           {user.role === 'ADMIN' ? (
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 shrink-0">
               <Link
                 href="/dashboard/items/new"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Đăng tải bài mới</span>
               </Link>
               <Link
                 href="/admin"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 font-bold text-sm border border-slate-200 shadow-2xs transition-all"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 font-bold text-sm border border-slate-200 shadow-2xs transition-all"
               >
                 <ShieldCheck className="w-4 h-4 text-amber-600" />
                 <span>Bàn làm việc Quản trị &amp; Duyệt bài</span>
@@ -75,13 +77,13 @@ export default async function DashboardPage() {
           ) : isUploader ? (
             <Link
               href="/dashboard/items/new"
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer self-start"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer self-start"
             >
               <Plus className="w-4 h-4" />
               <span>Đăng tải bài mới cho nhóm</span>
             </Link>
           ) : (
-            <div className="p-3.5 bg-amber-50 border border-amber-200/80 rounded-xl text-xs sm:text-sm text-amber-800 max-w-md flex items-start gap-2.5">
+            <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-lg text-xs sm:text-sm text-amber-800 max-w-md flex items-start gap-2.5">
               <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 Tài khoản thành viên. Để đăng tải công trình nghiên cứu, vui lòng liên hệ Quản trị viên để được cấp quyền <strong>CORE MEMBER</strong>.
@@ -91,7 +93,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* My Created Items */}
-        <section className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8">
+        <section className="bg-white rounded-lg border border-slate-200 shadow-xs p-5 sm:p-6">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">Các bài đã khởi tạo</h2>
@@ -133,10 +135,10 @@ export default async function DashboardPage() {
               {user.createdItems.map((item) => (
                 <div
                   key={item.id}
-                  className="py-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/70 -mx-4 px-4 rounded-xl transition-colors"
+                  className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/70 -mx-3 px-3 rounded-lg transition-colors"
                 >
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       <TypeBadge type={item.type} size="sm" />
                       <span className="text-xs sm:text-sm text-slate-500 font-medium flex items-center gap-1">
                         <Calendar className="w-3.5 h-3.5 text-slate-400" />
@@ -145,10 +147,10 @@ export default async function DashboardPage() {
                     </div>
 
                     <h3 className="font-bold text-slate-900 text-base sm:text-lg truncate">{item.title}</h3>
-                    <p className="text-sm text-slate-600 line-clamp-1 mt-1">{item.summary}</p>
+                    <p className="text-sm text-slate-600 line-clamp-1 mt-0.5">{item.summary}</p>
 
                     {item.status === 'REJECTED' && item.rejectionReason && (
-                      <div className="mt-3 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs sm:text-sm text-rose-800 flex items-start gap-2">
+                      <div className="mt-3 p-3 rounded-md bg-rose-50 border border-rose-200 text-xs sm:text-sm text-rose-800 flex items-start gap-2">
                         <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                         <div>
                           <strong>Góp ý từ Ban kiểm duyệt:</strong> {item.rejectionReason}
@@ -157,7 +159,7 @@ export default async function DashboardPage() {
                     )}
 
                     {!isUploader && (item.status === 'DRAFT' || item.status === 'REJECTED') && (
-                      <div className="mt-2.5 p-2.5 rounded-xl bg-amber-50 border border-amber-200/70 text-xs text-amber-800 flex items-center gap-2">
+                      <div className="mt-2.5 p-2.5 rounded-md bg-amber-50 border border-amber-200/70 text-xs text-amber-800 flex items-center gap-2">
                         <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                         <span>Bài viết chỉ xem. Tài khoản cần được cấp quyền Core Member để tiếp tục chỉnh sửa &amp; gửi xét duyệt.</span>
                       </div>

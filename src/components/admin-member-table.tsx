@@ -74,10 +74,10 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
         </div>
 
         {/* Role Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/80 self-start sm:self-auto text-xs sm:text-sm font-semibold overflow-x-auto max-w-full">
+        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-lg border border-slate-200/80 self-start sm:self-auto text-xs sm:text-sm font-semibold overflow-x-auto max-w-full">
           <button
             onClick={() => setRoleFilter('ALL')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3.5 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'ALL'
                 ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
@@ -87,7 +87,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
           </button>
           <button
             onClick={() => setRoleFilter('CORE_MEMBER')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3.5 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'CORE_MEMBER'
                 ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
@@ -97,7 +97,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
           </button>
           <button
             onClick={() => setRoleFilter('MEMBER')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3.5 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'MEMBER'
                 ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
@@ -107,7 +107,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
           </button>
           <button
             onClick={() => setRoleFilter('ADMIN')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
+            className={`px-3.5 py-1.5 rounded-md transition-all cursor-pointer whitespace-nowrap ${
               roleFilter === 'ADMIN'
                 ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
                 : 'text-slate-600 hover:text-slate-900'
@@ -119,7 +119,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
       </div>
 
       {/* Member Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
+      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
@@ -152,7 +152,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
 
                     <td className="px-6 py-4">
                       <span
-                        className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-bold border ${
+                        className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-0.5 rounded-md font-bold border ${
                           member.role === 'ADMIN'
                             ? 'bg-amber-50 text-amber-800 border-amber-200'
                             : member.role === 'CORE_MEMBER'

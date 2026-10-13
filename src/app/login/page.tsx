@@ -7,18 +7,18 @@ import { GraduationCap } from 'lucide-react';
 
 function LoginFormFallback() {
   return (
-    <div className="max-w-md mx-auto w-full animate-pulse bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 space-y-4 shadow-xs">
-      <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-        <Skeleton className="w-12 h-12 rounded-xl" />
+    <div className="max-w-md mx-auto w-full animate-pulse bg-white rounded-lg p-5 sm:p-6 border border-slate-200 space-y-4 shadow-2xs">
+      <div className="flex items-center gap-3 pb-3.5 border-b border-slate-100">
+        <Skeleton className="w-10 h-10 rounded-lg" />
         <div className="space-y-1.5 flex-1">
           <Skeleton className="h-5 w-40 rounded" />
           <Skeleton className="h-3 w-56 rounded" />
         </div>
       </div>
-      <div className="space-y-3 pt-3">
-        <Skeleton className="h-10 w-full rounded-xl" />
-        <Skeleton className="h-10 w-full rounded-xl" />
-        <Skeleton className="h-11 w-full rounded-xl mt-4" />
+      <div className="space-y-3 pt-2">
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <Skeleton className="h-10 w-full rounded-lg" />
+        <Skeleton className="h-10 w-full rounded-lg mt-3" />
       </div>
     </div>
   );

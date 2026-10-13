@@ -17,6 +17,8 @@ import {
   UserCheck,
 } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function MemberProfilePage({
   params,
 }: {
@@ -67,56 +69,56 @@ export default async function MemberProfilePage({
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
         {/* Profile Header */}
-        <header className="bg-white p-6 sm:p-10 rounded-2xl border border-slate-200 shadow-xs mb-10 flex flex-col md:flex-row items-center md:items-start gap-8">
-          <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl bg-[#0F294A] text-white font-black text-3xl sm:text-4xl flex items-center justify-center shadow-xs shrink-0 border-4 border-slate-100">
+        <header className="bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-2xs mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-[#0F294A] text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-xs shrink-0 border-2 border-slate-100">
             {user.fullName.charAt(0)}
           </div>
 
           <div className="flex-1 text-center md:text-left">
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
-              <h1 className="text-2xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 {user.fullName}
               </h1>
               <span
-                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs sm:text-sm font-bold border ${currentRole.color}`}
+                className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-xs font-bold border ${currentRole.color}`}
               >
-                <RoleIcon className="w-4 h-4" />
+                <RoleIcon className="w-3.5 h-3.5" />
                 <span>{currentRole.label}</span>
               </span>
             </div>
 
-            <p className="text-sm sm:text-base text-slate-700 max-w-3xl leading-relaxed mb-6 font-normal">
+            <p className="text-sm text-slate-700 max-w-3xl leading-relaxed mb-5 font-normal">
               {user.bio || 'Chưa cập nhật tiểu sử nghiên cứu khoa học.'}
             </p>
 
             {/* Academic Metrics Row */}
-            <div className="grid grid-cols-3 gap-4 max-w-lg mb-6 p-4 bg-slate-50 border border-slate-200 rounded-xl text-center">
+            <div className="grid grid-cols-3 gap-3 max-w-md mb-5 p-3.5 bg-slate-50 border border-slate-200 rounded-md text-center">
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-slate-900">{papers.length}</div>
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Bài Báo</div>
+                <div className="text-xl sm:text-2xl font-black text-slate-900">{papers.length}</div>
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Bài Báo</div>
               </div>
               <div className="border-x border-slate-200">
-                <div className="text-2xl sm:text-3xl font-black text-slate-900">{projects.length}</div>
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Dự Án</div>
+                <div className="text-xl sm:text-2xl font-black text-slate-900">{projects.length}</div>
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Dự Án</div>
               </div>
               <div>
-                <div className="text-2xl sm:text-3xl font-black text-amber-700">{achievements.length}</div>
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider mt-0.5">Giải Thưởng</div>
+                <div className="text-xl sm:text-2xl font-black text-amber-700">{achievements.length}</div>
+                <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Giải Thưởng</div>
               </div>
             </div>
 
             {/* Social & Scholar Links */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 text-sm font-semibold">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2.5 text-xs font-semibold">
               {user.googleScholarUrl && (
                 <a
                   href={user.googleScholarUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
-                  <GraduationCap className="w-4 h-4 text-slate-500" />
+                  <GraduationCap className="w-3.5 h-3.5 text-slate-500" />
                   <span>Google Scholar</span>
                 </a>
               )}
@@ -125,9 +127,9 @@ export default async function MemberProfilePage({
                   href={user.githubUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
-                  <Github className="w-4 h-4 text-slate-800" />
+                  <Github className="w-3.5 h-3.5 text-slate-800" />
                   <span>GitHub</span>
                 </a>
               )}
@@ -136,9 +138,9 @@ export default async function MemberProfilePage({
                   href={user.linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
-                  <Linkedin className="w-4 h-4 text-blue-600" />
+                  <Linkedin className="w-3.5 h-3.5 text-blue-600" />
                   <span>LinkedIn</span>
                 </a>
               )}
@@ -147,9 +149,9 @@ export default async function MemberProfilePage({
                   href={user.portfolioUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
                 >
-                  <Globe className="w-4 h-4 text-slate-500" />
+                  <Globe className="w-3.5 h-3.5 text-slate-500" />
                   <span>Trang cá nhân</span>
                 </a>
               )}
@@ -158,13 +160,13 @@ export default async function MemberProfilePage({
         </header>
 
         {/* Member Portfolios */}
-        <div className="space-y-12">
+        <div className="space-y-8">
           {/* Papers */}
           <section>
-            <div className="flex items-center gap-2.5 mb-5">
-              <FileText className="w-5 h-5 text-[#0F294A]" />
-              <h2 className="text-xl font-bold text-slate-900">Bài báo khoa học</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-blue-100 text-blue-800 font-bold ml-1 border border-blue-200">
+            <div className="flex items-center gap-2 mb-4">
+              <FileText className="w-5 h-5 text-[#0F294A] shrink-0" />
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Bài báo khoa học</h2>
+              <span className="text-xs px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold ml-1 border border-blue-200">
                 {papers.length}
               </span>
             </div>
@@ -175,7 +177,7 @@ export default async function MemberProfilePage({
                 description="Thành viên này hiện chưa công bố bài báo khoa học nào trong danh mục hệ thống."
               />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {papers.map((p) => (
                   <ShowcaseCard key={p.id} item={p} />
                 ))}
@@ -185,10 +187,10 @@ export default async function MemberProfilePage({
 
           {/* Projects */}
           <section>
-            <div className="flex items-center gap-2.5 mb-5">
-              <Code2 className="w-5 h-5 text-emerald-700" />
-              <h2 className="text-xl font-bold text-slate-900">Dự án công nghệ</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold ml-1 border border-emerald-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Code2 className="w-5 h-5 text-emerald-700 shrink-0" />
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Dự án công nghệ</h2>
+              <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold ml-1 border border-emerald-200">
                 {projects.length}
               </span>
             </div>
@@ -199,7 +201,7 @@ export default async function MemberProfilePage({
                 description="Thành viên này hiện chưa đăng tải dự án công nghệ nào trong danh mục hệ thống."
               />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {projects.map((p) => (
                   <ShowcaseCard key={p.id} item={p} />
                 ))}
@@ -209,10 +211,10 @@ export default async function MemberProfilePage({
 
           {/* Achievements */}
           <section>
-            <div className="flex items-center gap-2.5 mb-5">
-              <Trophy className="w-5 h-5 text-amber-700" />
-              <h2 className="text-xl font-bold text-slate-900">Giải thưởng &amp; Đóng góp</h2>
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 font-bold ml-1 border border-amber-200">
+            <div className="flex items-center gap-2 mb-4">
+              <Trophy className="w-5 h-5 text-amber-700 shrink-0" />
+              <h2 className="text-lg sm:text-xl font-bold text-slate-900">Giải thưởng &amp; Đóng góp</h2>
+              <span className="text-xs px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold ml-1 border border-amber-200">
                 {achievements.length}
               </span>
             </div>
@@ -223,7 +225,7 @@ export default async function MemberProfilePage({
                 description="Thành viên này hiện chưa ghi nhận giải thưởng hoặc cống hiến nào trong danh mục hệ thống."
               />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {achievements.map((a) => (
                   <ShowcaseCard key={a.id} item={a} />
                 ))}

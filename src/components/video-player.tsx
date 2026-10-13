@@ -11,7 +11,7 @@ export function VideoPlayer({ url, title }: { url: string; title: string }) {
   if (!embedUrl) return null;
 
   return (
-    <div className="relative aspect-video w-full rounded-2xl overflow-hidden border border-slate-200 shadow-xs bg-slate-950">
+    <div className="relative aspect-video w-full rounded-lg overflow-hidden border border-slate-200 shadow-xs bg-slate-950">
       {!isLoaded && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-900 text-slate-400 gap-3">
           <Loader2 className="w-8 h-8 text-blue-400 animate-spin" />

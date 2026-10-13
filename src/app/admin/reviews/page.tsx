@@ -64,7 +64,7 @@ export default async function AdminReviewsPage() {
               Danh sách các công trình do sinh viên gửi lên đang chờ xét duyệt xuất bản.
             </p>
           </div>
-          <span className="text-sm font-bold px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 self-start sm:self-center">
+          <span className="text-xs sm:text-sm font-bold px-3 py-1 rounded-md bg-amber-50 text-amber-800 border border-amber-200 self-start sm:self-center">
             {pendingItems.length} bài chờ duyệt
           </span>
         </div>
@@ -78,11 +78,11 @@ export default async function AdminReviewsPage() {
             actionHref="/admin"
           />
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3.5">
             {pendingItems.map((item) => (
               <div
                 key={item.id}
-                className="p-6 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-[#0F294A]/30 transition-colors"
+                className="p-5 bg-white rounded-lg border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-5 hover:border-[#0F294A]/30 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">

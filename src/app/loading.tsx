@@ -27,7 +27,7 @@ export default function HomeLoading() {
           <Skeleton className="w-full max-w-3xl h-14 mb-4" />
           <Skeleton className="w-full max-w-xl h-6 mb-10" />
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 w-full max-w-3xl p-5 bg-white/95 rounded-2xl border border-slate-200 shadow-xs">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl p-4 sm:p-5 bg-white/95 rounded-lg border border-slate-200 shadow-xs">
             <div className="flex flex-col items-center gap-2 p-2">
               <Skeleton className="w-20 h-10" />
               <Skeleton className="w-28 h-4" />
@@ -45,22 +45,22 @@ export default function HomeLoading() {
       </section>
 
       {/* Grid Cards Skeleton */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-slate-200 mb-8">
-          <div className="flex gap-2.5 flex-wrap">
-            <Skeleton className="w-32 h-10 rounded-xl" />
-            <Skeleton className="w-36 h-10 rounded-xl" />
-            <Skeleton className="w-36 h-10 rounded-xl" />
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl flex-1">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-5 border-b border-slate-200 mb-6">
+          <div className="flex gap-2 flex-wrap">
+            <Skeleton className="w-32 h-9 rounded-lg" />
+            <Skeleton className="w-36 h-9 rounded-lg" />
+            <Skeleton className="w-36 h-9 rounded-lg" />
           </div>
-          <Skeleton className="w-72 h-10 rounded-xl" />
+          <Skeleton className="w-72 h-9 rounded-lg" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
-            <div key={i} className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+            <div key={i} className="rounded-lg border border-slate-200 bg-white overflow-hidden shadow-xs">
               <Skeleton className="aspect-[16/9] w-full rounded-none" />
-              <div className="p-6 space-y-3.5">
-                <Skeleton className="w-28 h-5 rounded-full" />
+              <div className="p-4 sm:p-5 space-y-3">
+                <Skeleton className="w-28 h-5 rounded-md" />
                 <Skeleton className="w-full h-7" />
                 <Skeleton className="w-4/5 h-4" />
                 <Skeleton className="w-full h-12 pt-2" />

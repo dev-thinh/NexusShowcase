@@ -23,11 +23,9 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-8 sm:p-12 bg-white rounded-2xl border border-dashed border-slate-300 text-center transition-all ${className}`}
+      className={`flex flex-col items-center justify-center p-6 sm:p-10 bg-white rounded-lg border border-dashed border-slate-300 text-center transition-all ${className}`}
     >
-      <div className="w-12 h-12 rounded-xl bg-slate-100 text-slate-500 flex items-center justify-center mb-3.5 shadow-2xs">
-        <Icon className="w-6 h-6 text-slate-500" />
-      </div>
+      <Icon className="w-8 h-8 text-slate-400 mb-2.5" />
       <h3 className="text-sm sm:text-base font-bold text-slate-800 tracking-tight">
         {title}
       </h3>
@@ -36,11 +34,11 @@ export function EmptyState({
       </p>
 
       {actionLabel && (
-        <div className="mt-5">
+        <div className="mt-4">
           {actionHref ? (
             <Link
               href={actionHref}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
             >
               <span>{actionLabel}</span>
             </Link>
@@ -48,7 +46,7 @@ export function EmptyState({
             <button
               type="button"
               onClick={onActionClick}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold text-slate-700 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 transition-all cursor-pointer shadow-2xs"
             >
               <span>{actionLabel}</span>
             </button>

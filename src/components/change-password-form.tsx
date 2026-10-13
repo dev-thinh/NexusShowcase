@@ -48,16 +48,14 @@ export function ChangePasswordForm() {
 
   return (
     <div className="max-w-md mx-auto w-full">
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-xs p-6 sm:p-8">
-        <div className="flex items-center gap-3.5 pb-5 border-b border-slate-100">
-          <div className="w-12 h-12 rounded-xl bg-[#0F294A] text-white flex items-center justify-center shadow-xs">
-            <KeyRound className="w-6 h-6 text-blue-200" />
-          </div>
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-5 sm:p-7">
+        <div className="flex items-start gap-3 pb-4 border-b border-slate-100">
+          <KeyRound className="w-6 h-6 text-[#0F294A] shrink-0 mt-0.5" />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-tight">
               Đổi Mật Khẩu
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500">
+            <p className="text-xs sm:text-sm text-slate-500 truncate max-w-sm mt-0.5">
               Cập nhật mật khẩu bảo mật cho tài khoản của bạn
             </p>
           </div>
@@ -66,7 +64,7 @@ export function ChangePasswordForm() {
         {error && (
           <div
             role="alert"
-            className="mt-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-2.5"
+            className="mt-4 p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-2.5"
           >
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
             <div className="font-medium leading-relaxed">{error}</div>
@@ -76,14 +74,14 @@ export function ChangePasswordForm() {
         {success && (
           <div
             role="status"
-            className="mt-5 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2.5"
+            className="mt-4 p-3 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2.5"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <div className="font-semibold">Đổi mật khẩu thành công! Đang chuyển hướng...</div>
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+        <form onSubmit={handleSubmit} className="mt-5 space-y-3.5">
           <div>
             <label className="block text-xs font-semibold uppercase tracking-wider text-slate-700 mb-1.5">
               Mật khẩu hiện tại / Mật khẩu tạm thời
@@ -92,7 +90,7 @@ export function ChangePasswordForm() {
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
               placeholder="••••••••"
               disabled={isPending || success}
             />
@@ -106,7 +104,7 @@ export function ChangePasswordForm() {
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
               placeholder="••••••••"
               disabled={isPending || success}
             />
@@ -120,7 +118,7 @@ export function ChangePasswordForm() {
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
               placeholder="••••••••"
               disabled={isPending || success}
             />
@@ -129,7 +127,7 @@ export function ChangePasswordForm() {
           <button
             type="submit"
             disabled={isPending || success}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1a3a63] text-white text-sm font-semibold transition-colors disabled:opacity-50"
+            className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#0F294A] hover:bg-[#1a3a63] text-white text-sm font-semibold transition-colors disabled:opacity-50"
           >
             {isPending ? (
               <>
