@@ -118,7 +118,7 @@ export default async function HomePage({
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white text-slate-800 text-xs sm:text-sm font-semibold mb-3 shadow-2xs border border-slate-200">
             <GraduationCap className="w-4 h-4 text-[#0F294A]" />
-            <span>CLB Nghiên cứu &amp; Sáng tạo Nexus • Khoa CNTT - ĐHKHTN</span>
+            <span>Robotics &amp; IoT Lab • Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">

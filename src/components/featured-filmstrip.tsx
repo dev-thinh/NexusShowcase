@@ -71,7 +71,7 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
               Công Trình Nghiên Cứu &amp; Sáng Tạo Nổi Bật
             </h2>
             <p className="text-xs sm:text-sm text-slate-600 truncate max-w-3xl mt-1 font-medium">
-              Công trình nghiên cứu khoa học và sáng tạo công nghệ tiêu biểu của thành viên Nexus.
+              Công trình nghiên cứu khoa học và sáng tạo công nghệ tiêu biểu của Robotics &amp; IoT Lab.
             </p>
           </div>
         </div>
@@ -123,7 +123,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
   const authorNames = item.contributors
     .map((c) => c.user?.fullName || c.externalName)
     .filter(Boolean);
-  const primaryAuthor = authorNames[0] || 'CLB Nexus';
+  const primaryAuthor = authorNames[0] || 'Robotics & IoT Lab';
   const remainingCount = authorNames.length > 1 ? authorNames.length - 1 : 0;
 
   return (
@@ -143,9 +143,9 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
         ) : (
           <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
             <div className="w-9 h-9 rounded-md bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1 border border-slate-200">
-              NX
+              RI
             </div>
-            <span className="text-[11px] font-semibold text-slate-500">Nexus Academic Showcase</span>
+            <span className="text-[11px] font-semibold text-slate-500">Robotics &amp; IoT Lab</span>
           </div>
         )}
 

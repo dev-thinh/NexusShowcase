@@ -275,7 +275,7 @@ export function ItemForm({
           ...next[idx],
           userId: null,
           externalName: '',
-          externalAffiliation: 'Khoa CNTT - ĐHKHTN',
+          externalAffiliation: 'Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM',
         };
       }
       return next;
@@ -551,7 +551,7 @@ export function ItemForm({
             value={issuer}
             onChange={(e) => setIssuer(e.target.value)}
             className="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-sm sm:text-base text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
-            placeholder="Ví dụ: Hội nghị Khoa học Trẻ 2026, CLB Nexus, Khoa CNTT..."
+            placeholder="Ví dụ: Hội nghị Khoa học Trẻ 2026, Robotics & IoT Lab, Trường ĐH Khoa học Tự nhiên..."
           />
         </div>
 
@@ -869,7 +869,7 @@ export function ItemForm({
                         </label>
                         <input
                           type="text"
-                          placeholder="Khoa CNTT - ĐHKHTN"
+                          placeholder="Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM"
                           value={c.externalAffiliation || ''}
                           onChange={(e) => {
                             const next = [...contributors];

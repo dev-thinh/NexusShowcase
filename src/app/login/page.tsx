@@ -22,8 +22,8 @@ function LoginFormFallback() {
 }
 
 export const metadata = {
-  title: 'Đăng nhập - NexusShowcase',
-  description: 'Cổng xác thực nghiên cứu khoa học và sản phẩm công nghệ sinh viên Khoa CNTT - ĐH Khoa học Tự nhiên ĐHQG-HCM',
+  title: 'Đăng nhập - Robotics & IoT Lab',
+  description: 'Cổng xác thực nghiên cứu khoa học và sản phẩm công nghệ - Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM',
 };
 
 export default async function LoginPage() {
@@ -42,14 +42,14 @@ export default async function LoginPage() {
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
             {/* 
-              CỘT BÊN TRÁI: MỤC TIÊU CÂU LẠC BỘ
+              CỘT BÊN TRÁI: MỤC TIÊU ROBOTICS & IOT LAB
               (Cùng tone màu sáng đồng nhất, typography đậm rõ nét, 2 nút bên dưới)
             */}
             <aside className="lg:col-span-7 xl:col-span-7 space-y-6">
-              {/* Pill tag nhận diện CLB */}
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-700 shadow-2xs">
-                <span className="w-2 h-2 rounded-full bg-slate-700" />
-                <span>CÂU LẠC BỘ HỌC THUẬT NEXUS · FIT HCMUS</span>
+              {/* Pill tag nhận diện Robotics & IoT Lab */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/90 border border-slate-200/80 text-xs sm:text-[13px] font-semibold text-slate-800 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-slate-900 shrink-0" />
+                <span>Robotics &amp; IoT Lab · Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM</span>
               </div>
 
               {/* Tiêu đề lớn tạo điểm nhấn học thuật & công nghệ */}
@@ -60,7 +60,7 @@ export default async function LoginPage() {
 
               {/* Nội dung giới thiệu sứ mệnh & mục tiêu câu lạc bộ */}
               <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed max-w-xl font-normal">
-                Không gian học thuật tại Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM. Nơi kết nối sinh viên đam mê công nghệ, lưu trữ các đề tài nghiên cứu khoa học, khóa luận xuất sắc và phát triển các sản phẩm tiên phong.
+                Không gian nghiên cứu tại Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM. Nơi kết nối sinh viên đam mê công nghệ, lưu trữ các đề tài nghiên cứu khoa học, khóa luận xuất sắc và phát triển các giải pháp Robotics &amp; IoT tiên phong.
               </p>
 
               {/* 2 Nút điều hướng: 1 là Trang chủ, 2 là Liên hệ */}
@@ -80,18 +80,6 @@ export default async function LoginPage() {
                   <Mail className="w-4 h-4 text-slate-500" />
                   <span>Liên hệ</span>
                 </Link>
-              </div>
-
-              {/* Thẻ thông tin học thuật góc dưới (tương tự huy hiệu hội nghị trong ảnh mẫu) */}
-              <div className="pt-2">
-                <div className="inline-flex items-center gap-3 px-3.5 py-2 rounded-lg border border-slate-200 bg-white/90 backdrop-blur-xs text-xs text-slate-600 shadow-2xs">
-                  <span className="px-2 py-0.5 rounded bg-slate-900 text-white font-bold text-[11px]">
-                    Học thuật
-                  </span>
-                  <span className="font-medium text-slate-700">
-                    Khoa CNTT · ĐH Khoa học Tự nhiên, ĐHQG-HCM
-                  </span>
-                </div>
               </div>
             </aside>
 

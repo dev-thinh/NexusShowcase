@@ -41,6 +41,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             OR: [
               { email: identifier },
               { email: identifier.toLowerCase() },
+              { email: `${identifier.toLowerCase()}@robotics.hcmus.edu.vn` },
               { email: `${identifier.toLowerCase()}@nexus.hcmus.edu.vn` },
             ],
           },

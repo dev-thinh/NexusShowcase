@@ -29,10 +29,10 @@ export default function ContactPage() {
                 Kết nối &amp; Hợp tác
               </span>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
-                Liên hệ Ban Điều Hành CLB Nexus
+                Liên hệ Ban Điều Hành Robotics &amp; IoT Lab
               </h1>
               <p className="text-sm text-slate-600 truncate max-w-3xl mt-1">
-                Mọi thông tin liên hệ trao đổi học thuật, đề xuất hợp tác nghiên cứu hoặc tham gia sinh hoạt cùng CLB Nexus.
+                Mọi thông tin liên hệ trao đổi học thuật, đề xuất hợp tác nghiên cứu hoặc tham gia sinh hoạt cùng Robotics &amp; IoT Lab.
               </p>
             </div>
           </div>
@@ -50,7 +50,7 @@ export default function ContactPage() {
                     Cơ sở 1 (Trụ sở chính)
                   </span>
                   <h2 className="text-base sm:text-lg font-bold text-slate-900 leading-snug">
-                    Phòng Lab Nghiên cứu Khoa CNTT
+                    Phòng Lab Nghiên cứu Robotics &amp; IoT
                   </h2>
                 </div>
               </div>
@@ -65,15 +65,15 @@ export default function ContactPage() {
                 <div className="flex items-center gap-2.5">
                   <Mail className="w-4 h-4 text-slate-400 shrink-0" />
                   <a
-                    href="mailto:nexus@fit.hcmus.edu.vn"
+                    href="mailto:robotics-iot@hcmus.edu.vn"
                     className="text-[#0F294A] hover:underline font-semibold"
                   >
-                    nexus@fit.hcmus.edu.vn
+                    robotics-iot@hcmus.edu.vn
                   </a>
                 </div>
                 <div className="flex items-center gap-2.5">
                   <Phone className="w-4 h-4 text-slate-400 shrink-0" />
-                  <span>(028) 3835 4266 (Khoa Công nghệ Thông tin)</span>
+                  <span>(028) 3835 4266 (Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM)</span>
                 </div>
               </div>
             </div>
@@ -109,22 +109,12 @@ export default function ContactPage() {
             {/* Academic Department Affiliation */}
             <div className="p-4 sm:p-5 rounded-lg bg-slate-50 border border-slate-200">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
-                Đơn vị bảo trợ học thuật
+                Đơn vị chủ quản
               </h3>
               <p className="text-sm font-semibold text-slate-800">
-                Khoa Công nghệ Thông tin — Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM
+                Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
               </p>
               <div className="mt-2.5 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-600">
-                <a
-                  href="https://fit.hcmus.edu.vn"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-1 text-blue-700 hover:underline font-semibold"
-                >
-                  <Globe className="w-3.5 h-3.5" />
-                  <span>fit.hcmus.edu.vn</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
                 <a
                   href="https://hcmus.edu.vn"
                   target="_blank"

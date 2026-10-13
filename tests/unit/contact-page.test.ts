@@ -9,6 +9,7 @@ describe('Contact Page', () => {
 
     const content = fs.readFileSync(contactPath, 'utf-8');
     expect(content).toContain('Nguyễn Văn Cừ');
-    expect(content).toContain('nexus@');
+    expect(content).toContain('robotics-iot@');
+    expect(content).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
   });
 });

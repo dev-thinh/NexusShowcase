@@ -5,7 +5,7 @@ import { AcademicFooter } from '@/components/academic-footer';
 import { ChangePasswordForm } from '@/components/change-password-form';
 
 export const metadata = {
-  title: 'Đổi mật khẩu | Nexus Showcase',
+  title: 'Đổi mật khẩu | Robotics & IoT Lab',
 };
 
 export default async function ChangePasswordPage() {

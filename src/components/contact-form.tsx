@@ -20,7 +20,7 @@ export function ContactForm() {
         </h2>
       </div>
       <p className="text-xs text-slate-500 mb-5">
-        Vui lòng điền thông tin để gửi tin nhắn trực tiếp đến Ban Chủ nhiệm CLB Nexus.
+        Vui lòng điền thông tin để gửi tin nhắn trực tiếp đến Ban Điều Hành Robotics &amp; IoT Lab.
       </p>
 
       {submitted ? (
@@ -30,7 +30,7 @@ export function ContactForm() {
             Tin nhắn đã được gửi thành công!
           </h3>
           <p className="text-xs text-emerald-700 leading-relaxed max-w-sm mx-auto">
-            Cảm ơn bạn đã liên hệ. Ban Điều Hành CLB Nexus sẽ phản hồi qua email của bạn trong thời gian sớm nhất.
+            Cảm ơn bạn đã liên hệ. Ban Điều Hành Robotics &amp; IoT Lab sẽ phản hồi qua email của bạn trong thời gian sớm nhất.
           </p>
           <button
             type="button"
@@ -72,7 +72,7 @@ export function ContactForm() {
             </label>
             <input
               type="text"
-              placeholder="Khoa CNTT - Khóa 2022 / Doanh nghiệp đối tác"
+              placeholder="Khóa 2022 / Doanh nghiệp đối tác"
               className="w-full h-10 px-3.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all"
             />
           </div>
@@ -96,7 +96,7 @@ export function ContactForm() {
             <textarea
               rows={4}
               required
-              placeholder="Mô tả chi tiết nội dung bạn muốn trao đổi cùng CLB Nexus..."
+              placeholder="Mô tả chi tiết nội dung bạn muốn trao đổi cùng Robotics &amp; IoT Lab..."
               className="w-full p-3 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A] transition-all resize-none"
             />
           </div>

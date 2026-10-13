@@ -50,10 +50,10 @@ export default async function MembersDirectoryPage() {
                 Nhân sự &amp; Nghiên cứu viên
               </span>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
-                Danh bạ Thành viên CLB Nexus
+                Danh bạ Thành viên Robotics &amp; IoT Lab
               </h1>
               <p className="text-sm text-slate-600 truncate max-w-3xl mt-1">
-                Mạng lưới sinh viên, nghiên cứu viên và giảng viên phụ trách các hoạt động nghiên cứu khoa học, chuyển giao công nghệ tại Khoa CNTT - ĐHKHTN.
+                Mạng lưới sinh viên, nghiên cứu viên và giảng viên phụ trách các hoạt động nghiên cứu khoa học, chuyển giao công nghệ tại Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM.
               </p>
               <div className="mt-2.5 flex items-center gap-4 text-xs font-semibold text-slate-500 flex-wrap">
                 <span>Tổng cộng: {members.length} thành viên</span>

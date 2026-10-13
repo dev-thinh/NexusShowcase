@@ -14,16 +14,16 @@ export function AcademicFooter() {
               </div>
               <div>
                 <div className="font-extrabold text-base tracking-tight text-slate-900">
-                  NexusShowcase Academic Repository
+                  Robotics &amp; IoT Lab Repository
                 </div>
                 <div className="text-xs font-semibold text-slate-500">
-                  Khoa Công nghệ Thông tin • ĐH Khoa học Tự nhiên - ĐHQG-HCM
+                  Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
                 </div>
               </div>
             </div>
 
             <p className="text-sm text-slate-600 leading-relaxed max-w-md">
-              Nền tảng công bố và lưu trữ các công trình nghiên cứu khoa học xuất bản, dự án công nghệ và thành tích của sinh viên CLB Nexus.
+              Nền tảng công bố và lưu trữ các công trình nghiên cứu khoa học xuất bản, dự án công nghệ và thành tích của thành viên Robotics &amp; IoT Lab.
             </p>
 
             <div className="flex items-center gap-2 text-xs text-slate-500 pt-1">
@@ -40,12 +40,12 @@ export function AcademicFooter() {
             <ul className="space-y-2 text-sm">
               <li>
                 <a
-                  href="https://www.fit.hcmus.edu.vn"
+                  href="https://hcmus.edu.vn"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-slate-900 transition-colors inline-flex items-center gap-1.5"
                 >
-                  <span>Cổng Khoa CNTT HCMUS</span>
+                  <span>Cổng ĐH Khoa học Tự nhiên</span>
                   <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
                 </a>
               </li>
@@ -94,7 +94,7 @@ export function AcademicFooter() {
         {/* Bottom Copyright */}
         <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
           <div>
-            &copy; {new Date().getFullYear()} Nexus Academic Showcase • Trường Đại học Khoa học Tự nhiên - ĐHQG-HCM.
+            &copy; {new Date().getFullYear()} Robotics &amp; IoT Lab • Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM.
           </div>
           <div className="flex items-center gap-4 text-slate-500">
             <Link href="/" className="hover:text-slate-900 transition-colors">

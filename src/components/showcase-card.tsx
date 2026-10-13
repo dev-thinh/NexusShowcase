@@ -31,7 +31,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
     .map((c) => c.user?.fullName || c.externalName)
     .filter(Boolean);
 
-  const primaryAuthor = authorNames[0] || 'CLB Nexus';
+  const primaryAuthor = authorNames[0] || 'Robotics & IoT Lab';
   const remainingCount = authorNames.length > 1 ? authorNames.length - 1 : 0;
 
   return (
@@ -52,9 +52,9 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
         ) : (
           <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
             <div className="w-10 h-10 rounded-md bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1 border border-slate-200">
-              NX
+              RI
             </div>
-            <span className="text-xs font-semibold text-slate-500">Nexus Academic Showcase</span>
+            <span className="text-xs font-semibold text-slate-500">Robotics &amp; IoT Lab</span>
           </div>
         )}
 

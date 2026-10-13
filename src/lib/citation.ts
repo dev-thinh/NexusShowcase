@@ -20,7 +20,7 @@ function normalizeAuthorNames(item: CitationItem): string[] {
     .map((c) => c.user?.fullName || c.externalName)
     .filter(Boolean) as string[];
 
-  if (rawNames.length === 0) return ['CLB Nexus'];
+  if (rawNames.length === 0) return ['Robotics & IoT Lab'];
   return rawNames.map(cleanAcademicTitles);
 }
 
@@ -34,7 +34,7 @@ function removeDiacritics(str: string): string {
 
 export function getCitationKey(item: CitationItem): string {
   const authors = normalizeAuthorNames(item);
-  const firstAuthor = authors[0] || 'nexus';
+  const firstAuthor = authors[0] || 'robotics';
   const firstWord = firstAuthor.split(' ')[0] || 'author';
   const cleanFirstWord = removeDiacritics(firstWord).toLowerCase().replace(/[^a-z0-9]/g, '');
   const year = item.publishedYear ?? new Date().getFullYear();
@@ -50,7 +50,7 @@ export function generateBibTeX(item: CitationItem): string {
   const key = getCitationKey(item);
   const authors = normalizeAuthorNames(item);
   const authorsBib = authors.join(' and ');
-  const venue = item.issuer || 'Nexus Academic Showcase, Khoa CNTT - ĐH KHTN ĐHQG-HCM';
+  const venue = item.issuer || 'Robotics & IoT Lab, Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM';
   const year = item.publishedYear ?? new Date().getFullYear();
 
   return `@inproceedings{${key},
@@ -58,8 +58,8 @@ export function generateBibTeX(item: CitationItem): string {
   author = {${authorsBib}},
   booktitle = {${venue}},
   year = {${year}},
-  organization = {Khoa CNTT - ĐH Khoa học Tự nhiên, ĐHQG-HCM},
-  url = {https://nexus.fit.hcmus.edu.vn/showcase/${item.slug}}
+  organization = {Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM},
+  url = {https://robotics-iot.hcmus.edu.vn/showcase/${item.slug}}
 }`;
 }
 
@@ -82,9 +82,9 @@ export function generateAPA(item: CitationItem): string {
     authorString = `${formattedAuthors.slice(0, -1).join(', ')}, & ${formattedAuthors[formattedAuthors.length - 1]}`;
   }
 
-  const venue = item.issuer || 'Nexus Academic Showcase';
+  const venue = item.issuer || 'Robotics & IoT Lab';
   const year = item.publishedYear ?? new Date().getFullYear();
-  return `${authorString} (${year}). ${item.title}. ${venue}. https://nexus.fit.hcmus.edu.vn/showcase/${item.slug}`;
+  return `${authorString} (${year}). ${item.title}. ${venue}. https://robotics-iot.hcmus.edu.vn/showcase/${item.slug}`;
 }
 
 export function generateIEEE(item: CitationItem): string {
@@ -100,7 +100,7 @@ export function generateIEEE(item: CitationItem): string {
     ? formattedAuthors[0]
     : formattedAuthors.slice(0, -1).join(', ') + ' and ' + formattedAuthors[formattedAuthors.length - 1];
 
-  const venue = item.issuer || 'Nexus Academic Showcase';
+  const venue = item.issuer || 'Robotics & IoT Lab';
   const year = item.publishedYear ?? new Date().getFullYear();
   return `${authorStr}, "${item.title}," ${venue}, ${year}.`;
 }

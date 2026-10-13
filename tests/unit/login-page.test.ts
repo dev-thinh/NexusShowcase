@@ -24,9 +24,11 @@ describe('Split-Screen Login Page Layout and Neutral Language', () => {
     // Consistent light theme (no dark navy block on aside)
     expect(content).not.toContain('bg-[#0F294A]');
 
-    // Club mission and focus areas
-    expect(content).toContain('CÂU LẠC BỘ HỌC THUẬT NEXUS');
+    // System name and lab focus
+    expect(content).toContain('Robotics & IoT Lab');
+    expect(content).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
     expect(content).toContain('Ươm mầm nghiên cứu');
+    expect(content).not.toContain('Khoa CNTT · ĐH Khoa học Tự nhiên');
 
     // Escape hatch navigation buttons on the left bottom
     expect(content).toContain('href="/"');
