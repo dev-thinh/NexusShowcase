@@ -141,7 +141,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
                   <tr key={member.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#2B4C6F]/10 text-[#2B4C6F] font-extrabold flex items-center justify-center text-sm">
+                        <div className="w-9 h-9 rounded-full bg-[#0F294A]/10 text-[#0F294A] font-extrabold flex items-center justify-center text-sm">
                           {member.fullName.charAt(0)}
                         </div>
                         <div>

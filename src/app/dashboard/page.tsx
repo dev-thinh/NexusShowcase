@@ -61,7 +61,7 @@ export default async function DashboardPage() {
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2.5 shrink-0">
               <Link
                 href="/dashboard/items/new"
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer"
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Đăng tải bài mới</span>
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
           ) : isUploader ? (
             <Link
               href="/dashboard/items/new"
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer self-start"
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer self-start"
             >
               <Plus className="w-4 h-4" />
               <span>Đăng tải bài mới cho nhóm</span>

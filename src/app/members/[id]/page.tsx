@@ -72,7 +72,7 @@ export default async function MemberProfilePage({
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
         {/* Profile Header */}
         <header className="bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-2xs mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
-          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-[#2B4C6F] text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-xs shrink-0 border-2 border-slate-100">
+          <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-[#0F294A] text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-xs shrink-0 border-2 border-slate-100">
             {user.fullName.charAt(0)}
           </div>
 

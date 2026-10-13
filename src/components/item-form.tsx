@@ -602,7 +602,7 @@ export function ItemForm({
               onClick={() => setThumbnailMode('upload')}
               className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
                 thumbnailMode === 'upload'
-                  ? 'bg-[#2B4C6F] text-white shadow-2xs'
+                  ? 'bg-[#0F294A] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -613,7 +613,7 @@ export function ItemForm({
               onClick={() => setThumbnailMode('url')}
               className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
                 thumbnailMode === 'url'
-                  ? 'bg-[#2B4C6F] text-white shadow-2xs'
+                  ? 'bg-[#0F294A] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -757,7 +757,7 @@ export function ItemForm({
               >
                 <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-200/80">
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-extrabold px-2.5 py-1 rounded-md bg-[#2B4C6F] text-white">
+                    <span className="text-xs font-extrabold px-2.5 py-1 rounded-md bg-[#0F294A] text-white">
                       #{idx + 1}
                     </span>
 
@@ -768,7 +768,7 @@ export function ItemForm({
                         onClick={() => toggleContributorType(idx, true)}
                         className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
                           isInternal
-                            ? 'bg-[#2B4C6F] text-white shadow-2xs'
+                            ? 'bg-[#0F294A] text-white shadow-2xs'
                             : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
@@ -779,7 +779,7 @@ export function ItemForm({
                         onClick={() => toggleContributorType(idx, false)}
                         className={`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${
                           !isInternal
-                            ? 'bg-[#2B4C6F] text-white shadow-2xs'
+                            ? 'bg-[#0F294A] text-white shadow-2xs'
                             : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
@@ -1025,7 +1025,7 @@ export function ItemForm({
               type="button"
               disabled={uploadingDoc}
               onClick={() => docInputRef.current?.click()}
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm bg-[#2B4C6F] hover:bg-[#1F3750] text-white rounded-lg font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
             >
               {uploadingDoc ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
               <span>{uploadingDoc ? 'Đang tải lên...' : 'Tải lên PDF'}</span>
@@ -1086,7 +1086,7 @@ export function ItemForm({
                 type="button"
                 onClick={handleAddDirectDoc}
                 disabled={!directDocUrl.trim()}
-                className="sm:col-span-2 px-4 py-2 bg-[#2B4C6F] hover:bg-[#1F3750] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
+                className="sm:col-span-2 px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg text-xs font-bold transition-colors cursor-pointer disabled:opacity-50"
               >
                 Xác nhận
               </button>
@@ -1190,7 +1190,7 @@ export function ItemForm({
           type="button"
           disabled={loading}
           onClick={() => handleSubmit(true)}
-          className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm shadow-xs transition-all cursor-pointer disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
           <span>

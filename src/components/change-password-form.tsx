@@ -127,7 +127,7 @@ export function ChangePasswordForm() {
           <button
             type="submit"
             disabled={isPending || success}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#2B4C6F] hover:bg-[#1F3750] text-white text-sm font-semibold transition-colors disabled:opacity-50"
+            className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#0F294A] hover:bg-[#1a3a63] text-white text-sm font-semibold transition-colors disabled:opacity-50"
           >
             {isPending ? (
               <>

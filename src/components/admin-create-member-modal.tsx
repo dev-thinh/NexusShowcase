@@ -85,7 +85,7 @@ export function AdminCreateMemberModal() {
     <>
       <button
         onClick={handleOpen}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#2B4C6F] hover:bg-[#1F3750] active:scale-[0.98] text-white text-xs font-bold shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#2B4C6F]/20"
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white text-xs font-bold shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20"
       >
         <UserPlus className="w-4 h-4 text-white/80" />
         <span>Thêm thành viên mới</span>
@@ -128,7 +128,7 @@ export function AdminCreateMemberModal() {
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-5 py-2 rounded-xl bg-[#2B4C6F] hover:bg-[#1F3750] text-white text-xs font-bold transition-all shadow-xs"
+                className="px-5 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs"
               >
                 Hoàn tất
               </button>
@@ -288,7 +288,7 @@ export function AdminCreateMemberModal() {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#2B4C6F] hover:bg-[#1F3750] text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
               >
                 {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>{loading ? 'Đang tạo...' : 'Xác nhận tạo'}</span>

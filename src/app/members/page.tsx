@@ -149,13 +149,13 @@ export default async function MembersDirectoryPage() {
               >
                 <div>
                   <div className="flex items-start gap-3.5 mb-3">
-                    <div className="w-12 h-12 rounded-full bg-[#2B4C6F] text-white font-bold flex items-center justify-center text-base shrink-0 shadow-2xs">
+                    <div className="w-12 h-12 rounded-full bg-[#0F294A] text-white font-bold flex items-center justify-center text-base shrink-0 shadow-2xs">
                       {member.fullName?.charAt(0) || 'C'}
                     </div>
                     <div className="min-w-0 flex-1">
                       <Link
                         href={`/members/${member.id}`}
-                        className="font-bold text-base text-slate-900 hover:text-[#2B4C6F] transition-colors truncate block"
+                        className="font-bold text-base text-slate-900 hover:text-[#0F294A] transition-colors truncate block"
                       >
                         {member.fullName}
                       </Link>
