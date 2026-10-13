@@ -47,7 +47,12 @@ describe('Prisma Schema Definitions', () => {
     expect(content).toContain('PUBLIC');
     expect(content).toContain('PRIVATE');
 
+    expect(content).toContain('enum CategoryLayout');
+    expect(content).toContain('SHOWCASE_GRID');
+    expect(content).toContain('BIBLIOGRAPHY');
+
     expect(content).toContain('model Category');
+    expect(content).toContain('layoutType');
     expect(content).toContain('isNavFeatured');
     expect(content).toContain('displayOrder');
 
@@ -66,11 +71,18 @@ Expected: FAIL with missing `enum ItemVisibility` or `model Category`.
 
 - [ ] **Step 3: Modify `prisma/schema.prisma`**
 
-Thêm enum `ItemVisibility`, model `Category`, và cập nhật `ShowcaseItem` trong `prisma/schema.prisma`:
+Thêm enum `ItemVisibility`, enum `CategoryLayout`, model `Category`, và cập nhật `ShowcaseItem` trong `prisma/schema.prisma`:
 ```prisma
 enum ItemVisibility {
   PUBLIC
   PRIVATE
+}
+
+enum CategoryLayout {
+  SHOWCASE_GRID
+  BIBLIOGRAPHY
+  DATA_CATALOG
+  HONOR_ROLL
 }
 
 model Category {
@@ -78,6 +90,7 @@ model Category {
   name          String         @unique
   slug          String         @unique
   description   String?
+  layoutType    CategoryLayout @default(SHOWCASE_GRID)
   isNavFeatured Boolean        @default(false)
   displayOrder  Int            @default(0)
   createdAt     DateTime       @default(now())
@@ -380,7 +393,7 @@ git commit -m "feat(actions): add toggleItemVisibilityAction and persist mediaDr
 
 ---
 
-### Task 4: Zero Empty State Navigation Category Helper
+### Task 4: Zero Empty State Navigation Category Helper (Top 3 Limit)
 
 **Files:**
 - Create: `src/lib/nav-categories.ts`
@@ -388,8 +401,8 @@ git commit -m "feat(actions): add toggleItemVisibilityAction and persist mediaDr
 
 **Interfaces:**
 - Consumes: `prisma.category`, `prisma.showcaseItem`.
-- Produces: `getFeaturedNavCategories(isAuthenticated: boolean): Promise<Array<{ id: string; name: string; slug: string; count: number }>>`
-- Logic: Chỉ trả về các Category có `isNavFeatured === true` VÀ `count > 0` (đối với `isAuthenticated === false` thì chỉ đếm `visibility: 'PUBLIC'`; đối với `isAuthenticated === true` thì đếm cả `PUBLIC` và `PRIVATE`). Sắp xếp theo `displayOrder: 'asc'`.
+- Produces: `getFeaturedNavCategories(isAuthenticated: boolean): Promise<Array<{ id: string; name: string; slug: string; layoutType: string; count: number }>>`
+- Logic: Chỉ trả về các Category có `isNavFeatured === true` VÀ `count > 0`, sắp xếp theo `displayOrder: 'asc'`, giới hạn tối đa **Top 3** tab nổi bật nhất (tránh tràn thanh menu).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -407,7 +420,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 import { getFeaturedNavCategories } from '@/lib/nav-categories';
 
-describe('getFeaturedNavCategories (Zero Empty State)', () => {
+describe('getFeaturedNavCategories (Zero Empty State & Top 3 Limit)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -418,6 +431,7 @@ describe('getFeaturedNavCategories (Zero Empty State)', () => {
         id: 'cat-1',
         name: 'Bài báo khoa học',
         slug: 'publications',
+        layoutType: 'BIBLIOGRAPHY',
         displayOrder: 1,
         items: [{ id: 'item-1' }],
       },
@@ -425,6 +439,7 @@ describe('getFeaturedNavCategories (Zero Empty State)', () => {
         id: 'cat-2',
         name: 'Giải thưởng',
         slug: 'awards',
+        layoutType: 'HONOR_ROLL',
         displayOrder: 2,
         items: [], // 0 items!
       },
@@ -433,31 +448,21 @@ describe('getFeaturedNavCategories (Zero Empty State)', () => {
     const result = await getFeaturedNavCategories(false);
     expect(result).toHaveLength(1);
     expect(result[0].slug).toBe('publications');
+    expect(result[0].layoutType).toBe('BIBLIOGRAPHY');
     expect(result[0].count).toBe(1);
   });
 
-  it('sorts active categories by displayOrder', async () => {
+  it('limits to Top 3 featured categories even if more qualify', async () => {
     mockPrisma.category.findMany.mockResolvedValue([
-      {
-        id: 'cat-2',
-        name: 'Dự án',
-        slug: 'projects',
-        displayOrder: 2,
-        items: [{ id: 'item-2' }],
-      },
-      {
-        id: 'cat-1',
-        name: 'Bài báo',
-        slug: 'publications',
-        displayOrder: 1,
-        items: [{ id: 'item-1' }],
-      },
+      { id: '1', name: 'Cat 1', slug: 'cat-1', layoutType: 'SHOWCASE_GRID', displayOrder: 1, items: [{ id: 'i1' }] },
+      { id: '2', name: 'Cat 2', slug: 'cat-2', layoutType: 'SHOWCASE_GRID', displayOrder: 2, items: [{ id: 'i2' }] },
+      { id: '3', name: 'Cat 3', slug: 'cat-3', layoutType: 'SHOWCASE_GRID', displayOrder: 3, items: [{ id: 'i3' }] },
+      { id: '4', name: 'Cat 4', slug: 'cat-4', layoutType: 'SHOWCASE_GRID', displayOrder: 4, items: [{ id: 'i4' }] },
     ]);
 
     const result = await getFeaturedNavCategories(true);
-    expect(result).toHaveLength(2);
-    expect(result[0].slug).toBe('publications');
-    expect(result[1].slug).toBe('projects');
+    expect(result).toHaveLength(3);
+    expect(result.map((c) => c.slug)).toEqual(['cat-1', 'cat-2', 'cat-3']);
   });
 });
 ```
@@ -477,6 +482,7 @@ export interface FeaturedNavCategory {
   id: string;
   name: string;
   slug: string;
+  layoutType: string;
   count: number;
 }
 
@@ -500,13 +506,15 @@ export async function getFeaturedNavCategories(isAuthenticated: boolean): Promis
     },
   });
 
-  // Zero Empty State: filter out categories with 0 published items
+  // Zero Empty State: filter out categories with 0 published items, and take top 3
   return categories
     .filter((cat) => cat.items.length > 0)
+    .slice(0, 3)
     .map((cat) => ({
       id: cat.id,
       name: cat.name,
       slug: cat.slug,
+      layoutType: cat.layoutType,
       count: cat.items.length,
     }));
 }
@@ -915,7 +923,7 @@ git commit -m "feat(showcase): add 1-click visibility toggle for admin and guest
 
 ---
 
-### Task 10: Technical Directory Category Page (`/category/[slug]`)
+### Task 10: Multi-Layout Category Showcase Page (`/category/[slug]`)
 
 **Files:**
 - Create: `src/app/category/[slug]/page.tsx`
@@ -923,7 +931,11 @@ git commit -m "feat(showcase): add 1-click visibility toggle for admin and guest
 
 **Interfaces:**
 - Consumes: Category slug parameter, `auth()`, `prisma.category`, `prisma.showcaseItem`.
-- Produces: Trang chuyên đề danh mục với bố cục Technical Directory tối giản: Tiêu đề danh mục, số lượng công trình, bảng/danh sách công trình (Tiêu đề, Tác giả, Năm, Links, Badge Public/Private), tra cứu tốc độ cao.
+- Produces: Trang chuyên đề danh mục tự động biến đổi giao diện theo `category.layoutType`:
+  1. `BIBLIOGRAPHY`: Thư mục bài báo học thuật & trích dẫn nhanh (Citation Index).
+  2. `SHOWCASE_GRID`: Lưới sản phẩm công nghệ / Robotics trực quan với tags công nghệ & link Demo.
+  3. `DATA_CATALOG`: Bảng thông số kỹ thuật dataset (định dạng, kích thước, link tải nhanh).
+  4. `HONOR_ROLL`: Bảng vàng vinh danh thành tích & giải thưởng.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -933,14 +945,16 @@ import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Category Directory Page', () => {
-  it('exists and renders category directory items', () => {
+describe('Category Directory Page Multi-Layout', () => {
+  it('exists and handles the 4 layout types', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/category/[slug]/page.tsx');
     expect(fs.existsSync(pagePath)).toBe(true);
 
     const content = fs.readFileSync(pagePath, 'utf-8');
-    expect(content).toContain('params');
-    expect(content).toContain('slug');
+    expect(content).toContain('BIBLIOGRAPHY');
+    expect(content).toContain('SHOWCASE_GRID');
+    expect(content).toContain('DATA_CATALOG');
+    expect(content).toContain('HONOR_ROLL');
   });
 });
 ```
@@ -954,8 +968,12 @@ Expected: FAIL with `fs.existsSync(pagePath) is false`.
 
 Tạo `src/app/category/[slug]/page.tsx`:
 - Lấy category theo slug: `prisma.category.findUnique({ where: { slug } })`. Nếu không có, `notFound()`.
-- Lấy items thuộc category này có `status: 'PUBLISHED'` (kèm điều kiện `visibility: 'PUBLIC'` nếu chưa đăng nhập).
-- Render Navbar, Breadcrumb, Tiêu đề danh mục & mô tả, Danh sách Technical Directory mỏng gọn, Footer.
+- Lấy items thuộc category có `status: 'PUBLISHED'` (kèm điều kiện `visibility: 'PUBLIC'` nếu chưa đăng nhập).
+- Render giao diện tùy biến theo `category.layoutType`:
+  - `BIBLIOGRAPHY`: Danh sách trích dẫn bài báo học thuật (Title serif, authors, venue/journal, Citation modal/copy, PDF download).
+  - `SHOWCASE_GRID`: Lưới card sản phẩm 16:9, tags kỹ thuật, nút Demo & Code.
+  - `DATA_CATALOG`: Bảng thông số dataset (Name, File format, Size/Rows, License, Download buttons).
+  - `HONOR_ROLL`: Bảng vàng vinh danh thành tích (Rank badge, Award name, Competition, Team/Members, Year).
 
 - [ ] **Step 4: Run test to verify it passes**
 
@@ -966,7 +984,7 @@ Expected: PASS
 
 ```bash
 git add src/app/category/[slug]/page.tsx tests/unit/category-page.test.ts
-git commit -m "feat(category): implement technical directory view for category showcase"
+git commit -m "feat(category): implement multi-layout category showcase page"
 ```
 
 ---
