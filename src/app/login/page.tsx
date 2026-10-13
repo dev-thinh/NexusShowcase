@@ -1,16 +1,9 @@
 import { Suspense } from 'react';
 import Link from 'next/link';
+import { Navbar } from '@/components/navbar';
 import { LoginForm } from './login-form';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  GraduationCap,
-  ArrowLeft,
-  Mail,
-  BookOpen,
-  Cpu,
-  Sparkles,
-  ShieldCheck,
-} from 'lucide-react';
+import { ArrowLeft, Mail } from 'lucide-react';
 
 function LoginFormFallback() {
   return (
@@ -33,122 +26,86 @@ export const metadata = {
   description: 'Cổng xác thực nghiên cứu khoa học và sản phẩm công nghệ sinh viên Khoa CNTT - ĐH Khoa học Tự nhiên ĐHQG-HCM',
 };
 
-export default function LoginPage() {
+export default async function LoginPage() {
   return (
-    <div className="min-h-screen lg:h-screen lg:max-h-screen flex flex-col lg:flex-row font-sans overflow-x-hidden lg:overflow-hidden bg-slate-50">
-      {/* 
-        CỘT BÊN TRÁI: GIỚI THIỆU SỨ MỆNH & MỤC TIÊU CLB NEXUS 
-        (Deep Academic Navy theme, tương phản cao, chuyên nghiệp)
-      */}
-      <aside className="w-full lg:w-5/12 xl:w-5/12 bg-[#0F294A] text-white p-6 sm:p-8 lg:p-10 flex flex-col justify-between shrink-0 relative overflow-hidden">
-        {/* Họa tiết trang trí chìm học thuật */}
-        <div className="absolute -right-20 -bottom-20 w-80 h-80 rounded-full bg-blue-500/10 blur-3xl pointer-events-none" />
-        <div className="absolute -left-16 -top-16 w-60 h-60 rounded-full bg-amber-400/10 blur-2xl pointer-events-none" />
+    <div className="min-h-screen flex flex-col bg-white relative overflow-hidden selection:bg-slate-900 selection:text-white">
+      {/* 1. Header (Navbar) giữ nguyên đồng bộ toàn website */}
+      <Navbar />
 
-        {/* 1. Header Cột Trái: Logo & Tên đơn vị */}
-        <div className="relative z-10">
-          <Link
-            href="/"
-            className="inline-flex items-center gap-3 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300 rounded-lg p-1"
-          >
-            <div className="w-10 h-10 rounded-lg bg-white/10 border border-white/20 flex items-center justify-center text-white font-black text-xl shadow-xs group-hover:bg-white/20 transition-colors shrink-0">
-              <GraduationCap className="w-6 h-6 text-blue-200" />
-            </div>
-            <div>
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-white block leading-tight">
-                NexusShowcase
-              </span>
-              <span className="text-[10px] sm:text-[11px] font-bold text-slate-300 tracking-wider uppercase block">
-                Khoa CNTT • ĐH Khoa học Tự nhiên
-              </span>
-            </div>
-          </Link>
-        </div>
+      {/* Họa tiết ánh sáng gradient nền mềm mại theo mẫu hero học thuật */}
+      <div className="absolute top-16 left-0 w-96 h-96 bg-blue-100/40 rounded-full blur-3xl pointer-events-none -translate-x-1/4 -translate-y-1/4" />
+      <div className="absolute top-16 right-0 w-96 h-96 bg-purple-100/35 rounded-full blur-3xl pointer-events-none translate-x-1/4 -translate-y-1/4" />
+      <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-pink-100/25 rounded-full blur-3xl pointer-events-none" />
 
-        {/* 2. Nội dung chính Cột Trái: Mục tiêu & Giá trị cốt lõi */}
-        <div className="relative z-10 my-8 lg:my-auto space-y-6">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-md bg-white/10 text-amber-300 text-xs font-bold mb-3 border border-white/15">
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>CÂU LẠC BỘ HỌC THUẬT NEXUS</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
-              Ươm mầm nghiên cứu, <br className="hidden sm:inline" />
-              Kiến tạo công nghệ tương lai.
-            </h2>
-            <p className="mt-2.5 text-xs sm:text-sm text-slate-300 leading-relaxed max-w-md">
-              Không gian số lưu trữ, thẩm định và vinh danh các bài báo khoa học, sản phẩm công nghệ tiên phong của sinh viên và giảng viên Khoa Công nghệ Thông tin.
-            </p>
-          </div>
-
-          {/* 3 Mục tiêu trọng tâm */}
-          <div className="space-y-3 pt-1">
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10 backdrop-blur-xs">
-              <BookOpen className="w-5 h-5 text-blue-300 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-xs sm:text-sm font-bold text-white">Xuất bản &amp; Lưu trữ Công trình</h3>
-                <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5 leading-normal">
-                  Hệ thống hóa các đề tài NCKH, bài báo hội nghị quốc tế và khóa luận tốt nghiệp xuất sắc.
-                </p>
+      {/* 2. Main Hero Layout: Căn lề 2 bên chuẩn container */}
+      <main className="flex-1 flex items-center justify-center py-8 sm:py-10 lg:py-12 relative z-10">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+            {/* 
+              CỘT BÊN TRÁI: MỤC TIÊU CÂU LẠC BỘ
+              (Cùng tone màu sáng đồng nhất, typography đậm rõ nét, 2 nút bên dưới)
+            */}
+            <aside className="lg:col-span-7 xl:col-span-7 space-y-6">
+              {/* Pill tag nhận diện CLB */}
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 border border-slate-200/80 text-xs font-semibold text-slate-700 shadow-2xs">
+                <span className="w-2 h-2 rounded-full bg-slate-700" />
+                <span>CÂU LẠC BỘ HỌC THUẬT NEXUS · FIT HCMUS</span>
               </div>
-            </div>
 
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10 backdrop-blur-xs">
-              <Cpu className="w-5 h-5 text-emerald-300 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-xs sm:text-sm font-bold text-white">Dự án Công nghệ &amp; Ứng dụng</h3>
-                <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5 leading-normal">
-                  Thực hiện các sản phẩm mã nguồn mở, đồ án IoT, AI và giải pháp phần mềm thực tiễn.
-                </p>
-              </div>
-            </div>
+              {/* Tiêu đề lớn tạo điểm nhấn học thuật & công nghệ */}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-[52px] font-black text-slate-900 tracking-tight leading-[1.12]">
+                Ươm mầm nghiên cứu <br className="hidden sm:inline" />
+                &amp; Sáng tạo công nghệ.
+              </h1>
 
-            <div className="flex items-start gap-3 p-3 rounded-lg bg-white/5 border border-white/10 backdrop-blur-xs">
-              <ShieldCheck className="w-5 h-5 text-amber-300 shrink-0 mt-0.5" />
-              <div>
-                <h3 className="text-xs sm:text-sm font-bold text-white">Thẩm định &amp; Vinh danh Học thuật</h3>
-                <p className="text-[11px] sm:text-xs text-slate-300 mt-0.5 leading-normal">
-                  Quy trình bình duyệt chuẩn mực, kết nối cố vấn chuyên môn và vinh danh thành viên nòng cốt.
-                </p>
+              {/* Nội dung giới thiệu sứ mệnh & mục tiêu câu lạc bộ */}
+              <p className="text-sm sm:text-base lg:text-lg text-slate-600 leading-relaxed max-w-xl font-normal">
+                Không gian học thuật tại Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM. Nơi kết nối sinh viên đam mê công nghệ, lưu trữ các đề tài nghiên cứu khoa học, khóa luận xuất sắc và phát triển các sản phẩm tiên phong.
+              </p>
+
+              {/* 2 Nút điều hướng: 1 là Trang chủ, 2 là Liên hệ */}
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <Link
+                  href="/"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold shadow-xs transition-all active:scale-[0.98]"
+                >
+                  <ArrowLeft className="w-4 h-4 text-slate-300" />
+                  <span>Trang chủ</span>
+                </Link>
+
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-white hover:bg-slate-50 text-slate-800 text-sm font-bold border border-slate-300 shadow-2xs transition-all active:scale-[0.98]"
+                >
+                  <Mail className="w-4 h-4 text-slate-500" />
+                  <span>Liên hệ</span>
+                </Link>
               </div>
+
+              {/* Thẻ thông tin học thuật góc dưới (tương tự huy hiệu hội nghị trong ảnh mẫu) */}
+              <div className="pt-2">
+                <div className="inline-flex items-center gap-3 px-3.5 py-2 rounded-lg border border-slate-200 bg-white/90 backdrop-blur-xs text-xs text-slate-600 shadow-2xs">
+                  <span className="px-2 py-0.5 rounded bg-slate-900 text-white font-bold text-[11px]">
+                    Học thuật
+                  </span>
+                  <span className="font-medium text-slate-700">
+                    Khoa CNTT · ĐH Khoa học Tự nhiên, ĐHQG-HCM
+                  </span>
+                </div>
+              </div>
+            </aside>
+
+            {/* 
+              CỘT BÊN PHẢI: FORM ĐĂNG NHẬP
+              (Thay thế hình minh họa bằng thẻ đăng nhập nổi bật)
+            */}
+            <div className="lg:col-span-5 xl:col-span-5 w-full">
+              <Suspense fallback={<LoginFormFallback />}>
+                <LoginForm />
+              </Suspense>
             </div>
           </div>
         </div>
-
-        {/* 3. Footer Cột Trái: 2 Nút điều hướng thoát (Trang chủ & Liên hệ) */}
-        <div className="relative z-10 pt-4 border-t border-white/15 space-y-3">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold border border-white/20 transition-all hover:-translate-y-0.5 shadow-xs"
-            >
-              <ArrowLeft className="w-4 h-4 text-slate-300" />
-              <span>Trang chủ</span>
-            </Link>
-
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs sm:text-sm font-bold border border-white/20 transition-all hover:-translate-y-0.5 shadow-xs"
-            >
-              <Mail className="w-4 h-4 text-slate-300" />
-              <span>Liên hệ ban điều hành</span>
-            </Link>
-          </div>
-
-          <p className="text-[10px] text-slate-400">
-            © {new Date().getFullYear()} NexusShowcase • Đại học Khoa học Tự nhiên - ĐHQG-HCM
-          </p>
-        </div>
-      </aside>
-
-      {/* 
-        CỘT BÊN PHẢI: FORM ĐĂNG NHẬP 
-        (Sạch sẽ, tập trung, chuẩn UX học thuật)
-      */}
-      <main className="flex-1 flex items-center justify-center p-4 sm:p-6 lg:p-10 min-h-0 bg-slate-50/70">
-        <Suspense fallback={<LoginFormFallback />}>
-          <LoginForm />
-        </Suspense>
       </main>
     </div>
   );

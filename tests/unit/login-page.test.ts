@@ -7,9 +7,22 @@ describe('Split-Screen Login Page Layout and Neutral Language', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/login/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
 
-    // Split-screen structure: aside and main
+    // Header Navbar is preserved
+    expect(content).toContain('<Navbar');
+
+    // No AcademicFooter as requested
+    expect(content).not.toContain('<AcademicFooter');
+
+    // Standard 2-column container grid alignment
+    expect(content).toContain('max-w-7xl');
+    expect(content).toContain('grid-cols-1 lg:grid-cols-12');
+
+    // Split-screen structure: aside (club mission) and main
     expect(content).toContain('<aside');
     expect(content).toContain('<main');
+
+    // Consistent light theme (no dark navy block on aside)
+    expect(content).not.toContain('bg-[#0F294A]');
 
     // Club mission and focus areas
     expect(content).toContain('CÂU LẠC BỘ HỌC THUẬT NEXUS');
