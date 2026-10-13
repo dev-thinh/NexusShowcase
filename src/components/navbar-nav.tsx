@@ -72,28 +72,29 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
   const isProfileActive = user ? pathname === `/members/${user.id}` : false;
   const isLoginActive = pathname === '/login';
 
-  // Standard uniform active panel class
+  // Standard uniform active panel class - kích cỡ vừa vặn, không cuộn
   const activeTabClass =
-    'h-9 px-2.5 xl:px-3.5 rounded-lg inline-flex items-center justify-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150 shrink-0';
+    'h-8.5 px-2 xl:px-3 rounded-lg inline-flex items-center justify-center gap-1.5 text-xs xl:text-[13px] font-bold bg-[#0F294A] text-white shadow-xs transition-all duration-150 shrink-0';
 
   // Standard uniform inactive panel class
   const inactiveTabClass =
-    'h-9 px-2.5 xl:px-3.5 rounded-lg inline-flex items-center justify-center gap-1.5 xl:gap-2 text-xs xl:text-sm font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 shrink-0';
+    'h-8.5 px-2 xl:px-3 rounded-lg inline-flex items-center justify-center gap-1.5 text-xs xl:text-[13px] font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-all duration-150 shrink-0';
 
   return (
-    <div className="flex items-center justify-end lg:justify-between flex-1 min-w-0 gap-2 sm:gap-4">
+    <div className="flex items-center justify-end lg:justify-between flex-1 min-w-0 gap-2 sm:gap-3">
       {/* 
-        CÁC TAB NỘI DUNG Ở GIỮA (FLEX FLOW, KHÔNG BAO GIỜ BỊ OVERLAP BỞI PROFILE HOẶC LOGO)
+        CÁC TAB NỘI DUNG Ở GIỮA
+        Cố định hoàn toàn, vừa vặn không cuộn, không bị tràn
         Thứ tự chuẩn hóa: Trang chủ -> Thành viên -> Các tab nổi bật -> Bài đăng -> Liên hệ
       */}
-      <nav className="hidden lg:flex items-center justify-center gap-1 xl:gap-2 flex-1 min-w-0 px-1 overflow-x-auto no-scrollbar">
+      <nav className="hidden lg:flex items-center justify-center gap-1 flex-1 min-w-0">
         {/* 1. Tab: Trang chủ */}
         <Link
           href="/"
           className={isExploreActive ? activeTabClass : inactiveTabClass}
           aria-current={isExploreActive ? 'page' : undefined}
         >
-          <Compass className={`w-4 h-4 shrink-0 ${isExploreActive ? 'text-blue-200' : 'text-slate-400'}`} />
+          <Compass className={`w-3.5 h-3.5 shrink-0 ${isExploreActive ? 'text-blue-200' : 'text-slate-400'}`} />
           <span>Trang chủ</span>
         </Link>
 
@@ -103,7 +104,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
           className={isMembersActive ? activeTabClass : inactiveTabClass}
           aria-current={isMembersActive ? 'page' : undefined}
         >
-          <Users className={`w-4 h-4 shrink-0 ${isMembersActive ? 'text-blue-200' : 'text-slate-400'}`} />
+          <Users className={`w-3.5 h-3.5 shrink-0 ${isMembersActive ? 'text-blue-200' : 'text-slate-400'}`} />
           <span>Thành viên</span>
         </Link>
 
@@ -117,7 +118,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
               className={isCatActive ? activeTabClass : inactiveTabClass}
               aria-current={isCatActive ? 'page' : undefined}
             >
-              <Layers className={`w-4 h-4 shrink-0 ${isCatActive ? 'text-blue-200' : 'text-slate-400'}`} />
+              <Layers className={`w-3.5 h-3.5 shrink-0 ${isCatActive ? 'text-blue-200' : 'text-slate-400'}`} />
               <span>{cat.name}</span>
             </Link>
           );
@@ -129,7 +130,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
           className={isDashboardActive ? activeTabClass : inactiveTabClass}
           aria-current={isDashboardActive ? 'page' : undefined}
         >
-          <LayoutDashboard className={`w-4 h-4 shrink-0 ${isDashboardActive ? 'text-blue-200' : 'text-slate-400'}`} />
+          <LayoutDashboard className={`w-3.5 h-3.5 shrink-0 ${isDashboardActive ? 'text-blue-200' : 'text-slate-400'}`} />
           <span>Bài đăng</span>
         </Link>
 
@@ -139,20 +140,20 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
           className={isContactActive ? activeTabClass : inactiveTabClass}
           aria-current={isContactActive ? 'page' : undefined}
         >
-          <Mail className={`w-4 h-4 shrink-0 ${isContactActive ? 'text-blue-200' : 'text-slate-400'}`} />
+          <Mail className={`w-3.5 h-3.5 shrink-0 ${isContactActive ? 'text-blue-200' : 'text-slate-400'}`} />
           <span>Liên hệ</span>
         </Link>
       </nav>
 
       {/* GÓC BÊN PHẢI: QUẢN TRỊ (NẾU ADMIN), PROFILE & ĐĂNG XUẤT */}
-      <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 z-10">
+      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 z-10">
         {/* Menu Thả Quản trị (Dành riêng cho ADMIN, đặt bên cạnh Profile để không che các tab điều hướng) */}
         {user?.role === 'ADMIN' && (
           <div className="relative" ref={adminDropdownRef}>
             <button
               type="button"
               onClick={() => setIsAdminDropdownOpen((prev) => !prev)}
-              className={`h-9 px-2.5 sm:px-3 rounded-lg inline-flex items-center justify-center gap-1.5 text-xs sm:text-sm font-bold transition-all duration-150 border cursor-pointer ${
+              className={`h-8.5 px-2 sm:px-2.5 rounded-lg inline-flex items-center justify-center gap-1 text-xs font-bold transition-all duration-150 border cursor-pointer ${
                 isAdminActive
                   ? 'bg-[#0F294A] text-white shadow-xs border-transparent'
                   : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border-slate-200 shadow-2xs'
@@ -161,11 +162,11 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
               aria-haspopup="true"
             >
               <ShieldCheck
-                className={`w-4 h-4 shrink-0 ${isAdminActive ? 'text-amber-300' : 'text-slate-500'}`}
+                className={`w-3.5 h-3.5 shrink-0 ${isAdminActive ? 'text-amber-300' : 'text-slate-500'}`}
               />
               <span className="hidden sm:inline">Quản trị</span>
               <ChevronDown
-                className={`w-3.5 h-3.5 transition-transform duration-200 opacity-70 ${
+                className={`w-3 h-3 transition-transform duration-200 opacity-70 ${
                   isAdminDropdownOpen ? 'rotate-180' : ''
                 }`}
               />
@@ -233,7 +234,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             {/* User Profile Card với tên gọn gàng & 3 huy hiệu Role chuẩn */}
             <Link
               href={`/members/${user.id}`}
-              className={`h-9 px-2.5 sm:px-3 rounded-lg inline-flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-semibold transition-all border shadow-2xs shrink-0 ${
+              className={`h-8.5 px-2 sm:px-2.5 rounded-lg inline-flex items-center gap-1.5 text-xs font-semibold transition-all border shadow-2xs shrink-0 ${
                 isProfileActive
                   ? 'bg-[#0F294A] text-white border-transparent shadow-xs'
                   : 'bg-white hover:bg-slate-50 text-slate-800 border-slate-200'
@@ -250,21 +251,21 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
               </div>
 
               {/* Tên người dùng */}
-              <span className="truncate max-w-[65px] sm:max-w-[85px] md:max-w-[95px] font-medium leading-none">
+              <span className="truncate max-w-[60px] sm:max-w-[75px] md:max-w-[85px] font-medium leading-none">
                 {user.name || 'Thành viên'}
               </span>
 
               {/* 3 THẺ ROLE CHUẨN HÓA: Admin, Core, Member */}
               {user.role === 'ADMIN' ? (
-                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
+                <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
                   Admin
                 </span>
               ) : user.role === 'CORE_MEMBER' ? (
-                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200/80">
+                <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200/80">
                   Core
                 </span>
               ) : (
-                <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/80">
+                <span className="shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200/80">
                   Member
                 </span>
               )}
@@ -280,11 +281,11 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
             className={
               isLoginActive
                 ? activeTabClass
-                : 'h-9 px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white shadow-xs transition-colors'
+                : 'h-8.5 px-3 rounded-lg inline-flex items-center justify-center gap-1.5 text-xs font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white shadow-xs transition-colors'
             }
             aria-current={isLoginActive ? 'page' : undefined}
           >
-            <LogIn className="w-4 h-4 shrink-0 text-blue-200" />
+            <LogIn className="w-3.5 h-3.5 shrink-0 text-blue-200" />
             <span>Đăng nhập</span>
           </Link>
         )}
@@ -293,11 +294,11 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
         <button
           type="button"
           onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-          className="lg:hidden h-9 w-9 rounded-lg inline-flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
+          className="lg:hidden h-8.5 w-8.5 rounded-lg inline-flex items-center justify-center text-slate-700 hover:text-slate-900 hover:bg-slate-100 border border-slate-200 transition-colors cursor-pointer"
           aria-label={isMobileMenuOpen ? 'Đóng menu' : 'Mở menu điều hướng'}
           aria-expanded={isMobileMenuOpen}
         >
-          {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {isMobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
         </button>
       </div>
 

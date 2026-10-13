@@ -20,6 +20,7 @@ describe('Navbar Nav Component Structure', () => {
 
     // Layout uses flex-1 instead of absolute dead-center to avoid overlapping profile/admin
     expect(content).not.toContain('absolute left-1/2 -translate-x-1/2');
+    expect(content).not.toContain('overflow-x-auto');
     expect(content).toContain('right-0');
   });
 
