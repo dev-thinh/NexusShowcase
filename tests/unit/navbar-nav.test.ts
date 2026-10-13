@@ -18,9 +18,8 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain('Thành viên');
     expect(content).toContain('Liên hệ');
 
-    // Layout uses flex-1 instead of absolute dead-center to avoid overlapping profile/admin
-    expect(content).not.toContain('absolute left-1/2 -translate-x-1/2');
-    expect(content).not.toContain('overflow-x-auto');
+    // Layout keeps center navigation dead-center and admin menu right-anchored
+    expect(content).toContain('absolute left-1/2 -translate-x-1/2');
     expect(content).toContain('right-0');
   });
 
