@@ -41,6 +41,10 @@ describe('Home Page Minimalist Revamp', () => {
     expect(content).toContain('Robotics & IoT');
     expect(content).toContain('Nghiên cứu khoa học');
     expect(content).toContain('Dự án & Sáng tạo');
+
+    // Domains filter row removed for clean minimalist layout
+    expect(content).not.toContain('Research Domain Topics Filter');
+    expect(content).not.toContain('Tất cả lĩnh vực');
   });
 });
 
