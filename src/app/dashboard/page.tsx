@@ -83,7 +83,7 @@ export default async function DashboardPage() {
               <span>Đăng tải bài mới cho nhóm</span>
             </Link>
           ) : (
-            <div className="p-3 bg-amber-50 border border-amber-200/80 rounded-lg text-xs sm:text-sm text-amber-800 max-w-md flex items-start gap-2.5">
+            <div className="panel-callout bg-amber-50 border-amber-200/80 text-xs sm:text-sm text-amber-800 max-w-md flex items-start gap-2.5">
               <Info className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 Tài khoản thành viên. Để đăng tải công trình nghiên cứu, vui lòng liên hệ Quản trị viên để được cấp quyền <strong>CORE MEMBER</strong>.
@@ -93,7 +93,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* My Created Items */}
-        <section className="bg-white rounded-lg border border-slate-200 shadow-xs p-5 sm:p-6">
+        <section className="panel-operational sm:p-6">
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-slate-100">
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">Các bài đã khởi tạo</h2>
@@ -150,7 +150,7 @@ export default async function DashboardPage() {
                     <p className="text-sm text-slate-600 line-clamp-1 mt-0.5">{item.summary}</p>
 
                     {item.status === 'REJECTED' && item.rejectionReason && (
-                      <div className="mt-3 p-3 rounded-md bg-rose-50 border border-rose-200 text-xs sm:text-sm text-rose-800 flex items-start gap-2">
+                      <div className="panel-callout mt-3 bg-rose-50 border-rose-200 text-xs sm:text-sm text-rose-800 flex items-start gap-2">
                         <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                         <div>
                           <strong>Góp ý từ Ban kiểm duyệt:</strong> {item.rejectionReason}
@@ -159,7 +159,7 @@ export default async function DashboardPage() {
                     )}
 
                     {!isUploader && (item.status === 'DRAFT' || item.status === 'REJECTED') && (
-                      <div className="mt-2.5 p-2.5 rounded-md bg-amber-50 border border-amber-200/70 text-xs text-amber-800 flex items-center gap-2">
+                      <div className="panel-callout mt-2.5 bg-amber-50 border-amber-200/70 text-xs text-amber-800 flex items-center gap-2">
                         <Info className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                         <span>Bài viết chỉ xem. Tài khoản cần được cấp quyền Core Member để tiếp tục chỉnh sửa &amp; gửi xét duyệt.</span>
                       </div>

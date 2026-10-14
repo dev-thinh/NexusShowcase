@@ -82,7 +82,7 @@ export default async function AdminReviewsPage() {
             {pendingItems.map((item) => (
               <div
                 key={item.id}
-                className="p-5 bg-white rounded-lg border border-slate-200 shadow-2xs flex flex-col md:flex-row md:items-center justify-between gap-5 hover:border-[#0F294A]/30 transition-colors"
+                className="panel-operational flex flex-col md:flex-row md:items-center justify-between gap-5 hover:border-[#0F294A]/30 transition-colors"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex flex-wrap items-center gap-2 mb-2">
@@ -147,10 +147,10 @@ export default async function AdminReviewsPage() {
                   </div>
                 </div>
 
-                <div className="shrink-0 flex flex-wrap items-center gap-2.5">
+                <div className="action-row-card shrink-0 md:mt-0 md:border-t-0 md:pt-0">
                   <Link
                     href={`/showcase/${item.slug}`}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 hover:border-[#0F294A] text-slate-700 hover:text-[#0F294A] bg-white hover:bg-slate-50 text-xs font-bold transition-all shadow-2xs"
+                    className="action-secondary-card hover:border-[#0F294A] hover:text-[#0F294A]"
                   >
                     <Eye className="w-4 h-4 text-slate-500" />
                     <span>Xem chi tiết</span>

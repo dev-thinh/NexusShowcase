@@ -66,7 +66,7 @@ export default async function AdminDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <Link
             href="/admin/reviews"
-            className="group p-4 sm:p-5 bg-white rounded-lg border border-slate-200 shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
+            className="panel-operational group hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5">
@@ -94,7 +94,7 @@ export default async function AdminDashboardPage() {
 
           <Link
             href="/admin/members"
-            className="group p-4 sm:p-5 bg-white rounded-lg border border-slate-200 shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
+            className="panel-operational group hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
           >
             <div>
               <div className="flex items-center justify-between mb-3.5">
@@ -120,7 +120,7 @@ export default async function AdminDashboardPage() {
             </div>
           </Link>
 
-          <div className="p-4 sm:p-5 bg-white rounded-lg border border-slate-200 shadow-2xs flex flex-col justify-between">
+          <div className="panel-operational flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between mb-3.5">
                 <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
@@ -151,7 +151,7 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Pinned Showcase Management Panel */}
-        <section className="bg-white rounded-lg border border-slate-200 shadow-2xs p-5 sm:p-6">
+        <section className="panel-operational sm:p-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 mb-6">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/80 mb-1.5">

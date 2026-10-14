@@ -8,5 +8,6 @@ describe('Admin Reviews Page', () => {
     const content = fs.readFileSync(reviewsPath, 'utf-8');
 
     expect(content).toContain('mediaDriveUrl');
+    expect(content).toContain('action-row-card');
   });
 });

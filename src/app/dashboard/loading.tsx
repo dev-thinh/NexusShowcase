@@ -19,7 +19,7 @@ export default function DashboardLoading() {
           <Skeleton className="w-52 h-9 rounded-lg" />
         </div>
 
-        <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-5 sm:p-6 space-y-6">
+        <div className="panel-operational sm:p-6 space-y-6">
           <div className="flex justify-between items-center pb-4 border-b border-slate-100">
             <Skeleton className="w-56 h-6" />
             <Skeleton className="w-20 h-6 rounded-md" />

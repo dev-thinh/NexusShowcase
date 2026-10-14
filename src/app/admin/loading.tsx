@@ -20,7 +20,7 @@ export default function AdminLoading() {
 
         {/* Widgets Skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          <div className="p-5 sm:p-6 bg-white rounded-lg border border-slate-200 shadow-xs space-y-4">
+          <div className="panel-operational sm:p-6 space-y-4">
             <div className="flex justify-between items-center">
               <Skeleton className="w-10 h-10 rounded-md" />
               <Skeleton className="w-24 h-6 rounded-md" />
@@ -33,7 +33,7 @@ export default function AdminLoading() {
             </div>
           </div>
 
-          <div className="p-5 sm:p-6 bg-white rounded-lg border border-slate-200 shadow-xs space-y-4">
+          <div className="panel-operational sm:p-6 space-y-4">
             <div className="flex justify-between items-center">
               <Skeleton className="w-10 h-10 rounded-md" />
               <Skeleton className="w-28 h-6 rounded-md" />

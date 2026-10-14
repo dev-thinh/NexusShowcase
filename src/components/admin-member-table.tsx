@@ -119,7 +119,7 @@ export function AdminMemberTable({ members }: AdminMemberTableProps) {
       </div>
 
       {/* Member Table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden shadow-xs">
+      <div className="panel-operational p-0 overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
             <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
