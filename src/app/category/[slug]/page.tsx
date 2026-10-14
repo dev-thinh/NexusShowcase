@@ -311,7 +311,7 @@ export default async function CategoryPage({
                 {items.map((item) => (
                   <div
                     key={item.id}
-                    className="p-4 rounded-lg bg-white border border-slate-200 shadow-2xs flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:border-slate-300 transition-all"
+                    className="panel-public p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 hover:border-slate-300 transition-all"
                   >
                     <div className="space-y-1.5 flex-1">
                       <div className="flex items-center gap-2">

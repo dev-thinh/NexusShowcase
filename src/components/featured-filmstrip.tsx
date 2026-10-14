@@ -129,7 +129,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
   return (
     <Link
       href={`/showcase/${item.slug}`}
-      className="group/card block w-[300px] sm:w-[330px] shrink-0 bg-white rounded-lg border border-slate-200 shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all duration-200 ease-out overflow-hidden relative z-10 flex flex-col h-[360px]"
+      className="panel-public group/card block w-[300px] sm:w-[330px] shrink-0 p-0 hover:shadow-sm hover:border-slate-300 transition-all duration-200 ease-out overflow-hidden relative z-10 flex flex-col h-[360px]"
     >
       {/* Thumbnail Aspect 16/9 */}
       <div className="aspect-[16/9] w-full bg-slate-100 relative overflow-hidden border-b border-slate-100 shrink-0">

@@ -35,7 +35,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
   const remainingCount = authorNames.length > 1 ? authorNames.length - 1 : 0;
 
   return (
-    <div className="group flex flex-col rounded-lg border border-slate-200/90 bg-white shadow-2xs hover:shadow-sm hover:border-slate-300 transition-all duration-200 overflow-hidden">
+    <div className="panel-public group flex flex-col p-0 hover:shadow-sm hover:border-slate-300 transition-all duration-200 overflow-hidden">
       {/* Thumbnail Container */}
       <Link
         href={`/showcase/${item.slug}`}

@@ -23,7 +23,7 @@ export function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center p-6 sm:p-10 bg-white rounded-lg border border-dashed border-slate-300 text-center transition-all ${className}`}
+      className={`panel-nested flex flex-col items-center justify-center p-6 sm:p-10 border-dashed border-slate-300 text-center transition-all ${className}`}
     >
       <Icon className="w-8 h-8 text-slate-400 mb-2.5" />
       <h3 className="text-sm sm:text-base font-bold text-slate-800 tracking-tight">

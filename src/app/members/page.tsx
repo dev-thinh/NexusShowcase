@@ -84,7 +84,7 @@ export default async function MembersDirectoryPage() {
             {advisors.map((advisor) => (
               <div
                 key={advisor.id}
-                className="p-4 sm:p-5 rounded-lg bg-white border border-purple-100 shadow-2xs hover:border-purple-300 transition-all flex flex-col justify-between"
+                className="panel-public p-4 sm:p-5 border-purple-100 hover:border-purple-300 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start gap-3.5 mb-3">
@@ -145,7 +145,7 @@ export default async function MembersDirectoryPage() {
             {coreMembers.map((member) => (
               <div
                 key={member.id}
-                className="p-4 sm:p-5 rounded-lg bg-white border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between"
+                className="panel-public p-4 sm:p-5 hover:border-slate-300 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start gap-3.5 mb-3">
@@ -233,7 +233,7 @@ export default async function MembersDirectoryPage() {
             {regularMembers.map((member) => (
               <div
                 key={member.id}
-                className="p-4 rounded-lg bg-white border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex flex-col justify-between"
+                className="panel-public p-4 hover:border-slate-300 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-start gap-3.5 mb-3">
