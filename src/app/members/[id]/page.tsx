@@ -71,7 +71,7 @@ export default async function MemberProfilePage({
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
         {/* Profile Header */}
-        <header className="bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-2xs mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
+        <header className="panel-detail mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
           <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg bg-[#0F294A] text-white font-black text-2xl sm:text-3xl flex items-center justify-center shadow-xs shrink-0 border-2 border-slate-100">
             {user.fullName.charAt(0)}
           </div>
@@ -94,7 +94,7 @@ export default async function MemberProfilePage({
             </p>
 
             {/* Academic Metrics Row */}
-            <div className="grid grid-cols-3 gap-3 max-w-md mb-5 p-3.5 bg-slate-50 border border-slate-200 rounded-md text-center">
+            <div className="panel-nested grid grid-cols-3 gap-3 max-w-md mb-5 text-center">
               <div>
                 <div className="text-xl sm:text-2xl font-black text-slate-900">{papers.length}</div>
                 <div className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mt-0.5">Bài Báo</div>
@@ -116,7 +116,7 @@ export default async function MemberProfilePage({
                   href={user.googleScholarUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="action-secondary-detail"
                 >
                   <GraduationCap className="w-3.5 h-3.5 text-slate-500" />
                   <span>Google Scholar</span>
@@ -127,7 +127,7 @@ export default async function MemberProfilePage({
                   href={user.githubUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="action-secondary-detail"
                 >
                   <Github className="w-3.5 h-3.5 text-slate-800" />
                   <span>GitHub</span>
@@ -138,7 +138,7 @@ export default async function MemberProfilePage({
                   href={user.linkedinUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="action-secondary-detail"
                 >
                   <Linkedin className="w-3.5 h-3.5 text-blue-600" />
                   <span>LinkedIn</span>
@@ -149,7 +149,7 @@ export default async function MemberProfilePage({
                   href={user.portfolioUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs transition-colors"
+                  className="action-secondary-detail"
                 >
                   <Globe className="w-3.5 h-3.5 text-slate-500" />
                   <span>Trang cá nhân</span>

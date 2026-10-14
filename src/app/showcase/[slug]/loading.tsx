@@ -14,17 +14,17 @@ export default function ShowcaseDetailLoading() {
         <Skeleton className="w-48 h-5 mb-5" />
 
         {/* Header Skeleton */}
-        <div className="bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-xs mb-6 space-y-4">
+        <div className="panel-detail mb-6 space-y-4">
           <div className="flex gap-2.5">
             <Skeleton className="w-28 h-6 rounded-md" />
             <Skeleton className="w-24 h-6 rounded-md" />
           </div>
           <Skeleton className="w-4/5 h-10" />
-          <div className="p-4 sm:p-5 rounded-md bg-slate-50 border border-slate-200 space-y-2">
+          <div className="panel-nested space-y-2">
             <Skeleton className="w-32 h-4" />
             <Skeleton className="w-full h-12" />
           </div>
-          <div className="flex gap-2.5 pt-3 border-t border-slate-100 flex-wrap">
+          <div className="action-row-detail">
             <Skeleton className="w-36 h-9 rounded-lg" />
             <Skeleton className="w-40 h-9 rounded-lg" />
             <Skeleton className="w-40 h-9 rounded-lg" />
@@ -32,20 +32,20 @@ export default function ShowcaseDetailLoading() {
         </div>
 
         {/* Video Skeleton */}
-        <div className="mb-6 p-5 sm:p-6 bg-white rounded-lg border border-slate-200 shadow-xs space-y-4">
+        <div className="panel-detail mb-6 space-y-4">
           <Skeleton className="w-48 h-6" />
           <Skeleton className="aspect-video w-full rounded-lg" />
         </div>
 
         {/* Contributors Skeleton */}
-        <div className="bg-white p-5 sm:p-6 rounded-lg border border-slate-200 shadow-xs mb-6 space-y-5">
+        <div className="panel-detail mb-6 space-y-5">
           <div className="flex justify-between items-center">
             <Skeleton className="w-48 h-6" />
             <Skeleton className="w-24 h-4" />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="flex items-center gap-3.5 p-3.5 rounded-lg bg-slate-50 border border-slate-200">
+              <div key={i} className="panel-nested flex items-center gap-3.5">
                 <Skeleton className="w-10 h-10 rounded-full" />
                 <div className="space-y-1.5 flex-1">
                   <Skeleton className="w-36 h-5" />

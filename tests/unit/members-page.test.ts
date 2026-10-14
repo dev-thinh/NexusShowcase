@@ -12,4 +12,20 @@ describe('Members Directory Page', () => {
     expect(content).toContain('CORE_MEMBER');
     expect(content).toContain('MEMBER');
   });
+
+  it('keeps member detail and its loading state geometrically aligned', () => {
+    const detail = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/app/members/[id]/page.tsx'),
+      'utf-8',
+    );
+    const loading = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/app/members/[id]/loading.tsx'),
+      'utf-8',
+    );
+
+    expect(detail).toContain('panel-detail');
+    expect(detail).toContain('panel-nested');
+    expect(loading).toContain('panel-detail');
+    expect(loading).toContain('panel-nested');
+  });
 });

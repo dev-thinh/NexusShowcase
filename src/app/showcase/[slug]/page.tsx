@@ -78,7 +78,7 @@ export default async function ShowcaseDetailPage({
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-6xl flex-1">
         {/* Preview Banner for Admin / Creator */}
         {item.status !== 'PUBLISHED' && (
-          <div className="mb-6 p-4 sm:p-5 rounded-lg bg-amber-50 border border-amber-200 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
+          <div className="panel-callout mb-6 bg-amber-50 border-amber-200 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
             <div className="flex items-start gap-3">
               <Clock className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
               <div>
@@ -134,7 +134,7 @@ export default async function ShowcaseDetailPage({
         </Link>
 
         {/* Paper Header Card */}
-        <header className="bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-2xs mb-6">
+        <header className="panel-detail mb-6">
           <div className="flex flex-wrap items-center gap-2.5 mb-3.5">
             <TypeBadge type={item.type} />
             <span
@@ -174,7 +174,7 @@ export default async function ShowcaseDetailPage({
             {item.title}
           </h1>
 
-          <div className="mt-5 p-4 sm:p-5 rounded-md bg-slate-50 border border-slate-200">
+          <div className="panel-nested mt-5">
             <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
               Tóm tắt đề tài (Abstract)
             </h2>
@@ -184,11 +184,11 @@ export default async function ShowcaseDetailPage({
           </div>
 
           {/* Standardized Uniform Action Cards Panel */}
-          <div className="mt-6 pt-5 border-t border-slate-100 flex flex-wrap items-center gap-2.5">
+          <div className="action-row-detail">
             {/* Citation Generator */}
             <CitationModal
               item={item}
-              className="h-10 px-3.5 sm:px-4 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs sm:text-sm font-bold transition-all shadow-xs cursor-pointer inline-flex items-center justify-center gap-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
+              className="action-primary-detail"
             />
 
             {/* Admin Visibility Toggle */}
@@ -213,7 +213,7 @@ export default async function ShowcaseDetailPage({
                 href={paperLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-10 px-3.5 sm:px-4 rounded-lg bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-xs sm:text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2 group cursor-pointer"
+                className="action-secondary-detail group"
               >
                 <FileText className="w-4 h-4 text-blue-600 shrink-0" />
                 <span>Đọc bài báo gốc</span>
@@ -226,7 +226,7 @@ export default async function ShowcaseDetailPage({
                 href={githubLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-10 px-3.5 sm:px-4 rounded-lg bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-xs sm:text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2 group cursor-pointer"
+                className="action-secondary-detail group"
               >
                 <Github className="w-4 h-4 text-slate-900 shrink-0" />
                 <span>Mã nguồn GitHub</span>
@@ -239,7 +239,7 @@ export default async function ShowcaseDetailPage({
                 href={liveDemoLink.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-10 px-3.5 sm:px-4 rounded-lg bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-xs sm:text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2 group cursor-pointer"
+                className="action-secondary-detail group"
               >
                 <Globe className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>Trang web chạy thử</span>
@@ -253,7 +253,7 @@ export default async function ShowcaseDetailPage({
                 href={link.url}
                 target="_blank"
                 rel="noreferrer"
-                className="h-10 px-3.5 sm:px-4 rounded-lg bg-white hover:bg-slate-50 text-slate-800 hover:text-slate-900 border border-slate-200 shadow-2xs text-xs sm:text-sm font-semibold transition-all active:scale-[0.98] inline-flex items-center justify-center gap-2 group cursor-pointer"
+                className="action-secondary-detail group"
               >
                 <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-600 shrink-0" />
                 <span>{link.label}</span>
@@ -264,7 +264,7 @@ export default async function ShowcaseDetailPage({
 
         {/* Video Demo Section */}
         {videoLink && (
-          <section className="mb-6 bg-white p-5 sm:p-6 rounded-lg border border-slate-200 shadow-2xs">
+          <section className="panel-detail mb-6">
             <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
               <span>Video Trình Diễn &amp; Demo</span>
             </h2>
@@ -274,7 +274,7 @@ export default async function ShowcaseDetailPage({
 
         {/* Full-Text PDF & Attachments Section */}
         {item.attachments && item.attachments.length > 0 && (
-          <section className="bg-white p-5 sm:p-6 rounded-lg border border-slate-200 shadow-2xs mb-6">
+          <section className="panel-detail mb-6">
             <div className="flex items-center justify-between mb-3.5">
               <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
                 <Paperclip className="w-4 h-4 text-slate-500" />
@@ -289,7 +289,7 @@ export default async function ShowcaseDetailPage({
               {item.attachments.map((att) => (
                 <div
                   key={att.id}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-md bg-slate-50 border border-slate-200 hover:bg-slate-100/60 transition-colors"
+                  className="panel-nested flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-100/60 transition-colors"
                 >
                   <div className="flex items-center gap-3 truncate">
                     <div className="w-9 h-9 rounded-md bg-rose-50 text-rose-700 font-bold text-xs flex items-center justify-center shrink-0 border border-rose-200/80">
@@ -331,7 +331,7 @@ export default async function ShowcaseDetailPage({
         )}
 
         {/* Authors Section */}
-        <section className="bg-white p-5 sm:p-6 rounded-lg border border-slate-200 shadow-2xs mb-6">
+        <section className="panel-detail mb-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
               <Users className="w-5 h-5 text-[#0F294A]" />
@@ -348,7 +348,7 @@ export default async function ShowcaseDetailPage({
               return (
                 <div
                   key={c.id}
-                  className={`flex items-start gap-3.5 p-3.5 rounded-md border transition-all ${
+                  className={`panel-nested flex items-start gap-3.5 transition-all ${
                     isAdvisor
                       ? 'bg-purple-50/40 border-purple-200 hover:border-purple-300'
                       : 'bg-slate-50/70 border-slate-200 hover:bg-slate-50'
@@ -394,7 +394,7 @@ export default async function ShowcaseDetailPage({
 
         {/* Markdown Content Section */}
         {item.content && (
-          <section className="bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-2xs">
+          <section className="panel-detail">
             <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-3.5">Nội dung chi tiết</h2>
             <div className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line font-sans">
               {item.content}

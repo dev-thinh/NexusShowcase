@@ -12,7 +12,7 @@ export default function MemberProfileLoading() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl flex-1">
         {/* Profile Card Skeleton */}
-        <div className="bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-xs mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
+        <div className="panel-detail mb-8 flex flex-col md:flex-row items-center md:items-start gap-6">
           <Skeleton className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg shrink-0" />
           <div className="space-y-3.5 flex-1 w-full text-center md:text-left">
             <div className="flex gap-3 justify-center md:justify-start items-center">
@@ -21,7 +21,7 @@ export default function MemberProfileLoading() {
             </div>
             <Skeleton className="w-44 h-4 mx-auto md:mx-0" />
             <Skeleton className="w-full max-w-xl h-12 mx-auto md:mx-0" />
-            <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto md:mx-0 p-3.5 bg-slate-50 border border-slate-200 rounded-md">
+            <div className="panel-nested grid grid-cols-3 gap-3 max-w-lg mx-auto md:mx-0">
               <Skeleton className="h-8" />
               <Skeleton className="h-8" />
               <Skeleton className="h-8" />

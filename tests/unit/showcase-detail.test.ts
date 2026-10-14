@@ -17,4 +17,15 @@ describe('Showcase Detail Page Visibility Protection', () => {
     const togglePath = path.resolve(process.cwd(), 'src/components/visibility-toggle-button.tsx');
     expect(fs.existsSync(togglePath)).toBe(true);
   });
+
+  it('uses the shared detail panel and action rhythm', () => {
+    const detailPath = path.resolve(process.cwd(), 'src/app/showcase/[slug]/page.tsx');
+    const content = fs.readFileSync(detailPath, 'utf-8');
+
+    expect(content).toContain('panel-detail');
+    expect(content).toContain('panel-nested');
+    expect(content).toContain('action-row-detail');
+    expect(content).toContain('action-primary-detail');
+    expect(content).toContain('action-secondary-detail');
+  });
 });
