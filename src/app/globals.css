@@ -4,7 +4,7 @@
 
 @layer components {
   .panel-public {
-    @apply rounded-xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6;
+    @apply rounded-lg border border-slate-200 bg-white p-5 shadow-sm sm:p-6;
   }
 
   .panel-operational {
@@ -12,11 +12,11 @@
   }
 
   .panel-detail {
-    @apply rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8;
+    @apply rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8;
   }
 
   .panel-nested {
-    @apply rounded-lg border border-slate-200 bg-slate-50 p-3 sm:p-4;
+    @apply rounded-md border border-slate-200 bg-slate-50 p-3 sm:p-4;
   }
 
   .panel-callout {
