@@ -49,9 +49,9 @@ export default async function NewItemPage() {
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-5xl flex-1">
         <header className="mb-6 pb-5 border-b border-slate-200">
-          <div className="flex items-start gap-3 sm:gap-3.5">
-            <FilePlus2 className="w-7 h-7 sm:w-8 sm:h-8 text-[#0F294A] shrink-0 mt-0.5 sm:mt-1" />
-            <div className="min-w-0 flex-1">
+          <div className="heading-gutter">
+            <FilePlus2 aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-8 sm:h-8 text-[#0F294A] mt-0.5 sm:mt-1" />
+            <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                 Khởi tạo công trình
               </span>

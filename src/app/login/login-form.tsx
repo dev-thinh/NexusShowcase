@@ -69,8 +69,8 @@ export function LoginForm() {
     <div className="max-w-lg w-full mx-auto">
       <div className="panel-detail">
         {/* Header với icon trần to bằng tiêu đề */}
-        <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
-          <LogIn className="w-7 h-7 text-[#0F294A] shrink-0" />
+        <div className="heading-gutter pb-4 border-b border-slate-100">
+          <LogIn aria-hidden="true" className="heading-gutter-icon w-6 h-6 sm:w-7 sm:h-7 text-[#0F294A]" />
           <h1 className="text-2xl font-extrabold text-slate-900 leading-tight">
             Đăng nhập
           </h1>

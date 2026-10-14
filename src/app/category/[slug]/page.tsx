@@ -84,9 +84,9 @@ export default async function CategoryPage({
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-6xl flex-1">
         {/* Category Header */}
         <header className="mb-8 pb-6 border-b border-slate-200">
-          <div className="flex items-start gap-3 sm:gap-3.5">
-            {getLayoutIcon()}
-            <div className="min-w-0 flex-1">
+          <div className="heading-gutter">
+            <span aria-hidden="true" className="heading-gutter-icon block">{getLayoutIcon()}</span>
+            <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                 Chuyên mục công trình
               </span>

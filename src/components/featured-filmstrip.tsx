@@ -61,9 +61,9 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
   return (
     <section className="py-10 sm:py-14 bg-[#e8edf5] border-y border-slate-200 relative z-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl mb-6">
-        <div className="flex items-start gap-3 sm:gap-3.5">
-          <Sparkles className="w-7 h-7 sm:w-8 sm:h-8 text-amber-600 shrink-0 mt-0.5 sm:mt-1" />
-          <div className="min-w-0 flex-1">
+        <div className="heading-gutter">
+          <Sparkles aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-8 sm:h-8 text-amber-600 mt-0.5 sm:mt-1" />
+          <div className="min-w-0">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
               TIÊU ĐIỂM HỌC THUẬT
             </span>

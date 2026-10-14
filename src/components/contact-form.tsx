@@ -13,8 +13,8 @@ export function ContactForm() {
 
   return (
     <div className="panel-detail">
-      <div className="flex items-center gap-2 mb-2">
-        <MessageSquare className="w-5 h-5 text-[#0F294A] shrink-0" />
+      <div className="heading-gutter mb-2">
+        <MessageSquare aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
         <h2 className="text-base sm:text-lg font-bold text-slate-900">
           Gửi Tin Nhắn Kết Nối
         </h2>

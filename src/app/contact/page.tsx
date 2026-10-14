@@ -22,9 +22,9 @@ export default function ContactPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl flex-1">
         {/* Header */}
         <header className="mb-8 pb-6 border-b border-slate-200">
-          <div className="flex items-start gap-3 sm:gap-3.5">
-            <Mail className="w-7 h-7 sm:w-8 sm:h-8 text-[#0F294A] shrink-0 mt-0.5 sm:mt-1" />
-            <div className="min-w-0 flex-1">
+          <div className="heading-gutter">
+            <Mail aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-8 sm:h-8 text-[#0F294A] mt-0.5 sm:mt-1" />
+            <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                 Kết nối &amp; Hợp tác
               </span>
@@ -43,9 +43,9 @@ export default function ContactPage() {
           <div className="lg:col-span-7 space-y-4">
             {/* Campus 1 */}
             <div className="panel-detail">
-              <div className="flex items-start gap-3 mb-3">
-                <Building className="w-6 h-6 text-blue-700 shrink-0 mt-0.5" />
-                <div className="min-w-0 flex-1">
+              <div className="heading-gutter mb-3">
+                <Building aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-blue-700 mt-0.5" />
+                <div className="min-w-0">
                   <span className="text-xs font-bold uppercase text-blue-700 tracking-wider block">
                     Cơ sở 1 (Trụ sở chính)
                   </span>
@@ -80,9 +80,9 @@ export default function ContactPage() {
 
             {/* Campus 2 */}
             <div className="panel-detail">
-              <div className="flex items-start gap-3 mb-3">
-                <GraduationCap className="w-6 h-6 text-emerald-700 shrink-0 mt-0.5" />
-                <div className="min-w-0 flex-1">
+              <div className="heading-gutter mb-3">
+                <GraduationCap aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-emerald-700 mt-0.5" />
+                <div className="min-w-0">
                   <span className="text-xs font-bold uppercase text-emerald-700 tracking-wider block">
                     Cơ sở 2 (Cơ sở Đào tạo &amp; Thực nghiệm)
                   </span>

@@ -276,8 +276,8 @@ export default async function ShowcaseDetailPage({
         {item.attachments && item.attachments.length > 0 && (
           <section className="panel-detail mb-6">
             <div className="flex items-center justify-between mb-3.5">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-                <Paperclip className="w-4 h-4 text-slate-500" />
+              <h2 className="heading-gutter text-base sm:text-lg font-bold text-slate-900">
+                <Paperclip aria-hidden="true" className="heading-gutter-icon w-4 h-4 text-slate-500" />
                 <span>Tài Liệu Toàn Văn &amp; Phụ Lục Nghiên Cứu</span>
               </h2>
               <span className="text-xs text-slate-500 font-semibold">
@@ -333,8 +333,8 @@ export default async function ShowcaseDetailPage({
         {/* Authors Section */}
         <section className="panel-detail mb-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 flex items-center gap-2">
-              <Users className="w-5 h-5 text-[#0F294A]" />
+            <h2 className="heading-gutter text-base sm:text-lg font-bold text-slate-900">
+              <Users aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
               <span>Tác giả &amp; Người hướng dẫn</span>
             </h2>
             <span className="text-xs text-slate-500 font-semibold">{item.contributors.length} thành viên</span>

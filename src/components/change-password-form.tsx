@@ -49,9 +49,9 @@ export function ChangePasswordForm() {
   return (
     <div className="max-w-md mx-auto w-full">
       <div className="panel-detail sm:p-7">
-        <div className="flex items-start gap-3 pb-4 border-b border-slate-100">
-          <KeyRound className="w-6 h-6 text-[#0F294A] shrink-0 mt-0.5" />
-          <div className="min-w-0 flex-1">
+        <div className="heading-gutter pb-4 border-b border-slate-100">
+          <KeyRound aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-[#0F294A] mt-0.5" />
+          <div className="min-w-0">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-tight">
               Đổi Mật Khẩu
             </h2>

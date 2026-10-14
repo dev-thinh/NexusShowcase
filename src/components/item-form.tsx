@@ -395,8 +395,8 @@ export function ItemForm({
 
       {/* 1. Thông tin chung */}
       <section className="space-y-4">
-        <div className="border-b border-slate-100 pb-3 flex items-center gap-2.5">
-          <FileText className="w-5 h-5 text-[#0F294A]" />
+        <div className="heading-gutter border-b border-slate-100 pb-3">
+          <FileText aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
           <h2 className="text-lg sm:text-xl font-bold text-slate-900">1. Thông tin công trình</h2>
         </div>
 
@@ -590,8 +590,8 @@ export function ItemForm({
       {/* 2. Hình ảnh đại diện (Thumbnail) */}
       <section className="space-y-4">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2">
-            <ImageIcon className="w-5 h-5 text-[#0F294A]" />
+          <div className="heading-gutter">
+            <ImageIcon aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
             <h2 className="text-lg sm:text-xl font-bold text-slate-900">2. Hình ảnh đại diện (Thumbnail)</h2>
           </div>
 
@@ -735,8 +735,8 @@ export function ItemForm({
       {/* 3. Danh sách Tác giả & Giảng viên */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2.5">
-            <Users className="w-5 h-5 text-[#0F294A]" />
+          <div className="heading-gutter">
+            <Users aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">3. Danh sách Tác giả &amp; Giảng viên</h2>
               <p className="text-xs text-slate-500 mt-0.5">Xếp theo thứ tự xuất bản học thuật. Có thể chọn thành viên CLB hoặc nhập tác giả ngoài.</p>
@@ -924,8 +924,8 @@ export function ItemForm({
       {/* 4. Liên kết liên quan */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2">
-            <Link2 className="w-5 h-5 text-[#0F294A]" />
+          <div className="heading-gutter">
+            <Link2 aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
             <h2 className="text-lg sm:text-xl font-bold text-slate-900">4. Liên kết (arXiv, Video, GitHub...)</h2>
           </div>
           <button
@@ -1012,8 +1012,8 @@ export function ItemForm({
       {/* 5. Tài liệu toàn văn & Phụ lục nghiên cứu (PDF) */}
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
-          <div className="flex items-center gap-2.5">
-            <FileText className="w-5 h-5 text-[#0F294A] shrink-0" />
+          <div className="heading-gutter">
+            <FileText aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
             <div>
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">5. Tài liệu toàn văn &amp; Phụ lục (PDF)</h2>
               <p className="text-xs text-slate-500 mt-0.5">Tải lên file PDF từ máy hoặc dán link tài liệu trực tiếp.</p>
@@ -1162,8 +1162,8 @@ export function ItemForm({
 
       {/* 6. Nội dung Markdown chi tiết */}
       <section className="space-y-4">
-        <div className="border-b border-slate-100 pb-3 flex items-center gap-2.5">
-          <BookOpen className="w-5 h-5 text-[#0F294A] shrink-0" />
+        <div className="heading-gutter border-b border-slate-100 pb-3">
+          <BookOpen aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
           <h2 className="text-lg sm:text-xl font-bold text-slate-900">6. Nội dung chi tiết (Markdown)</h2>
         </div>
         <textarea

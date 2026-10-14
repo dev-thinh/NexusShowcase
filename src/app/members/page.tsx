@@ -43,9 +43,9 @@ export default async function MembersDirectoryPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl flex-1">
         {/* Header */}
         <header className="mb-8 pb-6 border-b border-slate-200">
-          <div className="flex items-start gap-3 sm:gap-3.5">
-            <Users className="w-7 h-7 sm:w-8 sm:h-8 text-[#0F294A] shrink-0 mt-0.5 sm:mt-1" />
-            <div className="min-w-0 flex-1">
+          <div className="heading-gutter">
+            <Users aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-8 sm:h-8 text-[#0F294A] mt-0.5 sm:mt-1" />
+            <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                 Nhân sự &amp; Nghiên cứu viên
               </span>
@@ -70,8 +70,8 @@ export default async function MembersDirectoryPage() {
 
         {/* 1. Advisors & Faculty (ADMIN) */}
         <section className="mb-10">
-          <div className="flex items-center gap-2 mb-4">
-            <GraduationCap className="w-6 h-6 text-purple-600 shrink-0" />
+          <div className="heading-gutter flex items-center gap-2 mb-4">
+            <GraduationCap aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
             <h2 className="text-xl font-bold text-slate-900">
               Ban Cố Vấn &amp; Giảng Viên Phụ Trách
             </h2>
@@ -131,8 +131,8 @@ export default async function MembersDirectoryPage() {
 
         {/* 2. Core Leadership & Members (CORE_MEMBER) */}
         <section className="mb-10">
-          <div className="flex items-center gap-2 mb-4">
-            <ShieldCheck className="w-6 h-6 text-blue-600 shrink-0" />
+          <div className="heading-gutter flex items-center gap-2 mb-4">
+            <ShieldCheck aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             <h2 className="text-xl font-bold text-slate-900">
               Ban Chủ Nhiệm &amp; Thành Viên Nòng Cốt
             </h2>
@@ -219,8 +219,8 @@ export default async function MembersDirectoryPage() {
 
         {/* 3. Research & Technical Members (MEMBER) */}
         <section className="mb-8">
-          <div className="flex items-center gap-2 mb-4">
-            <UserCheck className="w-6 h-6 text-emerald-600 shrink-0" />
+          <div className="heading-gutter flex items-center gap-2 mb-4">
+            <UserCheck aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-emerald-600" />
             <h2 className="text-xl font-bold text-slate-900">
               Thành Viên Nghiên Cứu &amp; Kỹ Thuật
             </h2>
