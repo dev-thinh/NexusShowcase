@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { changePasswordAction } from '@/actions/account-actions';
-import { KeyRound, CheckCircle2, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { CheckCircle2, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 
 export function ChangePasswordForm() {
   const router = useRouter();
@@ -49,8 +49,7 @@ export function ChangePasswordForm() {
   return (
     <div className="max-w-md mx-auto w-full">
       <div className="panel-detail sm:p-7">
-        <div className="heading-gutter pb-4 border-b border-slate-100">
-          <KeyRound aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-[#0F294A] mt-0.5" />
+        <div className="pb-4 border-b border-slate-100">
           <div className="min-w-0">
             <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-tight">
               Đổi Mật Khẩu

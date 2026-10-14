@@ -163,8 +163,7 @@ export default async function MemberProfilePage({
         <div className="space-y-8">
           {/* Papers */}
           <section>
-            <div className="heading-gutter flex items-center gap-2 mb-4">
-              <FileText aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
+            <div className="flex items-center gap-2 mb-4">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">Bài báo khoa học</h2>
               <span className="text-xs px-2 py-0.5 rounded-md bg-blue-100 text-blue-800 font-bold ml-1 border border-blue-200">
                 {papers.length}
@@ -187,8 +186,7 @@ export default async function MemberProfilePage({
 
           {/* Projects */}
           <section>
-            <div className="heading-gutter flex items-center gap-2 mb-4">
-              <Code2 aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-emerald-700" />
+            <div className="flex items-center gap-2 mb-4">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">Dự án công nghệ</h2>
               <span className="text-xs px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold ml-1 border border-emerald-200">
                 {projects.length}
@@ -211,8 +209,7 @@ export default async function MemberProfilePage({
 
           {/* Achievements */}
           <section>
-            <div className="heading-gutter flex items-center gap-2 mb-4">
-              <Trophy aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-amber-700" />
+            <div className="flex items-center gap-2 mb-4">
               <h2 className="text-lg sm:text-xl font-bold text-slate-900">Giải thưởng &amp; Đóng góp</h2>
               <span className="text-xs px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-bold ml-1 border border-amber-200">
                 {achievements.length}

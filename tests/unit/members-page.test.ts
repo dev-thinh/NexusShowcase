@@ -13,7 +13,8 @@ describe('Members Directory Page', () => {
     expect(content).not.toContain('Nhân sự &amp; Nghiên cứu viên');
     expect(content).not.toContain('Mạng lưới sinh viên');
     expect(content).not.toContain('Danh bạ');
-    expect(content).toContain('w-12 h-12 sm:w-[68px] sm:h-[68px]');
+    expect(content).not.toContain('heading-gutter-icon');
+    expect(content).toContain('max-w-7xl');
     expect(content).toContain('MEMBER_GROUP_LABELS.ADMIN');
     expect(content).toContain('MEMBER_GROUP_LABELS.CORE_MEMBER');
     expect(content).toContain('MEMBER_GROUP_LABELS.MEMBER');

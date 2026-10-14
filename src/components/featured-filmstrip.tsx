@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { ItemType, ItemScope } from '@prisma/client';
 import { TypeBadge } from '@/components/ui/badge';
 import {
-  Sparkles,
   Pin,
   Calendar,
   Building2,
@@ -61,8 +60,7 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
   return (
     <section className="py-10 sm:py-14 bg-[#e8edf5] border-y border-slate-200 relative z-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl mb-6">
-        <div className="heading-gutter">
-          <Sparkles aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-8 sm:h-8 text-amber-600 mt-0.5 sm:mt-1" />
+        <div>
           <div className="min-w-0">
             <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
               TIÊU ĐIỂM HỌC THUẬT

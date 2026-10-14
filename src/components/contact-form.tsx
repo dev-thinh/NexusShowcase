@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, MessageSquare, CheckCircle2 } from 'lucide-react';
+import { Send, CheckCircle2 } from 'lucide-react';
 
 export function ContactForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -13,8 +13,7 @@ export function ContactForm() {
 
   return (
     <div className="panel-detail">
-      <div className="heading-gutter mb-2">
-        <MessageSquare aria-hidden="true" className="heading-gutter-icon w-5 h-5 text-[#0F294A]" />
+      <div className="mb-2">
         <h2 className="text-base sm:text-lg font-bold text-slate-900">
           Gửi Tin Nhắn Kết Nối
         </h2>

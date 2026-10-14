@@ -59,13 +59,6 @@
     @apply mt-5 flex flex-wrap items-center justify-end gap-3 border-t border-slate-100 pt-5;
   }
 
-  .heading-gutter {
-    @apply relative;
-  }
-
-  .heading-gutter-icon {
-    @apply absolute right-full top-0 mr-1 sm:mr-3;
-  }
 }
 
 :root {

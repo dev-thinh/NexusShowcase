@@ -14,12 +14,10 @@ import {
   Calendar,
   Building2,
   Award,
-  Database,
   ArrowRight,
   ExternalLink,
   Download,
   FolderGit2,
-  BookOpen,
   Sparkles,
 } from 'lucide-react';
 
@@ -63,20 +61,6 @@ export default async function CategoryPage({
     ],
   });
 
-  const getLayoutIcon = () => {
-    switch (category.layoutType) {
-      case 'BIBLIOGRAPHY':
-        return <BookOpen className="w-7 h-7 sm:w-8 sm:h-8 text-blue-600 shrink-0 mt-0.5 sm:mt-1" />;
-      case 'DATA_CATALOG':
-        return <Database className="w-7 h-7 sm:w-8 sm:h-8 text-emerald-600 shrink-0 mt-0.5 sm:mt-1" />;
-      case 'HONOR_ROLL':
-        return <Award className="w-7 h-7 sm:w-8 sm:h-8 text-amber-600 shrink-0 mt-0.5 sm:mt-1" />;
-      case 'SHOWCASE_GRID':
-      default:
-        return <FolderGit2 className="w-7 h-7 sm:w-8 sm:h-8 text-[#0F294A] shrink-0 mt-0.5 sm:mt-1" />;
-    }
-  };
-
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
@@ -84,8 +68,7 @@ export default async function CategoryPage({
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-6xl flex-1">
         {/* Category Header */}
         <header className="mb-8 pb-6 border-b border-slate-200">
-          <div className="heading-gutter">
-            <span aria-hidden="true" className="heading-gutter-icon block">{getLayoutIcon()}</span>
+          <div>
             <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                 Chuyên mục công trình

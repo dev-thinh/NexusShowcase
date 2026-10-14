@@ -10,12 +10,10 @@ import { publicUserSelect } from '@/lib/public-user';
 import { buildHomepageCategoryWhere } from '@/lib/home-section-filters';
 import {
   BookOpen,
-  Bot,
   Search,
   FileText,
   ExternalLink,
   ArrowRight,
-  Code2,
   Github,
   Globe,
   Cpu,
@@ -595,8 +593,7 @@ export default async function HomePage({
         {/* PHÂN KHU 2: ROBOTICS & IOT (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
         <section className="space-y-6 pb-12 sm:pb-16 border-b border-slate-200">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
-            <div className="heading-gutter">
-              <Bot aria-hidden="true" className="heading-gutter-icon w-7 h-7 sm:w-16 sm:h-16 text-emerald-700 stroke-[1.5]" />
+            <div>
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                   Phần cứng &amp; Tự động hóa
@@ -634,8 +631,7 @@ export default async function HomePage({
         {/* PHÂN KHU 3: DỰ ÁN & SÁNG TẠO (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
         <section className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
-            <div className="heading-gutter">
-              <Code2 aria-hidden="true" className="heading-gutter-icon w-7 h-7 sm:w-16 sm:h-16 text-indigo-700 stroke-[1.5]" />
+            <div>
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                   Đổi mới &amp; Ứng dụng

@@ -5,7 +5,6 @@ import { canUserUpload } from '@/lib/permissions';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
 import { ItemForm } from '@/components/item-form';
-import { FileEdit } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -79,8 +78,7 @@ export default async function EditItemPage({
 
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-5xl flex-1">
         <header className="mb-6 pb-5 border-b border-slate-200">
-          <div className="heading-gutter">
-            <FileEdit aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-8 sm:h-8 text-[#0F294A] mt-0.5 sm:mt-1" />
+          <div>
             <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                 Hiệu chỉnh bài nộp

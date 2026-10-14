@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Crown, Microscope, UserCheck, Users } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { AcademicFooter } from '@/components/academic-footer';
 import { MemberCard } from '@/components/member-card';
 import { MemberPagination } from '@/components/member-pagination';
@@ -53,21 +53,15 @@ export default async function MembersDirectoryPage({
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl flex-1">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
         <header className="mb-10 pb-7 border-b border-slate-200">
-          <div className="heading-gutter items-center">
-            <Users
-              aria-hidden="true"
-              className="heading-gutter-icon w-12 h-12 sm:w-[68px] sm:h-[68px] text-[#0F294A]"
-            />
-            <div className="min-w-0">
+          <div className="min-w-0">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
                 Thành viên Robotics &amp; IoT Lab
               </h1>
               <p className="mt-1.5 text-sm sm:text-base font-semibold text-slate-500">
                 {members.length} thành viên
               </p>
-            </div>
           </div>
         </header>
 
@@ -75,10 +69,8 @@ export default async function MembersDirectoryPage({
           <section className="mb-10" aria-labelledby="leadership-heading">
             <div id="leadership-heading">
               <MemberSectionHeading
-                icon={Crown}
                 title={MEMBER_GROUP_LABELS.ADMIN}
                 count={advisors.length}
-                tone="text-purple-700"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -93,10 +85,8 @@ export default async function MembersDirectoryPage({
           <section className="mb-10" aria-labelledby="experienced-heading">
             <div id="experienced-heading">
               <MemberSectionHeading
-                icon={Microscope}
                 title={MEMBER_GROUP_LABELS.CORE_MEMBER}
                 count={experienced.length}
-                tone="text-blue-700"
               />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -114,10 +104,8 @@ export default async function MembersDirectoryPage({
         <section className="mb-8" aria-labelledby="members-heading">
           <div id="members-heading">
             <MemberSectionHeading
-              icon={UserCheck}
               title={MEMBER_GROUP_LABELS.MEMBER}
               count={regularMembers.length}
-              tone="text-emerald-700"
             />
           </div>
 

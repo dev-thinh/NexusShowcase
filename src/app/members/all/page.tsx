@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowLeft, Users } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { AcademicFooter } from '@/components/academic-footer';
 import { MemberCard } from '@/components/member-card';
 import { MemberPagination } from '@/components/member-pagination';
@@ -45,7 +45,7 @@ export default async function AllMembersPage({
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl flex-1">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
         <header className="mb-8 pb-6 border-b border-slate-200">
           <Link
             href="/members"
@@ -55,19 +55,13 @@ export default async function AllMembersPage({
             Quay lại trang thành viên
           </Link>
 
-          <div className="heading-gutter items-center">
-            <Users
-              aria-hidden="true"
-              className="heading-gutter-icon w-10 h-10 sm:w-12 sm:h-12 text-[#0F294A]"
-            />
-            <div className="min-w-0">
+          <div className="min-w-0">
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
                 Tất cả thành viên
               </h1>
               <p className="mt-1.5 text-sm sm:text-base font-semibold text-slate-500">
                 {members.length} thành viên
               </p>
-            </div>
           </div>
         </header>
 

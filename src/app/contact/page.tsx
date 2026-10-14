@@ -6,8 +6,6 @@ import {
   MapPin,
   Clock,
   Phone,
-  Building,
-  GraduationCap,
   Globe,
   ExternalLink,
 } from 'lucide-react';
@@ -22,8 +20,7 @@ export default function ContactPage() {
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-6xl flex-1">
         {/* Header */}
         <header className="mb-8 pb-6 border-b border-slate-200">
-          <div className="heading-gutter">
-            <Mail aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-8 sm:h-8 text-[#0F294A] mt-0.5 sm:mt-1" />
+          <div>
             <div className="min-w-0">
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                 Kết nối &amp; Hợp tác
@@ -43,8 +40,7 @@ export default function ContactPage() {
           <div className="lg:col-span-7 space-y-4">
             {/* Campus 1 */}
             <div className="panel-detail">
-              <div className="heading-gutter mb-3">
-                <Building aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-blue-700 mt-0.5" />
+              <div className="mb-3">
                 <div className="min-w-0">
                   <span className="text-xs font-bold uppercase text-blue-700 tracking-wider block">
                     Cơ sở 1 (Trụ sở chính)
@@ -80,8 +76,7 @@ export default function ContactPage() {
 
             {/* Campus 2 */}
             <div className="panel-detail">
-              <div className="heading-gutter mb-3">
-                <GraduationCap aria-hidden="true" className="heading-gutter-icon w-5 h-5 sm:w-6 sm:h-6 text-emerald-700 mt-0.5" />
+              <div className="mb-3">
                 <div className="min-w-0">
                   <span className="text-xs font-bold uppercase text-emerald-700 tracking-wider block">
                     Cơ sở 2 (Cơ sở Đào tạo &amp; Thực nghiệm)
