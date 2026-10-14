@@ -124,8 +124,8 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
       <div className="col-start-3 row-start-1 justify-self-end flex items-center gap-2 sm:gap-2.5 shrink-0 z-10">
         {user ? (
           <>
-            {user.role === 'ADMIN' ? (
-              /* Dành cho Quản trị viên: Thẻ Profile tích hợp Menu thả Quản trị */
+            {user.role === 'ADMIN' || user.role === 'EDITOR' ? (
+              /* Dành cho Quản trị viên & Biên tập viên: Thẻ Profile tích hợp Menu thả */
               <div className="relative" ref={adminMenuRef}>
                 <button
                   type="button"
@@ -137,7 +137,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                   }`}
                   aria-expanded={isAdminMenuOpen}
                   aria-haspopup="true"
-                  title="Menu Quản trị viên & Hồ sơ"
+                  title="Menu Quản lý & Hồ sơ"
                 >
                   <div
                     className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
@@ -148,11 +148,15 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                   </div>
 
                   <span className="truncate max-w-[65px] sm:max-w-[85px] md:max-w-[95px] font-medium leading-none">
-                    {user.name || 'Admin'}
+                    {user.name || (user.role === 'ADMIN' ? 'Admin' : 'Editor')}
                   </span>
 
-                  <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
-                    Admin
+                  <span className={`shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded-md ${
+                    user.role === 'ADMIN'
+                      ? 'bg-amber-50 text-amber-800 border border-amber-200/80'
+                      : 'bg-blue-50 text-blue-800 border border-blue-200/80'
+                  }`}>
+                    {user.role === 'ADMIN' ? 'Admin' : 'Editor'}
                   </span>
 
                   <ChevronDown
@@ -162,30 +166,32 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                   />
                 </button>
 
-                {/* Dropdown Quản trị viên thả xuống góc phải, không bao giờ che thanh navigate */}
+                {/* Dropdown thả xuống góc phải */}
                 {isAdminMenuOpen && (
                   <div className="absolute top-full right-0 mt-2 w-64 bg-white rounded-lg border border-slate-200 shadow-xl p-1.5 z-50 animate-in fade-in slide-from-top-2 duration-150">
                     <div className="px-2.5 py-1.5 text-[11px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 rounded-md mb-1 border border-amber-200/60 flex items-center gap-1.5">
                       <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                      <span>Khu vực Quản trị</span>
+                      <span>{user.role === 'ADMIN' ? 'Khu vực Quản trị' : 'Khu vực Biên tập'}</span>
                     </div>
 
-                    <Link
-                      href="/admin"
-                      className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
-                        pathname === '/admin'
-                          ? 'bg-slate-100 text-slate-900 font-bold'
-                          : 'hover:bg-slate-50 text-slate-700'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200">
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900">Bàn làm việc Quản trị</div>
-                        <div className="text-[11px] text-slate-500">Tổng quan &amp; công trình ghim</div>
-                      </div>
-                    </Link>
+                    {user.role === 'ADMIN' && (
+                      <Link
+                        href="/admin"
+                        className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
+                          pathname === '/admin'
+                            ? 'bg-slate-100 text-slate-900 font-bold'
+                            : 'hover:bg-slate-50 text-slate-700'
+                        }`}
+                      >
+                        <div className="w-7 h-7 rounded-md bg-amber-100 text-amber-800 flex items-center justify-center shrink-0 border border-amber-200">
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-slate-900">Bàn làm việc Quản trị</div>
+                          <div className="text-[11px] text-slate-500">Tổng quan &amp; công trình ghim</div>
+                        </div>
+                      </Link>
+                    )}
 
                     <Link
                       href="/admin/reviews"
@@ -199,27 +205,29 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
                         <CheckSquare className="w-3.5 h-3.5" />
                       </div>
                       <div>
-                        <div className="text-xs font-bold text-slate-900">Thẩm định bài nộp</div>
-                        <div className="text-[11px] text-slate-500">Duyệt công trình mới</div>
+                        <div className="text-xs font-bold text-slate-900">Thẩm định &amp; Biên tập</div>
+                        <div className="text-[11px] text-slate-500">Hàng đợi xét duyệt bài nộp</div>
                       </div>
                     </Link>
 
-                    <Link
-                      href="/admin/members"
-                      className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
-                        pathname.startsWith('/admin/members')
-                          ? 'bg-slate-100 text-slate-900 font-bold'
-                          : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
-                      }`}
-                    >
-                      <div className="w-7 h-7 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
-                        <Users className="w-3.5 h-3.5" />
-                      </div>
-                      <div>
-                        <div className="text-xs font-bold text-slate-900">Quản lý Thành viên</div>
-                        <div className="text-[11px] text-slate-500">Phân quyền CORE MEMBER</div>
-                      </div>
-                    </Link>
+                    {user.role === 'ADMIN' && (
+                      <Link
+                        href="/admin/members"
+                        className={`flex items-center gap-2.5 p-2 rounded-md transition-colors ${
+                          pathname.startsWith('/admin/members')
+                            ? 'bg-slate-100 text-slate-900 font-bold'
+                            : 'hover:bg-slate-50 text-slate-700 hover:text-slate-900'
+                        }`}
+                      >
+                        <div className="w-7 h-7 rounded-md bg-slate-100 text-slate-700 flex items-center justify-center shrink-0 border border-slate-200">
+                          <Users className="w-3.5 h-3.5" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-bold text-slate-900">Quản lý Thành viên</div>
+                          <div className="text-[11px] text-slate-500">Phân quyền thành viên &amp; Editor</div>
+                        </div>
+                      </Link>
+                    )}
 
                     <div className="border-t border-slate-100 my-1 pt-1">
                       <Link

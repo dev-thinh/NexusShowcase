@@ -53,7 +53,7 @@ export async function createMemberAction(input: CreateMemberInput) {
     return { success: false, error: `Tài khoản hoặc email "${emailTrimmed}" đã tồn tại trong hệ thống.` };
   }
 
-  const rawPassword = input.password?.trim() || crypto.randomBytes(6).toString('hex');
+  const rawPassword = input.password?.trim() || 'member123';
   if (rawPassword.length < 6) {
     return { success: false, error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.' };
   }

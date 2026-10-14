@@ -1,13 +1,13 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { prisma } from '@/lib/prisma';
-import { createMemberAction } from '@/actions/admin-actions';
+import { createMemberAction, updateUserRoleAction } from '@/actions/admin-actions';
 import bcrypt from 'bcryptjs';
 
 const currentUserMock = vi.hoisted(() => ({
   actor: null as {
     id: string;
     fullName: string;
-    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
+    role: 'ADMIN' | 'EDITOR' | 'CORE_MEMBER' | 'MEMBER';
     status: 'ACTIVE';
   } | null,
 }));
@@ -66,6 +66,29 @@ describe('Admin Create Member Action', () => {
     expect(isMatch).toBe(true);
 
     // Clean up
+    await prisma.user.delete({ where: { id: res.user!.id } });
+  });
+
+  it('should allow admin to assign and update EDITOR role through member management', async () => {
+    currentUserMock.actor = adminUser;
+    const email = `test-editor-${Date.now()}@student.hcmus.edu.vn`;
+    const res = await createMemberAction({
+      fullName: 'Lê Biên Tập Viên',
+      email,
+      role: 'EDITOR' as any,
+    });
+
+    expect(res.success).toBe(true);
+    expect(res.user?.role).toBe('EDITOR');
+
+    const updateRes = await updateUserRoleAction(res.user!.id, 'CORE_MEMBER');
+    expect(updateRes.success).toBe(true);
+    expect(updateRes.user?.role).toBe('CORE_MEMBER');
+
+    const updateBack = await updateUserRoleAction(res.user!.id, 'EDITOR');
+    expect(updateBack.success).toBe(true);
+    expect(updateBack.user?.role).toBe('EDITOR');
+
     await prisma.user.delete({ where: { id: res.user!.id } });
   });
 

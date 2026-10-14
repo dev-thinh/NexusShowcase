@@ -206,13 +206,13 @@ export const createMemberInputSchema = z.object({
   fullName: trimmedText(200).min(1),
   email: trimmedText(254).min(1),
   studentId: trimmedText(64).optional(),
-  role: z.enum(['MEMBER', 'CORE_MEMBER']).optional(),
+  role: z.enum(['MEMBER', 'CORE_MEMBER', 'EDITOR']).optional(),
   password: trimmedText(128).optional(),
 });
 
 export const userRoleUpdateInputSchema = z.object({
   targetUserId: cuidSchema,
-  newRole: z.enum(['GUEST', 'MEMBER', 'CORE_MEMBER', 'ADMIN']),
+  newRole: z.enum(['GUEST', 'MEMBER', 'CORE_MEMBER', 'EDITOR', 'ADMIN']),
 });
 
 export const deleteMemberInputSchema = z.object({ targetUserId: cuidSchema });

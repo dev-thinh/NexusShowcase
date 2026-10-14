@@ -30,7 +30,7 @@ export function AdminCreateMemberModal() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [studentId, setStudentId] = useState('');
-  const [role, setRole] = useState<'MEMBER' | 'CORE_MEMBER'>('MEMBER');
+  const [role, setRole] = useState<'MEMBER' | 'CORE_MEMBER' | 'EDITOR'>('MEMBER');
   const [password, setPassword] = useState('');
 
   const handleOpen = () => {
@@ -251,6 +251,32 @@ export function AdminCreateMemberModal() {
                     </div>
                     <p className="text-[11px] text-slate-500 font-normal mt-0.5">
                       Được quyền đại diện nhóm nộp bài báo/dự án
+                    </p>
+                  </div>
+                </label>
+
+                <label
+                  className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                    role === 'EDITOR'
+                      ? 'bg-blue-50/50 border-blue-300 text-blue-900 font-semibold'
+                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="role"
+                    value="EDITOR"
+                    checked={role === 'EDITOR'}
+                    onChange={() => setRole('EDITOR')}
+                    className="mt-0.5 accent-[#0F294A]"
+                  />
+                  <div>
+                    <div className="flex items-center gap-1 font-bold text-slate-900">
+                      <Shield className="w-3.5 h-3.5 text-amber-700" />
+                      <span>EDITOR</span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+                      Ban biên tập, xét duyệt và chuẩn hóa bài nộp
                     </p>
                   </div>
                 </label>

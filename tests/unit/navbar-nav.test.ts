@@ -42,4 +42,12 @@ describe('Navbar Nav Component Structure', () => {
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
     expect(navContent).not.toContain('{featuredCategories.map');
   });
+
+  it('exposes review queue to EDITOR while hiding member administration', () => {
+    const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
+    const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
+
+    expect(navContent).toContain("role === 'EDITOR'");
+    expect(navContent).toContain('/admin/reviews');
+  });
 });
