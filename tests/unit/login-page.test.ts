@@ -22,8 +22,8 @@ describe('Split-Screen Login Page Layout and Neutral Language', () => {
     expect(content).toContain('<aside');
     expect(content).toContain('<main');
 
-    // Consistent light theme (no dark navy block on aside)
-    expect(content).not.toContain('bg-[#0F294A]');
+    // Consistent light theme: the aside stays light even when small controls use navy
+    expect(content).not.toMatch(/<aside[^>]*bg-\[#0F294A\]/);
 
     // System name and lab focus
     expect(content).toContain('Robotics & IoT Lab');
@@ -36,6 +36,15 @@ describe('Split-Screen Login Page Layout and Neutral Language', () => {
     expect(content).toContain('href="/contact"');
     expect(content).toContain('Trang chủ');
     expect(content).toContain('Liên hệ');
+  });
+
+  it('uses the system primary navy for the Robotics chip and home button only', () => {
+    const pagePath = path.resolve(process.cwd(), 'src/app/login/page.tsx');
+    const content = fs.readFileSync(pagePath, 'utf-8');
+
+    expect(content.match(/bg-\[#0F294A\]/g) ?? []).toHaveLength(2);
+    expect(content).toContain('hover:bg-[#1E3A5F]');
+    expect(content).toContain('bg-white hover:bg-slate-50 text-slate-800');
   });
 
   it('ensures login form uses neutral language, larger max-w-lg styling, and clean inputs', () => {
@@ -55,5 +64,13 @@ describe('Split-Screen Login Page Layout and Neutral Language', () => {
     // Larger dimensions and rounded-lg
     expect(content).toContain('max-w-lg');
     expect(content).toContain('rounded-lg');
+  });
+
+  it('keeps the login icon inline with its title instead of hanging in the page gutter', () => {
+    const formPath = path.resolve(process.cwd(), 'src/app/login/login-form.tsx');
+    const content = fs.readFileSync(formPath, 'utf-8');
+
+    expect(content).toContain('flex items-center gap-3 pb-4');
+    expect(content).not.toContain('heading-gutter-icon');
   });
 });
