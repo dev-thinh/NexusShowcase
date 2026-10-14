@@ -60,4 +60,22 @@ describe('Members Directory Page', () => {
     expect(pagination).toContain('Trang trước');
     expect(pagination).toContain('Trang sau');
   });
+
+  it('provides a MEMBER-only full directory with twelve records per page', () => {
+    const fullPagePath = path.resolve(
+      process.cwd(),
+      'src/app/members/all/page.tsx',
+    );
+    expect(fs.existsSync(fullPagePath)).toBe(true);
+
+    const content = fs.readFileSync(fullPagePath, 'utf-8');
+    expect(content).toContain("role: 'MEMBER'");
+    expect(content).toContain("status: 'ACTIVE'");
+    expect(content).toContain(
+      'paginateMembers(members, params.page, 12)',
+    );
+    expect(content).toContain('Tất cả thành viên');
+    expect(content).not.toContain("role: 'ADMIN'");
+    expect(content).not.toContain("role: 'CORE_MEMBER'");
+  });
 });
