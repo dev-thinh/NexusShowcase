@@ -107,7 +107,7 @@ export default async function HomePage({
         </section>
 
         {/* Search Results Feed */}
-        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-5xl flex-1">
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-200 mb-6">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
@@ -471,7 +471,7 @@ export default async function HomePage({
       </section>
 
       {/* Main Academic Portal Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 max-w-6xl flex-1 space-y-14 sm:space-y-16">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 max-w-7xl flex-1 space-y-14 sm:space-y-16">
         
         {/* PHÂN KHU 1: NGHIÊN CỨU KHOA HỌC (Layout Ngang: Bất đối xứng 2 cột Trái - Phải) */}
         <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start pb-12 sm:pb-16 border-b border-slate-200">

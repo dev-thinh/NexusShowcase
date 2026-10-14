@@ -21,6 +21,15 @@ describe('Home Page Minimalist Revamp', () => {
     expect(content).toContain('auth');
   });
 
+  it('aligns both home content states with the footer container', () => {
+    const pagePath = path.resolve(process.cwd(), 'src/app/page.tsx');
+    const content = fs.readFileSync(pagePath, 'utf-8');
+
+    expect(content.match(/<main className="container mx-auto px-4 sm:px-6 lg:px-8[^\"]*max-w-7xl/g)).toHaveLength(2);
+    expect(content).not.toContain('py-8 sm:py-10 max-w-5xl flex-1');
+    expect(content).not.toContain('py-10 sm:py-14 max-w-6xl flex-1');
+  });
+
   it('matches brand panel design and implements Academic Lab Portal structure', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
