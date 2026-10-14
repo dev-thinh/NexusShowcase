@@ -86,7 +86,7 @@ export function TypeBadge({ type, size = 'md' }: TypeBadgeProps) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1.5 rounded-full font-semibold border shadow-2xs ${sizeClasses} ${config.classes}`}
+      className={`inline-flex items-center gap-1.5 rounded-md font-semibold border shadow-2xs ${sizeClasses} ${config.classes}`}
     >
       <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
       <span>{config.label}</span>
