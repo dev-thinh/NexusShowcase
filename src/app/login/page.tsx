@@ -40,11 +40,11 @@ export default async function LoginPage() {
       {/* 2. Main Hero Layout: Căn lề 2 bên chuẩn container */}
       <main className="min-h-[calc(100dvh-4rem)] flex-1 flex items-center justify-center py-8 sm:py-10 lg:py-12 relative z-10">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Hai cột được căn giữa trong vùng nhìn còn lại bên dưới navbar. */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
+          {/* Toàn cụm nằm giữa vùng nhìn; hai cột cùng bắt đầu từ một mép trên. */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
             {/* 
               CỘT BÊN TRÁI: TIÊU ĐỀ & NỘI DUNG GIỚI THIỆU
-              (Toàn bộ khối nội dung được căn giữa độc lập với form)
+              (Khối nội dung bắt đầu ngang mép trên của form)
             */}
             <aside className="lg:col-span-7 xl:col-span-7 space-y-6">
               {/* Panel nhận diện thương hiệu thuộc cột giới thiệu, không làm lệch tâm toàn bố cục. */}
@@ -92,7 +92,7 @@ export default async function LoginPage() {
 
             {/* 
               CỘT BÊN PHẢI: FORM ĐĂNG NHẬP
-              (Form được căn giữa trong cùng hàng lưới với khối giới thiệu)
+              (Mép trên của form thẳng hàng với khối giới thiệu)
             */}
             <div className="lg:col-span-5 xl:col-span-5 w-full">
               <Suspense fallback={<LoginFormFallback />}>
