@@ -3,14 +3,24 @@ import fs from 'fs';
 import path from 'path';
 
 describe('Members Directory Page', () => {
-  it('exists and organizes members by roles', () => {
+  it('renders the approved header, hierarchy, and six-member preview', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/members/page.tsx');
     expect(fs.existsSync(pagePath)).toBe(true);
 
     const content = fs.readFileSync(pagePath, 'utf-8');
-    expect(content).toContain('ADMIN');
-    expect(content).toContain('CORE_MEMBER');
-    expect(content).toContain('MEMBER');
+    expect(content).toContain('Thành viên Robotics &amp; IoT Lab');
+    expect(content).toContain('{members.length} thành viên');
+    expect(content).not.toContain('Nhân sự &amp; Nghiên cứu viên');
+    expect(content).not.toContain('Mạng lưới sinh viên');
+    expect(content).not.toContain('Danh bạ');
+    expect(content).toContain('w-12 h-12 sm:w-[68px] sm:h-[68px]');
+    expect(content).toContain('MEMBER_GROUP_LABELS.ADMIN');
+    expect(content).toContain('MEMBER_GROUP_LABELS.CORE_MEMBER');
+    expect(content).toContain('MEMBER_GROUP_LABELS.MEMBER');
+    expect(content).toContain(
+      'paginateMembers(regularMembers, params.page, 6)',
+    );
+    expect(content).toContain('href="/members/all"');
   });
 
   it('keeps member detail and its loading state geometrically aligned', () => {
