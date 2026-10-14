@@ -22,7 +22,7 @@ const localUploadUrlSchema = z
 
 const storedFileUrlSchema = z.union([safeHttpUrlSchema, localUploadUrlSchema]);
 
-const contributorInputSchema = z.object({
+export const contributorInputSchema = z.object({
   userId: cuidSchema.nullish(),
   externalName: trimmedText(200).nullish(),
   externalAffiliation: trimmedText(200).nullish(),
@@ -41,13 +41,13 @@ const contributorInputSchema = z.object({
   displayOrder: z.number().int().min(0).max(100),
 });
 
-const linkInputSchema = z.object({
+export const linkInputSchema = z.object({
   label: trimmedText(120).min(1),
   url: safeHttpUrlSchema,
   type: z.enum(['PAPER_URL', 'VIDEO_EMBED', 'GITHUB', 'LIVE_DEMO', 'SLIDES', 'CERTIFICATE', 'OTHER']),
 });
 
-const attachmentInputSchema = z.object({
+export const attachmentInputSchema = z.object({
   fileName: trimmedText(160).min(1),
   fileUrl: storedFileUrlSchema,
   fileSize: z.number().int().min(0).max(25 * 1024 * 1024),
@@ -61,6 +61,8 @@ export const createShowcaseItemInputSchema = z.object({
   type: z.enum(['RESEARCH_PAPER', 'PROJECT', 'ACHIEVEMENT']).default('PROJECT'),
   categoryId: cuidSchema.optional(),
   proposedCategory: trimmedText(100).optional(),
+  suggestedField: trimmedText(100).optional(),
+  customProjectType: trimmedText(100).optional(),
   tags: z.array(trimmedText(50)).max(20).default([]),
   scope: z.enum(['INTERNAL', 'CLUB_CONTRIBUTION', 'EXTERNAL', 'OPEN_SOURCE']).optional(),
   issuer: trimmedText(200).optional(),
@@ -73,6 +75,105 @@ export const createShowcaseItemInputSchema = z.object({
   attachments: z.array(attachmentInputSchema).max(10).optional(),
   submitForReview: z.boolean().optional(),
 });
+
+export const submissionResourceSchema = z.object({
+  kind: z.enum(['IMAGE', 'DOCUMENT', 'LINK']),
+  label: trimmedText(160).min(1),
+  url: storedFileUrlSchema,
+  linkType: z.enum(['PAPER_URL', 'VIDEO_EMBED', 'GITHUB', 'LIVE_DEMO', 'SLIDES', 'CERTIFICATE', 'OTHER']).optional(),
+  fileName: trimmedText(160).optional(),
+  fileSize: z.number().int().min(0).max(25 * 1024 * 1024).optional(),
+  mimeType: trimmedText(120).optional(),
+}).strict();
+
+const showcaseWorkflowShape = {
+  title: trimmedText(200).min(1),
+  summary: trimmedText(2_000).default(''),
+  content: trimmedText(50_000).default(''),
+  publishedYear: z.number().int().min(1900).max(MAX_CURRENT_YEAR).optional(),
+  suggestedField: trimmedText(100).default(''),
+  customProjectType: trimmedText(100).default(''),
+  contributors: z.array(contributorInputSchema).max(20).default([]),
+  resources: z.array(submissionResourceSchema).max(20).default([]),
+};
+
+export const showcaseDraftInputSchema = z.object(showcaseWorkflowShape).strict();
+
+export const showcaseSubmissionInputSchema = z.object(showcaseWorkflowShape).strict().superRefine((value, context) => {
+  if (!value.summary) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['summary'], message: 'Summary is required.' });
+  }
+  if (value.contributors.length === 0) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['contributors'], message: 'At least one contributor is required.' });
+  }
+});
+
+export const editorialDraftInputSchema = z.object({
+  title: trimmedText(200).min(1).optional(),
+  summary: trimmedText(2_000).min(1).optional(),
+  content: trimmedText(50_000).optional(),
+  thumbnailUrl: storedFileUrlSchema.nullable().optional(),
+  type: z.enum(['RESEARCH_PAPER', 'PROJECT', 'ACHIEVEMENT']).optional(),
+  categoryId: cuidSchema.nullable().optional(),
+  tags: z.array(trimmedText(50).min(1)).max(20).optional(),
+  issuer: trimmedText(200).nullable().optional(),
+  publishedYear: z.number().int().min(1900).max(MAX_CURRENT_YEAR).optional(),
+  resources: z.array(submissionResourceSchema).max(20).optional(),
+}).strict();
+
+export const reviewFieldKeySchema = z.enum([
+  'title',
+  'summary',
+  'content',
+  'contributors',
+  'resources',
+  'suggestedField',
+  'customProjectType',
+  'thumbnailUrl',
+  'type',
+  'categoryId',
+  'tags',
+  'issuer',
+  'publishedYear',
+]);
+
+export const reviewCommentInputSchema = z.object({
+  itemId: cuidSchema,
+  revisionId: cuidSchema.optional(),
+  fieldKey: reviewFieldKeySchema,
+  body: trimmedText(2_000).min(1),
+  audience: z.enum(['EDITORIAL', 'AUTHOR']),
+  severity: z.enum(['REQUIRED', 'SUGGESTION']),
+}).strict();
+
+const transitionReasonShape = {
+  itemId: cuidSchema,
+  reason: trimmedText(2_000).min(1),
+};
+
+export const requestAuthorRevisionInputSchema = z.object({
+  ...transitionReasonShape,
+  fieldKey: reviewFieldKeySchema.optional(),
+}).strict();
+
+export const rejectShowcaseInputSchema = z.object(transitionReasonShape).strict();
+
+const editorialChecklistSchema = z.object({
+  copyEdited: z.literal(true),
+  mediaChecked: z.literal(true),
+  metadataChecked: z.literal(true),
+}).strict();
+
+export const editorialHandoffInputSchema = z.object({
+  itemId: cuidSchema,
+  categoryId: cuidSchema,
+  checklist: editorialChecklistSchema,
+}).strict();
+
+export const publishEditorialDraftInputSchema = z.object({
+  itemId: cuidSchema,
+  checklist: editorialChecklistSchema,
+}).strict();
 
 export const showcaseItemIdSchema = cuidSchema;
 
@@ -107,3 +208,7 @@ export type LinkInput = z.input<typeof linkInputSchema>;
 export type AttachmentInput = z.input<typeof attachmentInputSchema>;
 export type CreateShowcaseItemInput = z.input<typeof createShowcaseItemInputSchema>;
 export type CreateMemberInput = z.input<typeof createMemberInputSchema>;
+export type ShowcaseDraftInput = z.input<typeof showcaseDraftInputSchema>;
+export type ShowcaseSubmissionInput = z.input<typeof showcaseSubmissionInputSchema>;
+export type EditorialDraftInput = z.input<typeof editorialDraftInputSchema>;
+export type ReviewCommentInput = z.input<typeof reviewCommentInputSchema>;

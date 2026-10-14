@@ -2,8 +2,13 @@ import { describe, expect, it } from 'vitest';
 import {
   createMemberInputSchema,
   createShowcaseItemInputSchema,
+  editorialDraftInputSchema,
+  rejectShowcaseInputSchema,
+  reviewCommentInputSchema,
   safeHttpUrlSchema,
+  showcaseDraftInputSchema,
   showcaseItemIdSchema,
+  showcaseSubmissionInputSchema,
   toggleItemVisibilityInputSchema,
 } from '@/lib/action-schemas';
 
@@ -79,5 +84,64 @@ describe('action schemas', () => {
   it('validates toggleItemVisibilityInputSchema requires valid cuid', () => {
     expect((toggleItemVisibilityInputSchema as any)?.safeParse?.({ itemId: 'not-a-cuid' })?.success).toBe(false);
     expect((toggleItemVisibilityInputSchema as any)?.safeParse?.({ itemId: 'cjr012345678901234567890' })?.success).toBe(true);
+  });
+});
+
+describe('submission workflow schemas', () => {
+  const author = {
+    userId: 'cjr012345678901234567890',
+    role: 'PROJECT_LEAD' as const,
+    displayOrder: 0,
+  };
+  const base = {
+    title: 'Bản thảo robot tự hành',
+    summary: '',
+    content: '',
+    suggestedField: 'Robotics',
+    customProjectType: '',
+    publishedYear: 2026,
+    contributors: [],
+    resources: [],
+  };
+
+  it('allows a title-only draft but requires a summary and contributor for submission', () => {
+    expect(showcaseDraftInputSchema.safeParse(base).success).toBe(true);
+    expect(showcaseSubmissionInputSchema.safeParse(base).success).toBe(false);
+    expect(showcaseSubmissionInputSchema.safeParse({
+      ...base,
+      summary: 'Mô tả đóng góp học thuật của dự án.',
+      contributors: [author],
+    }).success).toBe(true);
+  });
+
+  it('limits custom project types and resource collections to safe values', () => {
+    expect(showcaseDraftInputSchema.safeParse({ ...base, customProjectType: 'x'.repeat(101) }).success).toBe(false);
+    expect(showcaseDraftInputSchema.safeParse({
+      ...base,
+      resources: [{ kind: 'LINK', label: 'Unsafe', url: 'javascript:alert(1)' }],
+    }).success).toBe(false);
+    expect(showcaseDraftInputSchema.safeParse({
+      ...base,
+      resources: Array.from({ length: 21 }, (_, index) => ({
+        kind: 'LINK',
+        label: `Resource ${index}`,
+        url: 'https://example.test/resource',
+      })),
+    }).success).toBe(false);
+  });
+
+  it('accepts only known editable fields and requires actionable review text', () => {
+    expect(editorialDraftInputSchema.safeParse({ title: 'Bản biên tập', unknown: 'ignored' }).success).toBe(false);
+    expect(reviewCommentInputSchema.safeParse({
+      itemId: 'cjr012345678901234567890',
+      fieldKey: 'unknown',
+      body: 'Cần làm rõ.',
+      audience: 'AUTHOR',
+      severity: 'REQUIRED',
+    }).success).toBe(false);
+    expect(rejectShowcaseInputSchema.safeParse({
+      itemId: 'cjr012345678901234567890',
+      reason: '   ',
+    }).success).toBe(false);
   });
 });
