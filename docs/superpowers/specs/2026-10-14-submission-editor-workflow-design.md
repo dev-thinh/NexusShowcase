@@ -37,7 +37,8 @@ Media và quản trị viên có một không gian biên tập riêng để chu�
 - Sắp xếp tài nguyên cho bản xuất bản.
 - Tạo và đóng yêu cầu bổ sung.
 - Lưu và xem trước bản biên tập.
-- Không được tự thay đổi quyền sở hữu, tác giả hoặc xuất bản bài.
+- Đánh dấu bản biên tập là sẵn sàng để admin phê duyệt.
+- Không được tự thay đổi quyền sở hữu, tác giả, phê duyệt hoặc xuất bản bài.
 
 ### ADMIN
 
@@ -45,6 +46,8 @@ Media và quản trị viên có một không gian biên tập riêng để chu�
 - Thêm, xóa và sắp xếp tác giả hoặc thay đổi vai trò tác giả.
 - Thay đổi người sở hữu bài.
 - Phê duyệt, từ chối, xuất bản, mở lại hoặc lưu trữ công trình.
+- Gửi phản hồi nội bộ để editor tiếp tục biên tập.
+- Chỉ sửa nội dung qua chế độ biên tập có ghi audit; đây là quyền ngoại lệ, không phải luồng làm việc mặc định.
 - Quản lý thành viên và các quyền hệ thống khác như hiện tại.
 
 `MEMBER` giữ quyền hiện tại và không được tự đăng nếu chưa được cấp quyền upload.
@@ -58,17 +61,22 @@ DRAFT
 PENDING_REVIEW
   |-- REVISION_REQUESTED --> thành viên cập nhật --> PENDING_REVIEW
   |-- REJECTED
-  `-- PUBLISHED --> ARCHIVED
+  `-- READY_FOR_APPROVAL
+          |-- phản hồi nội bộ --> PENDING_REVIEW
+          |-- REVISION_REQUESTED --> thành viên cập nhật --> PENDING_REVIEW
+          |-- REJECTED
+          `-- PUBLISHED --> ARCHIVED
 ```
 
 - `DRAFT`: đang soạn; chỉ tiêu đề là bắt buộc để lưu.
-- `PENDING_REVIEW`: đã gửi; thành viên không tự thay đổi cho tới khi admin yêu cầu bổ sung hoặc mở lại.
+- `PENDING_REVIEW`: đã gửi và đang chờ hoặc đang được editor xử lý; thành viên không tự thay đổi cho tới khi nhận yêu cầu bổ sung hoặc được mở lại. Việc editor nhận bài được thể hiện bằng `assignedEditorId`, không cần thêm trạng thái “đang biên tập”.
+- `READY_FOR_APPROVAL`: editor đã hoàn tất bản biên tập; chỉ admin có thể phê duyệt và xuất bản. Admin có thể trả lại editor bằng phản hồi nội bộ hoặc yêu cầu thành viên bổ sung dữ liệu chuyên môn.
 - `REVISION_REQUESTED`: hiển thị là “Cần bổ sung”; bắt buộc có ít nhất một yêu cầu cụ thể. Thành viên được chỉnh sửa và gửi lại.
 - `REJECTED`: hiển thị là “Không được phê duyệt”; bắt buộc có lý do. Thành viên chỉ xem, admin có thể mở lại thành `DRAFT`.
 - `PUBLISHED`: bản xuất bản đang công khai theo visibility; thành viên không tự sửa trực tiếp.
 - `ARCHIVED`: ngừng hiển thị công khai nhưng dữ liệu và lịch sử được giữ lại.
 
-Việc editor đang biên tập hoặc checklist đã hoàn thành là trạng thái giao diện, không thêm vào enum nghiệp vụ.
+Việc editor đang gõ hoặc checklist đang hoàn thành là trạng thái giao diện. `READY_FOR_APPROVAL` được giữ trong enum vì đây là điểm bàn giao trách nhiệm chính thức giữa editor và admin.
 
 ## 5. Form dành cho thành viên
 
@@ -167,22 +175,32 @@ Các hành động cuối trang:
 - Lưu bản biên tập.
 - Xem trước.
 - Yêu cầu bổ sung.
-- Không phê duyệt.
-- Phê duyệt và xuất bản.
+- Editor: Gửi admin phê duyệt.
+- Admin: Trả lại editor.
+- Admin: Không phê duyệt.
+- Admin: Phê duyệt và xuất bản.
 
-Xuất bản chỉ khả dụng khi các điều kiện bắt buộc đã đạt. Hành động từ chối và xuất bản cần xác nhận rõ ràng.
+Editor không có quyền xuất bản trực tiếp. Xuất bản chỉ khả dụng cho admin khi bài ở trạng thái `READY_FOR_APPROVAL` và các điều kiện bắt buộc đã đạt. Hành động từ chối và xuất bản cần xác nhận rõ ràng.
+
+Admin không chỉnh nội dung trong luồng duyệt mặc định. Nếu cần xử lý khẩn cấp hoặc không có editor, admin phải chủ động chọn “Chuyển sang chế độ biên tập”; mọi thay đổi trong chế độ này được ghi audit. Hệ thống cho phép cùng một admin biên tập và phê duyệt để phù hợp nhóm ít người, nhưng hiển thị cảnh báo và ghi rõ người biên tập/người phê duyệt khi hai vai trò là cùng một tài khoản.
 
 ## 7. Phản hồi theo trường
 
-Mỗi yêu cầu bổ sung gồm:
+Phản hồi có hai loại:
+
+- `EDITORIAL`: phản hồi nội bộ từ admin tới editor về ngôn từ, hình ảnh, category, tags hoặc cách trình bày.
+- `AUTHOR_REVISION`: yêu cầu thành viên xác nhận hoặc bổ sung số liệu, thông số, tác giả, minh chứng hay tài liệu chuyên môn.
+
+Mỗi phản hồi gồm:
 
 - Khóa trường hoặc section liên quan.
 - Nội dung phản hồi.
 - Mức độ bắt buộc hoặc đề xuất.
+- Loại phản hồi và đối tượng nhận.
 - Người tạo và thời gian tạo.
 - Trạng thái đang mở hoặc đã xử lý.
 
-Thành viên nhìn thấy phản hồi ngay cạnh nội dung liên quan. Khi gửi lại, hệ thống đánh dấu các trường đã thay đổi kể từ snapshot trước. Bản biên tập của media không bị tự động ghi đè; editor được chọn giữ nội dung đã biên tập hoặc nhận nội dung mới.
+Thành viên chỉ nhìn thấy phản hồi `AUTHOR_REVISION` ngay cạnh nội dung liên quan; phản hồi `EDITORIAL` chỉ hiển thị trong workspace nội bộ. Khi thành viên gửi lại, hệ thống đánh dấu các trường đã thay đổi kể từ snapshot trước. Bản biên tập của media không bị tự động ghi đè; editor được chọn giữ nội dung đã biên tập hoặc nhận nội dung mới.
 
 ## 8. Mô hình dữ liệu khái niệm
 
@@ -196,13 +214,13 @@ Snapshot bất biến được tạo mỗi lần thành viên gửi hoặc gửi
 
 ### EditorialDraft
 
-Bản ghi một-một với công trình, chứa các override của bản xuất bản. Chỉ lưu trường đã được biên tập; trường không có override dùng dữ liệu từ snapshot mới nhất.
+Bản ghi một-một với công trình, chứa `assignedEditorId`, thời điểm editor hoàn tất và các override của bản xuất bản. Chỉ lưu trường đã được biên tập; trường không có override dùng dữ liệu từ snapshot mới nhất.
 
 Khi admin xuất bản, hệ thống tính bản hiệu lực từ snapshot mới nhất cộng các override, rồi ghi kết quả vào `ShowcaseItem` trong cùng transaction với việc chuyển trạng thái sang `PUBLISHED`. Vì vậy các trang công khai tiếp tục đọc dữ liệu chuẩn hóa từ `ShowcaseItem`, còn snapshot và editorial draft vẫn được giữ để đối chiếu và biên tập về sau.
 
 ### ReviewComment
 
-Lưu phản hồi theo trường hoặc section, mức độ, người tạo và trạng thái xử lý.
+Lưu loại phản hồi, đối tượng nhận, trường hoặc section liên quan, mức độ, người tạo và trạng thái xử lý.
 
 ### AuditEvent
 
@@ -262,8 +280,11 @@ State và validation dùng một nguồn dữ liệu thống nhất; component c
 - Snapshot không thay đổi sau khi admin biên tập.
 - Editorial override fallback đúng về snapshot gần nhất.
 - `REVISION_REQUESTED` cho phép gửi lại; `REJECTED` không cho phép gửi lại nếu chưa mở lại.
-- EDITOR không thể xuất bản hoặc sửa quyền sở hữu/tác giả.
-- ADMIN có thể xuất bản khi checklist và validation hợp lệ.
+- EDITOR không thể xuất bản, phê duyệt hoặc sửa quyền sở hữu/tác giả.
+- EDITOR có thể bàn giao bài sang `READY_FOR_APPROVAL` khi checklist biên tập hợp lệ.
+- ADMIN có thể xuất bản từ `READY_FOR_APPROVAL` khi checklist và validation hợp lệ.
+- Phản hồi `EDITORIAL` chỉ hiển thị trong workspace nội bộ; `AUTHOR_REVISION` hiển thị cho thành viên tại trường liên quan.
+- Admin chỉnh nội dung qua chế độ biên tập phải tạo audit event.
 - Phản hồi hiển thị đúng cạnh trường và có thể được đánh dấu đã xử lý.
 - Keyboard navigation, focus error, mobile tabs và sticky action bar hoạt động đúng.
 - Các route hiện tại tiếp tục hoạt động; dữ liệu cũ được migrate với fallback an toàn.
