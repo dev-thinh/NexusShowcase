@@ -1,12 +1,18 @@
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 import { prisma } from '@/lib/prisma';
-import { createShowcaseItemAction, reviewShowcaseItemAction } from '@/actions/showcase-actions';
+import {
+  createShowcaseItemAction,
+  reviewShowcaseItemAction,
+  saveShowcaseDraftAction,
+  submitShowcaseForReviewAction,
+} from '@/actions/showcase-actions';
+import { requestAuthorRevisionAction } from '@/actions/editorial-actions';
 
 const currentUserMock = vi.hoisted(() => ({
   actor: null as {
     id: string;
     fullName: string;
-    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
+    role: 'ADMIN' | 'EDITOR' | 'CORE_MEMBER' | 'MEMBER';
     status: 'ACTIVE';
   } | null,
 }));
@@ -23,6 +29,7 @@ describe('Showcase Server Actions', () => {
   let adminUser: any;
   let coreUser: any;
   let regularUser: any;
+  let editorUser: any;
 
   beforeAll(async () => {
     adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
@@ -55,6 +62,14 @@ describe('Showcase Server Actions', () => {
         status: 'ACTIVE',
       },
     });
+    editorUser = await prisma.user.create({
+      data: {
+        email: `editor-sc-${timestamp}@nexus.hcmus.edu.vn`,
+        fullName: 'Editor Showcase Test',
+        role: 'EDITOR',
+        status: 'ACTIVE',
+      },
+    });
   });
 
   it('should forbid regular member from creating showcase item', async () => {
@@ -72,7 +87,7 @@ describe('Showcase Server Actions', () => {
     expect(result.error).toContain('Chỉ Thành viên nòng cốt');
   });
 
-  it('should allow admin to create and directly publish showcase item', async () => {
+  it('routes admin-created submissions through editorial review', async () => {
     currentUserMock.actor = adminUser;
     const result = await createShowcaseItemAction({
       title: 'Công trình của Thầy Cố Vấn',
@@ -85,7 +100,7 @@ describe('Showcase Server Actions', () => {
     });
 
     expect(result.success).toBe(true);
-    expect(result.item?.status).toBe('PUBLISHED');
+    expect(result.item?.status).toBe('PENDING_REVIEW');
 
     if (result.item) {
       await prisma.showcaseItem.delete({ where: { id: result.item.id } });
@@ -141,16 +156,69 @@ describe('Showcase Server Actions', () => {
     expect(result.item?.attachments?.length).toBe(1);
     expect(result.item?.attachments?.[0].fileName).toBe('paper-manuscript.pdf');
 
-    // Admin duyệt bài
+    // Admin cannot bypass the editorial handoff.
     currentUserMock.actor = adminUser;
     const reviewResult = await reviewShowcaseItemAction(result.item!.id, {
       action: 'PUBLISH',
     });
-    expect(reviewResult.success).toBe(true);
-    expect(reviewResult.status).toBe('PUBLISHED');
+    expect(reviewResult.success).toBe(false);
 
     // Dọn dẹp
     await prisma.showcaseItem.delete({ where: { id: result.item!.id } });
+  });
+
+  it('creates immutable revisions when a member submits and resubmits a draft', async () => {
+    currentUserMock.actor = coreUser;
+    const draft = await saveShowcaseDraftAction(null, {
+      title: 'Revision workflow fixture',
+      summary: '',
+      contributors: [],
+      resources: [],
+    });
+    expect(draft.success).toBe(true);
+    if (!draft.success) return;
+
+    const invalidSubmission = await submitShowcaseForReviewAction(draft.data.id);
+    expect(invalidSubmission.success).toBe(false);
+    expect(invalidSubmission).toHaveProperty('fieldErrors.summary');
+
+    const saved = await saveShowcaseDraftAction(draft.data.id, {
+      title: 'Revision workflow fixture',
+      summary: 'First immutable submission.',
+      contributors: [{ userId: coreUser.id, role: 'PROJECT_LEAD', displayOrder: 0 }],
+      resources: [],
+    });
+    expect(saved.success).toBe(true);
+    const first = await submitShowcaseForReviewAction(draft.data.id);
+    expect(first).toEqual({ success: true, data: { status: 'PENDING_REVIEW', revisionNumber: 1 } });
+
+    currentUserMock.actor = editorUser;
+    const revision = await requestAuthorRevisionAction({
+      itemId: draft.data.id,
+      fieldKey: 'summary',
+      reason: 'Please clarify the result.',
+    });
+    expect(revision).toEqual({ success: true, data: { status: 'REVISION_REQUESTED' } });
+
+    currentUserMock.actor = coreUser;
+    await saveShowcaseDraftAction(draft.data.id, {
+      title: 'Revision workflow fixture',
+      summary: 'Second immutable submission with clarified results.',
+      contributors: [{ userId: coreUser.id, role: 'PROJECT_LEAD', displayOrder: 0 }],
+      resources: [],
+    });
+    const second = await submitShowcaseForReviewAction(draft.data.id);
+    expect(second).toEqual({ success: true, data: { status: 'PENDING_REVIEW', revisionNumber: 2 } });
+
+    const revisions = await prisma.submissionRevision.findMany({
+      where: { itemId: draft.data.id },
+      orderBy: { revisionNumber: 'asc' },
+    });
+    expect(revisions).toHaveLength(2);
+    expect((revisions[0].snapshot as { summary: string }).summary).toBe('First immutable submission.');
+    expect((revisions[1].snapshot as { summary: string }).summary).toContain('clarified results');
+
+    await prisma.showcaseItem.delete({ where: { id: draft.data.id } });
   });
 
   afterAll(async () => {
@@ -159,6 +227,9 @@ describe('Showcase Server Actions', () => {
     }
     if (regularUser?.id) {
       await prisma.user.deleteMany({ where: { id: regularUser.id } });
+    }
+    if (editorUser?.id) {
+      await prisma.user.deleteMany({ where: { id: editorUser.id } });
     }
   });
 });
