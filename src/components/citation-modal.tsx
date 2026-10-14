@@ -57,10 +57,10 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
       {triggerVariant === 'badge' ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-[#0F294A] hover:text-white transition-all cursor-pointer border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20"
+          className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-[#0F294A] hover:text-white transition-all cursor-pointer border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20"
           title="Trích dẫn công trình này"
         >
-          <Quote className="w-3 h-3" />
+          <Quote aria-hidden="true" className="w-3 h-3" />
           <span>Cite</span>
         </button>
       ) : (
@@ -71,7 +71,7 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
             'h-11 px-4 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-sm font-bold transition-all shadow-xs border border-transparent cursor-pointer inline-flex items-center justify-center gap-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20'
           }
         >
-          <Quote className="w-4 h-4 text-slate-300 shrink-0" />
+          <Quote aria-hidden="true" className="w-4 h-4 text-slate-300 shrink-0" />
           <span>Trích dẫn khoa học (Cite)</span>
         </button>
       )}

@@ -50,6 +50,9 @@ describe('Home Page Minimalist Revamp', () => {
     expect(content).toContain('/category/robotics-iot');
     expect(content).toContain('/category/du-an-sang-tao');
 
+    // Public content cards share the sitewide panel surface.
+    expect(content).toContain('panel-public');
+
     // Academic tools
     expect(content).toContain('<CitationModal');
   });

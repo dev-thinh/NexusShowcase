@@ -126,7 +126,7 @@ export default async function CategoryPage({
                   return (
                     <article
                       key={item.id}
-                      className="p-5 rounded-lg bg-white border border-slate-200 shadow-2xs hover:border-slate-300 transition-all flex flex-col gap-3.5"
+                      className="panel-public hover:border-slate-300 transition-all flex flex-col gap-3.5"
                     >
                       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
                         <TypeBadge type={item.type} />
@@ -170,17 +170,17 @@ export default async function CategoryPage({
                         {item.summary}
                       </p>
 
-                      <div className="flex flex-wrap items-center gap-3 pt-3.5 border-t border-slate-100">
+                      <div className="action-row-card">
                         <CitationModal
                           item={item}
-                          className="h-9 px-3 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-2 cursor-pointer"
+                          className="action-primary-card"
                         />
                         {paperLink && (
                           <a
                             href={paperLink.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="h-9 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-800 text-xs font-semibold transition-all inline-flex items-center gap-1.5"
+                            className="action-secondary-card"
                           >
                             <FileText className="w-3.5 h-3.5 text-blue-600" />
                             <span>Bài báo gốc</span>
@@ -189,7 +189,7 @@ export default async function CategoryPage({
                         )}
                         <Link
                           href={`/showcase/${item.slug}`}
-                          className="ml-auto text-xs font-bold text-[#0F294A] hover:underline inline-flex items-center gap-1"
+                          className="action-secondary-card ml-auto"
                         >
                           <span>Xem chi tiết đề tài</span>
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -210,7 +210,7 @@ export default async function CategoryPage({
                   return (
                     <article
                       key={item.id}
-                      className="rounded-lg bg-white border border-slate-200 overflow-hidden shadow-2xs hover:border-slate-300 transition-all flex flex-col"
+                      className="panel-public p-0 overflow-hidden hover:border-slate-300 transition-all flex flex-col"
                     >
                       {item.thumbnailUrl ? (
                         <div className="aspect-video bg-slate-100 relative overflow-hidden">

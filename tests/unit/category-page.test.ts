@@ -12,5 +12,6 @@ describe('Category Directory Page Multi-Layout', () => {
     expect(content).toContain('SHOWCASE_GRID');
     expect(content).toContain('DATA_CATALOG');
     expect(content).toContain('HONOR_ROLL');
+    expect(content).toContain('panel-public');
   });
 });
