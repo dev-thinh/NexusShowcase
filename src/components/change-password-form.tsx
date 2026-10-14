@@ -48,7 +48,7 @@ export function ChangePasswordForm() {
 
   return (
     <div className="max-w-md mx-auto w-full">
-      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-5 sm:p-7">
+      <div className="panel-detail sm:p-7">
         <div className="flex items-start gap-3 pb-4 border-b border-slate-100">
           <KeyRound className="w-6 h-6 text-[#0F294A] shrink-0 mt-0.5" />
           <div className="min-w-0 flex-1">

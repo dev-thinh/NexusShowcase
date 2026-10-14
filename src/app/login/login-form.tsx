@@ -67,7 +67,7 @@ export function LoginForm() {
 
   return (
     <div className="max-w-lg w-full mx-auto">
-      <div className="bg-white rounded-lg border border-slate-200 shadow-xs p-6 sm:p-8">
+      <div className="panel-detail">
         {/* Header với icon trần to bằng tiêu đề */}
         <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
           <LogIn className="w-7 h-7 text-[#0F294A] shrink-0" />

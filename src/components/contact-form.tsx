@@ -12,7 +12,7 @@ export function ContactForm() {
   };
 
   return (
-    <div className="bg-white p-5 sm:p-6 rounded-lg border border-slate-200 shadow-2xs">
+    <div className="panel-detail">
       <div className="flex items-center gap-2 mb-2">
         <MessageSquare className="w-5 h-5 text-[#0F294A] shrink-0" />
         <h2 className="text-base sm:text-lg font-bold text-slate-900">

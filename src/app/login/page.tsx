@@ -7,7 +7,7 @@ import { ArrowLeft, Mail } from 'lucide-react';
 
 function LoginFormFallback() {
   return (
-    <div className="max-w-lg mx-auto w-full animate-pulse bg-white rounded-lg p-6 sm:p-8 border border-slate-200 space-y-5 shadow-xs">
+    <div className="panel-detail max-w-lg mx-auto w-full animate-pulse space-y-5">
       <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
         <Skeleton className="w-7 h-7 rounded" />
         <Skeleton className="h-7 w-32 rounded" />

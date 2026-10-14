@@ -368,7 +368,7 @@ export function ItemForm({
   const isAdmin = currentUserRole === 'ADMIN';
 
   return (
-    <form className="space-y-6 bg-white p-5 sm:p-8 rounded-lg border border-slate-200 shadow-xs" onSubmit={(e) => e.preventDefault()}>
+    <form className="panel-operational sm:p-8 space-y-6" onSubmit={(e) => e.preventDefault()}>
       {error && (
         <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-800 rounded-md text-sm flex items-center gap-3 animate-in fade-in">
           <AlertCircle className="w-5 h-5 shrink-0 text-rose-600" />

@@ -38,7 +38,7 @@ export function Modal({ isOpen, onClose, title, description, children }: ModalPr
         aria-modal="true"
         aria-labelledby="modal-title"
       >
-        <div className="flex items-start justify-between px-6 py-5 border-b border-slate-200">
+        <div className="modal-header">
           <div>
             <h3 id="modal-title" className="text-base sm:text-lg font-bold text-slate-900">
               {title}
@@ -53,7 +53,7 @@ export function Modal({ isOpen, onClose, title, description, children }: ModalPr
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-6">{children}</div>
+        <div className="modal-body">{children}</div>
       </div>
     </div>
   );

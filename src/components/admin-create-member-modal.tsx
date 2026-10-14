@@ -124,11 +124,11 @@ export function AdminCreateMemberModal() {
               </button>
             </div>
 
-            <div className="flex justify-end pt-3">
+            <div className="modal-footer">
               <button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-5 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs"
+                className="action-primary-detail"
               >
                 Hoàn tất
               </button>
@@ -276,19 +276,19 @@ export function AdminCreateMemberModal() {
               </p>
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100">
+            <div className="modal-footer">
               <button
                 type="button"
                 disabled={loading}
                 onClick={() => setIsOpen(false)}
-                className="px-4 py-2 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer disabled:opacity-50"
+                className="action-secondary-detail disabled:opacity-50"
               >
                 Hủy
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 px-5 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                className="action-primary-detail disabled:opacity-50"
               >
                 {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                 <span>{loading ? 'Đang tạo...' : 'Xác nhận tạo'}</span>

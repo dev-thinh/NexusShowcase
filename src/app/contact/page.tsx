@@ -42,7 +42,7 @@ export default function ContactPage() {
           {/* Institutional Info Column (7 cols) */}
           <div className="lg:col-span-7 space-y-4">
             {/* Campus 1 */}
-            <div className="p-4 sm:p-5 rounded-lg bg-white border border-slate-200 shadow-2xs">
+            <div className="panel-detail">
               <div className="flex items-start gap-3 mb-3">
                 <Building className="w-6 h-6 text-blue-700 shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
@@ -79,7 +79,7 @@ export default function ContactPage() {
             </div>
 
             {/* Campus 2 */}
-            <div className="p-4 sm:p-5 rounded-lg bg-white border border-slate-200 shadow-2xs">
+            <div className="panel-detail">
               <div className="flex items-start gap-3 mb-3">
                 <GraduationCap className="w-6 h-6 text-emerald-700 shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
@@ -107,7 +107,7 @@ export default function ContactPage() {
             </div>
 
             {/* Academic Department Affiliation */}
-            <div className="p-4 sm:p-5 rounded-lg bg-slate-50 border border-slate-200">
+            <div className="panel-nested">
               <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1.5">
                 Đơn vị chủ quản
               </h3>

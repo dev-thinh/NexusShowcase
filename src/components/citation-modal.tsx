@@ -134,13 +134,13 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
           </div>
 
           {/* Action Footer */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+          <div className="modal-footer justify-between">
             {activeTab === 'bibtex' && (
               <button
                 onClick={handleDownloadBib}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                className="action-secondary-detail"
               >
-                <Download className="w-3.5 h-3.5 text-slate-500" />
+                <Download aria-hidden="true" className="w-3.5 h-3.5 text-slate-500" />
                 <span>Tải file .bib</span>
               </button>
             )}
@@ -148,22 +148,22 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
             <div className="flex items-center gap-2 ml-auto">
               <button
                 onClick={() => setIsOpen(false)}
-                className="px-3.5 py-1.5 rounded-xl text-slate-600 text-xs font-medium hover:bg-slate-100 transition-colors cursor-pointer"
+                className="action-secondary-detail"
               >
                 Đóng
               </button>
               <button
                 onClick={handleCopy}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                className="action-primary-detail"
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-300" />
+                    <Check aria-hidden="true" className="w-3.5 h-3.5 text-emerald-300" />
                     <span>Đã sao chép!</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-white/80" />
+                    <Copy aria-hidden="true" className="w-3.5 h-3.5 text-white/80" />
                     <span>Sao chép {activeTab.toUpperCase()}</span>
                   </>
                 )}

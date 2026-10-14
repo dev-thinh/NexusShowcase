@@ -58,7 +58,7 @@ export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) 
 
       {isOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-lg max-w-md w-full p-5 sm:p-6 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-150">
+          <div className="panel-operational max-w-md w-full sm:p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-3">
               <div className="flex items-start gap-3 min-w-0 flex-1">
                 <AlertTriangle className="w-6 h-6 text-rose-600 shrink-0 mt-0.5" />
@@ -113,12 +113,12 @@ export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) 
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2">
+            <div className="modal-footer">
               <button
                 type="button"
                 disabled={loading}
                 onClick={() => setIsOpen(false)}
-                className="px-3.5 py-1.5 rounded-md text-xs font-bold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                className="action-secondary-detail disabled:opacity-50"
               >
                 Hủy bỏ
               </button>
@@ -126,9 +126,9 @@ export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) 
                 type="button"
                 disabled={loading}
                 onClick={handleDelete}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-md text-xs font-bold bg-rose-600 hover:bg-rose-700 active:scale-[0.98] text-white shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                className="action-primary-detail bg-rose-600 hover:bg-rose-700 disabled:opacity-50"
               >
-                {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                {loading ? <Loader2 aria-hidden="true" className="w-3.5 h-3.5 animate-spin" /> : <Trash2 aria-hidden="true" className="w-3.5 h-3.5" />}
                 <span>Xóa tài khoản</span>
               </button>
             </div>
