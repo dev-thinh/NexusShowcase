@@ -22,9 +22,28 @@ describe('Prisma Schema Definitions', () => {
     expect(content).toContain('isNavFeatured');
     expect(content).toContain('displayOrder');
 
-    expect(content).toContain('visibility      ItemVisibility');
-    expect(content).toContain('mediaDriveUrl   String?');
-    expect(content).toContain('tags            String[]');
-    expect(content).toContain('category        Category?');
+    expect(content).toMatch(/visibility\s+ItemVisibility/);
+    expect(content).toMatch(/mediaDriveUrl\s+String\?/);
+    expect(content).toMatch(/tags\s+String\[\]/);
+    expect(content).toMatch(/category\s+Category\?/);
+  });
+
+  it('declares the editorial workflow enums and persistence models', () => {
+    const schemaPath = path.resolve(process.cwd(), 'prisma/schema.prisma');
+    const content = fs.readFileSync(schemaPath, 'utf-8');
+
+    expect(content).toContain('EDITOR');
+    expect(content).toContain('REVISION_REQUESTED');
+    expect(content).toContain('READY_FOR_APPROVAL');
+    expect(content).toContain('ARCHIVED');
+    expect(content).toContain('enum ReviewAudience');
+    expect(content).toContain('enum ReviewSeverity');
+    expect(content).toContain('enum ReviewCommentStatus');
+    expect(content).toContain('model SubmissionRevision');
+    expect(content).toContain('model EditorialDraft');
+    expect(content).toContain('model ReviewComment');
+    expect(content).toContain('model AuditEvent');
+    expect(content).toContain('suggestedField');
+    expect(content).toContain('customProjectType');
   });
 });

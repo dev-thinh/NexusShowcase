@@ -99,4 +99,84 @@ describe('Prisma Schema and Database Models', () => {
     // Clean up
     await prisma.showcaseItem.delete({ where: { id: item.id } });
   });
+
+  it('persists a submission revision, editorial draft, review comment, and audit event', async () => {
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const fixtureEmails = [
+      `workflow-author-${suffix}@nexus.test`,
+      `workflow-editor-${suffix}@nexus.test`,
+    ];
+
+    try {
+      const author = await prisma.user.create({
+        data: {
+          email: fixtureEmails[0],
+          fullName: 'Workflow Author',
+          role: 'CORE_MEMBER',
+          status: 'ACTIVE',
+        },
+      });
+      const editor = await prisma.user.create({
+        data: {
+          email: fixtureEmails[1],
+          fullName: 'Workflow Editor',
+          role: 'EDITOR',
+          status: 'ACTIVE',
+        },
+      });
+      const item = await prisma.showcaseItem.create({
+        data: {
+          title: 'Workflow persistence fixture',
+          slug: `workflow-persistence-${suffix}`,
+          summary: 'A fixture for the editorial persistence workflow.',
+          creatorId: author.id,
+          suggestedField: 'Robotics',
+          customProjectType: 'Embedded research prototype',
+          revisions: {
+            create: {
+              revisionNumber: 1,
+              snapshot: { title: 'Workflow persistence fixture' },
+              submittedById: author.id,
+            },
+          },
+          editorialDraft: {
+            create: {
+              assignedEditorId: editor.id,
+              overrides: { title: 'Edited workflow fixture' },
+            },
+          },
+          reviewComments: {
+            create: {
+              fieldKey: 'summary',
+              body: 'Please clarify the research contribution.',
+              audience: 'AUTHOR',
+              severity: 'REQUIRED',
+              authorId: editor.id,
+            },
+          },
+          auditEvents: {
+            create: {
+              actorId: editor.id,
+              action: 'EDITOR_ASSIGNED',
+            },
+          },
+        },
+        include: {
+          revisions: true,
+          editorialDraft: true,
+          reviewComments: true,
+          auditEvents: true,
+        },
+      });
+
+      expect(item.revisions).toHaveLength(1);
+      expect(item.editorialDraft?.assignedEditorId).toBe(editor.id);
+      expect(item.reviewComments).toHaveLength(1);
+      expect(item.auditEvents).toHaveLength(1);
+
+      await prisma.showcaseItem.delete({ where: { id: item.id } });
+    } finally {
+      await prisma.user.deleteMany({ where: { email: { in: fixtureEmails } } });
+    }
+  });
 });

@@ -30,6 +30,16 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
       classes: 'bg-amber-50 text-amber-800 border-amber-200/80',
       icon: Clock,
     },
+    REVISION_REQUESTED: {
+      label: 'Cần chỉnh sửa',
+      classes: 'bg-orange-50 text-orange-800 border-orange-200/80',
+      icon: FileEdit,
+    },
+    READY_FOR_APPROVAL: {
+      label: 'Chờ phê duyệt',
+      classes: 'bg-blue-50 text-blue-800 border-blue-200/80',
+      icon: Clock,
+    },
     REJECTED: {
       label: 'Cần sửa đổi',
       classes: 'bg-rose-50 text-rose-700 border-rose-200/80',
@@ -38,6 +48,11 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
     DRAFT: {
       label: 'Bản nháp',
       classes: 'bg-slate-100 text-slate-700 border-slate-200/80',
+      icon: FileEdit,
+    },
+    ARCHIVED: {
+      label: 'Đã lưu trữ',
+      classes: 'bg-slate-100 text-slate-600 border-slate-200/80',
       icon: FileEdit,
     },
   };

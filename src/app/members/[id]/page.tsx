@@ -58,6 +58,7 @@ export default async function MemberProfilePage({
   const roleBadgeConfig = {
     ADMIN: { label: 'Quản Trị Viên', color: 'bg-amber-50 text-amber-800 border-amber-200/80', icon: ShieldCheck },
     CORE_MEMBER: { label: 'CORE MEMBER', color: 'bg-blue-50 text-blue-800 border-blue-200/80', icon: UserCheck },
+    EDITOR: { label: 'Biên tập viên', color: 'bg-indigo-50 text-indigo-800 border-indigo-200/80', icon: UserCheck },
     MEMBER: { label: 'Thành viên', color: 'bg-slate-100 text-slate-700 border-slate-200/80', icon: UserCheck },
     GUEST: { label: 'Khách', color: 'bg-slate-100 text-slate-600 border-slate-200/80', icon: UserCheck },
   };
