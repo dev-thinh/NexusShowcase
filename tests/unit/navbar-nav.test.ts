@@ -20,8 +20,11 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain('Thành viên');
     expect(content).toContain('Liên hệ');
 
-    // Layout keeps center navigation dead-center and admin menu right-anchored
-    expect(content).toContain('absolute left-1/2 -translate-x-1/2');
+    // Layout assigns tabs and account actions to explicit columns in the
+    // navbar's balanced three-column grid.
+    expect(content).toContain('col-start-2 row-start-1 justify-self-center');
+    expect(content).toContain('col-start-3 row-start-1 justify-self-end');
+    expect(content).not.toContain('absolute left-1/2 -translate-x-1/2');
     expect(content).toContain('right-0');
   });
 
@@ -31,6 +34,7 @@ describe('Navbar Nav Component Structure', () => {
 
     expect(content).toContain('getFeaturedNavCategories');
     expect(content).toContain('featuredCategories');
+    expect(content).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
 
     const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');

@@ -13,10 +13,12 @@ describe('Split-Screen Login Page Layout and Neutral Language', () => {
     // No AcademicFooter as requested
     expect(content).not.toContain('<AcademicFooter');
 
-    // Standard 2-column container grid alignment with top-edge alignment
+    // The content area fills the viewport below the 64px navbar, and each
+    // desktop column is centered within that available space.
     expect(content).toContain('max-w-7xl');
+    expect(content).toContain('min-h-[calc(100dvh-4rem)]');
     expect(content).toContain('grid-cols-1 lg:grid-cols-12');
-    expect(content).toContain('items-start');
+    expect(content).toContain('items-center');
 
     // Split-screen structure: aside (club mission) and main
     expect(content).toContain('<aside');

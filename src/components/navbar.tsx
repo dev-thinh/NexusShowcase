@@ -11,9 +11,9 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-2xs w-full">
-      <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between">
+      <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center">
         {/* Góc trên bên trái: Brand Logo & Tên */}
-        <div className="flex items-center shrink-0">
+        <div className="col-start-1 row-start-1 flex items-center justify-self-start min-w-0">
           <Link
             href="/"
             className="flex items-center gap-3 group rounded-xl p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"

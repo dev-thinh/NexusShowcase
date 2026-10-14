@@ -38,32 +38,27 @@ export default async function LoginPage() {
       <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-pink-100/25 rounded-full blur-3xl pointer-events-none" />
 
       {/* 2. Main Hero Layout: Căn lề 2 bên chuẩn container */}
-      <main className="flex-1 flex items-center justify-center py-8 sm:py-10 lg:py-12 relative z-10">
+      <main className="min-h-[calc(100dvh-4rem)] flex-1 flex items-center justify-center py-8 sm:py-10 lg:py-12 relative z-10">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Panel nhận diện thương hiệu Robotics & IoT Lab */}
-          <div className="mb-6 lg:mb-8">
-            <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 p-1.5 pr-3.5 sm:pr-4 rounded-lg bg-white border border-slate-200 shadow-2xs">
-              <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#0F294A] text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span>Robotics &amp; IoT Lab</span>
-              </div>
-              <div className="hidden sm:block h-3.5 w-px bg-slate-200" />
-              <span className="text-xs sm:text-[13px] font-semibold text-slate-700 tracking-tight">
-                Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
-              </span>
-            </div>
-          </div>
-
-          {/* 
-            Lưới 2 cột: Căn ngang mép trên giữa Tiêu đề và Form đăng nhập 
-            (items-start đảm bảo tiêu đề in đậm căn ngang mép trên của form)
-          */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start">
+          {/* Hai cột được căn giữa trong vùng nhìn còn lại bên dưới navbar. */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
             {/* 
               CỘT BÊN TRÁI: TIÊU ĐỀ & NỘI DUNG GIỚI THIỆU
-              (Tiêu đề h1 bắt đầu ngay từ mép trên, căn ngang với mép trên của form)
+              (Toàn bộ khối nội dung được căn giữa độc lập với form)
             */}
             <aside className="lg:col-span-7 xl:col-span-7 space-y-6">
+              {/* Panel nhận diện thương hiệu thuộc cột giới thiệu, không làm lệch tâm toàn bố cục. */}
+              <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 p-1.5 pr-3.5 sm:pr-4 rounded-lg bg-white border border-slate-200 shadow-2xs">
+                <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#0F294A] text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span>Robotics &amp; IoT Lab</span>
+                </div>
+                <div className="hidden sm:block h-3.5 w-px bg-slate-200" />
+                <span className="text-xs sm:text-[13px] font-semibold text-slate-700 tracking-tight">
+                  Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
+                </span>
+              </div>
+
               {/* Tiêu đề lớn tạo điểm nhấn học thuật & công nghệ */}
               <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-[52px] font-black text-slate-900 tracking-tight leading-[1.12]">
                 Ươm mầm nghiên cứu <br className="hidden sm:inline" />
@@ -97,7 +92,7 @@ export default async function LoginPage() {
 
             {/* 
               CỘT BÊN PHẢI: FORM ĐĂNG NHẬP
-              (Mép trên của form căn ngang với mép trên của tiêu đề h1)
+              (Form được căn giữa trong cùng hàng lưới với khối giới thiệu)
             */}
             <div className="lg:col-span-5 xl:col-span-5 w-full">
               <Suspense fallback={<LoginFormFallback />}>

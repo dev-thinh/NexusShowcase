@@ -76,7 +76,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
         Thứ tự chuẩn hóa: Trang chủ -> Thành viên -> Bài đăng (khi đăng nhập) -> Liên hệ
         (3 chuyên mục nghiên cứu & dự án được khám phá trực tiếp trên Trang chủ với giao diện chuyên biệt)
       */}
-      <nav className="hidden sm:flex absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
+      <nav className="hidden sm:flex col-start-2 row-start-1 justify-self-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
         {/* 1. Tab: Trang chủ */}
         <Link
           href="/"
@@ -121,7 +121,7 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
       </nav>
 
       {/* GÓC TRÊN BÊN PHẢI: PROFILE VỚI MENU QUẢN TRỊ & ĐĂNG XUẤT */}
-      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 z-10 ml-auto">
+      <div className="col-start-3 row-start-1 justify-self-end flex items-center gap-2 sm:gap-2.5 shrink-0 z-10">
         {user ? (
           <>
             {user.role === 'ADMIN' ? (
