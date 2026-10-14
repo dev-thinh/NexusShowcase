@@ -30,11 +30,6 @@ export function BasicInformationFields({ value, errors, onChange }: BasicInforma
         <textarea id="submission-summary" rows={5} value={value.summary} onChange={(event) => onChange('summary', event.target.value)} aria-describedby={errors.summary?.length ? 'submission-summary-error' : undefined} aria-invalid={Boolean(errors.summary?.length)} className={inputClass} />
         <FieldError id="submission-summary-error" errors={errors.summary} />
       </div>
-      <div>
-        <label htmlFor="submission-content" className="block text-sm font-semibold text-slate-900">Nội dung chi tiết</label>
-        <textarea id="submission-content" rows={10} value={value.content} onChange={(event) => onChange('content', event.target.value)} aria-describedby={errors.content?.length ? 'submission-content-error' : undefined} className={`${inputClass} font-mono`} />
-        <FieldError id="submission-content-error" errors={errors.content} />
-      </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="submission-field" className="block text-sm font-semibold text-slate-900">Gợi ý lĩnh vực</label>

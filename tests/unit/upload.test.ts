@@ -99,4 +99,16 @@ describe('Upload File Action Unit Tests', () => {
     expect(result).toMatchObject({ success: false, code: 'UPLOAD_FAILED' });
     expect(result.error).not.toContain('secret');
   });
+
+  it('accepts an authenticated, signature-verified PDF resource', async () => {
+    (auth as any).mockResolvedValueOnce({ user: { id: 'core-1', role: 'CORE_MEMBER' } });
+    const formData = new FormData();
+    formData.append('file', new File([new Uint8Array([0x25, 0x50, 0x44, 0x46, 0x2d])], 'research.pdf', { type: 'application/pdf' }));
+    formData.append('type', 'pdf');
+
+    const result = await uploadFileAction(formData);
+
+    expect(result).toMatchObject({ success: true, mimeType: 'application/pdf', fileName: 'research.pdf' });
+    expect(result.url).toMatch(/^\/uploads\/documents\/[\w-]+\.pdf$/);
+  });
 });
