@@ -13,8 +13,10 @@ describe('form and modal panel consistency', () => {
     expect(read(file)).toContain('panel-detail');
   });
 
-  it('uses operational grouping for the item editor', () => {
-    expect(read('src/components/item-form.tsx')).toContain('panel-operational');
+  it('uses a continuous document surface for the item editor', () => {
+    const editor = read('src/components/submission/submission-editor.tsx');
+    expect(editor).toContain('divide-y divide-slate-200');
+    expect(editor).not.toContain('panel-operational');
   });
 
   it('defines shared modal regions', () => {

@@ -24,7 +24,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers }: Subm
   const { state, updateField, saveDraft, submitForReview } = useSubmissionEditor(dataWithAuthor);
   const driveResource = (state.data.resources ?? []).find((resource) => resource.kind === 'LINK' && resource.label === 'Google Drive');
   return (
-    <form className="mx-auto max-w-4xl divide-y divide-slate-200 bg-white" onSubmit={(event) => event.preventDefault()} noValidate>
+    <form className="max-w-4xl divide-y divide-slate-200 bg-white" onSubmit={(event) => event.preventDefault()} noValidate>
       {state.formError && <div role="alert" className="mb-2 border-l-2 border-rose-600 py-2 pl-3 text-sm text-rose-800">{state.formError}</div>}
       <section className="pb-8">
         <h2 className="text-lg font-bold text-slate-950">Thông tin cơ bản</h2>

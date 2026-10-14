@@ -1,16 +1,23 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 
-describe('Item Form Component', () => {
-  it('supports mediaDriveUrl, tags, and category proposal', () => {
-    const formPath = path.resolve(process.cwd(), 'src/components/item-form.tsx');
-    const content = fs.readFileSync(formPath, 'utf-8');
+const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
 
-    expect(content).toContain('mediaDriveUrl');
-    expect(content).toContain('proposedCategory');
-    expect(content).toContain('tags');
-    expect(content).toContain('categoryId');
-    expect(content).toContain('FormCategoryOption');
+describe('member submission routes', () => {
+  it.each([
+    'src/app/dashboard/items/new/page.tsx',
+    'src/app/dashboard/items/[id]/edit/page.tsx',
+  ])('%s uses the shared submission editor and document width', (file) => {
+    const source = read(file);
+    expect(source).toContain('SubmissionEditor');
+    expect(source).toContain('max-w-7xl');
+    expect(source).not.toContain('ItemForm');
+    expect(source).not.toContain('prisma.category.findMany');
+  });
+
+  it('adapts existing draft records through one mapper', () => {
+    expect(read('src/app/dashboard/items/[id]/edit/page.tsx')).toContain('mapShowcaseItemToSubmission');
+    expect(read('src/lib/submission-types.ts')).toContain('export function mapShowcaseItemToSubmission');
   });
 });

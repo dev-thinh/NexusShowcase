@@ -15,7 +15,7 @@ const headingSources = [
   'src/components/change-password-form.tsx',
   'src/components/contact-form.tsx',
   'src/components/featured-filmstrip.tsx',
-  'src/components/item-form.tsx',
+  'src/components/submission/submission-editor.tsx',
   'src/components/member-section-heading.tsx',
 ];
 
