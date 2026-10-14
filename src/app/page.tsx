@@ -495,9 +495,10 @@ export default async function HomePage({
             <div className="pt-2">
               <Link
                 href="/category/bai-bao-khoa-hoc"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs sm:text-sm font-bold shadow-xs transition-colors group"
+                data-home-view-all
+                className="action-primary-card group"
               >
-                <span>Xem tất cả bài báo ({publishedPapersCount})</span>
+                <span>Xem tất cả ({publishedPapersCount})</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
@@ -611,9 +612,10 @@ export default async function HomePage({
 
             <Link
               href="/category/robotics-iot"
-              className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] transition-colors shrink-0 group self-start sm:self-auto"
+              data-home-view-all
+              className="action-primary-card group shrink-0 self-start sm:self-auto"
             >
-              <span>Xem tất cả dự án ({activeProjectsCount})</span>
+              <span>Xem tất cả ({activeProjectsCount})</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
@@ -650,7 +652,8 @@ export default async function HomePage({
             {creativeCount > 0 && (
               <Link
                 href="/category/du-an-sang-tao"
-                className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#0F294A] hover:text-[#1E3A5F] transition-colors shrink-0 group self-start sm:self-auto"
+                data-home-view-all
+                className="action-primary-card group shrink-0 self-start sm:self-auto"
               >
                 <span>Xem tất cả ({creativeCount})</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
