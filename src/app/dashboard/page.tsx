@@ -150,7 +150,7 @@ export default async function DashboardPage() {
                     <p className="text-sm text-slate-600 line-clamp-1 mt-0.5">{item.summary}</p>
 
                     {item.status === 'REJECTED' && item.rejectionReason && (
-                      <div className="panel-callout mt-3 bg-rose-50 border-rose-200 text-xs sm:text-sm text-rose-800 flex items-start gap-2">
+                      <div className="mt-3 flex items-start gap-2 border-l-2 border-rose-500 pl-3 text-xs text-rose-800 sm:text-sm">
                         <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
                         <div>
                           <strong>Góp ý từ Ban kiểm duyệt:</strong> {item.rejectionReason}
@@ -168,16 +168,16 @@ export default async function DashboardPage() {
 
                   <div className="shrink-0 flex items-center gap-3">
                     <StatusBadge status={item.status} />
-                    {isUploader && (item.status === 'DRAFT' || item.status === 'REJECTED' || user.role === 'ADMIN') ? (
+                    {isUploader && ['DRAFT', 'REVISION_REQUESTED'].includes(item.status) ? (
                       <Link
                         href={`/dashboard/items/${item.id}/edit`}
                         className="text-xs sm:text-sm font-semibold px-2.5 py-1.5 rounded-lg border border-slate-200 text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-colors"
                       >
-                        {item.status === 'REJECTED' ? 'Sửa & Nộp lại' : 'Chỉnh sửa'}
+                        {item.status === 'REVISION_REQUESTED' ? 'Sửa theo phản hồi' : 'Chỉnh sửa'}
                       </Link>
-                    ) : !isUploader && (item.status === 'DRAFT' || item.status === 'REJECTED') ? (
+                    ) : item.status === 'REJECTED' || (!isUploader && ['DRAFT', 'REVISION_REQUESTED'].includes(item.status)) ? (
                       <span className="text-xs font-semibold px-2.5 py-1.5 rounded-lg bg-slate-100 text-slate-500 border border-slate-200 cursor-not-allowed">
-                        Chỉ xem
+                        Chỉ đọc
                       </span>
                     ) : null}
                     <Link

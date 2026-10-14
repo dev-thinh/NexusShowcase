@@ -19,7 +19,16 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
   const { id } = await params;
   const item = await prisma.showcaseItem.findUnique({
     where: { id },
-    include: { contributors: { orderBy: { displayOrder: 'asc' } }, links: true, attachments: true },
+    include: {
+      contributors: { orderBy: { displayOrder: 'asc' } },
+      links: true,
+      attachments: true,
+      reviewComments: {
+        where: { audience: 'AUTHOR', status: 'OPEN' },
+        select: { id: true, fieldKey: true, body: true, audience: true, severity: true },
+        orderBy: { createdAt: 'asc' },
+      },
+    },
   });
   if (!item) notFound();
   if (item.creatorId !== user.id) redirect('/dashboard');
@@ -40,7 +49,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">{item.status === 'REVISION_REQUESTED' ? 'Chỉnh sửa theo phản hồi' : 'Chỉnh sửa bản nháp'}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Nội dung chỉ được cập nhật khi còn là bản nháp hoặc khi ban biên tập yêu cầu chỉnh sửa.</p>
           </header>
-          <SubmissionEditor initialData={mapShowcaseItemToSubmission(item)} currentUser={{ id: user.id, fullName: user.fullName, role: user.role }} clubMembers={members} mode="edit" />
+          <SubmissionEditor initialData={mapShowcaseItemToSubmission(item)} currentUser={{ id: user.id, fullName: user.fullName, role: user.role }} clubMembers={members} mode="edit" reviewComments={item.reviewComments} />
         </div>
       </main>
       <AcademicFooter />
