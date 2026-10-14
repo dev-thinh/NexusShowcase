@@ -1,0 +1,129 @@
+import React from 'react';
+import type { SubmissionSnapshot } from '@/lib/submission-types';
+
+interface SourceRevisionViewProps {
+  snapshot: SubmissionSnapshot;
+  revisions?: Array<{
+    id: string;
+    revisionNumber: number;
+    submittedAt: Date | string;
+  }>;
+  selectedRevisionNumber?: number;
+  onSelectRevision?: (revNum: number) => void;
+}
+
+export function SourceRevisionView({
+  snapshot,
+  revisions = [],
+  selectedRevisionNumber = 1,
+  onSelectRevision,
+}: SourceRevisionViewProps) {
+  return (
+    <div className="space-y-6 text-slate-800">
+      <div className="flex items-center justify-between pb-4 border-b border-slate-200">
+        <div>
+          <h2 className="text-base font-semibold text-slate-900">Bản gốc tác giả</h2>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Snapshot bất biến do tác giả nộp
+          </p>
+        </div>
+        {revisions.length > 1 && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-slate-500">Lần nộp:</span>
+            <select
+              value={selectedRevisionNumber}
+              onChange={(e) => onSelectRevision?.(Number(e.target.value))}
+              className="text-xs border border-slate-300 rounded px-2 py-1 bg-white"
+            >
+              {revisions.map((rev) => (
+                <option key={rev.id} value={rev.revisionNumber}>
+                  Lần {rev.revisionNumber} ({new Date(rev.submittedAt).toLocaleDateString('vi-VN')})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-4 text-sm">
+        <div>
+          <span className="text-xs font-medium text-slate-500 block mb-1">Tiêu đề công trình</span>
+          <p className="font-medium text-slate-900">{snapshot.title || 'Chưa có tiêu đề'}</p>
+        </div>
+
+        <div>
+          <span className="text-xs font-medium text-slate-500 block mb-1">Gợi ý lĩnh vực</span>
+          <p className="text-slate-700">
+            {snapshot.suggestedField || snapshot.customProjectType || 'Chưa có gợi ý'}
+          </p>
+        </div>
+
+        <div>
+          <span className="text-xs font-medium text-slate-500 block mb-1">Tóm tắt</span>
+          <p className="text-slate-700 whitespace-pre-line leading-relaxed">
+            {snapshot.summary || 'Chưa có tóm tắt'}
+          </p>
+        </div>
+
+        {snapshot.content && (
+          <div>
+            <span className="text-xs font-medium text-slate-500 block mb-1">Nội dung chi tiết</span>
+            <div className="text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50 p-3 rounded border border-slate-100 text-xs">
+              {snapshot.content}
+            </div>
+          </div>
+        )}
+
+        <div>
+          <span className="text-xs font-medium text-slate-500 block mb-2">Tác giả và người tham gia</span>
+          {snapshot.contributors.length === 0 ? (
+            <p className="text-xs text-slate-400 italic">Không có danh sách tác giả</p>
+          ) : (
+            <ul className="divide-y divide-slate-100 border border-slate-200 rounded text-xs bg-slate-50/50">
+              {snapshot.contributors.map((contrib, idx) => (
+                <li key={idx} className="p-2.5 flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-slate-900">
+                      {contrib.externalName || contrib.userId || 'Thành viên'}
+                    </span>
+                    {contrib.externalAffiliation && (
+                      <span className="text-slate-500 block text-[11px]">
+                        {contrib.externalAffiliation}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-[11px] bg-slate-200/80 px-2 py-0.5 rounded text-slate-700">
+                    {contrib.customRoleTitle || contrib.role}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div>
+          <span className="text-xs font-medium text-slate-500 block mb-2">Tài nguyên đính kèm</span>
+          {snapshot.resources.length === 0 ? (
+            <p className="text-xs text-slate-400 italic">Không có tài nguyên</p>
+          ) : (
+            <ul className="divide-y divide-slate-100 border border-slate-200 rounded text-xs">
+              {snapshot.resources.map((res, idx) => (
+                <li key={idx} className="p-2.5 flex items-center justify-between">
+                  <div>
+                    <span className="font-medium text-slate-900">{res.label}</span>
+                    <span className="text-slate-400 block text-[11px] truncate max-w-xs">
+                      {res.url}
+                    </span>
+                  </div>
+                  <span className="text-[11px] text-slate-500 uppercase tracking-wider font-mono">
+                    {res.kind}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

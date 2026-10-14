@@ -1,0 +1,56 @@
+import { describe, expect, it } from 'vitest';
+import fs from 'fs';
+import path from 'path';
+
+const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
+
+describe('academic review workspace', () => {
+  it('uses a 40/60 continuous desktop grid with divider and mobile tabs', () => {
+    const workspace = read('src/components/editorial/review-workspace.tsx');
+    expect(workspace).toMatch(/grid.*lg:grid-cols-\[minmax\(0,2fr\)_minmax\(0,3fr\)\]|grid.*lg:grid-cols-5|lg:divide-x/);
+    expect(workspace).toContain('role="tab"');
+    expect(workspace).toContain('aria-selected');
+    expect(workspace).not.toContain('panel-operational');
+  });
+
+  it('renders read-only source revision view without editable inputs', () => {
+    const sourceView = read('src/components/editorial/source-revision-view.tsx');
+    expect(sourceView).toContain('Bản gốc tác giả');
+    expect(sourceView).not.toMatch(/<input|<textarea/);
+    expect(sourceView).toContain('Tác giả');
+    expect(sourceView).toContain('Tài nguyên');
+  });
+
+  it('provides editorial fields with edited markers, per-field restore, and category requirement', () => {
+    const fields = read('src/components/editorial/editorial-fields.tsx');
+    expect(fields).toContain('Đã biên tập');
+    expect(fields).toContain('Khôi phục bản gửi');
+    expect(fields).toContain('Chuyên mục');
+    expect(fields).toContain('htmlFor="editorial-category"');
+    expect(fields).not.toContain('panel-operational');
+  });
+
+  it('renders a compact review checklist with explicit verification items', () => {
+    const checklist = read('src/components/editorial/review-checklist.tsx');
+    expect(checklist).toContain('copyEdited');
+    expect(checklist).toContain('mediaChecked');
+    expect(checklist).toContain('metadataChecked');
+    expect(checklist).toContain('type="checkbox"');
+  });
+
+  it('supports role-specific actions for EDITOR and ADMIN', () => {
+    const workspace = read('src/components/editorial/review-workspace.tsx');
+    expect(workspace).toContain('Gửi phê duyệt');
+    expect(workspace).toContain('Trả lại biên tập');
+    expect(workspace).toContain('Yêu cầu bổ sung');
+    expect(workspace).toContain('Xem trước');
+  });
+
+  it('secures routes and provides editorial preview', () => {
+    const reviewRoute = read('src/app/admin/reviews/[id]/page.tsx');
+    const previewRoute = read('src/app/admin/reviews/[id]/preview/page.tsx');
+    expect(reviewRoute).toContain("getCurrentUser(['EDITOR', 'ADMIN'])");
+    expect(previewRoute).toContain("getCurrentUser(['EDITOR', 'ADMIN'])");
+    expect(previewRoute).toContain('mergeEditorialOverrides');
+  });
+});
