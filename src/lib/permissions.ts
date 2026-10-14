@@ -12,6 +12,15 @@ export function canUserUpload(user: UserSessionSubset | null | undefined): boole
 
 export function canUserReview(user: UserSessionSubset | null | undefined): boolean {
   if (!user || !user.role) return false;
+  return user.role === 'EDITOR' || user.role === 'ADMIN';
+}
+
+export function canUserEditPublication(user: UserSessionSubset | null | undefined): boolean {
+  return canUserReview(user);
+}
+
+export function canUserPublish(user: UserSessionSubset | null | undefined): boolean {
+  if (!user || !user.role) return false;
   return user.role === 'ADMIN';
 }
 

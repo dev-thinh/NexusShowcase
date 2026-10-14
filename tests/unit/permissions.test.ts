@@ -1,5 +1,11 @@
 import { describe, it, expect } from 'vitest';
-import { canUserUpload, canUserReview, isMemberOrHigher } from '@/lib/permissions';
+import {
+  canUserEditPublication,
+  canUserPublish,
+  canUserUpload,
+  canUserReview,
+  isMemberOrHigher,
+} from '@/lib/permissions';
 
 describe('RBAC Permission Helpers', () => {
   it('should allow CORE_MEMBER and ADMIN to upload (Member and Guest denied)', () => {
@@ -10,11 +16,20 @@ describe('RBAC Permission Helpers', () => {
     expect(canUserUpload(null)).toBe(false);
   });
 
-  it('should only allow ADMIN to review/publish submissions', () => {
+  it('allows editors and admins to review submissions', () => {
     expect(canUserReview({ role: 'ADMIN' })).toBe(true);
+    expect(canUserReview({ role: 'EDITOR' })).toBe(true);
     expect(canUserReview({ role: 'CORE_MEMBER' })).toBe(false);
     expect(canUserReview({ role: 'MEMBER' })).toBe(false);
     expect(canUserReview(null)).toBe(false);
+  });
+
+  it('separates publication editing from final publishing', () => {
+    expect(canUserEditPublication({ role: 'EDITOR' })).toBe(true);
+    expect(canUserEditPublication({ role: 'ADMIN' })).toBe(true);
+    expect(canUserEditPublication({ role: 'CORE_MEMBER' })).toBe(false);
+    expect(canUserPublish({ role: 'EDITOR' })).toBe(false);
+    expect(canUserPublish({ role: 'ADMIN' })).toBe(true);
   });
 
   it('should check if user is official club member', () => {
