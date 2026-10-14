@@ -292,20 +292,6 @@ export function NavbarNav({ user, featuredCategories = [] }: NavbarNavProps) {
           </Link>
         )}
       </div>
-
-      {/* Nút lối tắt nổi Quản trị viên (Floating Quick Access) ở góc dưới bên phải màn hình */}
-      {user?.role === 'ADMIN' && (
-        <aside className="fixed bottom-5 right-5 z-40 print:hidden animate-in fade-in duration-200" aria-label="Lối tắt Quản trị">
-          <Link
-            href="/admin"
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#0F294A] hover:bg-[#1E3A5F] text-amber-300 hover:text-amber-200 border border-slate-700/80 shadow-lg hover:shadow-xl text-xs font-bold transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 group"
-            title="Lối tắt mở Bàn làm việc Quản trị"
-          >
-            <ShieldCheck className="w-4 h-4 text-amber-400 group-hover:rotate-12 transition-transform" />
-            <span>Khu vực Quản trị</span>
-          </Link>
-        </aside>
-      )}
     </>
   );
 }

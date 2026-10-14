@@ -26,6 +26,8 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain('col-start-3 row-start-1 justify-self-end');
     expect(content).not.toContain('absolute left-1/2 -translate-x-1/2');
     expect(content).toContain('right-0');
+    expect(content).not.toContain('fixed bottom-5 right-5');
+    expect(content).not.toContain('aria-label="Lối tắt Quản trị"');
   });
 
   it('streamlines center navigation to core tabs while passing featured categories', () => {

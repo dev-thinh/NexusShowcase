@@ -65,13 +65,13 @@ export default async function HomePage({
         <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-100 bg-slate-50/60">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
             {/* Tech-badge Panel */}
-            <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-3.5 p-2 pr-4 sm:pr-5 rounded-xl bg-white border border-slate-200 shadow-xs mb-5 sm:mb-6">
-              <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#0F294A] text-white text-xs sm:text-sm font-bold tracking-wide shadow-2xs shrink-0">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <div data-brand-lockup="home" className="inline-flex items-center gap-3 sm:gap-3.5 px-3 py-2 rounded-lg bg-slate-100/80 mb-5 sm:mb-6">
+              <div className="flex items-center gap-2 shrink-0 text-[#0F294A] text-xs sm:text-sm font-extrabold tracking-wide">
+                <span className="w-1.5 h-1.5 rounded-[2px] bg-[#0F294A]/70" />
                 <span>Robotics &amp; IoT Lab</span>
               </div>
               <div className="hidden sm:block h-4 w-px bg-slate-200" />
-              <span className="text-xs sm:text-sm font-semibold text-slate-700 tracking-tight">
+              <span className="text-[10px] sm:text-sm font-semibold text-slate-600 tracking-tight whitespace-nowrap">
                 Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
               </span>
             </div>
@@ -430,13 +430,13 @@ export default async function HomePage({
       <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-100 bg-slate-50/60">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
           {/* Tech-badge Panel */}
-          <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-3.5 p-2 pr-4 sm:pr-5 rounded-xl bg-white border border-slate-200 shadow-xs mb-5 sm:mb-6">
-            <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-lg bg-[#0F294A] text-white text-xs sm:text-sm font-bold tracking-wide shadow-2xs shrink-0">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <div data-brand-lockup="home" className="inline-flex items-center gap-3 sm:gap-3.5 px-3 py-2 rounded-lg bg-slate-100/80 mb-5 sm:mb-6">
+            <div className="flex items-center gap-2 shrink-0 text-[#0F294A] text-xs sm:text-sm font-extrabold tracking-wide">
+              <span className="w-1.5 h-1.5 rounded-[2px] bg-[#0F294A]/70" />
               <span>Robotics &amp; IoT Lab</span>
             </div>
             <div className="hidden sm:block h-4 w-px bg-slate-200" />
-            <span className="text-xs sm:text-sm font-semibold text-slate-700 tracking-tight">
+            <span className="text-[10px] sm:text-sm font-semibold text-slate-600 tracking-tight whitespace-nowrap">
               Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
             </span>
           </div>

@@ -48,13 +48,13 @@ export default async function LoginPage() {
             */}
             <aside className="lg:col-span-7 xl:col-span-7 space-y-6">
               {/* Panel nhận diện thương hiệu thuộc cột giới thiệu, không làm lệch tâm toàn bố cục. */}
-              <div className="inline-flex flex-wrap sm:flex-nowrap items-center gap-2.5 sm:gap-3 p-1.5 pr-3.5 sm:pr-4 rounded-lg bg-white border border-slate-200 shadow-2xs">
-                <div className="flex items-center gap-2 px-2.5 py-1 rounded-md bg-[#0F294A] text-white text-xs font-bold tracking-wide shadow-2xs shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div data-brand-lockup="login" className="inline-flex items-center gap-2.5 sm:gap-3 px-3 py-2 rounded-lg bg-slate-100/80">
+                <div className="flex items-center gap-2 shrink-0 text-[#0F294A] text-xs font-extrabold tracking-wide">
+                  <span className="w-1.5 h-1.5 rounded-[2px] bg-[#0F294A]/70" />
                   <span>Robotics &amp; IoT Lab</span>
                 </div>
                 <div className="hidden sm:block h-3.5 w-px bg-slate-200" />
-                <span className="text-xs sm:text-[13px] font-semibold text-slate-700 tracking-tight">
+                <span className="text-[10px] sm:text-[13px] font-semibold text-slate-600 tracking-tight whitespace-nowrap">
                   Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
                 </span>
               </div>

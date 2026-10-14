@@ -40,11 +40,14 @@ describe('Split-Screen Login Page Layout and Neutral Language', () => {
     expect(content).toContain('Liên hệ');
   });
 
-  it('uses the system primary navy for the Robotics chip and home button only', () => {
+  it('uses a borderless static brand lockup and keeps navy for the home button', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/login/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
 
-    expect(content.match(/bg-\[#0F294A\]/g) ?? []).toHaveLength(2);
+    expect(content).toContain('data-brand-lockup="login"');
+    expect(content).toContain('bg-slate-100/80');
+    expect(content).not.toContain('bg-emerald-400 animate-pulse');
+    expect(content).not.toContain('rounded-md bg-[#0F294A] text-white text-xs');
     expect(content).toContain('hover:bg-[#1E3A5F]');
     expect(content).toContain('bg-white hover:bg-slate-50 text-slate-800');
   });

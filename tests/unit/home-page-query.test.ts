@@ -34,10 +34,12 @@ describe('Home Page Minimalist Revamp', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
 
-    // Brand panel with dark navy chip and slightly larger home page scale
-    expect(content).toContain('rounded-xl bg-white border border-slate-200 shadow-xs mb-5 sm:mb-6');
-    expect(content).toContain('rounded-lg bg-[#0F294A] text-white text-xs sm:text-sm font-bold tracking-wide shadow-2xs');
-    expect(content).toContain('bg-emerald-400 animate-pulse');
+    // The brand lockup stays on one line without button-like borders or a filled chip.
+    expect(content.match(/data-brand-lockup="home"/g) ?? []).toHaveLength(2);
+    expect(content).toContain('bg-slate-100/80');
+    expect(content).toContain('text-[#0F294A] text-xs sm:text-sm font-extrabold');
+    expect(content).not.toContain('rounded-xl bg-white border border-slate-200 shadow-xs');
+    expect(content).not.toContain('bg-emerald-400 animate-pulse');
     expect(content).toContain('Robotics &amp; IoT Lab');
     expect(content).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
 
