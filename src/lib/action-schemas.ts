@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const INVALID_ACTION_INPUT_ERROR = 'Invalid input.';
 
 const MAX_CURRENT_YEAR = new Date().getFullYear() + 1;
-const cuidSchema = z.string().cuid();
+export const cuidSchema = z.string().cuid();
 const trimmedText = (max: number) => z.string().trim().max(max);
 
 export const safeHttpUrlSchema = z
@@ -174,6 +174,16 @@ export const editorialHandoffInputSchema = z.object({
   checklist: editorialChecklistSchema,
 }).strict();
 
+export const assignEditorInputSchema = z.object({
+  itemId: cuidSchema,
+  editorId: cuidSchema.nullable().optional(),
+}).strict();
+
+export const returnToEditorInputSchema = z.object({
+  itemId: cuidSchema,
+  reason: trimmedText(2_000).min(1),
+}).strict();
+
 export const publishEditorialDraftInputSchema = z.object({
   itemId: cuidSchema,
   checklist: editorialChecklistSchema,
@@ -216,3 +226,5 @@ export type ShowcaseDraftInput = z.input<typeof showcaseDraftInputSchema>;
 export type ShowcaseSubmissionInput = z.input<typeof showcaseSubmissionInputSchema>;
 export type EditorialDraftInput = z.input<typeof editorialDraftInputSchema>;
 export type ReviewCommentInput = z.input<typeof reviewCommentInputSchema>;
+export type AssignEditorInput = z.input<typeof assignEditorInputSchema>;
+export type ReturnToEditorInput = z.input<typeof returnToEditorInputSchema>;
