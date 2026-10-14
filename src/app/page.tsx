@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { TypeBadge } from '@/components/ui/badge';
 import { CitationModal } from '@/components/citation-modal';
 import { publicUserSelect } from '@/lib/public-user';
+import { buildHomepageCategoryWhere } from '@/lib/home-section-filters';
 import {
   BookOpen,
   Bot,
@@ -261,19 +262,7 @@ export default async function HomePage({
     }),
     // 2. Robotics & IoT Projects
     prisma.showcaseItem.findMany({
-      where: {
-        ...baseWhere,
-        OR: [
-          { category: { slug: 'robotics-iot' } },
-          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
-          { title: { contains: 'robot', mode: 'insensitive' } },
-          { title: { contains: 'iot', mode: 'insensitive' } },
-        ],
-        NOT: [
-          { type: 'RESEARCH_PAPER' },
-          { category: { slug: 'bai-bao-khoa-hoc' } },
-        ],
-      },
+      where: buildHomepageCategoryWhere('robotics-iot', baseWhere),
       include: {
         contributors: {
           include: { user: { select: publicUserSelect } },
@@ -286,32 +275,11 @@ export default async function HomePage({
       take: 3,
     }),
     prisma.showcaseItem.count({
-      where: {
-        ...baseWhere,
-        OR: [
-          { category: { slug: 'robotics-iot' } },
-          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
-          { title: { contains: 'robot', mode: 'insensitive' } },
-          { title: { contains: 'iot', mode: 'insensitive' } },
-        ],
-        NOT: [
-          { type: 'RESEARCH_PAPER' },
-          { category: { slug: 'bai-bao-khoa-hoc' } },
-        ],
-      },
+      where: buildHomepageCategoryWhere('robotics-iot', baseWhere),
     }),
     // 3. Creative & Other Projects
     prisma.showcaseItem.findMany({
-      where: {
-        ...baseWhere,
-        NOT: [
-          { type: 'RESEARCH_PAPER' },
-          { category: { slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } } },
-          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
-          { title: { contains: 'robot', mode: 'insensitive' } },
-          { title: { contains: 'iot', mode: 'insensitive' } },
-        ],
-      },
+      where: buildHomepageCategoryWhere('du-an-sang-tao', baseWhere),
       include: {
         contributors: {
           include: { user: { select: publicUserSelect } },
@@ -324,16 +292,7 @@ export default async function HomePage({
       take: 3,
     }),
     prisma.showcaseItem.count({
-      where: {
-        ...baseWhere,
-        NOT: [
-          { type: 'RESEARCH_PAPER' },
-          { category: { slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } } },
-          { tags: { hasSome: ['Robotics', 'robotics', 'Robot', 'robot', 'IoT', 'iot', 'Nhúng', 'Embedded', 'Hardware', 'Phần cứng'] } },
-          { title: { contains: 'robot', mode: 'insensitive' } },
-          { title: { contains: 'iot', mode: 'insensitive' } },
-        ],
-      },
+      where: buildHomepageCategoryWhere('du-an-sang-tao', baseWhere),
     }),
   ]);
 
@@ -635,10 +594,8 @@ export default async function HomePage({
         {/* PHÂN KHU 2: ROBOTICS & IOT (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
         <section className="space-y-6 pb-12 sm:pb-16 border-b border-slate-200">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 border border-emerald-100">
-                <Bot className="w-5 h-5" />
-              </div>
+            <div className="flex items-start gap-4">
+              <Bot aria-hidden="true" className="w-14 h-14 sm:w-16 sm:h-16 text-emerald-700 shrink-0 stroke-[1.5]" />
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                   Phần cứng &amp; Tự động hóa
@@ -675,10 +632,8 @@ export default async function HomePage({
         {/* PHÂN KHU 3: DỰ ÁN & SÁNG TẠO (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
         <section className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-indigo-50 text-indigo-700 flex items-center justify-center shrink-0 border border-indigo-100">
-                <Code2 className="w-5 h-5" />
-              </div>
+            <div className="flex items-start gap-4">
+              <Code2 aria-hidden="true" className="w-14 h-14 sm:w-16 sm:h-16 text-indigo-700 shrink-0 stroke-[1.5]" />
               <div>
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
                   Đổi mới &amp; Ứng dụng
