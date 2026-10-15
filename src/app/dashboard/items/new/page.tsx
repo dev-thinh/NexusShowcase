@@ -25,7 +25,7 @@ export default async function NewItemPage() {
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
       <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <div className="max-w-4xl">
+        <div className="max-w-6xl">
           <header className="mb-8 border-b border-slate-200 pb-5">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">Đăng công trình mới</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Lưu bản nháp chỉ với tiêu đề. Trước khi gửi duyệt, bổ sung tóm tắt và ít nhất một người đóng góp.</p>

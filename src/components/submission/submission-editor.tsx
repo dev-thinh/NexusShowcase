@@ -24,31 +24,39 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, review
     contributors: [{ userId: currentUser.id, role: 'PROJECT_LEAD' as const, displayOrder: 0 }],
   };
   const { state, updateField, saveDraft, submitForReview } = useSubmissionEditor(dataWithAuthor);
-  const driveResource = (state.data.resources ?? []).find((resource) => resource.kind === 'LINK' && resource.label === 'Google Drive');
   return (
-    <form className="max-w-4xl divide-y divide-slate-200 bg-white" onSubmit={(event) => event.preventDefault()} noValidate>
-      {state.formError && <div role="alert" className="mb-2 border-l-2 border-rose-600 py-2 pl-3 text-sm text-rose-800">{state.formError}</div>}
-      <section className="pb-8">
-        <h2 className="text-lg font-bold text-slate-950">Thông tin cơ bản</h2>
-        <div className="mt-5"><BasicInformationFields value={state.data} errors={state.fieldErrors} onChange={updateField} reviewComments={reviewComments} /></div>
-      </section>
-      <section className="py-8">
-        <h2 className="text-lg font-bold text-slate-950">Tác giả và người đóng góp</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Thêm những người trực tiếp tham gia công trình và sắp xếp theo thứ tự hiển thị.</p>
-        <ReviewComments comments={reviewComments} fieldKey="contributors" />
-        <ContributorEditor value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={(contributors) => updateField('contributors', contributors)} />
-      </section>
-      <section className="pt-8">
-        <h2 className="text-lg font-bold text-slate-950">Tài nguyên và thông tin bổ sung</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Đính kèm tài liệu, hình ảnh hoặc liên kết giúp hội đồng hiểu và kiểm chứng công trình.</p>
-        <ReviewComments comments={reviewComments} fieldKey="resources" />
-        <ResourceEditor value={state.data.resources ?? []} onChange={(resources) => updateField('resources', resources)} />
-        <OptionalDetails content={state.data.content ?? ''} driveUrl={driveResource?.url ?? ''} onContentChange={(content) => updateField('content', content)} onDriveUrlChange={(url) => {
-          const resources = (state.data.resources ?? []).filter((resource) => !(resource.kind === 'LINK' && resource.label === 'Google Drive'));
-          updateField('resources', url ? [...resources, { kind: 'LINK', label: 'Google Drive', url }] : resources);
-        }} />
-        <SubmissionActionBar saveState={state.saveState} onSave={() => void saveDraft()} onSubmit={() => void submitForReview()} />
-      </section>
+    <form className="panel-detail max-w-6xl overflow-hidden !p-0" onSubmit={(event) => event.preventDefault()} noValidate>
+      {state.formError && <div role="alert" className="border-b border-rose-200 bg-rose-50 px-6 py-3 text-sm font-medium text-rose-800 sm:px-8">{state.formError}</div>}
+      <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(20rem,5fr)] lg:divide-x lg:divide-slate-200">
+        <section className="p-6 sm:p-8">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Hồ sơ công trình</p>
+          <h2 className="mt-2 text-xl font-bold tracking-tight text-slate-950">Thông tin cơ bản</h2>
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Trình bày ngắn gọn vấn đề nghiên cứu, phương pháp và đóng góp chính.</p>
+          <div className="mt-6"><BasicInformationFields value={state.data} errors={state.fieldErrors} onChange={updateField} reviewComments={reviewComments} /></div>
+          <OptionalDetails content={state.data.content ?? ''} onContentChange={(content) => updateField('content', content)} />
+        </section>
+
+        <div className="divide-y divide-slate-200 bg-slate-50/40">
+          <section className="p-6 sm:p-8 lg:p-6 xl:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Nhóm thực hiện</p>
+            <h2 className="mt-2 text-lg font-bold text-slate-950">
+              Tác giả và người đóng góp <span className="text-rose-700" aria-hidden="true">*</span>
+              <span className="sr-only"> (Bắt buộc khi gửi)</span>
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Thêm người tham gia và xác định vai trò.</p>
+            <ReviewComments comments={reviewComments} fieldKey="contributors" />
+            <ContributorEditor value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={(contributors) => updateField('contributors', contributors)} />
+          </section>
+          <section className="p-6 sm:p-8 lg:p-6 xl:p-8">
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-500">Minh chứng</p>
+            <h2 className="mt-2 text-lg font-bold text-slate-950">Tài nguyên đính kèm</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Bổ sung hình ảnh, PDF hoặc liên kết cần thiết.</p>
+            <ReviewComments comments={reviewComments} fieldKey="resources" />
+            <ResourceEditor value={state.data.resources ?? []} onChange={(resources) => updateField('resources', resources)} />
+          </section>
+        </div>
+      </div>
+      <SubmissionActionBar saveState={state.saveState} onSave={() => void saveDraft()} onSubmit={() => void submitForReview()} />
     </form>
   );
 }

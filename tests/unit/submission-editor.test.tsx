@@ -14,11 +14,16 @@ const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file)
 describe('submission editor shell', () => {
   it('uses one continuous academic form with three unnumbered sections', () => {
     const editor = read('src/components/submission/submission-editor.tsx');
-    expect(editor).toContain('max-w-4xl');
-    expect(editor).toContain('divide-y divide-slate-200');
+    expect(editor).toContain('panel-detail');
+    expect(editor).toContain('lg:grid-cols-[minmax(0,7fr)_minmax(20rem,5fr)]');
+    expect(editor).toContain('lg:divide-x');
     expect(editor).toContain('Thông tin cơ bản');
     expect(editor).toContain('Tác giả và người đóng góp');
-    expect(editor).toContain('Tài nguyên và thông tin bổ sung');
+    expect(editor).toContain('Tài nguyên đính kèm');
+    expect(editor).toContain('Trình bày ngắn gọn vấn đề nghiên cứu, phương pháp và đóng góp chính.');
+    expect(editor).toContain('Thêm người tham gia và xác định vai trò.');
+    expect(editor).toContain('Bổ sung hình ảnh, PDF hoặc liên kết cần thiết.');
+    expect(editor).not.toContain('cho quá trình thẩm định');
     expect(editor).not.toContain('panel-operational');
     expect(editor).not.toMatch(/Bước\s*[123]|0[123]\./);
     expect(editor).not.toMatch(/categoryId|layoutType|emoji/i);
@@ -29,7 +34,7 @@ describe('submission editor shell', () => {
     expect(contributors).toContain('Thêm thành viên CLB');
     expect(contributors).toContain('Thêm người bên ngoài');
     expect(contributors).toContain('Vai trò chi tiết');
-    expect(contributors).toContain('border-t');
+    expect(contributors).toContain('panel-nested');
     expect(contributors).toContain('aria-label');
     expect(contributors).not.toContain('rounded-xl');
   });
@@ -37,19 +42,20 @@ describe('submission editor shell', () => {
   it('adds one typed resource at a time with accessible file controls', () => {
     const resources = read('src/components/submission/resource-editor.tsx');
     expect(resources).toContain('Thêm tài nguyên');
-    expect(resources).toContain('<option value="IMAGE">');
-    expect(resources).toContain('<option value="DOCUMENT">');
-    expect(resources).toContain('<option value="LINK">');
+    expect(resources).toContain("add('IMAGE')");
+    expect(resources).toContain("add('DOCUMENT')");
+    expect(resources).toContain("add('LINK')");
     expect(resources).toContain('type="file"');
     expect(resources).toContain('aria-label={`Xóa tài nguyên');
+    expect(resources).toContain('panel-nested');
     expect(resources).not.toMatch(/onClick=.*<div/);
   });
 
   it('keeps advanced fields inside an optional details disclosure', () => {
     const optional = read('src/components/submission/optional-details.tsx');
     expect(optional).toContain('<details');
-    expect(optional).toContain('Thông tin tùy chọn');
-    expect(optional).toContain('Google Drive');
+    expect(optional).toContain('Nội dung chi tiết');
+    expect(optional).not.toContain('Google Drive');
     expect(optional).toContain('Markdown');
   });
 
@@ -58,9 +64,16 @@ describe('submission editor shell', () => {
     expect(fields).toContain('htmlFor="submission-title"');
     expect(fields).toContain('id="submission-title"');
     expect(fields).toContain('aria-describedby');
+    expect(fields.match(/aria-required="true" required/g)).toHaveLength(2);
     expect(fields).toContain('Tiêu đề');
     expect(fields).toContain('Tóm tắt');
     expect(fields).toContain('Gợi ý lĩnh vực');
+  });
+
+  it('marks contributors as required for submission', () => {
+    const editor = read('src/components/submission/submission-editor.tsx');
+    expect(editor).toContain('Bắt buộc khi gửi');
+    expect(editor).toContain('aria-hidden="true">*</span>');
   });
 
   it('tracks title-only drafts and save state through the reducer', () => {
@@ -80,5 +93,7 @@ describe('submission editor shell', () => {
     expect(actions).toContain('Lưu thất bại');
     expect(actions).toContain('sm:sticky');
     expect(actions).not.toContain('fixed');
+    expect(actions).toContain('action-secondary-detail');
+    expect(actions).toContain('action-primary-detail');
   });
 });

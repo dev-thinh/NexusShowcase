@@ -12,6 +12,7 @@ describe('member submission routes', () => {
     const source = read(file);
     expect(source).toContain('SubmissionEditor');
     expect(source).toContain('max-w-7xl');
+    expect(source).toContain('max-w-6xl');
     expect(source).not.toContain('ItemForm');
     expect(source).not.toContain('prisma.category.findMany');
   });

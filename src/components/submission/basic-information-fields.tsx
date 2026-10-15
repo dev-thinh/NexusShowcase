@@ -22,16 +22,16 @@ export function BasicInformationFields({ value, errors, onChange, reviewComments
   return (
     <div className="space-y-6">
       <div>
-        <label htmlFor="submission-title" className="block text-sm font-semibold text-slate-900">Tiêu đề</label>
+        <label htmlFor="submission-title" className="block text-sm font-semibold text-slate-900">Tiêu đề <span className="text-rose-700" aria-hidden="true">*</span><span className="sr-only"> (bắt buộc)</span></label>
         <p className="mt-1 text-sm text-slate-600">Tên ngắn gọn, chính xác của công trình hoặc dự án.</p>
-        <input id="submission-title" value={value.title} onChange={(event) => onChange('title', event.target.value)} aria-describedby={[errors.title?.length ? 'submission-title-error' : '', commentDescriptionId('title')].filter(Boolean).join(' ') || undefined} aria-invalid={Boolean(errors.title?.length)} className={inputClass} />
+        <input id="submission-title" value={value.title} onChange={(event) => onChange('title', event.target.value)} aria-describedby={[errors.title?.length ? 'submission-title-error' : '', commentDescriptionId('title')].filter(Boolean).join(' ') || undefined} aria-invalid={Boolean(errors.title?.length)} aria-required="true" required className={inputClass} />
         <FieldError id="submission-title-error" errors={errors.title} />
         <ReviewComments comments={reviewComments} fieldKey="title" />
       </div>
       <div>
-        <label htmlFor="submission-summary" className="block text-sm font-semibold text-slate-900">Tóm tắt</label>
+        <label htmlFor="submission-summary" className="block text-sm font-semibold text-slate-900">Tóm tắt <span className="text-rose-700" aria-hidden="true">*</span><span className="sr-only"> (bắt buộc khi gửi)</span></label>
         <p className="mt-1 text-sm text-slate-600">Trình bày vấn đề, cách tiếp cận và đóng góp chính. Có thể bổ sung trước khi gửi duyệt.</p>
-        <textarea id="submission-summary" rows={5} value={value.summary} onChange={(event) => onChange('summary', event.target.value)} aria-describedby={[errors.summary?.length ? 'submission-summary-error' : '', commentDescriptionId('summary')].filter(Boolean).join(' ') || undefined} aria-invalid={Boolean(errors.summary?.length)} className={inputClass} />
+        <textarea id="submission-summary" rows={5} value={value.summary} onChange={(event) => onChange('summary', event.target.value)} aria-describedby={[errors.summary?.length ? 'submission-summary-error' : '', commentDescriptionId('summary')].filter(Boolean).join(' ') || undefined} aria-invalid={Boolean(errors.summary?.length)} aria-required="true" required className={inputClass} />
         <FieldError id="submission-summary-error" errors={errors.summary} />
         <ReviewComments comments={reviewComments} fieldKey="summary" />
       </div>

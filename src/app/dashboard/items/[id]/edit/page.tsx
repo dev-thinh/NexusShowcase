@@ -44,7 +44,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
       <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-        <div className="max-w-4xl">
+        <div className="max-w-6xl">
           <header className="mb-8 border-b border-slate-200 pb-5">
             <h1 className="text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">{item.status === 'REVISION_REQUESTED' ? 'Chỉnh sửa theo phản hồi' : 'Chỉnh sửa bản nháp'}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Nội dung chỉ được cập nhật khi còn là bản nháp hoặc khi ban biên tập yêu cầu chỉnh sửa.</p>

@@ -15,7 +15,8 @@ describe('form and modal panel consistency', () => {
 
   it('uses a continuous document surface for the item editor', () => {
     const editor = read('src/components/submission/submission-editor.tsx');
-    expect(editor).toContain('divide-y divide-slate-200');
+    expect(editor).toContain('panel-detail');
+    expect(editor).toContain('lg:divide-x');
     expect(editor).not.toContain('panel-operational');
   });
 
