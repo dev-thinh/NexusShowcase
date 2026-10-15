@@ -133,7 +133,11 @@ export async function submitShowcaseForReviewAction(
 
   const item = await prisma.showcaseItem.findUnique({
     where: { id: parsedId.data },
-    include: { contributors: true, links: true, attachments: true },
+    include: {
+      contributors: { include: { user: { select: { fullName: true } } } },
+      links: true,
+      attachments: true,
+    },
   });
   if (!item) return { success: false, error: 'Không tìm thấy công trình.' };
   if (item.creatorId !== user.id && user.role !== 'ADMIN') return { success: false, error: 'Bạn không có quyền gửi công trình này.' };

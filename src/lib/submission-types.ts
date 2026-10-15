@@ -11,6 +11,10 @@ export type SubmissionResource = {
   mimeType?: string;
 };
 
+export type SnapshotContributor = ContributorInput & {
+  displayName?: string | null;
+};
+
 export interface SubmissionSnapshot {
   title: string;
   summary: string;
@@ -18,7 +22,7 @@ export interface SubmissionSnapshot {
   publishedYear: number;
   suggestedField: string;
   customProjectType: string;
-  contributors: ContributorInput[];
+  contributors: SnapshotContributor[];
   resources: SubmissionResource[];
 }
 
@@ -32,7 +36,6 @@ export interface EditorialOverrides {
   tags?: string[];
   issuer?: string | null;
   publishedYear?: number;
-  resources?: SubmissionResource[];
 }
 
 export interface EffectivePublication extends SubmissionSnapshot {
@@ -50,7 +53,7 @@ export interface SubmissionSnapshotSource {
   publishedYear?: number | null;
   suggestedField?: string | null;
   customProjectType?: string | null;
-  contributors: ContributorInput[];
+  contributors: Array<SnapshotContributor & { user?: { fullName: string | null } | null }>;
   resources?: SubmissionResource[];
   links?: Array<{ label: string; url: string; type: LinkType }>;
   attachments?: Array<{
@@ -77,6 +80,7 @@ export function mapShowcaseItemToSubmission(item: {
     role: ContributorInput['role'];
     customRoleTitle: string | null;
     displayOrder: number;
+    user?: { fullName: string | null } | null;
   }>;
   links: Array<{ label: string; url: string; type: LinkType }>;
   attachments: Array<{ fileName: string; fileUrl: string; fileSize: number; mimeType: string }>;
@@ -91,6 +95,7 @@ export function mapShowcaseItemToSubmission(item: {
     customProjectType: item.customProjectType ?? '',
     contributors: item.contributors.map((entry) => ({
       userId: entry.userId,
+      displayName: entry.user?.fullName ?? null,
       externalName: entry.externalName,
       externalAffiliation: entry.externalAffiliation,
       externalLink: entry.externalLink,

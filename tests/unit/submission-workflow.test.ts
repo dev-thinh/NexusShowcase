@@ -12,6 +12,7 @@ const snapshot: SubmissionSnapshot = {
   contributors: [
     {
       userId: 'cm12345678901234567890123',
+      displayName: 'Nguyễn An',
       externalName: null,
       externalAffiliation: null,
       externalLink: null,
@@ -55,8 +56,8 @@ describe('submission snapshots', () => {
     expect(effective.resources).toEqual(snapshot.resources);
   });
 
-  it('replaces resource arrays only when an override is supplied', () => {
+  it('always preserves immutable snapshot resources', () => {
     const resources = [{ kind: 'DOCUMENT' as const, label: 'Bài báo', url: '/uploads/documents/paper.pdf' }];
-    expect(mergeEditorialOverrides(snapshot, { resources }).resources).toEqual(resources);
+    expect(mergeEditorialOverrides(snapshot, { resources } as never).resources).toEqual(snapshot.resources);
   });
 });

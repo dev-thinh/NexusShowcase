@@ -132,6 +132,7 @@ describe('submission workflow schemas', () => {
 
   it('accepts only known editable fields and requires actionable review text', () => {
     expect(editorialDraftInputSchema.safeParse({ title: 'Bản biên tập', unknown: 'ignored' }).success).toBe(false);
+    expect(editorialDraftInputSchema.safeParse({ resources: [] }).success).toBe(false);
     expect(reviewCommentInputSchema.safeParse({
       itemId: 'cjr012345678901234567890',
       fieldKey: 'unknown',
