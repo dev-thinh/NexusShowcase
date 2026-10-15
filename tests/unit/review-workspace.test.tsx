@@ -54,6 +54,9 @@ describe('academic review workspace', () => {
     expect(workspace).toContain('Xem trước');
     expect(workspace).toContain('publishEditorialDraftAction');
     expect(workspace).toContain('Xuất bản');
+    expect(workspace).toContain("useState<ItemVisibility>('PRIVATE')");
+    expect(workspace).toContain('Nội bộ');
+    expect(workspace).toContain('Công khai');
   });
 
   it('secures routes and provides editorial preview', () => {

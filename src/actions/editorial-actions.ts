@@ -400,7 +400,7 @@ export async function returnToEditorAction(
 
 export async function publishEditorialDraftAction(
   input: unknown
-): Promise<ActionResult<{ status: string }>> {
+): Promise<ActionResult<{ status: string; visibility: 'PRIVATE' | 'PUBLIC' }>> {
   const actor = await getCurrentUser(['ADMIN']);
   if (!actor) return { success: false, error: 'Chỉ quản trị viên có quyền xuất bản.' };
 
@@ -470,6 +470,7 @@ export async function publishEditorialDraftAction(
         issuer: effective.issuer,
         publishedYear: effective.publishedYear,
         status: 'PUBLISHED',
+        visibility: parsed.data.visibility,
         publishedAt,
         rejectionReason: null,
       },
@@ -512,11 +513,12 @@ export async function publishEditorialDraftAction(
           editorId: item.editorialDraft?.assignedEditorId ?? null,
           checklist: parsed.data.checklist,
           publishedAt: publishedAt.toISOString(),
+          visibility: parsed.data.visibility,
         },
       },
     });
 
-    return { status: 'PUBLISHED', slug: item.slug } as const;
+    return { status: 'PUBLISHED', visibility: parsed.data.visibility, slug: item.slug } as const;
   });
 
   if ('error' in result) {
@@ -532,7 +534,7 @@ export async function publishEditorialDraftAction(
   } catch {
     // Cache invalidation requires a Next.js request context and is unavailable in integration tests.
   }
-  return { success: true, data: { status: result.status } };
+  return { success: true, data: { status: result.status, visibility: result.visibility } };
 }
 
 export async function requestAuthorRevisionAction(input: unknown): Promise<ActionResult<{ status: string }>> {

@@ -3,6 +3,7 @@ import {
   createMemberInputSchema,
   createShowcaseItemInputSchema,
   editorialDraftInputSchema,
+  publishEditorialDraftInputSchema,
   rejectShowcaseInputSchema,
   reviewCommentInputSchema,
   safeHttpUrlSchema,
@@ -144,5 +145,13 @@ describe('submission workflow schemas', () => {
       itemId: 'cjr012345678901234567890',
       reason: '   ',
     }).success).toBe(false);
+  });
+
+  it('requires an explicit publication visibility', () => {
+    const checklist = { copyEdited: true, mediaChecked: true, metadataChecked: true };
+    expect(publishEditorialDraftInputSchema.safeParse({ itemId: 'cjr012345678901234567890', checklist }).success).toBe(false);
+    expect(publishEditorialDraftInputSchema.parse({
+      itemId: 'cjr012345678901234567890', checklist, visibility: 'PRIVATE',
+    }).visibility).toBe('PRIVATE');
   });
 });

@@ -186,6 +186,7 @@ export const returnToEditorInputSchema = z.object({
 export const publishEditorialDraftInputSchema = z.object({
   itemId: cuidSchema,
   checklist: editorialChecklistSchema,
+  visibility: z.enum(['PRIVATE', 'PUBLIC']),
 }).strict();
 
 export const showcaseItemIdSchema = cuidSchema;

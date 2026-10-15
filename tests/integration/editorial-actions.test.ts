@@ -291,6 +291,7 @@ describe('Editorial Actions Integration', () => {
     const adminPublish = await publishEditorialDraftAction({
       itemId: testItem.id,
       checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+      visibility: 'PRIVATE',
     });
     expect(adminPublish.success).toBe(true);
 
@@ -299,6 +300,7 @@ describe('Editorial Actions Integration', () => {
       where: { id: testItem.id },
     });
     expect(published?.status).toBe('PUBLISHED');
+    expect(published?.visibility).toBe('PRIVATE');
     expect(published?.title).toBe('Materialized Final Publication Title');
     expect(published?.summary).toBe('Polished academic summary for public display.');
     expect(published?.publishedAt).not.toBeNull();
@@ -337,6 +339,7 @@ describe('Editorial Actions Integration', () => {
     const resNotReady = await publishEditorialDraftAction({
       itemId: unapprovedItem.id,
       checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+      visibility: 'PRIVATE',
     });
     expect(resNotReady.success).toBe(false);
 
@@ -349,6 +352,7 @@ describe('Editorial Actions Integration', () => {
     const resNoCat = await publishEditorialDraftAction({
       itemId: unapprovedItem.id,
       checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+      visibility: 'PRIVATE',
     });
     expect(resNoCat.success).toBe(false);
 
@@ -389,6 +393,7 @@ describe('Editorial Actions Integration', () => {
     const resOpenComment = await publishEditorialDraftAction({
       itemId: unapprovedItem.id,
       checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+      visibility: 'PRIVATE',
     });
     expect(resOpenComment.success).toBe(false);
 
@@ -400,8 +405,16 @@ describe('Editorial Actions Integration', () => {
     const resSuccess = await publishEditorialDraftAction({
       itemId: unapprovedItem.id,
       checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+      visibility: 'PUBLIC',
     });
     expect(resSuccess.success).toBe(true);
+    const publicItem = await prisma.showcaseItem.findUnique({ where: { id: unapprovedItem.id } });
+    expect(publicItem?.visibility).toBe('PUBLIC');
+    const publicationAudit = await prisma.auditEvent.findFirst({
+      where: { itemId: unapprovedItem.id, action: 'PUBLISHED' },
+      orderBy: { createdAt: 'desc' },
+    });
+    expect(publicationAudit?.metadata).toMatchObject({ visibility: 'PUBLIC' });
 
     // Clean up
     await prisma.showcaseItem.delete({ where: { id: unapprovedItem.id } });

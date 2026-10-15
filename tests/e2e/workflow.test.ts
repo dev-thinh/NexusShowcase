@@ -163,6 +163,7 @@ describe('submission through publication workflow', () => {
         await publishEditorialDraftAction({
           itemId: draft.data.id,
           checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+          visibility: 'PRIVATE',
         })
       ).success
     ).toBe(false);
@@ -173,6 +174,7 @@ describe('submission through publication workflow', () => {
         await publishEditorialDraftAction({
           itemId: draft.data.id,
           checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+          visibility: 'PRIVATE',
         })
       ).success
     ).toBe(true);

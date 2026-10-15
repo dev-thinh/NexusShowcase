@@ -3,7 +3,7 @@
 import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { ItemStatus } from '@prisma/client';
+import type { ItemStatus, ItemVisibility } from '@prisma/client';
 import type { EditorialOverrides, SubmissionSnapshot } from '@/lib/submission-types';
 import { SourceRevisionView } from './source-revision-view';
 import { EditorialFields } from './editorial-fields';
@@ -85,6 +85,7 @@ export function ReviewWorkspace({
   });
 
   const [comments, setComments] = useState<CommentItem[]>(initialComments);
+  const [publicationVisibility, setPublicationVisibility] = useState<ItemVisibility>('PRIVATE');
   const [statusMessage, setStatusMessage] = useState<{
     type: 'success' | 'error';
     text: string;
@@ -210,7 +211,11 @@ export function ReviewWorkspace({
   const handlePublish = () => {
     setStatusMessage(null);
     startTransition(async () => {
-      const res = await publishEditorialDraftAction({ itemId: item.id, checklist });
+      const res = await publishEditorialDraftAction({
+        itemId: item.id,
+        checklist,
+        visibility: publicationVisibility,
+      });
       if (res.success) {
         setStatusMessage({ type: 'success', text: 'Đã xuất bản công trình.' });
         router.push(`/showcase/${item.slug}`);
@@ -437,6 +442,17 @@ export function ReviewWorkspace({
             {/* ADMIN Action: Return to Editor */}
             {currentUser.role === 'ADMIN' && item.status === 'READY_FOR_APPROVAL' && (
               <>
+                <label className="sr-only" htmlFor="publication-visibility">Phạm vi xuất bản</label>
+                <select
+                  id="publication-visibility"
+                  value={publicationVisibility}
+                  onChange={(event) => setPublicationVisibility(event.target.value as ItemVisibility)}
+                  disabled={isPending}
+                  className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs font-medium text-slate-700"
+                >
+                  <option value="PRIVATE">Nội bộ</option>
+                  <option value="PUBLIC">Công khai</option>
+                </select>
                 <button
                   type="button"
                   onClick={() => {
