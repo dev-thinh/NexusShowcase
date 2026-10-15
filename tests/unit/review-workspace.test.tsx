@@ -34,10 +34,10 @@ describe('academic review workspace', () => {
     expect(sourceView).toContain('fieldKey="resources"');
   });
 
-  it('provides editorial fields with edited markers, per-field restore, and category requirement', () => {
+  it('provides concise per-field restore controls and category requirement', () => {
     const fields = read('src/components/editorial/editorial-fields.tsx');
-    expect(fields).toContain('Đã biên tập');
-    expect(fields).toContain('Khôi phục bản gửi');
+    expect(fields).not.toContain('Đã biên tập');
+    expect(fields).toContain('Khôi phục bản gốc');
     expect(fields).toContain('Chuyên mục');
     expect(fields).toContain('htmlFor="editorial-category"');
     expect(fields).not.toContain('panel-operational');
@@ -59,6 +59,9 @@ describe('academic review workspace', () => {
     expect(workspace).toContain('Xem trước');
     expect(workspace).toContain('publishEditorialDraftAction');
     expect(workspace).toContain('Xuất bản');
+    expect(workspace).toContain("const canEdit = currentUser.role === 'EDITOR'");
+    expect(workspace).toContain("const isApproval = currentUser.role === 'ADMIN'");
+    expect(workspace).toContain('{canEdit && (');
     expect(workspace).toContain("useState<ItemVisibility>('PRIVATE')");
     expect(workspace).toContain('Nội bộ');
     expect(workspace).toContain('Công khai');

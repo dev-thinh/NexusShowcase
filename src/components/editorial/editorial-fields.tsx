@@ -67,17 +67,14 @@ export function EditorialFields({
             >
               Chuyên mục <span className="text-red-500">*</span>
             </label>
-            {overrides.categoryId !== undefined && (
+            {overrides.categoryId !== undefined && !disabled && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
                 <button
                   type="button"
                   onClick={() => onRestoreField('categoryId')}
                   className="text-[11px] text-blue-600 hover:text-blue-800"
                 >
-                  Khôi phục bản gửi
+                  Khôi phục bản gốc
                 </button>
               </div>
             )}
@@ -114,17 +111,14 @@ export function EditorialFields({
             >
               Tiêu đề công trình
             </label>
-            {overrides.title !== undefined && (
+            {overrides.title !== undefined && !disabled && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
                 <button
                   type="button"
                   onClick={() => onRestoreField('title')}
                   className="text-[11px] text-blue-600 hover:text-blue-800"
                 >
-                  Khôi phục bản gửi
+                  Khôi phục bản gốc
                 </button>
               </div>
             )}
@@ -155,10 +149,8 @@ export function EditorialFields({
               >
                 Loại nội dung
               </label>
-              {overrides.type !== undefined && (
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
+            {overrides.type !== undefined && !disabled && (
+                <button type="button" onClick={() => onRestoreField('type')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
               )}
             </div>
             <select
@@ -182,10 +174,8 @@ export function EditorialFields({
               >
                 Năm công bố
               </label>
-              {overrides.publishedYear !== undefined && (
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
+              {overrides.publishedYear !== undefined && !disabled && (
+                <button type="button" onClick={() => onRestoreField('publishedYear')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
               )}
             </div>
             <input
@@ -208,17 +198,14 @@ export function EditorialFields({
             >
               Mô tả tóm tắt
             </label>
-            {overrides.summary !== undefined && (
+            {overrides.summary !== undefined && !disabled && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
                 <button
                   type="button"
                   onClick={() => onRestoreField('summary')}
                   className="text-[11px] text-blue-600 hover:text-blue-800"
                 >
-                  Khôi phục bản gửi
+                  Khôi phục bản gốc
                 </button>
               </div>
             )}
@@ -248,17 +235,14 @@ export function EditorialFields({
             >
               Nội dung chi tiết (Markdown)
             </label>
-            {overrides.content !== undefined && (
+            {overrides.content !== undefined && !disabled && (
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
                 <button
                   type="button"
                   onClick={() => onRestoreField('content')}
                   className="text-[11px] text-blue-600 hover:text-blue-800"
                 >
-                  Khôi phục bản gửi
+                  Khôi phục bản gốc
                 </button>
               </div>
             )}
@@ -289,10 +273,8 @@ export function EditorialFields({
               >
                 Tags (cách nhau bởi dấu phẩy)
               </label>
-              {overrides.tags !== undefined && (
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
+              {overrides.tags !== undefined && !disabled && (
+                <button type="button" onClick={() => onRestoreField('tags')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
               )}
             </div>
             <input
@@ -322,10 +304,8 @@ export function EditorialFields({
               >
                 Đơn vị / Hội nghị công bố
               </label>
-              {overrides.issuer !== undefined && (
-                <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                  Đã biên tập
-                </span>
+              {overrides.issuer !== undefined && !disabled && (
+                <button type="button" onClick={() => onRestoreField('issuer')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
               )}
             </div>
             <input
@@ -349,10 +329,8 @@ export function EditorialFields({
             >
               Ảnh đại diện (Thumbnail URL)
             </label>
-            {overrides.thumbnailUrl !== undefined && (
-              <span className="text-[10px] font-medium bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded">
-                Đã biên tập
-              </span>
+            {overrides.thumbnailUrl !== undefined && !disabled && (
+              <button type="button" onClick={() => onRestoreField('thumbnailUrl')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
             )}
           </div>
           <input

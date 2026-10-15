@@ -5,6 +5,14 @@ import path from 'path';
 const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf-8');
 
 describe('form and modal panel consistency', () => {
+  it('aligns the editorial workspace with shared panel and action tokens', () => {
+    const workspace = read('src/components/editorial/review-workspace.tsx');
+    const sourceView = read('src/components/editorial/source-revision-view.tsx');
+    expect(workspace).toContain('panel-detail');
+    expect(sourceView).toContain('panel-nested');
+    expect(workspace).toContain('action-primary-detail');
+    expect(workspace).toContain('action-secondary-detail');
+  });
   it.each([
     'src/app/login/login-form.tsx',
     'src/components/contact-form.tsx',

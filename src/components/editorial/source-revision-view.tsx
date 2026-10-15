@@ -80,7 +80,7 @@ export function SourceRevisionView({
         {snapshot.content && (
           <div>
             <span className="text-xs font-medium text-slate-500 block mb-1">Nội dung chi tiết</span>
-            <div className="text-slate-700 whitespace-pre-line leading-relaxed bg-slate-50 p-3 rounded border border-slate-100 text-xs">
+            <div className="panel-nested text-slate-700 whitespace-pre-line leading-relaxed text-xs">
               {snapshot.content}
             </div>
           </div>
@@ -91,7 +91,7 @@ export function SourceRevisionView({
           {snapshot.contributors.length === 0 ? (
             <p className="text-xs text-slate-400 italic">Không có danh sách tác giả</p>
           ) : (
-            <ul className="divide-y divide-slate-100 border border-slate-200 rounded text-xs bg-slate-50/50">
+            <ul className="panel-nested divide-y divide-slate-100 !p-0 text-xs bg-slate-50/50">
               {snapshot.contributors.map((contrib, idx) => (
                 <li key={idx} className="p-2.5 flex items-center justify-between">
                   <div>
@@ -118,7 +118,7 @@ export function SourceRevisionView({
           {snapshot.resources.length === 0 ? (
             <p className="text-xs text-slate-400 italic">Không có tài nguyên</p>
           ) : (
-            <ul className="divide-y divide-slate-100 border border-slate-200 rounded text-xs">
+            <ul className="panel-nested divide-y divide-slate-100 !p-0 text-xs">
               {snapshot.resources.map((res, idx) => {
                 const metadata = formatResourceMetadata(res);
                 return (
