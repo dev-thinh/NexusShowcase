@@ -39,7 +39,7 @@
 - Produces Prisma enums `Role.EDITOR`, `ItemStatus.REVISION_REQUESTED`, `ItemStatus.READY_FOR_APPROVAL`, `ItemStatus.ARCHIVED`, `ReviewAudience`, `ReviewSeverity`, and `ReviewCommentStatus`.
 - Produces models `SubmissionRevision`, `EditorialDraft`, `ReviewComment`, and `AuditEvent` with relations to `ShowcaseItem` and `User`.
 
-- [ ] **Step 1: Write failing schema tests**
+- [x] **Step 1: Write failing schema tests**
 
 Assert that `schema.prisma` declares the new enum members and models, and add an integration test that creates an item with one revision, editorial draft, comment, and audit event.
 
@@ -53,13 +53,13 @@ expect(schema).toContain('model ReviewComment');
 expect(schema).toContain('model AuditEvent');
 ```
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run: `npx vitest run tests/unit/prisma-schema-types.test.ts tests/integration/prisma-schema.test.ts`
 
 Expected: FAIL because the enums and models do not exist.
 
-- [ ] **Step 3: Extend the Prisma schema and migration**
+- [x] **Step 3: Extend the Prisma schema and migration**
 
 Use JSON columns for immutable snapshots and sparse editorial overrides:
 
@@ -145,7 +145,7 @@ suggestedField    String?
 customProjectType String?
 ```
 
-- [ ] **Step 4: Generate Prisma Client and apply to the test database**
+- [x] **Step 4: Generate Prisma Client and apply to the test database**
 
 Run: `npx prisma generate`
 
@@ -153,7 +153,7 @@ Run against the configured safe test database: `npx prisma migrate deploy`
 
 Expected: client generation and migration complete successfully.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 Run: `npx vitest run tests/unit/prisma-schema-types.test.ts tests/integration/prisma-schema.test.ts`
 
@@ -175,7 +175,7 @@ git commit -m "feat(workflow): add editorial persistence models"
 - Produces `canUserEditPublication(user)`, `canUserPublish(user)`, and updated `canUserReview(user)`.
 - Produces `SubmissionSnapshot`, `EditorialOverrides`, `EffectivePublication`, `buildSubmissionSnapshot(item)`, and `mergeEditorialOverrides(snapshot, overrides)`.
 
-- [ ] **Step 1: Write failing permission and merge tests**
+- [x] **Step 1: Write failing permission and merge tests**
 
 Cover EDITOR access, ADMIN-only publishing, sparse override fallback, and preservation of nested contributor/resource arrays.
 
@@ -187,11 +187,11 @@ expect(mergeEditorialOverrides(snapshot, { title: 'Bản biên tập' }).summary
   .toBe(snapshot.summary);
 ```
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run: `npx vitest run tests/unit/permissions.test.ts tests/unit/submission-workflow.test.ts`
 
-- [ ] **Step 3: Implement typed helpers**
+- [x] **Step 3: Implement typed helpers**
 
 Define the snapshot as plain JSON-safe values, never Prisma objects:
 
@@ -223,7 +223,7 @@ export interface EditorialOverrides {
 
 Use explicit property selection in `buildSubmissionSnapshot`; do not serialize a Prisma model wholesale.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 Run: `npx vitest run tests/unit/permissions.test.ts tests/unit/submission-workflow.test.ts`
 
@@ -242,7 +242,7 @@ git commit -m "feat(workflow): define editorial permissions and snapshots"
 - Produces `showcaseDraftInputSchema`, `showcaseSubmissionInputSchema`, `editorialDraftInputSchema`, `reviewCommentInputSchema`, and their inferred input types.
 - Draft input accepts `summary: ''`; submission input requires non-empty summary and at least one contributor.
 
-- [ ] **Step 1: Write failing validation tests**
+- [x] **Step 1: Write failing validation tests**
 
 ```ts
 expect(showcaseDraftInputSchema.safeParse({ ...base, title: 'Bản nháp', summary: '', contributors: [] }).success).toBe(true);
@@ -252,15 +252,15 @@ expect(showcaseSubmissionInputSchema.safeParse({ ...base, summary: 'Tóm tắt',
 
 Also test safe HTTP URLs, maximum resource counts, `customProjectType` length 100, allowed field keys, and non-empty rejection/revision reasons.
 
-- [ ] **Step 2: Run test and verify RED**
+- [x] **Step 2: Run test and verify RED**
 
 Run: `npx vitest run tests/unit/action-schemas.test.ts`
 
-- [ ] **Step 3: Implement schemas with shared fields**
+- [x] **Step 3: Implement schemas with shared fields**
 
 Build a shared object shape, then apply distinct refinements for draft, submission, editorial handoff, author revision, rejection, and publishing. Return flattened field errors from callers rather than the current generic `Invalid input.` response.
 
-- [ ] **Step 4: Run test and commit**
+- [x] **Step 4: Run test and commit**
 
 Run: `npx vitest run tests/unit/action-schemas.test.ts`
 
@@ -282,7 +282,7 @@ git commit -m "feat(workflow): separate draft and submission validation"
 - Produces `submitShowcaseForReviewAction(itemId: string)`.
 - Produces `requestAuthorRevisionAction(input)`, `rejectShowcaseAction(input)`, `reopenShowcaseAction(itemId)`, and `archiveShowcaseAction(itemId)`.
 
-- [ ] **Step 1: Write failing transition tests**
+- [x] **Step 1: Write failing transition tests**
 
 Cover:
 
@@ -294,11 +294,11 @@ Cover:
 - EDITOR cannot publish/reject/reopen/archive.
 - ADMIN cannot publish directly from `PENDING_REVIEW`.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run: `npx vitest run tests/integration/showcase-actions.test.ts tests/integration/action-authorization.test.ts`
 
-- [ ] **Step 3: Implement transitions as transactions**
+- [x] **Step 3: Implement transitions as transactions**
 
 Submission must calculate the next revision number and create the snapshot in the same transaction as the status update. Every transition creates an `AuditEvent`. Return this result shape consistently:
 
@@ -310,7 +310,7 @@ type ActionResult<T = undefined> =
 
 Keep compatibility wrappers for old action exports until the member form and admin review UI are migrated in later tasks.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 Run: `npx vitest run tests/integration/showcase-actions.test.ts tests/integration/action-authorization.test.ts`
 
@@ -336,23 +336,23 @@ git commit -m "feat(workflow): enforce submission state transitions"
 - Produces `SubmissionEditorProps` with `initialData`, `currentUser`, `clubMembers`, and `mode: 'create' | 'edit'`.
 - Produces a reducer/controller exposing `state`, `updateField`, `saveDraft`, `submitForReview`, `fieldErrors`, `saveState`, and `isDirty`.
 
-- [ ] **Step 1: Write failing component tests**
+- [x] **Step 1: Write failing component tests**
 
 Render the editor and assert a single continuous form, three section headings, sentence-case labels, title-only draft save, field-level error association, and sticky action labels. Assert absence of `panel-operational`, numbered section headings, category controls, layout terminology, and emoji options.
 
-- [ ] **Step 2: Run test and verify RED**
+- [x] **Step 2: Run test and verify RED**
 
 Run: `npx vitest run tests/unit/submission-editor.test.tsx`
 
-- [ ] **Step 3: Implement the shell and basic fields**
+- [x] **Step 3: Implement the shell and basic fields**
 
 Use a plain `<form>` with `max-w-4xl`, `divide-y divide-slate-200`, and section padding. Inputs receive stable ids, labels use `htmlFor`, and errors use `aria-describedby`. Keep official category/type fields out of this UI; expose only optional `suggestedField` and conditional `customProjectType`.
 
-- [ ] **Step 4: Implement save state and navigation guard**
+- [x] **Step 4: Implement save state and navigation guard**
 
 Use `beforeunload` only while dirty, with effect cleanup. The action bar displays `Chưa lưu`, `Đang lưu…`, `Đã lưu`, or `Lưu thất bại`; on mobile it returns to normal document flow instead of covering fields.
 
-- [ ] **Step 5: Run test and commit**
+- [x] **Step 5: Run test and commit**
 
 Run: `npx vitest run tests/unit/submission-editor.test.tsx`
 
@@ -375,23 +375,23 @@ git commit -m "feat(submission): add concise academic editor shell"
 - `ContributorEditor` consumes and emits `ContributorInput[]`.
 - `ResourceEditor` consumes and emits `SubmissionResource[]` and adapts image, PDF, and link resources to existing upload actions.
 
-- [ ] **Step 1: Write failing interaction tests**
+- [x] **Step 1: Write failing interaction tests**
 
 Cover default current-user contributor, member search/add, external contributor, optional role detail, one empty-free resource list, “Thêm tài nguyên” type selection, keyboard-accessible upload, remove action labels, and the optional details disclosure.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run: `npx vitest run tests/unit/submission-editor.test.tsx tests/unit/upload.test.ts`
 
-- [ ] **Step 3: Implement contributors as compact rows**
+- [x] **Step 3: Implement contributors as compact rows**
 
 Do not wrap each person in a card. Use rows separated by `border-t`, 40–44px icon controls with `aria-label`, and show advanced academic roles only after “Vai trò chi tiết” is enabled.
 
-- [ ] **Step 4: Implement progressive resources**
+- [x] **Step 4: Implement progressive resources**
 
 The add menu creates exactly one resource row of the selected type. Reuse `uploadFileAction`; expose progress/error text and never make a clickable `div` the only upload control. Keep raw Google Drive and extended Markdown fields in `OptionalDetails`.
 
-- [ ] **Step 5: Run tests and commit**
+- [x] **Step 5: Run tests and commit**
 
 Run: `npx vitest run tests/unit/submission-editor.test.tsx tests/unit/upload.test.ts`
 
@@ -415,19 +415,19 @@ git commit -m "feat(submission): add contributors and progressive resources"
 - Routes render `SubmissionEditor` and load only member-facing data.
 - Existing draft records are adapted through one mapper in `submission-types.ts`.
 
-- [ ] **Step 1: Update route tests first**
+- [x] **Step 1: Update route tests first**
 
 Assert both routes use `SubmissionEditor`, the member form does not fetch categories, create/edit share the same document width, and pending/published/rejected edit guards follow the approved state rules.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run: `npx vitest run tests/unit/item-form.test.ts tests/unit/showcase-edit.test.ts tests/unit/form-panel-consistency.test.ts tests/unit/heading-gutter.test.ts`
 
-- [ ] **Step 3: Integrate routes and remove ItemForm**
+- [x] **Step 3: Integrate routes and remove ItemForm**
 
 Preserve navbar/footer, existing authentication, `mustChangePassword`, and ownership checks. Replace the old `max-w-5xl` panel wrapper with the continuous editor shell. Delete obsolete source assertions rather than preserving implementation-detail tests for the removed component.
 
-- [ ] **Step 4: Run member workflow tests and commit**
+- [x] **Step 4: Run member workflow tests and commit**
 
 Run: `npx vitest run tests/unit/item-form.test.ts tests/unit/showcase-edit.test.ts tests/unit/form-panel-consistency.test.ts tests/integration/showcase-actions.test.ts`
 
@@ -448,19 +448,19 @@ git commit -m "refactor(submission): replace monolithic item form"
 - Produces member-facing status labels for all six statuses.
 - `ReviewComments` renders only `AUTHOR_REVISION` comments beside matching fields/sections.
 
-- [ ] **Step 1: Write failing dashboard tests**
+- [x] **Step 1: Write failing dashboard tests**
 
 Test labels/actions for DRAFT, PENDING_REVIEW, REVISION_REQUESTED, READY_FOR_APPROVAL, REJECTED, PUBLISHED, and ARCHIVED. Verify rejected items are read-only and revision-requested items show field comments.
 
-- [ ] **Step 2: Run test and verify RED**
+- [x] **Step 2: Run test and verify RED**
 
 Run: `npx vitest run tests/unit/dashboard-workflow.test.ts`
 
-- [ ] **Step 3: Implement compact status treatment**
+- [x] **Step 3: Implement compact status treatment**
 
 Use text/badge status within existing rows; do not create status cards. Map comments by `fieldKey`, connect them with `aria-describedby`, and hide `EDITORIAL` comments from member routes.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 Run: `npx vitest run tests/unit/dashboard-workflow.test.ts tests/unit/showcase-edit.test.ts`
 
@@ -486,19 +486,19 @@ git commit -m "feat(submission): show workflow states and author feedback"
 - Produces `addReviewCommentAction(input)` and `resolveReviewCommentAction(commentId)`.
 - Produces `markReadyForApprovalAction(itemId)` and `returnToEditorAction(itemId, message)`.
 
-- [ ] **Step 1: Write failing authorization and lifecycle tests**
+- [x] **Step 1: Write failing authorization and lifecycle tests**
 
 Test EDITOR/ADMIN editing rights, ADMIN-only return action, immutable source revision, sparse override persistence, audience visibility, required checklist/category before handoff, and audit events.
 
-- [ ] **Step 2: Run test and verify RED**
+- [x] **Step 2: Run test and verify RED**
 
 Run: `npx vitest run tests/integration/editorial-actions.test.ts`
 
-- [ ] **Step 3: Implement actions transactionally**
+- [x] **Step 3: Implement actions transactionally**
 
 Use `mergeEditorialOverrides` only for previews and publication; never copy overrides into the member snapshot. Returning to editor moves `READY_FOR_APPROVAL` to `PENDING_REVIEW` and creates an `EDITORIAL` comment. Requesting author revision creates `AUTHOR_REVISION` comments and moves the item to `REVISION_REQUESTED`.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 Run: `npx vitest run tests/integration/editorial-actions.test.ts tests/integration/action-authorization.test.ts`
 
@@ -523,29 +523,29 @@ git commit -m "feat(editorial): add assignment feedback and handoff actions"
 - `ReviewWorkspace` receives the item, latest revision, revision list, editorial draft, categories, comments, current actor, and preview URL.
 - Child components emit typed override/comment/checklist events through callbacks owned by the workspace.
 
-- [ ] **Step 1: Write failing layout and accessibility tests**
+- [x] **Step 1: Write failing layout and accessibility tests**
 
 Assert a 40/60 desktop grid with one vertical divider, mobile source/publication tabs, no card-per-field classes, original values read-only, edited markers, per-field restore, category required, compact checklist, and role-specific actions.
 
-- [ ] **Step 2: Run test and verify RED**
+- [x] **Step 2: Run test and verify RED**
 
 Run: `npx vitest run tests/unit/review-workspace.test.tsx`
 
-- [ ] **Step 3: Implement the server route**
+- [x] **Step 3: Implement the server route**
 
 Authorize EDITOR or ADMIN, fetch all workspace data in parallel where independent, reject missing items, and avoid exposing internal comments on public/member routes.
 
 The preview route must render `mergeEditorialOverrides(latestRevision.snapshot, editorialDraft.overrides)` and must never be accessible to an unrelated member or unauthenticated visitor.
 
-- [ ] **Step 4: Implement the document workspace**
+- [x] **Step 4: Implement the document workspace**
 
 Use one white grid with `lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]` and `lg:divide-x`. On small screens, use semantic tabs with keyboard navigation. Fields with overrides show “Đã biên tập” and a text action “Khôi phục bản gửi”; do not use nested panels.
 
-- [ ] **Step 5: Implement checklist and actions**
+- [x] **Step 5: Implement checklist and actions**
 
 EDITOR sees save, preview, request-author-revision, and handoff. ADMIN sees return-to-editor, reject, enter-edit-mode, preview, and publish. Admin edit mode must require an explicit activation and a reason when the item is already published.
 
-- [ ] **Step 6: Run tests and commit**
+- [x] **Step 6: Run tests and commit**
 
 Run: `npx vitest run tests/unit/review-workspace.test.tsx tests/unit/admin-reviews.test.ts`
 
@@ -571,19 +571,19 @@ git commit -m "feat(editorial): add academic review workspace"
 - Review queue supports `PENDING_REVIEW` and `READY_FOR_APPROVAL` filters.
 - Role controls include EDITOR; editor navigation exposes the review queue but not member administration or final publishing controls.
 
-- [ ] **Step 1: Write failing queue and role tests**
+- [x] **Step 1: Write failing queue and role tests**
 
 Assert no direct publish/reject button on queue rows, correct queues per role, links to `/admin/reviews/[id]`, and safe assignment of EDITOR through admin member management.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run: `npx vitest run tests/unit/admin-reviews.test.ts tests/unit/navbar-nav.test.ts tests/integration/admin-create-member.test.ts`
 
-- [ ] **Step 3: Implement queues and navigation**
+- [x] **Step 3: Implement queues and navigation**
 
 Keep queue rows compact and separated by rules, not cards. Editors see assigned/unassigned pending work and their internal feedback. Admins see both pending work and ready-for-approval work. Delete `AdminReviewButton` after all imports are removed.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 Run: `npx vitest run tests/unit/admin-reviews.test.ts tests/unit/navbar-nav.test.ts tests/integration/admin-create-member.test.ts`
 
@@ -606,19 +606,19 @@ git commit -m "refactor(editorial): route reviews through editor queues"
 - Produces `publishEditorialDraftAction(itemId, checklist)` restricted to ADMIN.
 - Produces `getEffectivePublication(snapshot, editorialDraft)` for preview only; public routes continue reading materialized `ShowcaseItem` fields.
 
-- [ ] **Step 1: Write failing publication tests**
+- [x] **Step 1: Write failing publication tests**
 
 Test that publication is rejected outside `READY_FOR_APPROVAL`, without category, with open required comments, or by EDITOR. Verify a successful transaction applies overrides, preserves source revision/editorial draft, sets `publishedAt`, records editor/approver identities, and creates an audit event.
 
-- [ ] **Step 2: Run tests and verify RED**
+- [x] **Step 2: Run tests and verify RED**
 
 Run: `npx vitest run tests/integration/editorial-actions.test.ts tests/integration/public-data-boundary.test.ts`
 
-- [ ] **Step 3: Implement atomic publication**
+- [x] **Step 3: Implement atomic publication**
 
 Within one Prisma transaction: load the logical workflow state, validate checklist/open comments/category, merge the latest snapshot and overrides, conditionally update only a `READY_FOR_APPROVAL` item, set `PUBLISHED`, preserve editorial records, and create `AuditEvent`. Revalidate `/`, `/dashboard`, `/admin`, `/admin/reviews`, and `/showcase/[slug]` after success.
 
-- [ ] **Step 4: Run tests and commit**
+- [x] **Step 4: Run tests and commit**
 
 Run: `npx vitest run tests/integration/editorial-actions.test.ts tests/integration/public-data-boundary.test.ts tests/unit/showcase-detail.test.ts`
 
@@ -637,21 +637,21 @@ git commit -m "feat(editorial): publish approved editorial drafts"
 **Interfaces:**
 - Verifies the complete CORE_MEMBER → EDITOR → ADMIN workflow and backwards compatibility for existing records.
 
-- [ ] **Step 1: Add end-to-end workflow coverage**
+- [x] **Step 1: Add end-to-end workflow coverage**
 
 Cover draft save, member submission, editor assignment/editing, author revision, resubmission, ready-for-approval, admin return-to-editor, final publish, rejection, reopen, and archive. Verify the public page uses edited copy while revision history retains original copy.
 
-- [ ] **Step 2: Run focused E2E/integration suites**
+- [x] **Step 2: Run focused E2E/integration suites**
 
 Run: `npx vitest run tests/e2e/workflow.test.ts tests/integration/showcase-actions.test.ts tests/integration/editorial-actions.test.ts tests/integration/action-authorization.test.ts`
 
 Expected: all pass with no leaked records after cleanup.
 
-- [ ] **Step 3: Document roles and workflow**
+- [x] **Step 3: Document roles and workflow**
 
 Update README role descriptions, the submission/review state diagram, safe migration commands, and the requirement that only ADMIN can publish.
 
-- [ ] **Step 4: Run complete verification**
+- [x] **Step 4: Run complete verification**
 
 Run sequentially:
 
@@ -666,7 +666,7 @@ git diff --check
 
 Expected: every command exits 0. Inspect `git status --short` and confirm the user-owned thumbnail remains untracked and unstaged.
 
-- [ ] **Step 5: Commit final verification/docs changes**
+- [x] **Step 5: Commit final verification/docs changes**
 
 ```bash
 git add README.md tests/e2e/workflow.test.ts
