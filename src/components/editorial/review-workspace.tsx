@@ -18,6 +18,7 @@ import {
   addReviewCommentAction,
   resolveReviewCommentAction,
   assignEditorAction,
+  publishEditorialDraftAction,
 } from '@/actions/editorial-actions';
 
 interface ReviewWorkspaceProps {
@@ -198,6 +199,20 @@ export function ReviewWorkspace({
           type: 'success',
           text: 'Đã bàn giao bản biên tập sẵn sàng để phê duyệt!',
         });
+        router.refresh();
+      } else {
+        setStatusMessage({ type: 'error', text: res.error });
+      }
+    });
+  };
+
+  const handlePublish = () => {
+    setStatusMessage(null);
+    startTransition(async () => {
+      const res = await publishEditorialDraftAction({ itemId: item.id, checklist });
+      if (res.success) {
+        setStatusMessage({ type: 'success', text: 'Đã xuất bản công trình.' });
+        router.push(`/showcase/${item.slug}`);
         router.refresh();
       } else {
         setStatusMessage({ type: 'error', text: res.error });
@@ -422,17 +437,27 @@ export function ReviewWorkspace({
 
             {/* ADMIN Action: Return to Editor */}
             {currentUser.role === 'ADMIN' && item.status === 'READY_FOR_APPROVAL' && (
-              <button
-                type="button"
-                onClick={() => {
-                  setModalMode('return');
-                  setModalReason('');
-                }}
-                disabled={isPending}
-                className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded hover:bg-indigo-100 disabled:opacity-50"
-              >
-                Trả lại biên tập
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setModalMode('return');
+                    setModalReason('');
+                  }}
+                  disabled={isPending}
+                  className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded hover:bg-indigo-100 disabled:opacity-50"
+                >
+                  Trả lại biên tập
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePublish}
+                  disabled={isPending}
+                  className="px-4 py-1.5 text-xs font-medium text-white bg-emerald-700 rounded hover:bg-emerald-800 disabled:opacity-50"
+                >
+                  Xuất bản
+                </button>
+              </>
             )}
 
             {/* ADMIN Action: Reject */}

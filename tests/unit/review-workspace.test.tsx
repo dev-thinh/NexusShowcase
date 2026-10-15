@@ -44,6 +44,8 @@ describe('academic review workspace', () => {
     expect(workspace).toContain('Trả lại biên tập');
     expect(workspace).toContain('Yêu cầu bổ sung');
     expect(workspace).toContain('Xem trước');
+    expect(workspace).toContain('publishEditorialDraftAction');
+    expect(workspace).toContain('Xuất bản');
   });
 
   it('secures routes and provides editorial preview', () => {

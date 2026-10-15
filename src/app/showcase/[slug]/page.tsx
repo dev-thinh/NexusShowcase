@@ -6,7 +6,6 @@ import { AcademicFooter } from '@/components/academic-footer';
 import { VideoPlayer } from '@/components/video-player';
 import { StatusBadge, TypeBadge, RoleBadge } from '@/components/ui/badge';
 import { CitationModal } from '@/components/citation-modal';
-import { AdminReviewButton } from '@/components/admin-review-button';
 import { PinToggleButton } from '@/components/pin-toggle-button';
 import { VisibilityToggleButton } from '@/components/visibility-toggle-button';
 import { publicUserSelect } from '@/lib/public-user';
@@ -97,8 +96,13 @@ export default async function ShowcaseDetailPage({
             </div>
 
             <div className="shrink-0 self-end sm:self-center flex items-center gap-2">
-            {currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' && (
-                <AdminReviewButton itemId={item.id} />
+            {currentUser?.role === 'ADMIN' && ['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.status) && (
+              <Link
+                href={`/admin/reviews/${item.id}`}
+                className="px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg text-xs font-bold transition-all shadow-xs"
+              >
+                Mở không gian biên tập
+              </Link>
             )}
             {(item.status === 'DRAFT' || item.status === 'REJECTED') && (
               ((currentUser?.id === item.creatorId && (currentUser?.role === 'CORE_MEMBER' || currentUser?.role === 'ADMIN')) || currentUser?.role === 'ADMIN') ? (

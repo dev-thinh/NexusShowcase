@@ -7,6 +7,7 @@ import {
   resolveReviewCommentAction,
   markReadyForApprovalAction,
   returnToEditorAction,
+  publishEditorialDraftAction,
 } from '@/actions/editorial-actions';
 
 const currentUserMock = vi.hoisted(() => ({
@@ -99,8 +100,8 @@ describe('Editorial Actions Integration', () => {
   });
 
   afterAll(async () => {
-    if (testItem) {
-      await prisma.showcaseItem.deleteMany({ where: { id: testItem.id } });
+    if (authorUser) {
+      await prisma.showcaseItem.deleteMany({ where: { creatorId: authorUser.id } });
     }
     if (testCategory) {
       await prisma.category.deleteMany({ where: { id: testCategory.id } });
@@ -234,5 +235,155 @@ describe('Editorial Actions Integration', () => {
       },
     });
     expect(returnComment).not.toBeNull();
+    if (returnComment) {
+      await prisma.reviewComment.update({
+        where: { id: returnComment.id },
+        data: { status: 'RESOLVED', resolvedById: editorUser.id, resolvedAt: new Date() },
+      });
+    }
+  });
+
+  it('restricts publishEditorialDraftAction to ADMIN and materializes effective publication atomically', async () => {
+    // Mark ready for approval first
+    currentUserMock.actor = editorUser;
+    await markReadyForApprovalAction({
+      itemId: testItem.id,
+      categoryId: testCategory.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    });
+
+    // Save editor overrides to be materialized
+    await saveEditorialDraftAction(testItem.id, {
+      title: 'Materialized Final Publication Title',
+      summary: 'Polished academic summary for public display.',
+    });
+
+    // EDITOR cannot publish
+    currentUserMock.actor = editorUser;
+    const editorPublish = await publishEditorialDraftAction({
+      itemId: testItem.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    });
+    expect(editorPublish.success).toBe(false);
+
+    // ADMIN publishes
+    currentUserMock.actor = adminUser;
+    const adminPublish = await publishEditorialDraftAction({
+      itemId: testItem.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    });
+    expect(adminPublish.success).toBe(true);
+
+    // Verify materialized fields in ShowcaseItem
+    const published = await prisma.showcaseItem.findUnique({
+      where: { id: testItem.id },
+    });
+    expect(published?.status).toBe('PUBLISHED');
+    expect(published?.title).toBe('Materialized Final Publication Title');
+    expect(published?.summary).toBe('Polished academic summary for public display.');
+    expect(published?.publishedAt).not.toBeNull();
+
+    // Verify source snapshot and editorial draft records preserved
+    const rev = await prisma.submissionRevision.findUnique({
+      where: { itemId_revisionNumber: { itemId: testItem.id, revisionNumber: 1 } },
+    });
+    expect((rev?.snapshot as any)?.title).toBe('Original Author Title');
+
+    const draft = await prisma.editorialDraft.findUnique({
+      where: { itemId: testItem.id },
+    });
+    expect(draft).not.toBeNull();
+
+    // Verify audit event
+    const audit = await prisma.auditEvent.findFirst({
+      where: { itemId: testItem.id, action: 'PUBLISHED' },
+    });
+    expect(audit).not.toBeNull();
+  });
+
+  it('rejects publication when not READY_FOR_APPROVAL, without category, or with open required comments', async () => {
+    const unapprovedItem = await prisma.showcaseItem.create({
+      data: {
+        title: 'Unapproved Item',
+        slug: `unapproved-${Date.now()}`,
+        summary: 'Summary',
+        status: 'PENDING_REVIEW',
+        creatorId: authorUser.id,
+      },
+    });
+
+    currentUserMock.actor = adminUser;
+    // 1. Rejects if not READY_FOR_APPROVAL
+    const resNotReady = await publishEditorialDraftAction({
+      itemId: unapprovedItem.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    });
+    expect(resNotReady.success).toBe(false);
+
+    // Update to READY_FOR_APPROVAL but without category
+    await prisma.showcaseItem.update({
+      where: { id: unapprovedItem.id },
+      data: { status: 'READY_FOR_APPROVAL', categoryId: null },
+    });
+    // 2. Rejects if without category
+    const resNoCat = await publishEditorialDraftAction({
+      itemId: unapprovedItem.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    });
+    expect(resNoCat.success).toBe(false);
+
+    // Update with category, but add an open REQUIRED comment
+    await prisma.showcaseItem.update({
+      where: { id: unapprovedItem.id },
+      data: { categoryId: testCategory.id },
+    });
+    await prisma.submissionRevision.create({
+      data: {
+        itemId: unapprovedItem.id,
+        revisionNumber: 1,
+        submittedById: authorUser.id,
+        snapshot: {
+          title: 'Unapproved Item',
+          summary: 'Summary',
+          content: '',
+          publishedYear: new Date().getFullYear(),
+          suggestedField: '',
+          customProjectType: '',
+          contributors: [],
+          resources: [],
+        },
+      },
+    });
+    const comment = await prisma.reviewComment.create({
+      data: {
+        itemId: unapprovedItem.id,
+        fieldKey: 'content',
+        body: 'Must fix this formula.',
+        audience: 'EDITORIAL',
+        severity: 'REQUIRED',
+        status: 'OPEN',
+        authorId: adminUser.id,
+      },
+    });
+    // 3. Rejects if open required comment exists
+    const resOpenComment = await publishEditorialDraftAction({
+      itemId: unapprovedItem.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    });
+    expect(resOpenComment.success).toBe(false);
+
+    // Resolve comment -> now should succeed
+    await prisma.reviewComment.update({
+      where: { id: comment.id },
+      data: { status: 'RESOLVED', resolvedById: adminUser.id, resolvedAt: new Date() },
+    });
+    const resSuccess = await publishEditorialDraftAction({
+      itemId: unapprovedItem.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    });
+    expect(resSuccess.success).toBe(true);
+
+    // Clean up
+    await prisma.showcaseItem.delete({ where: { id: unapprovedItem.id } });
   });
 });

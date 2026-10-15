@@ -6,11 +6,15 @@ import {
   cuidSchema,
   editorialDraftInputSchema,
   editorialHandoffInputSchema,
+  publishEditorialDraftInputSchema,
   rejectShowcaseInputSchema,
   requestAuthorRevisionInputSchema,
   reviewCommentInputSchema,
   showcaseItemIdSchema,
 } from '@/lib/action-schemas';
+import { mergeEditorialOverrides } from '@/lib/submission-snapshot';
+import type { EditorialOverrides, SubmissionSnapshot } from '@/lib/submission-types';
+import { revalidatePath } from 'next/cache';
 import type { ZodError } from 'zod';
 
 type ActionResult<T = undefined> =
@@ -370,6 +374,143 @@ export async function returnToEditorAction(
   return { success: true, data: updated };
 }
 
+export async function publishEditorialDraftAction(
+  input: unknown
+): Promise<ActionResult<{ status: string }>> {
+  const actor = await getCurrentUser(['ADMIN']);
+  if (!actor) return { success: false, error: 'Chỉ quản trị viên có quyền xuất bản.' };
+
+  const parsed = publishEditorialDraftInputSchema.safeParse(input);
+  if (!parsed.success) return invalid(parsed.error);
+
+  const result = await prisma.$transaction(async (tx) => {
+    const item = await tx.showcaseItem.findUnique({
+      where: { id: parsed.data.itemId },
+      select: {
+        id: true,
+        slug: true,
+        status: true,
+        categoryId: true,
+        revisions: {
+          orderBy: { revisionNumber: 'desc' },
+          take: 1,
+          select: { snapshot: true },
+        },
+        editorialDraft: {
+          select: { assignedEditorId: true, overrides: true },
+        },
+      },
+    });
+
+    if (!item) return { error: 'Không tìm thấy công trình.' } as const;
+    if (item.status !== 'READY_FOR_APPROVAL') {
+      return { error: 'Chỉ bài sẵn sàng phê duyệt mới có thể xuất bản.' } as const;
+    }
+    if (!item.categoryId) {
+      return { error: 'Bắt buộc phải gán chuyên mục trước khi xuất bản.' } as const;
+    }
+    if (!item.revisions[0]) {
+      return { error: 'Không tìm thấy bản gửi để xuất bản.' } as const;
+    }
+
+    const openRequiredComments = await tx.reviewComment.count({
+      where: {
+        itemId: item.id,
+        status: 'OPEN',
+        severity: 'REQUIRED',
+      },
+    });
+    if (openRequiredComments > 0) {
+      return { error: 'Vẫn còn phản hồi bắt buộc chưa được giải quyết.' } as const;
+    }
+
+    const effective = mergeEditorialOverrides(
+      item.revisions[0].snapshot as unknown as SubmissionSnapshot,
+      (item.editorialDraft?.overrides ?? {}) as EditorialOverrides
+    );
+    const resources = effective.resources ?? [];
+    const links = resources.filter((resource) => resource.kind === 'LINK');
+    const attachments = resources.filter((resource) => resource.kind !== 'LINK');
+    const publishedAt = new Date();
+
+    const update = await tx.showcaseItem.updateMany({
+      where: { id: item.id, status: 'READY_FOR_APPROVAL' },
+      data: {
+        title: effective.title,
+        summary: effective.summary,
+        content: effective.content,
+        thumbnailUrl: effective.thumbnailUrl,
+        type: effective.type,
+        categoryId: effective.categoryId ?? item.categoryId,
+        tags: effective.tags,
+        issuer: effective.issuer,
+        publishedYear: effective.publishedYear,
+        status: 'PUBLISHED',
+        publishedAt,
+        rejectionReason: null,
+      },
+    });
+    if (update.count !== 1) {
+      return { error: 'Trạng thái bài đã thay đổi. Vui lòng tải lại trang.' } as const;
+    }
+
+    await tx.itemLink.deleteMany({ where: { itemId: item.id } });
+    await tx.itemAttachment.deleteMany({ where: { itemId: item.id } });
+    if (links.length > 0) {
+      await tx.itemLink.createMany({
+        data: links.map((resource) => ({
+          itemId: item.id,
+          label: resource.label,
+          url: resource.url,
+          type: resource.linkType ?? 'OTHER',
+        })),
+      });
+    }
+    if (attachments.length > 0) {
+      await tx.itemAttachment.createMany({
+        data: attachments.map((resource) => ({
+          itemId: item.id,
+          fileName: resource.fileName ?? resource.label,
+          fileUrl: resource.url,
+          fileSize: resource.fileSize ?? 0,
+          mimeType: resource.mimeType ?? (resource.kind === 'IMAGE' ? 'image/webp' : 'application/pdf'),
+        })),
+      });
+    }
+
+    await tx.auditEvent.create({
+      data: {
+        itemId: item.id,
+        actorId: actor.id,
+        action: 'PUBLISHED',
+        metadata: {
+          approverId: actor.id,
+          editorId: item.editorialDraft?.assignedEditorId ?? null,
+          checklist: parsed.data.checklist,
+          publishedAt: publishedAt.toISOString(),
+        },
+      },
+    });
+
+    return { status: 'PUBLISHED', slug: item.slug } as const;
+  });
+
+  if ('error' in result) {
+    return { success: false, error: result.error ?? 'Không thể xuất bản công trình.' };
+  }
+
+  try {
+    revalidatePath('/');
+    revalidatePath('/dashboard');
+    revalidatePath('/admin');
+    revalidatePath('/admin/reviews');
+    revalidatePath(`/showcase/${result.slug}`);
+  } catch {
+    // Cache invalidation requires a Next.js request context and is unavailable in integration tests.
+  }
+  return { success: true, data: { status: result.status } };
+}
+
 export async function requestAuthorRevisionAction(input: unknown): Promise<ActionResult<{ status: string }>> {
   const actor = await getCurrentUser(['EDITOR', 'ADMIN']);
   if (!actor) return { success: false, error: 'Bạn không có quyền yêu cầu chỉnh sửa.' };
@@ -446,10 +587,10 @@ async function adminStatusTransition(
   return { success: true, data: updated };
 }
 
-export function reopenShowcaseAction(itemId: string) {
+export async function reopenShowcaseAction(itemId: string) {
   return adminStatusTransition(itemId, ['REJECTED'], 'DRAFT', 'REOPENED');
 }
 
-export function archiveShowcaseAction(itemId: string) {
+export async function archiveShowcaseAction(itemId: string) {
   return adminStatusTransition(itemId, ['PUBLISHED', 'REJECTED'], 'ARCHIVED', 'ARCHIVED');
 }
