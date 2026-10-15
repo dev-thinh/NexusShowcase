@@ -28,6 +28,21 @@ function invalid(error: ZodError): ActionResult<never> {
   return { success: false, error: 'Invalid input.', fieldErrors };
 }
 
+function isAssignedEditor(
+  actor: { id: string; role: string },
+  item: { status: string; editorialDraft: { assignedEditorId: string | null } | null }
+) {
+  return actor.role === 'EDITOR' &&
+    item.status === 'PENDING_REVIEW' &&
+    item.editorialDraft?.assignedEditorId === actor.id;
+}
+
+const editorialBoundarySelect = {
+  id: true,
+  status: true,
+  editorialDraft: { select: { assignedEditorId: true } },
+} as const;
+
 export async function assignEditorAction(
   itemId: string,
   editorId?: string | null
@@ -91,7 +106,7 @@ export async function saveEditorialDraftAction(
   itemId: string,
   overrides: unknown
 ): Promise<ActionResult<{ itemId: string }>> {
-  const actor = await getCurrentUser(['EDITOR', 'ADMIN']);
+  const actor = await getCurrentUser(['EDITOR']);
   if (!actor) return { success: false, error: 'Bạn không có quyền lưu bản biên tập.' };
 
   const parsedItem = showcaseItemIdSchema.safeParse(itemId);
@@ -102,21 +117,16 @@ export async function saveEditorialDraftAction(
 
   const item = await prisma.showcaseItem.findUnique({
     where: { id: parsedItem.data },
-    select: { id: true },
+    select: editorialBoundarySelect,
   });
   if (!item) return { success: false, error: 'Không tìm thấy công trình.' };
+  if (!isAssignedEditor(actor, item)) {
+    return { success: false, error: 'Chỉ biên tập viên được phân công mới có thể chỉnh sửa bài này.' };
+  }
 
-  await prisma.editorialDraft.upsert({
+  await prisma.editorialDraft.update({
     where: { itemId: parsedItem.data },
-    create: {
-      itemId: parsedItem.data,
-      assignedEditorId: actor.id,
-      overrides: parsedOverrides.data as any,
-      checklist: {},
-    },
-    update: {
-      overrides: parsedOverrides.data as any,
-    },
+    data: { overrides: parsedOverrides.data as any },
   });
 
   return { success: true, data: { itemId: parsedItem.data } };
@@ -125,7 +135,7 @@ export async function saveEditorialDraftAction(
 export async function addReviewCommentAction(
   input: unknown
 ): Promise<ActionResult<{ id: string }>> {
-  const actor = await getCurrentUser(['EDITOR', 'ADMIN']);
+  const actor = await getCurrentUser(['EDITOR']);
   if (!actor) return { success: false, error: 'Bạn không có quyền thêm phản hồi.' };
 
   const parsed = reviewCommentInputSchema.safeParse(input);
@@ -133,9 +143,12 @@ export async function addReviewCommentAction(
 
   const item = await prisma.showcaseItem.findUnique({
     where: { id: parsed.data.itemId },
-    select: { id: true },
+    select: editorialBoundarySelect,
   });
   if (!item) return { success: false, error: 'Không tìm thấy công trình.' };
+  if (!isAssignedEditor(actor, item)) {
+    return { success: false, error: 'Chỉ biên tập viên được phân công mới có thể thêm phản hồi.' };
+  }
 
   const created = await prisma.$transaction(async (tx) => {
     const comment = await tx.reviewComment.create({
@@ -174,7 +187,7 @@ export async function addReviewCommentAction(
 export async function resolveReviewCommentAction(
   commentId: string
 ): Promise<ActionResult<{ id: string }>> {
-  const actor = await getCurrentUser(['EDITOR', 'ADMIN']);
+  const actor = await getCurrentUser(['EDITOR']);
   if (!actor) return { success: false, error: 'Bạn không có quyền xử lý phản hồi.' };
 
   const parsed = cuidSchema.safeParse(commentId);
@@ -182,9 +195,17 @@ export async function resolveReviewCommentAction(
 
   const comment = await prisma.reviewComment.findUnique({
     where: { id: parsed.data },
-    select: { id: true, itemId: true, status: true },
+    select: {
+      id: true,
+      itemId: true,
+      status: true,
+      item: { select: editorialBoundarySelect },
+    },
   });
   if (!comment) return { success: false, error: 'Không tìm thấy phản hồi.' };
+  if (!isAssignedEditor(actor, comment.item)) {
+    return { success: false, error: 'Chỉ biên tập viên được phân công mới có thể xử lý phản hồi.' };
+  }
   if (comment.status === 'RESOLVED') {
     return { success: true, data: { id: comment.id } };
   }
@@ -216,7 +237,7 @@ export async function markReadyForApprovalAction(
   itemIdOrInput: unknown,
   extraPayload?: unknown
 ): Promise<ActionResult<{ status: string }>> {
-  const actor = await getCurrentUser(['EDITOR', 'ADMIN']);
+  const actor = await getCurrentUser(['EDITOR']);
   if (!actor) return { success: false, error: 'Bạn không có quyền bàn giao phê duyệt.' };
 
   let rawInput: unknown;
@@ -233,11 +254,14 @@ export async function markReadyForApprovalAction(
 
   const item = await prisma.showcaseItem.findUnique({
     where: { id: parsed.data.itemId },
-    select: { id: true, status: true, categoryId: true },
+    select: { ...editorialBoundarySelect, categoryId: true },
   });
   if (!item) return { success: false, error: 'Không tìm thấy công trình.' };
   if (item.status !== 'PENDING_REVIEW') {
     return { success: false, error: 'Chỉ bài đang chờ biên tập mới có thể bàn giao phê duyệt.' };
+  }
+  if (!isAssignedEditor(actor, item)) {
+    return { success: false, error: 'Chỉ biên tập viên được phân công mới có thể bàn giao bài.' };
   }
 
   const targetCategoryId = parsed.data.categoryId || item.categoryId;
@@ -512,14 +536,14 @@ export async function publishEditorialDraftAction(
 }
 
 export async function requestAuthorRevisionAction(input: unknown): Promise<ActionResult<{ status: string }>> {
-  const actor = await getCurrentUser(['EDITOR', 'ADMIN']);
+  const actor = await getCurrentUser(['EDITOR']);
   if (!actor) return { success: false, error: 'Bạn không có quyền yêu cầu chỉnh sửa.' };
   const parsed = requestAuthorRevisionInputSchema.safeParse(input);
   if (!parsed.success) return invalid(parsed.error);
 
   const updated = await prisma.$transaction(async (tx) => {
-    const item = await tx.showcaseItem.findUnique({ where: { id: parsed.data.itemId }, select: { status: true } });
-    if (!item || !['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.status)) return null;
+    const item = await tx.showcaseItem.findUnique({ where: { id: parsed.data.itemId }, select: editorialBoundarySelect });
+    if (!item || !isAssignedEditor(actor, item)) return null;
     await tx.reviewComment.create({
       data: {
         itemId: parsed.data.itemId,
@@ -548,7 +572,7 @@ export async function rejectShowcaseAction(input: unknown): Promise<ActionResult
   const parsed = rejectShowcaseInputSchema.safeParse(input);
   if (!parsed.success) return invalid(parsed.error);
   const item = await prisma.showcaseItem.findUnique({ where: { id: parsed.data.itemId }, select: { status: true } });
-  if (!item || !['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.status)) {
+  if (!item || item.status !== 'READY_FOR_APPROVAL') {
     return { success: false, error: 'Trạng thái hiện tại không thể bị từ chối.' };
   }
   const updated = await prisma.$transaction(async (tx) => {

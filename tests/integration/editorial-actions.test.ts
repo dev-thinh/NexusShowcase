@@ -8,6 +8,8 @@ import {
   markReadyForApprovalAction,
   returnToEditorAction,
   publishEditorialDraftAction,
+  requestAuthorRevisionAction,
+  rejectShowcaseAction,
 } from '@/actions/editorial-actions';
 
 const currentUserMock = vi.hoisted(() => ({
@@ -155,6 +157,26 @@ describe('Editorial Actions Integration', () => {
     expect((rev?.snapshot as any)?.title).toBe('Original Author Title');
   });
 
+  it('prevents ADMIN from performing Editor work or rejecting before approval', async () => {
+    currentUserMock.actor = adminUser;
+
+    expect(await saveEditorialDraftAction(testItem.id, { title: 'Admin edit' }))
+      .toMatchObject({ success: false });
+    expect(await markReadyForApprovalAction({
+      itemId: testItem.id,
+      categoryId: testCategory.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    })).toMatchObject({ success: false });
+    expect(await requestAuthorRevisionAction({
+      itemId: testItem.id,
+      reason: 'Admin should not contact the author.',
+    })).toMatchObject({ success: false });
+    expect(await rejectShowcaseAction({
+      itemId: testItem.id,
+      reason: 'Not yet in final approval.',
+    })).toMatchObject({ success: false });
+  });
+
   it('supports creating and resolving review comments with audience separation', async () => {
     currentUserMock.actor = editorUser;
 
@@ -244,18 +266,16 @@ describe('Editorial Actions Integration', () => {
   });
 
   it('restricts publishEditorialDraftAction to ADMIN and materializes effective publication atomically', async () => {
-    // Mark ready for approval first
+    // Save editor overrides before the read-only approval phase.
     currentUserMock.actor = editorUser;
+    await saveEditorialDraftAction(testItem.id, {
+      title: 'Materialized Final Publication Title',
+      summary: 'Polished academic summary for public display.',
+    });
     await markReadyForApprovalAction({
       itemId: testItem.id,
       categoryId: testCategory.id,
       checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
-    });
-
-    // Save editor overrides to be materialized
-    await saveEditorialDraftAction(testItem.id, {
-      title: 'Materialized Final Publication Title',
-      summary: 'Polished academic summary for public display.',
     });
 
     // EDITOR cannot publish

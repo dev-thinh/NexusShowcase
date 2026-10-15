@@ -6,7 +6,7 @@ import {
   saveShowcaseDraftAction,
   submitShowcaseForReviewAction,
 } from '@/actions/showcase-actions';
-import { requestAuthorRevisionAction } from '@/actions/editorial-actions';
+import { assignEditorAction, requestAuthorRevisionAction } from '@/actions/editorial-actions';
 
 const currentUserMock = vi.hoisted(() => ({
   actor: null as {
@@ -193,6 +193,7 @@ describe('Showcase Server Actions', () => {
     expect(first).toEqual({ success: true, data: { status: 'PENDING_REVIEW', revisionNumber: 1 } });
 
     currentUserMock.actor = editorUser;
+    await assignEditorAction(draft.data.id, editorUser.id);
     const revision = await requestAuthorRevisionAction({
       itemId: draft.data.id,
       fieldKey: 'summary',
