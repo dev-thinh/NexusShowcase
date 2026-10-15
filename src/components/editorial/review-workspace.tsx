@@ -9,6 +9,7 @@ import { SourceRevisionView } from './source-revision-view';
 import { EditorialFields } from './editorial-fields';
 import { ReviewChecklist, type ChecklistState } from './review-checklist';
 import type { CommentItem } from './field-review-comments';
+import { StatusBadge } from '@/components/ui/badge';
 import {
   saveEditorialDraftAction,
   markReadyForApprovalAction,
@@ -285,9 +286,7 @@ export function ReviewWorkspace({
               ← Danh sách xét duyệt
             </Link>
             <span className="text-slate-300">|</span>
-            <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-800 tracking-wider">
-              {item.status}
-            </span>
+            <StatusBadge status={item.status} size="sm" />
             <h1 className="text-sm font-semibold text-slate-900 truncate max-w-md hidden sm:inline">
               {item.title}
             </h1>

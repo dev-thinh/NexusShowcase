@@ -5,6 +5,14 @@ import path from 'path';
 const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
 
 describe('academic review workspace', () => {
+  it('uses localized status presentation instead of rendering the raw enum', () => {
+    const workspace = read('src/components/editorial/review-workspace.tsx');
+    const showcase = read('src/app/showcase/[slug]/page.tsx');
+    expect(workspace).toContain('<StatusBadge status={item.status}');
+    expect(workspace).not.toMatch(/>\s*\{item\.status\}\s*</);
+    expect(showcase).toContain('<StatusBadge status={item.status}');
+  });
+
   it('uses a 40/60 continuous desktop grid with divider and mobile tabs', () => {
     const workspace = read('src/components/editorial/review-workspace.tsx');
     expect(workspace).toMatch(/grid.*lg:grid-cols-\[minmax\(0,2fr\)_minmax\(0,3fr\)\]|grid.*lg:grid-cols-5|lg:divide-x/);

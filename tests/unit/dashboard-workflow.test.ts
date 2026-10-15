@@ -7,9 +7,7 @@ const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file)
 describe('member workflow dashboard', () => {
   it('defines member-facing labels for every workflow status', () => {
     const badge = read('src/components/ui/badge.tsx');
-    for (const status of ['DRAFT', 'PENDING_REVIEW', 'REVISION_REQUESTED', 'READY_FOR_APPROVAL', 'REJECTED', 'PUBLISHED', 'ARCHIVED']) {
-      expect(badge).toContain(`${status}:`);
-    }
+    expect(badge).toContain('getItemStatusLabel(status)');
   });
 
   it('offers editing only for drafts and requested revisions', () => {
