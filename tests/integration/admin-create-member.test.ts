@@ -44,7 +44,7 @@ describe('Admin Create Member Action', () => {
     expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
   });
 
-  it('should allow admin to create a new member with default password', async () => {
+  it('should allow admin to create a new member with a generated temporary password', async () => {
     currentUserMock.actor = adminUser;
     const email = `test-member-${Date.now()}@student.hcmus.edu.vn`;
     const res = await createMemberAction({
@@ -60,9 +60,12 @@ describe('Admin Create Member Action', () => {
     expect(res.user?.role).toBe('CORE_MEMBER');
     expect(res.user?.status).toBe('ACTIVE');
 
-    // Verify password is default member123
+    expect(res.temporaryPassword).toBeDefined();
+    expect(res.temporaryPassword).not.toBe('member123');
+
+    // Verify the one-time password returned to the admin matches the stored hash.
     const created = await prisma.user.findUnique({ where: { id: res.user!.id } });
-    const isMatch = await bcrypt.compare('member123', created!.passwordHash!);
+    const isMatch = await bcrypt.compare(res.temporaryPassword!, created!.passwordHash!);
     expect(isMatch).toBe(true);
 
     // Clean up

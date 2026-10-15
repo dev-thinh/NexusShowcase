@@ -108,3 +108,31 @@ npx tsc --noEmit
 # Tạo bản build tối ưu cho production
 npm run build
 ```
+
+---
+
+## 5. Editorial roles and publication workflow
+
+- `CORE_MEMBER` creates a title-only draft, completes the required metadata, and submits it for review. Every submission creates an immutable `SubmissionRevision`.
+- `EDITOR` claims or receives pending work, adds author-facing or internal feedback, prepares editorial overrides, assigns the official category, completes the checklist, and hands the item off as `READY_FOR_APPROVAL`.
+- `ADMIN` may return an item to the editor, reject it, reopen a rejected item, publish an approved editorial draft, or archive a completed item. Only `ADMIN` can publish.
+
+```text
+DRAFT -> PENDING_REVIEW -> REVISION_REQUESTED -> PENDING_REVIEW
+                         -> REJECTED -> DRAFT (ADMIN reopen)
+PENDING_REVIEW -> READY_FOR_APPROVAL -> PUBLISHED -> ARCHIVED
+                                  \-> PENDING_REVIEW (ADMIN return)
+```
+
+`REVISION_REQUESTED` remains editable by the author. `REJECTED` is read-only until an admin explicitly reopens it. Publication atomically materializes the latest submission plus editorial overrides into `ShowcaseItem`; revisions, editorial drafts, comments, and audit events remain available for traceability.
+
+### Safe database migration
+
+Back up production data before deployment, configure `DATABASE_URL` for the intended database, and run:
+
+```bash
+npx prisma generate
+npx prisma migrate deploy
+```
+
+Use `npm run db:push` only for local development. Automated integration and E2E suites must use a separate `TEST_DATABASE_URL` containing `test` in its database name or schema.

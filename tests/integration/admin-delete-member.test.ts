@@ -75,14 +75,18 @@ describe('Admin Delete Member Action', () => {
     await prisma.user.delete({ where: { id: tempAdmin.id } });
   });
 
-  it('should successfully delete a regular or core member', async () => {
+  it('should suspend a regular or core member and revoke existing sessions', async () => {
     currentUserMock.actor = adminUser;
     const res = await deleteMemberAction(testMember.id);
     expect(res.success).toBe(true);
     expect(res.message).toContain('thành công');
 
-    // Verify user no longer exists in database
+    // The record remains for attribution and audit history.
     const found = await prisma.user.findUnique({ where: { id: testMember.id } });
-    expect(found).toBeNull();
+    expect(found?.status).toBe('SUSPENDED');
+    expect(found?.deletedAt).not.toBeNull();
+    expect(found?.sessionVersion).toBeGreaterThan(1);
+
+    await prisma.user.delete({ where: { id: testMember.id } });
   });
 });
