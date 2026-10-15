@@ -1,5 +1,8 @@
-import React from 'react';
-import type { SubmissionSnapshot } from '@/lib/submission-types';
+import React, { useState } from 'react';
+import type { SubmissionResource, SubmissionSnapshot } from '@/lib/submission-types';
+import { formatResourceMetadata } from '@/lib/resource-presentation';
+import { ResourcePreviewModal } from './resource-preview-modal';
+import { FieldReviewComments, type CommentItem } from './field-review-comments';
 
 interface SourceRevisionViewProps {
   snapshot: SubmissionSnapshot;
@@ -10,6 +13,10 @@ interface SourceRevisionViewProps {
   }>;
   selectedRevisionNumber?: number;
   onSelectRevision?: (revNum: number) => void;
+  memberNamesById?: Record<string, string>;
+  comments?: CommentItem[];
+  onAddComment?: (fieldKey: string, body: string, audience: 'EDITORIAL' | 'AUTHOR', severity: 'REQUIRED' | 'SUGGESTION') => Promise<void>;
+  onResolveComment?: (commentId: string) => Promise<void>;
 }
 
 export function SourceRevisionView({
@@ -17,7 +24,12 @@ export function SourceRevisionView({
   revisions = [],
   selectedRevisionNumber = 1,
   onSelectRevision,
+  memberNamesById = {},
+  comments = [],
+  onAddComment,
+  onResolveComment,
 }: SourceRevisionViewProps) {
+  const [previewResource, setPreviewResource] = useState<SubmissionResource | null>(null);
   return (
     <div className="space-y-6 text-slate-800">
       <div className="flex items-center justify-between pb-4 border-b border-slate-200">
@@ -84,7 +96,7 @@ export function SourceRevisionView({
                 <li key={idx} className="p-2.5 flex items-center justify-between">
                   <div>
                     <span className="font-medium text-slate-900">
-                      {contrib.externalName || contrib.userId || 'Thành viên'}
+                      {contrib.externalName ?? contrib.displayName ?? memberNamesById[contrib.userId ?? ''] ?? 'Thành viên'}
                     </span>
                     {contrib.externalAffiliation && (
                       <span className="text-slate-500 block text-[11px]">
@@ -107,23 +119,30 @@ export function SourceRevisionView({
             <p className="text-xs text-slate-400 italic">Không có tài nguyên</p>
           ) : (
             <ul className="divide-y divide-slate-100 border border-slate-200 rounded text-xs">
-              {snapshot.resources.map((res, idx) => (
-                <li key={idx} className="p-2.5 flex items-center justify-between">
+              {snapshot.resources.map((res, idx) => {
+                const metadata = formatResourceMetadata(res);
+                return (
+                <li key={idx} className="p-2.5 flex items-center justify-between gap-3">
                   <div>
-                    <span className="font-medium text-slate-900">{res.label}</span>
-                    <span className="text-slate-400 block text-[11px] truncate max-w-xs">
-                      {res.url}
-                    </span>
+                    <span className="font-medium text-slate-900">{metadata.primary}</span>
+                    <span className="text-slate-500 block text-[11px]">{metadata.secondary}</span>
                   </div>
-                  <span className="text-[11px] text-slate-500 uppercase tracking-wider font-mono">
-                    {res.kind}
-                  </span>
+                  <button type="button" onClick={() => setPreviewResource(res)} className="action-secondary-detail shrink-0" aria-label={`Xem tài nguyên ${res.label}`}>
+                    Xem tài nguyên
+                  </button>
                 </li>
-              ))}
+              )})}
             </ul>
           )}
+          <FieldReviewComments
+            fieldKey="resources"
+            comments={comments}
+            onAddComment={onAddComment}
+            onResolveComment={onResolveComment}
+          />
         </div>
       </div>
+      <ResourcePreviewModal resource={previewResource} onClose={() => setPreviewResource(null)} />
     </div>
   );
 }

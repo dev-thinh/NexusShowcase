@@ -27,6 +27,11 @@ describe('academic review workspace', () => {
     expect(sourceView).not.toMatch(/<input|<textarea/);
     expect(sourceView).toContain('Tác giả');
     expect(sourceView).toContain('Tài nguyên');
+    expect(sourceView).toContain("contrib.displayName ?? memberNamesById[contrib.userId ?? '']");
+    expect(sourceView).not.toContain("contrib.externalName || contrib.userId");
+    expect(sourceView).not.toContain('{res.url}');
+    expect(sourceView).toContain('Xem tài nguyên');
+    expect(sourceView).toContain('fieldKey="resources"');
   });
 
   it('provides editorial fields with edited markers, per-field restore, and category requirement', () => {

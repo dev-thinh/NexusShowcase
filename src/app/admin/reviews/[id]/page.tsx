@@ -80,6 +80,22 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
     ? (revisions[0].snapshot as unknown as SubmissionSnapshot)
     : fallbackSnapshot;
 
+  const contributorIds = Array.from(new Set(
+    [latestSnapshot, ...revisions.map((revision) => revision.snapshot as unknown as SubmissionSnapshot)]
+      .flatMap((snapshot) => snapshot.contributors)
+      .map((contributor) => contributor.userId)
+      .filter((userId): userId is string => Boolean(userId))
+  ));
+  const contributorUsers = contributorIds.length > 0
+    ? await prisma.user.findMany({
+        where: { id: { in: contributorIds } },
+        select: { id: true, fullName: true },
+      })
+    : [];
+  const memberNamesById = Object.fromEntries(
+    contributorUsers.map((user) => [user.id, user.fullName ?? 'Thành viên'])
+  );
+
   return (
     <ReviewWorkspace
       item={{
@@ -122,6 +138,7 @@ export default async function ReviewDetailPage({ params }: ReviewDetailPageProps
         fullName: actor.fullName,
       }}
       previewUrl={`/admin/reviews/${item.id}/preview`}
+      memberNamesById={memberNamesById}
     />
   );
 }

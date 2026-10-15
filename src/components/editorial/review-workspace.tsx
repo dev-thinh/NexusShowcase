@@ -50,6 +50,7 @@ interface ReviewWorkspaceProps {
     fullName: string | null;
   };
   previewUrl: string;
+  memberNamesById?: Record<string, string>;
 }
 
 export function ReviewWorkspace({
@@ -61,6 +62,7 @@ export function ReviewWorkspace({
   comments: initialComments,
   currentUser,
   previewUrl,
+  memberNamesById = {},
 }: ReviewWorkspaceProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -86,6 +88,9 @@ export function ReviewWorkspace({
 
   const [comments, setComments] = useState<CommentItem[]>(initialComments);
   const [publicationVisibility, setPublicationVisibility] = useState<ItemVisibility>('PRIVATE');
+  const canEdit = currentUser.role === 'EDITOR' &&
+    item.status === 'PENDING_REVIEW' &&
+    editorialDraft?.assignedEditorId === currentUser.id;
   const [statusMessage, setStatusMessage] = useState<{
     type: 'success' | 'error';
     text: string;
@@ -376,6 +381,10 @@ export function ReviewWorkspace({
               revisions={revisions}
               selectedRevisionNumber={selectedRevisionNumber}
               onSelectRevision={setSelectedRevisionNumber}
+              memberNamesById={memberNamesById}
+              comments={comments}
+              onAddComment={canEdit ? handleAddComment : undefined}
+              onResolveComment={canEdit ? handleResolveComment : undefined}
             />
           </div>
 
