@@ -202,6 +202,14 @@ describe('submission through publication workflow', () => {
     if (!draft.success) return;
     expect((await submitShowcaseForReviewAction(draft.data.id)).success).toBe(true);
 
+    currentUserMock.actor = editor;
+    expect((await assignEditorAction(draft.data.id, editor.id)).success).toBe(true);
+    expect((await markReadyForApprovalAction({
+      itemId: draft.data.id,
+      categoryId: category.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    })).success).toBe(true);
+
     currentUserMock.actor = admin;
     expect(
       (await rejectShowcaseAction({ itemId: draft.data.id, reason: 'Outside the publication scope.' })).success

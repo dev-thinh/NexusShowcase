@@ -113,9 +113,11 @@ npm run build
 
 ## 5. Editorial roles and publication workflow
 
-- `CORE_MEMBER` creates a title-only draft, completes the required metadata, and submits it for review. Every submission creates an immutable `SubmissionRevision`.
-- `EDITOR` claims or receives pending work, adds author-facing or internal feedback, prepares editorial overrides, assigns the official category, completes the checklist, and hands the item off as `READY_FOR_APPROVAL`.
-- `ADMIN` may return an item to the editor, reject it, reopen a rejected item, publish an approved editorial draft, or archive a completed item. Only `ADMIN` can publish.
+- `CORE_MEMBER` completes a draft and submits it for review. Every submission creates an immutable `SubmissionRevision`, including contributor display names and the exact resource list.
+- Only the assigned `EDITOR` may edit publication fields, add/resolve feedback, request an author revision, or hand off an item while it is `PENDING_REVIEW`.
+- During `READY_FOR_APPROVAL`, the workspace is read-only. `ADMIN` may publish internally (`PRIVATE`, the default), publish publicly (`PUBLIC`), return the item to its Editor, or reject it.
+- `ADMIN` never sends feedback directly to the author. The Admin returns work to the Editor, who owns author communication.
+- Author resources are immutable throughout review. Editor and Admin may preview them and attach field feedback, but cannot rename, remove, replace, or exclude them from publication.
 
 ```text
 DRAFT -> PENDING_REVIEW -> REVISION_REQUESTED -> PENDING_REVIEW
@@ -124,7 +126,9 @@ PENDING_REVIEW -> READY_FOR_APPROVAL -> PUBLISHED -> ARCHIVED
                                   \-> PENDING_REVIEW (ADMIN return)
 ```
 
-`REVISION_REQUESTED` remains editable by the author. `REJECTED` is read-only until an admin explicitly reopens it. Publication atomically materializes the latest submission plus editorial overrides into `ShowcaseItem`; revisions, editorial drafts, comments, and audit events remain available for traceability.
+`REVISION_REQUESTED` remains editable by the author. `REJECTED` is read-only until an admin explicitly reopens it. Publication atomically materializes the latest submission plus editorial overrides, status, and visibility into `ShowcaseItem`; revisions, editorial drafts, comments, and audit events remain available for traceability.
+
+User-facing status labels are centralized and localized: `Bản nháp`, `Chờ biên tập`, `Chờ tác giả bổ sung`, `Chờ phê duyệt`, `Đã xuất bản`, `Không được phê duyệt`, and `Đã lưu trữ`. Raw enum tokens are not displayed in the interface.
 
 ### Safe database migration
 
