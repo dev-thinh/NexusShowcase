@@ -39,6 +39,7 @@ export function buildSubmissionSnapshot(source: SubmissionSnapshotSource): Submi
     customProjectType: source.customProjectType ?? '',
     contributors: source.contributors.map((contributor) => ({
       userId: contributor.userId ?? null,
+      displayName: contributor.displayName ?? contributor.user?.fullName ?? null,
       externalName: contributor.externalName ?? null,
       externalAffiliation: contributor.externalAffiliation ?? null,
       externalLink: contributor.externalLink ?? null,
@@ -58,6 +59,6 @@ export function mergeEditorialOverrides(
     ...snapshot,
     ...overrides,
     contributors: snapshot.contributors.map((contributor) => ({ ...contributor })),
-    resources: (overrides.resources ?? snapshot.resources).map((resource) => ({ ...resource })),
+    resources: snapshot.resources.map((resource) => ({ ...resource })),
   };
 }

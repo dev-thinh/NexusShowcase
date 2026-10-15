@@ -6,7 +6,7 @@ import {
   saveShowcaseDraftAction,
   submitShowcaseForReviewAction,
 } from '@/actions/showcase-actions';
-import { requestAuthorRevisionAction } from '@/actions/editorial-actions';
+import { assignEditorAction, requestAuthorRevisionAction } from '@/actions/editorial-actions';
 
 const currentUserMock = vi.hoisted(() => ({
   actor: null as {
@@ -193,6 +193,7 @@ describe('Showcase Server Actions', () => {
     expect(first).toEqual({ success: true, data: { status: 'PENDING_REVIEW', revisionNumber: 1 } });
 
     currentUserMock.actor = editorUser;
+    await assignEditorAction(draft.data.id, editorUser.id);
     const revision = await requestAuthorRevisionAction({
       itemId: draft.data.id,
       fieldKey: 'summary',
@@ -217,12 +218,15 @@ describe('Showcase Server Actions', () => {
     expect(revisions).toHaveLength(2);
     expect((revisions[0].snapshot as { summary: string }).summary).toBe('First immutable submission.');
     expect((revisions[1].snapshot as { summary: string }).summary).toContain('clarified results');
+    expect((revisions[0].snapshot as { contributors: Array<{ displayName?: string }> }).contributors[0].displayName)
+      .toBe(coreUser.fullName);
 
     await prisma.showcaseItem.delete({ where: { id: draft.data.id } });
   });
 
   afterAll(async () => {
     if (coreUser?.id) {
+      await prisma.showcaseItem.deleteMany({ where: { creatorId: coreUser.id } });
       await prisma.user.deleteMany({ where: { id: coreUser.id } });
     }
     if (regularUser?.id) {

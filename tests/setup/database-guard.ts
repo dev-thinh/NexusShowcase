@@ -1,8 +1,12 @@
 export function assertTestDatabaseUrl(
-  devUrl: string | undefined = process.env.DATABASE_URL,
-  testUrl: string | undefined = process.env.TEST_DATABASE_URL,
+  devUrl?: string,
+  testUrl?: string,
   env: Record<string, string | undefined> = process.env
 ): string {
+  if (arguments.length === 0) {
+    devUrl = process.env.DATABASE_URL;
+    testUrl = process.env.TEST_DATABASE_URL;
+  }
   if (!testUrl || !testUrl.trim()) {
     throw new Error('TEST_DATABASE_URL is required to run database integration tests.');
   }

@@ -163,6 +163,7 @@ describe('submission through publication workflow', () => {
         await publishEditorialDraftAction({
           itemId: draft.data.id,
           checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+          visibility: 'PRIVATE',
         })
       ).success
     ).toBe(false);
@@ -173,6 +174,7 @@ describe('submission through publication workflow', () => {
         await publishEditorialDraftAction({
           itemId: draft.data.id,
           checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+          visibility: 'PRIVATE',
         })
       ).success
     ).toBe(true);
@@ -199,6 +201,14 @@ describe('submission through publication workflow', () => {
     expect(draft.success).toBe(true);
     if (!draft.success) return;
     expect((await submitShowcaseForReviewAction(draft.data.id)).success).toBe(true);
+
+    currentUserMock.actor = editor;
+    expect((await assignEditorAction(draft.data.id, editor.id)).success).toBe(true);
+    expect((await markReadyForApprovalAction({
+      itemId: draft.data.id,
+      categoryId: category.id,
+      checklist: { copyEdited: true, mediaChecked: true, metadataChecked: true },
+    })).success).toBe(true);
 
     currentUserMock.actor = admin;
     expect(

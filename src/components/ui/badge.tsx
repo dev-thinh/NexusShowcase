@@ -12,6 +12,7 @@ import {
   GraduationCap,
   Users,
 } from 'lucide-react';
+import { getItemStatusLabel } from '@/lib/item-status-presentation';
 
 interface StatusBadgeProps {
   status: ItemStatus;
@@ -21,37 +22,30 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
   const configs = {
     PUBLISHED: {
-      label: 'Đã xuất bản',
       classes: 'bg-emerald-50 text-emerald-700 border-emerald-200/80',
       icon: CheckCircle2,
     },
     PENDING_REVIEW: {
-      label: 'Chờ duyệt',
       classes: 'bg-amber-50 text-amber-800 border-amber-200/80',
       icon: Clock,
     },
     REVISION_REQUESTED: {
-      label: 'Cần chỉnh sửa',
       classes: 'bg-orange-50 text-orange-800 border-orange-200/80',
       icon: FileEdit,
     },
     READY_FOR_APPROVAL: {
-      label: 'Chờ phê duyệt',
       classes: 'bg-blue-50 text-blue-800 border-blue-200/80',
       icon: Clock,
     },
     REJECTED: {
-      label: 'Cần sửa đổi',
       classes: 'bg-rose-50 text-rose-700 border-rose-200/80',
       icon: XCircle,
     },
     DRAFT: {
-      label: 'Bản nháp',
       classes: 'bg-slate-100 text-slate-700 border-slate-200/80',
       icon: FileEdit,
     },
     ARCHIVED: {
-      label: 'Đã lưu trữ',
       classes: 'bg-slate-100 text-slate-600 border-slate-200/80',
       icon: FileEdit,
     },
@@ -66,7 +60,7 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
       className={`inline-flex items-center gap-1.5 rounded-full font-semibold border shadow-2xs transition-colors ${sizeClasses} ${config.classes}`}
     >
       <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
-      <span>{config.label}</span>
+      <span>{getItemStatusLabel(status)}</span>
     </span>
   );
 }

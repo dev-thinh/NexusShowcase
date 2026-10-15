@@ -3,12 +3,13 @@
 import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import type { ItemStatus } from '@prisma/client';
+import type { ItemStatus, ItemVisibility } from '@prisma/client';
 import type { EditorialOverrides, SubmissionSnapshot } from '@/lib/submission-types';
 import { SourceRevisionView } from './source-revision-view';
 import { EditorialFields } from './editorial-fields';
 import { ReviewChecklist, type ChecklistState } from './review-checklist';
 import type { CommentItem } from './field-review-comments';
+import { StatusBadge } from '@/components/ui/badge';
 import {
   saveEditorialDraftAction,
   markReadyForApprovalAction,
@@ -49,6 +50,7 @@ interface ReviewWorkspaceProps {
     fullName: string | null;
   };
   previewUrl: string;
+  memberNamesById?: Record<string, string>;
 }
 
 export function ReviewWorkspace({
@@ -60,6 +62,7 @@ export function ReviewWorkspace({
   comments: initialComments,
   currentUser,
   previewUrl,
+  memberNamesById = {},
 }: ReviewWorkspaceProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -84,6 +87,11 @@ export function ReviewWorkspace({
   });
 
   const [comments, setComments] = useState<CommentItem[]>(initialComments);
+  const [publicationVisibility, setPublicationVisibility] = useState<ItemVisibility>('PRIVATE');
+  const canEdit = currentUser.role === 'EDITOR' &&
+    item.status === 'PENDING_REVIEW' &&
+    editorialDraft?.assignedEditorId === currentUser.id;
+  const isApproval = currentUser.role === 'ADMIN' && item.status === 'READY_FOR_APPROVAL';
   const [statusMessage, setStatusMessage] = useState<{
     type: 'success' | 'error';
     text: string;
@@ -209,7 +217,11 @@ export function ReviewWorkspace({
   const handlePublish = () => {
     setStatusMessage(null);
     startTransition(async () => {
-      const res = await publishEditorialDraftAction({ itemId: item.id, checklist });
+      const res = await publishEditorialDraftAction({
+        itemId: item.id,
+        checklist,
+        visibility: publicationVisibility,
+      });
       if (res.success) {
         setStatusMessage({ type: 'success', text: 'Đã xuất bản công trình.' });
         router.push(`/showcase/${item.slug}`);
@@ -285,9 +297,7 @@ export function ReviewWorkspace({
               ← Danh sách xét duyệt
             </Link>
             <span className="text-slate-300">|</span>
-            <span className="text-xs font-semibold uppercase px-2 py-0.5 rounded bg-slate-100 text-slate-800 tracking-wider">
-              {item.status}
-            </span>
+            <StatusBadge status={item.status} size="sm" />
             <h1 className="text-sm font-semibold text-slate-900 truncate max-w-md hidden sm:inline">
               {item.title}
             </h1>
@@ -301,14 +311,14 @@ export function ReviewWorkspace({
             >
               Xem trước
             </Link>
-            <button
+            {canEdit && <button
               type="button"
               onClick={handleSaveDraft}
               disabled={isPending}
-              className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50 disabled:opacity-50"
+              className="action-secondary-detail"
             >
               Lưu bản biên tập
-            </button>
+            </button>}
           </div>
         </div>
       </div>
@@ -360,10 +370,10 @@ export function ReviewWorkspace({
         </div>
 
         {/* Continuous Two-Column Document Grid */}
-        <div className="bg-white border border-slate-200 rounded-lg shadow-sm grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:divide-x divide-slate-200">
+        <div className="panel-detail max-w-6xl overflow-hidden !p-0 grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:divide-x divide-slate-200">
           {/* Left Column (40% desktop) - Read-only Source Revision */}
           <div
-            className={`p-6 lg:p-8 ${
+            className={`p-6 sm:p-8 ${
               activeTab === 'source' ? 'block' : 'hidden lg:block'
             }`}
           >
@@ -372,12 +382,16 @@ export function ReviewWorkspace({
               revisions={revisions}
               selectedRevisionNumber={selectedRevisionNumber}
               onSelectRevision={setSelectedRevisionNumber}
+              memberNamesById={memberNamesById}
+              comments={comments}
+              onAddComment={canEdit ? handleAddComment : undefined}
+              onResolveComment={canEdit ? handleResolveComment : undefined}
             />
           </div>
 
           {/* Right Column (60% desktop) - Editorial Draft & Controls */}
           <div
-            className={`p-6 lg:p-8 space-y-6 ${
+            className={`p-6 sm:p-8 space-y-6 ${
               activeTab === 'editorial' ? 'block' : 'hidden lg:block'
             }`}
           >
@@ -388,15 +402,15 @@ export function ReviewWorkspace({
               onChangeOverride={handleOverrideChange}
               onRestoreField={handleRestoreField}
               comments={comments}
-              onAddComment={handleAddComment}
-              onResolveComment={handleResolveComment}
-              disabled={isPending}
+              onAddComment={canEdit ? handleAddComment : undefined}
+              onResolveComment={canEdit ? handleResolveComment : undefined}
+              disabled={!canEdit || isPending}
             />
 
             <ReviewChecklist
               checklist={checklist}
               onChangeChecklist={handleChecklistChange}
-              disabled={isPending}
+              disabled={!canEdit || isPending}
             />
           </div>
         </div>
@@ -411,6 +425,7 @@ export function ReviewWorkspace({
 
           <div className="flex items-center gap-2 flex-wrap">
             {/* Common: Request Author Revision */}
+            {canEdit && (
             <button
               type="button"
               onClick={() => {
@@ -418,26 +433,38 @@ export function ReviewWorkspace({
                 setModalReason('');
               }}
               disabled={isPending}
-              className="px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded hover:bg-amber-100 disabled:opacity-50"
+              className="action-secondary-detail"
             >
               Yêu cầu bổ sung
             </button>
+            )}
 
             {/* EDITOR Action: Mark Ready for Approval */}
-            {currentUser.role === 'EDITOR' && item.status === 'PENDING_REVIEW' && (
+            {canEdit && (
               <button
                 type="button"
                 onClick={handleHandoff}
                 disabled={isPending}
-                className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
+                className="action-primary-detail"
               >
                 Gửi phê duyệt
               </button>
             )}
 
             {/* ADMIN Action: Return to Editor */}
-            {currentUser.role === 'ADMIN' && item.status === 'READY_FOR_APPROVAL' && (
+            {isApproval && (
               <>
+                <label className="sr-only" htmlFor="publication-visibility">Phạm vi xuất bản</label>
+                <select
+                  id="publication-visibility"
+                  value={publicationVisibility}
+                  onChange={(event) => setPublicationVisibility(event.target.value as ItemVisibility)}
+                  disabled={isPending}
+                  className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs font-medium text-slate-700"
+                >
+                  <option value="PRIVATE">Nội bộ</option>
+                  <option value="PUBLIC">Công khai</option>
+                </select>
                 <button
                   type="button"
                   onClick={() => {
@@ -445,7 +472,7 @@ export function ReviewWorkspace({
                     setModalReason('');
                   }}
                   disabled={isPending}
-                  className="px-3 py-1.5 text-xs font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded hover:bg-indigo-100 disabled:opacity-50"
+                  className="action-secondary-detail"
                 >
                   Trả lại biên tập
                 </button>
@@ -453,7 +480,7 @@ export function ReviewWorkspace({
                   type="button"
                   onClick={handlePublish}
                   disabled={isPending}
-                  className="px-4 py-1.5 text-xs font-medium text-white bg-emerald-700 rounded hover:bg-emerald-800 disabled:opacity-50"
+                  className="action-primary-detail"
                 >
                   Xuất bản
                 </button>
@@ -461,8 +488,7 @@ export function ReviewWorkspace({
             )}
 
             {/* ADMIN Action: Reject */}
-            {currentUser.role === 'ADMIN' &&
-              ['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.status) && (
+            {isApproval && (
                 <button
                   type="button"
                   onClick={() => {

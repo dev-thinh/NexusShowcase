@@ -122,7 +122,6 @@ export const editorialDraftInputSchema = z.object({
   tags: z.array(trimmedText(50).min(1)).max(20).optional(),
   issuer: trimmedText(200).nullable().optional(),
   publishedYear: z.number().int().min(1900).max(MAX_CURRENT_YEAR).optional(),
-  resources: z.array(submissionResourceSchema).max(20).optional(),
 }).strict();
 
 export const reviewFieldKeySchema = z.enum([
@@ -187,6 +186,7 @@ export const returnToEditorInputSchema = z.object({
 export const publishEditorialDraftInputSchema = z.object({
   itemId: cuidSchema,
   checklist: editorialChecklistSchema,
+  visibility: z.enum(['PRIVATE', 'PUBLIC']),
 }).strict();
 
 export const showcaseItemIdSchema = cuidSchema;

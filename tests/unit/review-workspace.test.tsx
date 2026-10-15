@@ -5,6 +5,14 @@ import path from 'path';
 const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
 
 describe('academic review workspace', () => {
+  it('uses localized status presentation instead of rendering the raw enum', () => {
+    const workspace = read('src/components/editorial/review-workspace.tsx');
+    const showcase = read('src/app/showcase/[slug]/page.tsx');
+    expect(workspace).toContain('<StatusBadge status={item.status}');
+    expect(workspace).not.toMatch(/>\s*\{item\.status\}\s*</);
+    expect(showcase).toContain('<StatusBadge status={item.status}');
+  });
+
   it('uses a 40/60 continuous desktop grid with divider and mobile tabs', () => {
     const workspace = read('src/components/editorial/review-workspace.tsx');
     expect(workspace).toMatch(/grid.*lg:grid-cols-\[minmax\(0,2fr\)_minmax\(0,3fr\)\]|grid.*lg:grid-cols-5|lg:divide-x/);
@@ -19,12 +27,17 @@ describe('academic review workspace', () => {
     expect(sourceView).not.toMatch(/<input|<textarea/);
     expect(sourceView).toContain('Tác giả');
     expect(sourceView).toContain('Tài nguyên');
+    expect(sourceView).toContain("contrib.displayName ?? memberNamesById[contrib.userId ?? '']");
+    expect(sourceView).not.toContain("contrib.externalName || contrib.userId");
+    expect(sourceView).not.toContain('{res.url}');
+    expect(sourceView).toContain('Xem tài nguyên');
+    expect(sourceView).toContain('fieldKey="resources"');
   });
 
-  it('provides editorial fields with edited markers, per-field restore, and category requirement', () => {
+  it('provides concise per-field restore controls and category requirement', () => {
     const fields = read('src/components/editorial/editorial-fields.tsx');
-    expect(fields).toContain('Đã biên tập');
-    expect(fields).toContain('Khôi phục bản gửi');
+    expect(fields).not.toContain('Đã biên tập');
+    expect(fields).toContain('Khôi phục bản gốc');
     expect(fields).toContain('Chuyên mục');
     expect(fields).toContain('htmlFor="editorial-category"');
     expect(fields).not.toContain('panel-operational');
@@ -46,6 +59,12 @@ describe('academic review workspace', () => {
     expect(workspace).toContain('Xem trước');
     expect(workspace).toContain('publishEditorialDraftAction');
     expect(workspace).toContain('Xuất bản');
+    expect(workspace).toContain("const canEdit = currentUser.role === 'EDITOR'");
+    expect(workspace).toContain("const isApproval = currentUser.role === 'ADMIN'");
+    expect(workspace).toContain('{canEdit && (');
+    expect(workspace).toContain("useState<ItemVisibility>('PRIVATE')");
+    expect(workspace).toContain('Nội bộ');
+    expect(workspace).toContain('Công khai');
   });
 
   it('secures routes and provides editorial preview', () => {
