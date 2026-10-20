@@ -12,28 +12,23 @@ vi.mock('@/actions/showcase-actions', () => ({
 const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file), 'utf8');
 
 describe('submission editor shell', () => {
-  it('uses one continuous academic form with three unnumbered sections', () => {
+  it('groups the abstract, contributors and section workspace with a shared preview', () => {
     const editor = read('src/components/submission/submission-editor.tsx');
     expect(editor).toContain('panel-detail');
-    expect(editor).toContain('lg:grid-cols-[minmax(0,7fr)_minmax(20rem,5fr)]');
-    expect(editor).toContain('lg:divide-x');
-    expect(editor).toContain('Thông tin cơ bản');
-    expect(editor).toContain('Tác giả và người đóng góp');
+    expect(editor).toContain('SectionEditor');
+    expect(editor).toContain('ArticleContent');
+    expect(editor).toContain('Xem trước');
+    expect(editor).toContain('ResourceEditor');
     expect(editor).toContain('Tài nguyên đính kèm');
-    expect(editor).toContain('Trình bày ngắn gọn vấn đề nghiên cứu, phương pháp và đóng góp chính.');
-    expect(editor).toContain('Thêm người tham gia và xác định vai trò.');
-    expect(editor).toContain('Bổ sung hình ảnh, PDF hoặc liên kết cần thiết.');
-    expect(editor).not.toContain('cho quá trình thẩm định');
-    expect(editor).not.toContain('panel-operational');
-    expect(editor).not.toMatch(/Bước\s*[123]|0[123]\./);
-    expect(editor).not.toMatch(/categoryId|layoutType|emoji/i);
+    expect(editor).toContain("role: 'CONTRIBUTOR'");
   });
 
-  it('uses compact contributor rows with member, external, and optional role flows', () => {
+  it('uses compact contributor rows with member, external, and free-text role flows', () => {
     const contributors = read('src/components/submission/contributor-editor.tsx');
     expect(contributors).toContain('Thêm thành viên CLB');
     expect(contributors).toContain('Thêm người bên ngoài');
-    expect(contributors).toContain('Vai trò chi tiết');
+    expect(contributors).toContain('customRoleTitle');
+    expect(contributors).not.toContain('<select');
     expect(contributors).toContain('panel-nested');
     expect(contributors).toContain('aria-label');
     expect(contributors).not.toContain('rounded-xl');
@@ -42,8 +37,9 @@ describe('submission editor shell', () => {
   it('adds one typed resource at a time with accessible file controls', () => {
     const resources = read('src/components/submission/resource-editor.tsx');
     expect(resources).toContain('Thêm tài nguyên');
-    expect(resources).toContain("add('IMAGE')");
     expect(resources).toContain("add('DOCUMENT')");
+    expect(resources).toContain('>Tệp</button>');
+    expect(resources).not.toContain('Tài liệu PDF');
     expect(resources).toContain("add('LINK')");
     expect(resources).toContain('type="file"');
     expect(resources).toContain('aria-label={`Xóa tài nguyên');
@@ -67,13 +63,13 @@ describe('submission editor shell', () => {
     expect(fields.match(/aria-required="true" required/g)).toHaveLength(2);
     expect(fields).toContain('Tiêu đề');
     expect(fields).toContain('Tóm tắt');
-    expect(fields).toContain('Gợi ý lĩnh vực');
+    expect(fields).not.toContain('Gợi ý lĩnh vực');
+    expect(fields).not.toContain('submission-custom-type');
   });
 
-  it('marks contributors as required for submission', () => {
-    const editor = read('src/components/submission/submission-editor.tsx');
-    expect(editor).toContain('Bắt buộc khi gửi');
-    expect(editor).toContain('aria-hidden="true">*</span>');
+  it('defaults the year to the current year while preserving an existing year', () => {
+    expect(createInitialSubmissionState({}).data.publishedYear).toBe(new Date().getFullYear());
+    expect(createInitialSubmissionState({ publishedYear: 2024 }).data.publishedYear).toBe(2024);
   });
 
   it('tracks title-only drafts and save state through the reducer', () => {
@@ -91,7 +87,7 @@ describe('submission editor shell', () => {
     expect(actions).toContain('Đang lưu…');
     expect(actions).toContain('Đã lưu');
     expect(actions).toContain('Lưu thất bại');
-    expect(actions).toContain('sm:sticky');
+    expect(actions).toContain('sticky bottom-0');
     expect(actions).not.toContain('fixed');
     expect(actions).toContain('action-secondary-detail');
     expect(actions).toContain('action-primary-detail');
