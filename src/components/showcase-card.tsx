@@ -1,3 +1,4 @@
+import { CardLink } from '@/components/card-link';
 import Link from 'next/link';
 import { ItemType, ItemScope } from '@prisma/client';
 import { TypeBadge } from '@/components/ui/badge';
@@ -31,11 +32,12 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
     .map((c) => c.user?.fullName || c.externalName)
     .filter(Boolean);
 
-  const primaryAuthor = authorNames[0] || 'Robotics & IoT Lab';
+  const primaryAuthor = authorNames[0] || 'CLB Robotics & IoT';
   const remainingCount = authorNames.length > 1 ? authorNames.length - 1 : 0;
 
   return (
-    <div className="panel-public group flex flex-col p-0 hover:shadow-sm hover:border-slate-300 transition-all duration-200 overflow-hidden">
+    <div className="clickable-card panel-public group flex flex-col p-0 hover:shadow-sm hover:border-slate-300 transition-all duration-200 overflow-hidden">
+      <CardLink slug={item.slug} />
       {/* Thumbnail Container */}
       <Link
         href={`/showcase/${item.slug}`}
@@ -51,10 +53,10 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
           />
         ) : (
           <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-            <div className="w-10 h-10 rounded-md bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1 border border-slate-200">
+            <div className="w-10 h-10 rounded-md bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-semibold mb-1 border border-slate-200">
               RI
             </div>
-            <span className="text-xs font-semibold text-slate-500">Robotics &amp; IoT Lab</span>
+            <span className="text-xs font-semibold text-slate-500">CLB Robotics &amp; IoT</span>
           </div>
         )}
 
@@ -71,14 +73,14 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
       <div className="p-4 sm:p-5 flex flex-col flex-1">
         <div className="flex items-center gap-2.5 text-xs text-slate-500 mb-2">
           {item.publishedYear && (
-            <span className="flex items-center gap-1 font-medium">
+            <span className="flex items-center gap-1 font-semibold">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
               {item.publishedYear}
             </span>
           )}
           {item.issuer && (
             <span
-              className="flex items-center gap-1 font-medium truncate max-w-[180px]"
+              className="flex items-center gap-1 font-semibold truncate max-w-[180px]"
               title={item.issuer}
             >
               <Building2 className="w-3.5 h-3.5 text-slate-400" />
@@ -88,7 +90,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
         </div>
 
         <Link href={`/showcase/${item.slug}`} className="block group-hover:text-[#0F294A] transition-colors">
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 group-hover:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2">
+          <h3 className="text-base sm:text-lg font-semibold text-slate-900 group-hover:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2">
             {item.title}
           </h3>
         </Link>
@@ -113,7 +115,7 @@ export function ShowcaseCard({ item }: ShowcaseCardProps) {
             <CitationModal item={item} triggerVariant="badge" />
             <Link
               href={`/showcase/${item.slug}`}
-              className="text-[#0F294A] text-xs font-bold hover:text-[#1E3A5F] inline-flex items-center gap-1 group/btn transition-colors"
+              className="text-[#0F294A] text-xs font-semibold hover:text-[#1E3A5F] inline-flex items-center gap-1 group/btn transition-colors"
             >
               <span>Xem</span>
               <ArrowRight className="w-3 h-3 group-hover/btn:translate-x-0.5 transition-transform" />

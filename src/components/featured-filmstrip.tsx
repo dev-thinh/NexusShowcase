@@ -62,14 +62,14 @@ export function FeaturedFilmstrip({ items }: FeaturedFilmstripProps) {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl mb-6">
         <div>
           <div className="min-w-0">
-            <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 block">
               TIÊU ĐIỂM HỌC THUẬT
             </span>
-            <h2 className="text-xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight">
+            <h2 className="text-xl sm:text-3xl font-semibold text-slate-900 tracking-tight leading-tight">
               Công Trình Nghiên Cứu &amp; Sáng Tạo Nổi Bật
             </h2>
-            <p className="text-xs sm:text-sm text-slate-600 truncate max-w-3xl mt-1 font-medium">
-              Công trình nghiên cứu khoa học và sáng tạo công nghệ tiêu biểu của Robotics &amp; IoT Lab.
+            <p className="text-xs sm:text-sm text-slate-600 truncate max-w-3xl mt-1 font-semibold">
+              Công trình nghiên cứu khoa học và sáng tạo công nghệ tiêu biểu của CLB Robotics &amp; IoT.
             </p>
           </div>
         </div>
@@ -121,7 +121,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
   const authorNames = item.contributors
     .map((c) => c.user?.fullName || c.externalName)
     .filter(Boolean);
-  const primaryAuthor = authorNames[0] || 'Robotics & IoT Lab';
+  const primaryAuthor = authorNames[0] || 'CLB Robotics & IoT';
   const remainingCount = authorNames.length > 1 ? authorNames.length - 1 : 0;
 
   return (
@@ -140,10 +140,10 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
           />
         ) : (
           <div className="w-full h-full bg-slate-50 flex flex-col items-center justify-center text-slate-400 p-4 text-center">
-            <div className="w-9 h-9 rounded-md bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-bold mb-1 border border-slate-200">
+            <div className="w-9 h-9 rounded-md bg-white shadow-2xs flex items-center justify-center text-[#0F294A] font-semibold mb-1 border border-slate-200">
               RI
             </div>
-            <span className="text-[11px] font-semibold text-slate-500">Robotics &amp; IoT Lab</span>
+            <span className="text-[11px] font-semibold text-slate-500">CLB Robotics &amp; IoT</span>
           </div>
         )}
 
@@ -155,12 +155,12 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
         {/* Pin or New Badge */}
         <div className="absolute top-2.5 right-2.5">
           {item.isPinned ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-amber-600 text-white shadow-2xs">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-[11px] font-semibold bg-amber-600 text-white shadow-2xs">
               <Pin className="w-3 h-3 fill-white" />
               <span>Được ghim</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-white/95 text-slate-700 shadow-2xs border border-slate-200">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-white/95 text-slate-700 shadow-2xs border border-slate-200">
               <span>Mới nhất</span>
             </span>
           )}
@@ -172,12 +172,12 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
         <div>
           {/* Metadata */}
           <div className="flex items-center gap-3 text-xs text-slate-500 mb-2">
-            <span className="flex items-center gap-1 font-medium">
+            <span className="flex items-center gap-1 font-semibold">
               <Calendar className="w-3.5 h-3.5 text-slate-400" />
               {item.publishedYear}
             </span>
             {item.issuer && (
-              <span className="flex items-center gap-1 font-medium truncate max-w-[190px]" title={item.issuer}>
+              <span className="flex items-center gap-1 font-semibold truncate max-w-[190px]" title={item.issuer}>
                 <Building2 className="w-3.5 h-3.5 text-slate-400" />
                 {item.issuer}
               </span>
@@ -185,7 +185,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
           </div>
 
           {/* Title */}
-          <h3 className="text-base font-bold text-slate-900 group-hover/card:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2">
+          <h3 className="text-base font-semibold text-slate-900 group-hover/card:text-[#0F294A] transition-colors line-clamp-2 leading-snug mb-2">
             {item.title}
           </h3>
 
@@ -205,7 +205,7 @@ function FilmstripCard({ item }: { item: FeaturedItemData }) {
             )}
           </div>
 
-          <span className="inline-flex items-center gap-1 text-xs font-bold text-[#0F294A] group-hover/card:translate-x-0.5 transition-transform">
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#0F294A] group-hover/card:translate-x-0.5 transition-transform">
             <span>Chi tiết</span>
             <ArrowUpRight className="w-3.5 h-3.5" />
           </span>
