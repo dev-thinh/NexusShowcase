@@ -23,7 +23,9 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env*.local
+!.env.example
 dev.db
 dev.db-journal
 
@@ -39,3 +41,6 @@ next-env.d.ts
 
 # local git worktrees
 .worktrees/
+
+# uploaded resource files
+/storage/resources/

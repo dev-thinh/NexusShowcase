@@ -4,32 +4,51 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🔄 Đang làm sạch và khởi tạo tài khoản quản trị duy nhất cho NexusShowcase...');
+  console.log('🔄 Đang kiểm tra và khởi tạo dữ liệu bootstrap cho NexusShowcase...');
 
-  // Xóa toàn bộ dữ liệu mock cũ
-  await prisma.itemAttachment.deleteMany();
-  await prisma.itemLink.deleteMany();
-  await prisma.itemContributor.deleteMany();
-  await prisma.itemTag.deleteMany();
-  await prisma.showcaseItem.deleteMany();
-  await prisma.tag.deleteMany();
-  await prisma.user.deleteMany();
+  if (process.env.RESET_DATABASE === 'true') {
+    console.log('⚠️ Cờ RESET_DATABASE được bật: Đang làm sạch dữ liệu cũ...');
+    await prisma.itemAttachment.deleteMany();
+    await prisma.itemLink.deleteMany();
+    await prisma.itemContributor.deleteMany();
+    await prisma.showcaseItem.deleteMany();
+    await prisma.user.deleteMany();
+  }
 
-  // Khởi tạo duy nhất 1 tài khoản Admin
-  const adminPasswordHash = await bcrypt.hash('admin123', 10);
+  const existingAdmin = await prisma.user.findFirst({
+    where: { role: 'ADMIN' },
+  });
+
+  if (existingAdmin) {
+    console.log(`ℹ️ Tài khoản Quản trị viên đã tồn tại (${existingAdmin.email}). Bỏ qua khởi tạo admin mới.`);
+    return;
+  }
+
+  const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim() || 'admin01';
+  const rawPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD?.trim();
+
+  if (!rawPassword) {
+    throw new Error(
+      'Vui lòng cấu hình biến môi trường BOOTSTRAP_ADMIN_PASSWORD để tạo tài khoản admin đầu tiên.'
+    );
+  }
+
+  const adminPasswordHash = await bcrypt.hash(rawPassword, 10);
 
   const admin = await prisma.user.create({
     data: {
-      email: 'admin01',
+      email,
       fullName: 'Quản Trị Viên Học Thuật (Admin)',
       passwordHash: adminPasswordHash,
       role: 'ADMIN',
       status: 'ACTIVE',
-      bio: 'Tài khoản Quản trị viên Phòng Lab Nghiên cứu Khoa học & CLB Nexus, Khoa CNTT - ĐH KHTN ĐHQG-HCM.',
+      mustChangePassword: false,
+      sessionVersion: 1,
+      bio: 'Tài khoản Quản trị viên CLB Nexus, Khoa CNTT - ĐH KHTN ĐHQG-HCM.',
     },
   });
 
-  console.log(`✅ Khởi tạo thành công tài khoản quản trị duy nhất: ${admin.email} (Mật khẩu: admin123)`);
+  console.log(`✅ Khởi tạo thành công tài khoản quản trị: ${admin.email}`);
 }
 
 main()

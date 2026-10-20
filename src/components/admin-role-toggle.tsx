@@ -4,15 +4,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { updateUserRoleAction } from '@/actions/admin-actions';
 import { Role } from '@prisma/client';
-import { Loader2, ArrowUpCircle, ArrowDownCircle, ShieldCheck } from 'lucide-react';
+import { Loader2, ArrowUpCircle, ArrowDownCircle, ShieldCheck, Shield } from 'lucide-react';
 import { Tooltip } from '@/components/ui/tooltip';
 
 export function AdminRoleToggle({
-  adminId,
   userId,
   currentRole,
 }: {
-  adminId: string;
   userId: string;
   currentRole: Role;
 }) {
@@ -22,16 +20,23 @@ export function AdminRoleToggle({
   const toggleCoreMember = async () => {
     const nextRole = currentRole === 'CORE_MEMBER' ? 'MEMBER' : 'CORE_MEMBER';
     setLoading(true);
-    await updateUserRoleAction(adminId, userId, nextRole);
+    await updateUserRoleAction(userId, nextRole);
+    setLoading(false);
+    router.refresh();
+  };
+
+  const setRole = async (newRole: Role) => {
+    setLoading(true);
+    await updateUserRoleAction(userId, newRole);
     setLoading(false);
     router.refresh();
   };
 
   if (currentRole === 'ADMIN') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold border border-amber-200">
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-amber-50 text-amber-800 text-xs font-semibold border border-amber-200">
         <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-        <span>Quản trị viên</span>
+        <span>Toàn quyền</span>
       </span>
     );
   }
@@ -43,10 +48,10 @@ export function AdminRoleToggle({
       <button
         disabled={loading}
         onClick={toggleCoreMember}
-        className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer disabled:opacity-50 ${
+        className={`inline-flex items-center gap-1.5 min-h-9 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] disabled:opacity-50 ${
           isCore
-            ? 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200'
-            : 'bg-[#0F294A] hover:bg-[#1E3A5F] text-white'
+            ? 'bg-white hover:bg-slate-50 text-slate-700 border border-slate-200'
+            : 'bg-brand-button hover:brightness-110 text-white'
         }`}
       >
         {loading ? (
@@ -56,7 +61,7 @@ export function AdminRoleToggle({
         ) : (
           <ArrowUpCircle className="w-3.5 h-3.5 text-white/80" />
         )}
-        <span>{isCore ? 'Hạ xuống Member' : 'Nâng lên CORE MEMBER'}</span>
+        <span>{isCore ? 'Thu quyền đăng bài' : 'Cấp quyền đăng bài'}</span>
       </button>
 
       <Tooltip

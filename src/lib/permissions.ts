@@ -15,6 +15,15 @@ export function canUserReview(user: UserSessionSubset | null | undefined): boole
   return user.role === 'ADMIN';
 }
 
+export function canUserEditPublication(user: UserSessionSubset | null | undefined): boolean {
+  return false;
+}
+
+export function canUserPublish(user: UserSessionSubset | null | undefined): boolean {
+  if (!user || !user.role) return false;
+  return user.role === 'ADMIN';
+}
+
 export function isMemberOrHigher(user: UserSessionSubset | null | undefined): boolean {
   if (!user || !user.role) return false;
   return user.role === 'ADMIN' || user.role === 'CORE_MEMBER' || user.role === 'MEMBER';

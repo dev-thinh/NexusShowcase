@@ -9,7 +9,6 @@ import {
   CitationItem,
 } from '@/lib/citation';
 import {
-  Quote,
   Copy,
   Check,
   Download,
@@ -57,10 +56,9 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
       {triggerVariant === 'badge' ? (
         <button
           onClick={() => setIsOpen(true)}
-          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-slate-700 bg-slate-100 hover:bg-[#0F294A] hover:text-white transition-all cursor-pointer border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20"
+          className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-[#0F294A] hover:text-white transition-all cursor-pointer border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20"
           title="Trích dẫn công trình này"
         >
-          <Quote className="w-3 h-3" />
           <span>Cite</span>
         </button>
       ) : (
@@ -68,10 +66,9 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
           onClick={() => setIsOpen(true)}
           className={
             className ||
-            'h-11 px-4 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-sm font-bold transition-all shadow-xs border border-transparent cursor-pointer inline-flex items-center justify-center gap-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20'
+            'h-11 px-4 rounded-xl bg-brand-button hover:brightness-110 text-white text-sm font-semibold transition-all shadow-xs border border-transparent cursor-pointer inline-flex items-center justify-center gap-2 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20'
           }
         >
-          <Quote className="w-4 h-4 text-slate-300 shrink-0" />
           <span>Trích dẫn khoa học (Cite)</span>
         </button>
       )}
@@ -90,9 +87,9 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
                 setActiveTab('bibtex');
                 setCopied(false);
               }}
-              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'bibtex'
-                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -103,9 +100,9 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
                 setActiveTab('apa');
                 setCopied(false);
               }}
-              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'apa'
-                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -116,9 +113,9 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
                 setActiveTab('ieee');
                 setCopied(false);
               }}
-              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'ieee'
-                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
+                  ? 'bg-white text-slate-900 shadow-2xs font-semibold'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
@@ -129,41 +126,41 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
           {/* Citation Preview Box */}
           <div className="relative">
             <div className="p-4 bg-slate-900 text-slate-100 rounded-xl font-mono text-[11px] leading-relaxed overflow-x-auto max-h-64 border border-slate-800 shadow-inner">
-              <pre className="whitespace-pre-wrap font-mono">{currentContent}</pre>
+              <pre className="text-left whitespace-pre-wrap font-mono">{currentContent}</pre>
             </div>
           </div>
 
           {/* Action Footer */}
-          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+          <div className="modal-footer">
             {activeTab === 'bibtex' && (
               <button
                 onClick={handleDownloadBib}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-200 text-slate-700 text-xs font-semibold hover:bg-slate-50 transition-colors cursor-pointer"
+                className="action-secondary-detail"
               >
-                <Download className="w-3.5 h-3.5 text-slate-500" />
+                <Download aria-hidden="true" className="w-3.5 h-3.5 text-slate-500" />
                 <span>Tải file .bib</span>
               </button>
             )}
 
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center justify-center gap-2">
               <button
                 onClick={() => setIsOpen(false)}
-                className="px-3.5 py-1.5 rounded-xl text-slate-600 text-xs font-medium hover:bg-slate-100 transition-colors cursor-pointer"
+                className="action-secondary-detail"
               >
                 Đóng
               </button>
               <button
                 onClick={handleCopy}
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs cursor-pointer"
+                className="action-primary-detail"
               >
                 {copied ? (
                   <>
-                    <Check className="w-3.5 h-3.5 text-emerald-300" />
+                    <Check aria-hidden="true" className="w-3.5 h-3.5 text-emerald-300" />
                     <span>Đã sao chép!</span>
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-white/80" />
+                    <Copy aria-hidden="true" className="w-3.5 h-3.5 text-white/80" />
                     <span>Sao chép {activeTab.toUpperCase()}</span>
                   </>
                 )}

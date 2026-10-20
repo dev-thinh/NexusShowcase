@@ -1,6 +1,5 @@
 import Link from 'next/link';
-import { auth } from '@/lib/auth';
-import { GraduationCap } from 'lucide-react';
+import { getSession as auth } from '@/lib/session';
 import { NavbarNav } from '@/components/navbar-nav';
 
 export async function Navbar() {
@@ -9,23 +8,34 @@ export async function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 transition-all shadow-2xs w-full">
-      <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-10 h-16 flex items-center justify-between">
+      <div className="relative w-full px-4 sm:px-6 lg:px-8 xl:px-10 min-h-16 py-3 xl:py-0 gap-y-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center">
         {/* Góc trên bên trái: Brand Logo & Tên */}
-        <div className="flex items-center shrink-0">
+        <div className="col-start-1 row-start-1 col-span-2 xl:col-span-1 max-xl:pr-3 flex items-center justify-self-start min-w-0">
           <Link
             href="/"
-            className="flex items-center gap-3 group rounded-xl p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
-            aria-label="Trang chủ NexusShowcase"
+            className="min-w-0 flex items-center gap-3 group rounded-xl p-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
+            aria-label="Trang chủ CLB Robotics & IoT"
           >
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0F294A] flex items-center justify-center text-white font-black text-lg shadow-xs group-hover:bg-[#1E3A5F] transition-colors shrink-0">
-              <GraduationCap className="w-5 h-5 text-blue-200" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-base sm:text-lg tracking-tight text-slate-900 group-hover:text-[#0F294A] transition-colors leading-tight font-serif">
-                NexusShowcase
+            <span
+              aria-hidden="true"
+              className="h-9 w-6 shrink-0 bg-brand-button sm:h-10 sm:w-7"
+              style={{
+                maskImage: 'url(/logo.svg)',
+                maskSize: 'contain',
+                maskPosition: 'center',
+                maskRepeat: 'no-repeat',
+                WebkitMaskImage: 'url(/logo.svg)',
+                WebkitMaskSize: 'contain',
+                WebkitMaskPosition: 'center',
+                WebkitMaskRepeat: 'no-repeat',
+              }}
+            />
+            <div className="flex min-w-0 flex-col gap-0.5">
+              <span className="truncate font-semibold text-base sm:text-lg tracking-tight text-slate-900 group-hover:text-[#0F294A] transition-colors leading-tight">
+                CLB Robotics &amp; IoT
               </span>
-              <span className="text-[10px] font-bold text-slate-500 tracking-wider uppercase hidden sm:block">
-                Khoa CNTT • ĐH Khoa Học Tự Nhiên
+              <span className="block text-xs font-semibold uppercase leading-tight tracking-normal text-slate-500">
+                Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
               </span>
             </div>
           </Link>

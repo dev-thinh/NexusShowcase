@@ -1,9 +1,29 @@
 import type { Metadata } from 'next';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { PageReveal } from '@/components/page-reveal';
+import { DialogProvider } from '@/components/dialog-provider';
+import { NavigationTransitionProvider } from '@/components/navigation-transition';
+import { ImeInputSupport } from '@/components/ime-input-support';
+
+const inter = Inter({
+  subsets: ['latin', 'vietnamese'],
+  weight: ['400', '600'],
+  style: ['normal', 'italic'],
+  variable: '--font-sans',
+  display: 'swap',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  weight: ['400', '600'],
+  variable: '--font-mono',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  title: 'NexusShowcase - Academic Club Portfolio',
-  description: 'Trưng bày bài báo khoa học, dự án công nghệ và thành tích CLB',
+  title: 'CLB Robotics & IoT - Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM',
+  description: 'Trưng bày công trình nghiên cứu khoa học, dự án công nghệ và sản phẩm Robotics & IoT',
 };
 
 export default function RootLayout({
@@ -12,17 +32,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
-        />
-      </head>
-      <body className="min-h-screen text-slate-900 antialiased selection:bg-blue-100 selection:text-blue-900">
-        {children}
+    <html lang="vi" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className={`${inter.className} min-h-screen text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900`}>
+        <NavigationTransitionProvider>
+          <DialogProvider>
+            <ImeInputSupport />
+            <PageReveal />
+            {children}
+          </DialogProvider>
+        </NavigationTransitionProvider>
       </body>
     </html>
   );

@@ -7,8 +7,13 @@ export async function POST(req: NextRequest) {
     const result = await uploadFileAction(formData);
 
     if (!result.success) {
-      const isForbidden = result.error?.includes('quyền');
-      return NextResponse.json({ error: result.error }, { status: isForbidden ? 403 : 400 });
+      const status =
+        result.code === 'UNAUTHORIZED'
+          ? 403
+          : result.code === 'UPLOAD_FAILED'
+          ? 500
+          : 400;
+      return NextResponse.json({ error: result.error, code: result.code }, { status });
     }
 
     return NextResponse.json({
@@ -18,6 +23,6 @@ export async function POST(req: NextRequest) {
       mimeType: result.mimeType,
     });
   } catch (err: any) {
-    return NextResponse.json({ error: 'Lỗi xử lý tệp tin tải lên.' }, { status: 500 });
+    return NextResponse.json({ error: 'Lỗi xử lý tệp tin tải lên.', code: 'UPLOAD_FAILED' }, { status: 500 });
   }
 }

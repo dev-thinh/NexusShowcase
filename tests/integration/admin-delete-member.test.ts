@@ -1,6 +1,23 @@
-import { describe, it, expect, beforeAll } from 'vitest';
+import { describe, it, expect, beforeAll, vi } from 'vitest';
 import { prisma } from '@/lib/prisma';
 import { createMemberAction, deleteMemberAction } from '@/actions/admin-actions';
+
+const currentUserMock = vi.hoisted(() => ({
+  actor: null as {
+    id: string;
+    fullName: string;
+    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
+    status: 'ACTIVE';
+  } | null,
+}));
+
+vi.mock('@/lib/current-user', () => ({
+  getCurrentUser: vi.fn(async (allowedRoles?: string[]) => {
+    const actor = currentUserMock.actor;
+    if (!actor || (allowedRoles && !allowedRoles.includes(actor.role))) return null;
+    return actor;
+  }),
+}));
 
 describe('Admin Delete Member Action', () => {
   let adminUser: any;
@@ -10,7 +27,8 @@ describe('Admin Delete Member Action', () => {
     adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
     if (!adminUser) throw new Error('No admin user found');
 
-    const created = await createMemberAction(adminUser.id, {
+    currentUserMock.actor = adminUser;
+    const created = await createMemberAction({
       fullName: 'Nguyễn Sinh Viên Xóa',
       email: `delete-test-${Date.now()}@student.hcmus.edu.vn`,
       role: 'MEMBER',
@@ -20,18 +38,26 @@ describe('Admin Delete Member Action', () => {
 
   it('should reject deletion if caller is not an ADMIN', async () => {
     const fakeNonAdminId = 'non-admin-id';
-    const res = await deleteMemberAction(fakeNonAdminId, testMember.id);
+    currentUserMock.actor = {
+      id: fakeNonAdminId,
+      fullName: 'Non-admin member',
+      role: 'MEMBER',
+      status: 'ACTIVE',
+    };
+    const res = await deleteMemberAction(testMember.id);
     expect(res.success).toBe(false);
     expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
   });
 
   it('should prevent admin from deleting their own account', async () => {
-    const res = await deleteMemberAction(adminUser.id, adminUser.id);
+    currentUserMock.actor = adminUser;
+    const res = await deleteMemberAction(adminUser.id);
     expect(res.success).toBe(false);
     expect(res.error).toContain('Quản trị viên không thể tự xóa tài khoản của chính mình');
   });
 
   it('should prevent deleting another ADMIN account', async () => {
+    currentUserMock.actor = adminUser;
     // create a temporary second admin to test
     const tempAdmin = await prisma.user.create({
       data: {
@@ -42,20 +68,25 @@ describe('Admin Delete Member Action', () => {
       },
     });
 
-    const res = await deleteMemberAction(adminUser.id, tempAdmin.id);
+    const res = await deleteMemberAction(tempAdmin.id);
     expect(res.success).toBe(false);
     expect(res.error).toContain('Không thể xóa tài khoản Quản trị viên');
 
     await prisma.user.delete({ where: { id: tempAdmin.id } });
   });
 
-  it('should successfully delete a regular or core member', async () => {
-    const res = await deleteMemberAction(adminUser.id, testMember.id);
+  it('should suspend a regular or core member and revoke existing sessions', async () => {
+    currentUserMock.actor = adminUser;
+    const res = await deleteMemberAction(testMember.id);
     expect(res.success).toBe(true);
     expect(res.message).toContain('thành công');
 
-    // Verify user no longer exists in database
+    // The record remains for attribution and audit history.
     const found = await prisma.user.findUnique({ where: { id: testMember.id } });
-    expect(found).toBeNull();
+    expect(found?.status).toBe('SUSPENDED');
+    expect(found?.deletedAt).not.toBeNull();
+    expect(found?.sessionVersion).toBeGreaterThan(1);
+
+    await prisma.user.delete({ where: { id: testMember.id } });
   });
 });

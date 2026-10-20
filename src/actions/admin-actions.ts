@@ -1,23 +1,35 @@
 'use server';
 
 import { prisma } from '@/lib/prisma';
-import { canUserReview } from '@/lib/permissions';
+import { getCurrentUser } from '@/lib/current-user';
 import { Role } from '@prisma/client';
+import {
+  createMemberInputSchema,
+  deleteMemberInputSchema,
+  INVALID_ACTION_INPUT_ERROR,
+  userRoleUpdateInputSchema,
+  type CreateMemberInput,
+} from '@/lib/action-schemas';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 
-export interface CreateMemberInput {
-  fullName: string;
-  email: string;
-  studentId?: string;
-  role?: 'MEMBER' | 'CORE_MEMBER';
-  password?: string;
+export type { CreateMemberInput };
+
+function toSafeMember(user: { id: string; fullName: string; role: Role; status: string }) {
+  return { id: user.id, fullName: user.fullName, role: user.role, status: user.status };
 }
 
-export async function createMemberAction(adminId: string, input: CreateMemberInput) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+export async function createMemberAction(input: CreateMemberInput) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền tạo tài khoản thành viên.' };
   }
+
+  const parsedInput = createMemberInputSchema.safeParse(input);
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  input = parsedInput.data;
 
   if (!input.fullName?.trim()) {
     return { success: false, error: 'Vui lòng nhập họ và tên của thành viên.' };
@@ -41,7 +53,7 @@ export async function createMemberAction(adminId: string, input: CreateMemberInp
     return { success: false, error: `Tài khoản hoặc email "${emailTrimmed}" đã tồn tại trong hệ thống.` };
   }
 
-  const rawPassword = input.password?.trim() || 'member123';
+  const rawPassword = input.password?.trim() || crypto.randomBytes(12).toString('base64url');
   if (rawPassword.length < 6) {
     return { success: false, error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.' };
   }
@@ -55,33 +67,53 @@ export async function createMemberAction(adminId: string, input: CreateMemberInp
       role: input.role || 'MEMBER',
       status: 'ACTIVE',
       passwordHash,
+      mustChangePassword: true,
+      sessionVersion: 1,
     },
+    select: { id: true, fullName: true, role: true, status: true },
   });
 
-  return { success: true, user: newUser };
+  return { success: true, user: toSafeMember(newUser), temporaryPassword: rawPassword };
 }
 
-export async function updateUserRoleAction(adminId: string, targetUserId: string, newRole: Role) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+export async function updateUserRoleAction(targetUserId: string, newRole: Role) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền phân quyền thành viên.' };
   }
 
+  const parsedInput = userRoleUpdateInputSchema.safeParse({ targetUserId, newRole });
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  targetUserId = parsedInput.data.targetUserId;
+  newRole = parsedInput.data.newRole;
+
   const updatedUser = await prisma.user.update({
     where: { id: targetUserId },
-    data: { role: newRole },
+    data: {
+      role: newRole,
+      sessionVersion: { increment: 1 },
+    },
+    select: { id: true, fullName: true, role: true, status: true },
   });
 
-  return { success: true, user: updatedUser };
+  return { success: true, user: toSafeMember(updatedUser) };
 }
 
-export async function deleteMemberAction(adminId: string, targetUserId: string) {
-  const admin = await prisma.user.findUnique({ where: { id: adminId } });
-  if (!admin || !canUserReview(admin)) {
+export async function deleteMemberAction(targetUserId: string) {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền xóa tài khoản thành viên.' };
   }
 
-  if (adminId === targetUserId) {
+  const parsedInput = deleteMemberInputSchema.safeParse({ targetUserId });
+  if (!parsedInput.success) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+  targetUserId = parsedInput.data.targetUserId;
+
+  if (admin.id === targetUserId) {
     return { success: false, error: 'Quản trị viên không thể tự xóa tài khoản của chính mình.' };
   }
 
@@ -97,12 +129,17 @@ export async function deleteMemberAction(adminId: string, targetUserId: string) 
     return { success: false, error: 'Không thể xóa tài khoản Quản trị viên của hệ thống.' };
   }
 
-  await prisma.user.delete({
+  await prisma.user.update({
     where: { id: targetUserId },
+    data: {
+      status: 'SUSPENDED',
+      deletedAt: new Date(),
+      sessionVersion: { increment: 1 },
+    },
   });
 
   return {
     success: true,
-    message: `Đã xóa tài khoản "${targetUser.fullName}" thành công.`,
+    message: `Đã vô hiệu hóa tài khoản "${targetUser.fullName}" thành công.`,
   };
 }

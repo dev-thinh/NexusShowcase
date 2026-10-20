@@ -1,138 +1,26 @@
-import { auth } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import Link from 'next/link';
+import { getCurrentUser } from '@/lib/current-user';
 import { prisma } from '@/lib/prisma';
+import { pendingReviewWhere, getReviewSnapshot } from '@/lib/direct-review';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
-import { AdminReviewButton } from '@/components/admin-review-button';
-import { TypeBadge } from '@/components/ui/badge';
 import { EmptyState } from '@/components/ui/empty-state';
-import Link from 'next/link';
-import {
-  ArrowLeft,
-  CheckCircle2,
-  User,
-  Users,
-  Calendar,
-  Eye,
-} from 'lucide-react';
+import { CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default async function AdminReviewsPage() {
-  const session = await auth();
-  if (!session?.user || !session.user.id) {
-    redirect('/login');
-  }
-  if ((session.user as any).role !== 'ADMIN') {
-    redirect('/');
-  }
-  const adminId = session.user.id;
-
-  const pendingItems = await prisma.showcaseItem.findMany({
-    where: { status: 'PENDING_REVIEW' },
-    include: {
-      creator: true,
-      contributors: {
-        include: { user: true },
-        orderBy: { displayOrder: 'asc' },
-      },
-    },
-    orderBy: { createdAt: 'desc' },
-  });
-
-  return (
-    <div className="min-h-screen flex flex-col font-sans">
-      <Navbar />
-
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0F294A] mb-6 transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>Quay lại bàn làm việc</span>
-        </Link>
-
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight font-serif">
-              Duyệt bài đăng công trình
-            </h1>
-            <p className="text-sm text-slate-600 mt-1">
-              Danh sách các công trình do sinh viên gửi lên đang chờ xét duyệt xuất bản.
-            </p>
-          </div>
-          <span className="text-sm font-bold px-3.5 py-1.5 rounded-full bg-amber-50 text-amber-800 border border-amber-200 self-start sm:self-center">
-            {pendingItems.length} bài chờ duyệt
-          </span>
-        </div>
-
-        {pendingItems.length === 0 ? (
-          <EmptyState
-            icon={CheckCircle2}
-            title="Không có bài đăng nào cần duyệt"
-            description="Tất cả các bài nộp từ sinh viên đã được thẩm định và xử lý xong."
-            actionLabel="Quay lại bàn làm việc"
-            actionHref="/admin"
-          />
-        ) : (
-          <div className="space-y-4">
-            {pendingItems.map((item) => (
-              <div
-                key={item.id}
-                className="p-6 bg-white rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-[#0F294A]/30 transition-colors"
-              >
-                <div className="flex-1 min-w-0">
-                  <div className="flex flex-wrap items-center gap-2 mb-2">
-                    <TypeBadge type={item.type} size="sm" />
-                    <span className="text-xs sm:text-sm text-slate-500 font-medium flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      {item.publishedYear}
-                    </span>
-                    <span className="text-xs sm:text-sm text-slate-600 font-semibold bg-slate-100 px-2.5 py-0.5 rounded-md flex items-center gap-1 border border-slate-200">
-                      <User className="w-3.5 h-3.5 text-slate-400" />
-                      Người nộp: {item.creator.fullName}
-                    </span>
-                  </div>
-
-                  <Link
-                    href={`/showcase/${item.slug}`}
-                    className="group/title block focus-visible:outline-none"
-                  >
-                    <h2 className="text-lg sm:text-xl font-bold text-slate-900 group-hover/title:text-[#0F294A] group-hover/title:underline leading-snug font-serif transition-colors">
-                      {item.title}
-                    </h2>
-                  </Link>
-                  <p className="text-sm text-slate-600 mt-1.5 line-clamp-2 leading-relaxed">
-                    {item.summary}
-                  </p>
-
-                  <div className="text-xs sm:text-sm text-slate-500 mt-4 pt-3 border-t border-slate-100 flex items-center gap-2">
-                    <Users className="w-4 h-4 text-[#0F294A] shrink-0" />
-                    <strong className="text-slate-700">Tác giả:</strong>
-                    <span className="truncate">
-                      {item.contributors
-                        .map((c) => c.user?.fullName || c.externalName)
-                        .join(', ')}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="shrink-0 flex flex-wrap items-center gap-2.5">
-                  <Link
-                    href={`/showcase/${item.slug}`}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 hover:border-[#0F294A] text-slate-700 hover:text-[#0F294A] bg-white hover:bg-slate-50 text-xs font-bold transition-all shadow-2xs"
-                  >
-                    <Eye className="w-4 h-4 text-slate-500" />
-                    <span>Xem chi tiết</span>
-                  </Link>
-                  <AdminReviewButton adminId={adminId} itemId={item.id} />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </main>
-
-      <AcademicFooter />
-    </div>
-  );
+  if (!await getCurrentUser(['ADMIN'])) redirect('/login?callbackUrl=/admin/reviews');
+  const items = await prisma.showcaseItem.findMany({ where: pendingReviewWhere, include: {
+    creator: { select: { fullName: true } },
+    contributors: { include: { user: { select: { fullName: true } } }, orderBy: { displayOrder: 'asc' } }, links: true, attachments: true,
+    revisions: { orderBy: { revisionNumber: 'desc' }, take: 1 }, editorialDraft: true,
+  }, orderBy: { updatedAt: 'asc' } });
+  return <div className="min-h-screen flex flex-col"><Navbar /><main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+    <Link href="/admin" className="text-sm text-slate-500 hover:text-[#0F294A]">← Bàn làm việc quản trị</Link>
+    <header className="my-6 border-b border-slate-200 pb-5"><h1 className="text-3xl font-semibold text-[#0F294A]">Phê duyệt bài đăng</h1><p className="mt-2 text-sm text-slate-600">{items.length} bản nộp chờ duyệt. Xem nội dung và quyết định xuất bản, yêu cầu sửa hoặc từ chối.</p></header>
+    {!items.length ? <EmptyState icon={CheckCircle2} title="Không có bài chờ duyệt" description="Các bản nộp đã được xử lý." /> : <div className="panel-operational divide-y divide-slate-200 !p-0">{items.map(item => {
+      const snapshot = getReviewSnapshot(item);
+      return <div key={item.id} className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center sm:p-6"><div className="min-w-0"><p className="mb-2 text-xs font-semibold text-amber-700">{item.status === 'PUBLISHED' ? 'Bản cập nhật · Bài hiện tại vẫn đang hiển thị' : 'Chờ duyệt'}</p><Link href={`/admin/reviews/${item.id}`} className="break-words text-lg font-semibold text-[#0F294A] hover:underline">{snapshot.title}</Link><p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600">{snapshot.summary}</p><p className="mt-2 text-xs text-slate-500">Người nộp: {item.creator.fullName} · {snapshot.publishedYear}</p></div><Link href={`/admin/reviews/${item.id}`} className="action-primary-detail min-h-11 shrink-0">Xem và duyệt<ArrowRight aria-hidden="true" className="h-4 w-4" /></Link></div>;
+    })}</div>}
+  </main><AcademicFooter /></div>;
 }

@@ -1,207 +1,39 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Role } from '@prisma/client';
+import Link from 'next/link';
+import type { Role } from '@prisma/client';
 import { AdminRoleToggle } from '@/components/admin-role-toggle';
 import { AdminDeleteMemberModal } from '@/components/admin-delete-member-modal';
 import { Search, ShieldCheck, UserCheck, User, X } from 'lucide-react';
 
-interface MemberItem {
-  id: string;
-  fullName: string;
-  email: string;
-  role: Role;
-  studentId: string | null;
-  createdAt: Date | string;
-}
+interface MemberItem { id: string; fullName: string; role: Role; createdAt: Date | string }
+const roleNames: Record<Role, string> = { ADMIN: 'Quản trị viên', CORE_MEMBER: 'Thành viên nòng cốt', MEMBER: 'Thành viên', EDITOR: 'Thành viên', GUEST: 'Khách' };
+const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLocaleLowerCase('vi');
 
-interface AdminMemberTableProps {
-  adminId: string;
-  members: MemberItem[];
-}
-
-export function AdminMemberTable({ adminId, members }: AdminMemberTableProps) {
+export function AdminMemberTable({ members }: { members: MemberItem[] }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<'ALL' | Role>('ALL');
-
-  const filteredMembers = useMemo(() => {
-    return members.filter((member) => {
-      // Role filter
-      if (roleFilter !== 'ALL' && member.role !== roleFilter) {
-        return false;
-      }
-
-      // Search query
-      if (searchQuery.trim()) {
-        const query = searchQuery.trim().toLowerCase();
-        const matchName = member.fullName.toLowerCase().includes(query);
-        const matchEmail = member.email.toLowerCase().includes(query);
-        const matchMSSV = member.studentId?.toLowerCase().includes(query) || false;
-        return matchName || matchEmail || matchMSSV;
-      }
-
-      return true;
-    });
-  }, [members, searchQuery, roleFilter]);
-
-  const counts = useMemo(() => {
-    return {
-      all: members.length,
-      core: members.filter((m) => m.role === 'CORE_MEMBER').length,
-      regular: members.filter((m) => m.role === 'MEMBER').length,
-      admin: members.filter((m) => m.role === 'ADMIN').length,
-    };
-  }, [members]);
-
-  return (
-    <div className="space-y-4">
-      {/* Search & Filter Toolbar */}
-      <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
-        {/* Search Input */}
-        <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tìm theo họ tên, email, MSSV..."
-            className="w-full pl-10 pr-9 py-2.5 rounded-xl bg-white border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-all placeholder:text-slate-400 shadow-2xs"
-          />
-          {searchQuery && (
-            <button
-              onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 rounded-full cursor-pointer"
-              aria-label="Xóa từ khóa tìm kiếm"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-
-        {/* Role Filter Tabs */}
-        <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/80 self-start sm:self-auto text-xs sm:text-sm font-semibold overflow-x-auto max-w-full">
-          <button
-            onClick={() => setRoleFilter('ALL')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-              roleFilter === 'ALL'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Tất cả ({counts.all})
-          </button>
-          <button
-            onClick={() => setRoleFilter('CORE_MEMBER')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-              roleFilter === 'CORE_MEMBER'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            CORE MEMBER ({counts.core})
-          </button>
-          <button
-            onClick={() => setRoleFilter('MEMBER')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-              roleFilter === 'MEMBER'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Member ({counts.regular})
-          </button>
-          <button
-            onClick={() => setRoleFilter('ADMIN')}
-            className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-              roleFilter === 'ADMIN'
-                ? 'bg-white text-slate-900 shadow-2xs font-bold border border-slate-200/60'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            Admin ({counts.admin})
-          </button>
-        </div>
+  const filteredMembers = useMemo(() => members.filter(member => (roleFilter === 'ALL' || member.role === roleFilter) && normalize(member.fullName).includes(normalize(searchQuery.trim()))), [members, searchQuery, roleFilter]);
+  const filters = [
+    { value: 'ALL' as const, label: 'Tất cả', count: members.length },
+    { value: 'CORE_MEMBER' as const, label: 'Nòng cốt', count: members.filter(member => member.role === 'CORE_MEMBER').length },
+    { value: 'MEMBER' as const, label: 'Thành viên', count: members.filter(member => member.role === 'MEMBER').length },
+    { value: 'ADMIN' as const, label: 'Quản trị viên', count: members.filter(member => member.role === 'ADMIN').length },
+  ];
+  return <section className="panel-operational min-w-0 !p-0 !shadow-none" aria-label="Danh sách thành viên">
+    <div className="space-y-4 border-b border-slate-200 p-4 sm:p-5">
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><h2 className="text-lg font-semibold text-[#0F294A]">Thành viên <span className="ml-1 text-sm font-normal text-slate-500">{members.length}</span></h2>
+        <div className="relative w-full sm:max-w-xs"><Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><label htmlFor="admin-member-search" className="sr-only">Tìm thành viên theo họ tên</label><input id="admin-member-search" type="search" value={searchQuery} onChange={event => setSearchQuery(event.target.value)} placeholder="Tìm theo họ tên…" className="min-h-10 w-full rounded-md border border-slate-300 bg-white py-2 pl-9 pr-10 text-sm outline-none focus:border-[#0F294A] focus:ring-2 focus:ring-[#0F294A]/10" />{searchQuery && <button type="button" onClick={() => setSearchQuery('')} aria-label="Xóa từ khóa tìm kiếm" className="absolute right-1 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded text-slate-500 hover:bg-slate-100"><X aria-hidden="true" className="h-4 w-4" /></button>}</div>
       </div>
-
-      {/* Member Table */}
-      <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-xs">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wider">
-              <tr>
-                <th className="px-6 py-4">Thành viên</th>
-                <th className="px-6 py-4">Email / Tên đăng nhập</th>
-                <th className="px-6 py-4">Vai trò</th>
-                <th className="px-6 py-4 text-right">Thao tác quản trị</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredMembers.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="px-6 py-12 text-center text-slate-400">
-                    Không tìm thấy thành viên nào phù hợp với điều kiện tìm kiếm.
-                  </td>
-                </tr>
-              ) : (
-                filteredMembers.map((member) => (
-                  <tr key={member.id} className="hover:bg-slate-50/70 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-[#0F294A]/10 text-[#0F294A] font-extrabold flex items-center justify-center text-sm">
-                          {member.fullName.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="font-bold text-slate-900 text-sm sm:text-base">{member.fullName}</div>
-                          {member.studentId && (
-                            <div className="text-xs text-slate-500 font-medium">
-                              MSSV: {member.studentId}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-
-                    <td className="px-6 py-4 text-slate-600 font-mono text-xs sm:text-sm">
-                      {member.email}
-                    </td>
-
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-bold border ${
-                          member.role === 'ADMIN'
-                            ? 'bg-amber-50 text-amber-800 border-amber-200'
-                            : member.role === 'CORE_MEMBER'
-                            ? 'bg-blue-50 text-blue-800 border-blue-200'
-                            : 'bg-slate-100 text-slate-700 border-slate-200'
-                        }`}
-                      >
-                        {member.role === 'ADMIN' && <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />}
-                        {member.role === 'CORE_MEMBER' && <UserCheck className="w-3.5 h-3.5 text-blue-600" />}
-                        {member.role === 'MEMBER' && <User className="w-3.5 h-3.5 text-slate-500" />}
-                        <span>{member.role === 'CORE_MEMBER' ? 'CORE MEMBER' : member.role}</span>
-                      </span>
-                    </td>
-
-                    <td className="px-6 py-4 text-right">
-                      <div className="inline-flex items-center justify-end gap-2">
-                        <AdminRoleToggle
-                          adminId={adminId}
-                          userId={member.id}
-                          currentRole={member.role}
-                        />
-                        <AdminDeleteMemberModal
-                          adminId={adminId}
-                          member={member}
-                        />
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <div className="flex max-w-full gap-1 overflow-x-auto" role="group" aria-label="Lọc theo vai trò">{filters.map(filter => <button key={filter.value} type="button" aria-pressed={roleFilter === filter.value} onClick={() => setRoleFilter(filter.value)} className={`inline-flex min-h-9 shrink-0 items-center gap-2 rounded-md px-3 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#0F294A] ${roleFilter === filter.value ? 'bg-blue-50 text-[#0F294A]' : 'text-slate-500 hover:bg-slate-50 hover:text-slate-900'}`}>{filter.label}<span className="tabular-nums opacity-70">{filter.count}</span></button>)}</div>
     </div>
-  );
+    <div aria-hidden="true" className="hidden grid-cols-[minmax(0,1fr)_12rem_minmax(16rem,auto)] gap-4 border-b border-slate-200 bg-slate-50 px-5 py-3 text-xs font-semibold text-slate-500 lg:grid"><span>Thành viên</span><span>Vai trò</span><span className="text-right">Thao tác</span></div>
+    {!filteredMembers.length ? <div className="px-4 py-10 text-center"><p className="text-sm font-semibold text-slate-700">Không tìm thấy thành viên</p><button type="button" onClick={() => { setSearchQuery(''); setRoleFilter('ALL'); }} className="mt-3 text-sm font-semibold text-[#0F294A] hover:underline">Xóa bộ lọc</button></div> : <ul className="divide-y divide-slate-200">{filteredMembers.map(member => <li key={member.id} className="grid min-w-0 gap-3 p-4 transition-colors hover:bg-slate-50/60 sm:p-5 lg:grid-cols-[minmax(0,1fr)_12rem_minmax(16rem,auto)] lg:items-center lg:gap-4">
+      <div className="flex min-w-0 items-center gap-3"><span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-slate-100 text-sm font-semibold text-[#0F294A]">{member.fullName.charAt(0)}</span><div className="min-w-0"><Link href={`/members/${member.id}`} className="break-words text-sm font-semibold text-slate-900 hover:text-[#0F294A] hover:underline">{member.fullName}</Link><p className="mt-1 text-xs text-slate-500">Tham gia {new Date(member.createdAt).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })}</p></div></div>
+      <span className={`inline-flex w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-semibold ${member.role === 'ADMIN' ? 'border-slate-200 bg-slate-100 text-slate-700' : member.role === 'CORE_MEMBER' ? 'border-blue-100 bg-blue-50 text-blue-800' : 'border-slate-200 bg-white text-slate-600'}`}>{member.role === 'ADMIN' ? <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" /> : member.role === 'CORE_MEMBER' ? <UserCheck aria-hidden="true" className="h-3.5 w-3.5" /> : <User aria-hidden="true" className="h-3.5 w-3.5" />}{roleNames[member.role]}</span>
+      <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3 lg:justify-end lg:border-0 lg:pt-0"><AdminRoleToggle userId={member.id} currentRole={member.role} /><AdminDeleteMemberModal member={member} /></div>
+    </li>)}</ul>}
+    <p aria-live="polite" className="border-t border-slate-200 px-4 py-3 text-xs text-slate-500 sm:px-5">Hiển thị {filteredMembers.length} / {members.length} thành viên</p>
+  </section>;
 }

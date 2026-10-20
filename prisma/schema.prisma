@@ -11,6 +11,7 @@ enum Role {
   GUEST
   MEMBER
   CORE_MEMBER
+  EDITOR
   ADMIN
 }
 
@@ -36,8 +37,54 @@ enum ItemScope {
 enum ItemStatus {
   DRAFT
   PENDING_REVIEW
+  REVISION_REQUESTED
+  READY_FOR_APPROVAL
   PUBLISHED
   REJECTED
+  ARCHIVED
+}
+
+enum ReviewAudience {
+  EDITORIAL
+  AUTHOR
+}
+
+enum ReviewSeverity {
+  REQUIRED
+  SUGGESTION
+}
+
+enum ReviewCommentStatus {
+  OPEN
+  RESOLVED
+}
+
+enum ItemVisibility {
+  PUBLIC
+  PRIVATE
+}
+
+enum CategoryLayout {
+  SHOWCASE_GRID
+  BIBLIOGRAPHY
+  DATA_CATALOG
+  HONOR_ROLL
+}
+
+model Category {
+  id            String         @id @default(cuid())
+  name          String         @unique
+  slug          String         @unique
+  description   String?
+  layoutType    CategoryLayout @default(SHOWCASE_GRID)
+  isNavFeatured Boolean        @default(false)
+  displayOrder  Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  items ShowcaseItem[]
+
+  @@map("categories")
 }
 
 enum ContributorRole {
@@ -62,76 +109,165 @@ enum LinkType {
 }
 
 model User {
-  id               String          @id @default(cuid())
-  email            String          @unique
-  passwordHash     String?
-  fullName         String
-  studentId        String?
-  avatarUrl        String?
-  bio              String?
-  githubUrl        String?
-  linkedinUrl      String?
-  googleScholarUrl String?
-  portfolioUrl     String?
-  role             Role            @default(GUEST)
-  status           UserStatus      @default(PENDING)
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  id                 String     @id @default(cuid())
+  email              String     @unique
+  passwordHash       String?
+  fullName           String
+  studentId          String?
+  avatarUrl          String?
+  bio                String?
+  githubUrl          String?
+  linkedinUrl        String?
+  googleScholarUrl   String?
+  portfolioUrl       String?
+  role               Role       @default(GUEST)
+  status             UserStatus @default(PENDING)
+  mustChangePassword Boolean    @default(false)
+  sessionVersion     Int        @default(1)
+  deletedAt          DateTime?
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
 
-  createdItems     ShowcaseItem[]  @relation("CreatedByUser")
-  contributions    ItemContributor[]
+  createdItems            ShowcaseItem[]       @relation("CreatedByUser")
+  contributions           ItemContributor[]
+  submittedRevisions      SubmissionRevision[] @relation("SubmittedRevisions")
+  assignedEditorialDrafts EditorialDraft[]     @relation("AssignedEditorialDrafts")
+  authoredReviewComments  ReviewComment[]      @relation("AuthoredReviewComments")
+  resolvedReviewComments  ReviewComment[]      @relation("ResolvedReviewComments")
+  itemAuditEvents         AuditEvent[]         @relation("ItemAuditEvents")
 
   @@map("users")
 }
 
 model ShowcaseItem {
-  id              String            @id @default(cuid())
-  title           String
-  slug            String            @unique
-  summary         String
-  content         String?
-  type            ItemType
-  scope           ItemScope?
-  issuer          String?
-  thumbnailUrl    String?
-  status          ItemStatus        @default(DRAFT)
-  rejectionReason String?
-  publishedYear   Int
-  publishedAt     DateTime?
-  isPinned        Boolean           @default(false)
-  pinnedAt        DateTime?
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id                String         @id @default(cuid())
+  title             String
+  slug              String         @unique
+  summary           String
+  content           String?
+  authorDraft       Json?
+  reviewStatus      ItemStatus?
+  reviewVersion     Int            @default(0)
+  type              ItemType       @default(PROJECT)
+  suggestedField    String?
+  customProjectType String?
+  scope             ItemScope?
+  issuer            String?
+  thumbnailUrl      String?
+  status            ItemStatus     @default(DRAFT)
+  visibility        ItemVisibility @default(PRIVATE)
+  rejectionReason   String?
+  publishedYear     Int?           @default(2026)
+  publishedAt       DateTime?
+  isPinned          Boolean        @default(false)
+  pinnedAt          DateTime?
+  mediaDriveUrl     String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
 
-  creatorId       String
-  creator         User              @relation("CreatedByUser", fields: [creatorId], references: [id], onDelete: Cascade)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
-  contributors    ItemContributor[]
-  links           ItemLink[]
-  attachments     ItemAttachment[]
-  tags            ItemTag[]
+  creatorId String
+  creator   User   @relation("CreatedByUser", fields: [creatorId], references: [id], onDelete: Restrict)
+
+  contributors   ItemContributor[]
+  links          ItemLink[]
+  attachments    ItemAttachment[]
+  revisions      SubmissionRevision[]
+  editorialDraft EditorialDraft?
+  reviewComments ReviewComment[]
+  auditEvents    AuditEvent[]
 
   @@index([type, status])
+  @@index([status, visibility])
+  @@index([categoryId])
   @@index([publishedYear])
   @@index([isPinned, status])
   @@map("showcase_items")
 }
 
+model SubmissionRevision {
+  id             String          @id @default(cuid())
+  itemId         String
+  revisionNumber Int
+  snapshot       Json
+  submittedById  String
+  submittedAt    DateTime        @default(now())
+  item           ShowcaseItem    @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  submittedBy    User            @relation("SubmittedRevisions", fields: [submittedById], references: [id], onDelete: Restrict)
+  comments       ReviewComment[]
+
+  @@unique([itemId, revisionNumber])
+  @@index([itemId, submittedAt])
+  @@map("submission_revisions")
+}
+
+model EditorialDraft {
+  id               String       @id @default(cuid())
+  itemId           String       @unique
+  assignedEditorId String?
+  overrides        Json
+  checklist        Json         @default("{}")
+  completedAt      DateTime?
+  updatedAt        DateTime     @updatedAt
+  item             ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  assignedEditor   User?        @relation("AssignedEditorialDrafts", fields: [assignedEditorId], references: [id], onDelete: SetNull)
+
+  @@map("editorial_drafts")
+}
+
+model ReviewComment {
+  id           String              @id @default(cuid())
+  itemId       String
+  revisionId   String?
+  fieldKey     String
+  body         String
+  audience     ReviewAudience
+  severity     ReviewSeverity
+  status       ReviewCommentStatus @default(OPEN)
+  authorId     String
+  resolvedById String?
+  createdAt    DateTime            @default(now())
+  resolvedAt   DateTime?
+  item         ShowcaseItem        @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  revision     SubmissionRevision? @relation(fields: [revisionId], references: [id], onDelete: SetNull)
+  author       User                @relation("AuthoredReviewComments", fields: [authorId], references: [id], onDelete: Restrict)
+  resolvedBy   User?               @relation("ResolvedReviewComments", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([itemId, audience, status])
+  @@map("review_comments")
+}
+
+model AuditEvent {
+  id        String       @id @default(cuid())
+  itemId    String
+  actorId   String
+  action    String
+  metadata  Json         @default("{}")
+  createdAt DateTime     @default(now())
+  item      ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  actor     User         @relation("ItemAuditEvents", fields: [actorId], references: [id], onDelete: Restrict)
+
+  @@index([itemId, createdAt])
+  @@map("audit_events")
+}
+
 model ItemContributor {
-  id                  String           @id @default(cuid())
-  itemId              String
-  userId              String?
-  user                User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  id     String  @id @default(cuid())
+  itemId String
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
   externalName        String?
   externalAffiliation String?
   externalLink        String?
 
-  role                ContributorRole  @default(CONTRIBUTOR)
-  customRoleTitle     String?
-  displayOrder        Int              @default(0)
+  role            ContributorRole @default(CONTRIBUTOR)
+  customRoleTitle String?
+  displayOrder    Int             @default(0)
 
-  item                ShowcaseItem     @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  item ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@index([itemId])
   @@index([userId])
@@ -139,46 +275,26 @@ model ItemContributor {
 }
 
 model ItemLink {
-  id       String       @id @default(cuid())
-  itemId   String
-  label    String
-  url      String
-  type     LinkType     @default(OTHER)
+  id     String   @id @default(cuid())
+  itemId String
+  label  String
+  url    String
+  type   LinkType @default(OTHER)
 
-  item     ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  item ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("item_links")
 }
 
 model ItemAttachment {
-  id       String       @id @default(cuid())
+  id       String @id @default(cuid())
   itemId   String
   fileName String
   fileUrl  String
   fileSize Int
   mimeType String
 
-  item     ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  item ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("item_attachments")
-}
-
-model Tag {
-  id    String    @id @default(cuid())
-  name  String    @unique
-  slug  String    @unique
-  items ItemTag[]
-
-  @@map("tags")
-}
-
-model ItemTag {
-  itemId String
-  tagId  String
-
-  item   ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  tag    Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([itemId, tagId])
-  @@map("item_tags")
 }

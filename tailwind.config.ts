@@ -7,11 +7,15 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontWeight: {
+      normal: 'var(--font-weight-normal)',
+      semibold: 'var(--font-weight-emphasis)',
+    },
     extend: {
       fontFamily: {
-        serif: ['Crimson Pro', 'Georgia', 'serif'],
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+        sans: ['var(--font-sans)', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['var(--font-sans)', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['var(--font-mono)', '"JetBrains Mono"', 'Menlo', 'monospace'],
       },
       colors: {
         // Semantic Token Mapping

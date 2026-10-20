@@ -10,17 +10,33 @@ describe('Prisma Schema and Database Models', () => {
     await prisma.$disconnect();
   });
 
-  it('should find seeded admin user', async () => {
-    const admin = await prisma.user.findFirst({
-      where: { role: 'ADMIN' },
+  it('should find or create admin user fixture', async () => {
+    const admin = await prisma.user.upsert({
+      where: { email: 'fixture-admin@nexus.test' },
+      update: {},
+      create: {
+        email: 'fixture-admin@nexus.test',
+        fullName: 'Fixture Admin',
+        role: 'ADMIN',
+        status: 'ACTIVE',
+      },
     });
     expect(admin).toBeDefined();
-    expect(admin?.role).toBe('ADMIN');
+    expect(admin.role).toBe('ADMIN');
   });
 
   it('should create and retrieve a showcase item with contributor', async () => {
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-    if (!admin) throw new Error('Admin not found');
+    let admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
+    if (!admin) {
+      admin = await prisma.user.create({
+        data: {
+          email: 'fixture-admin-showcase@nexus.test',
+          fullName: 'Fixture Admin Showcase',
+          role: 'ADMIN',
+          status: 'ACTIVE',
+        },
+      });
+    }
 
     const item = await prisma.showcaseItem.create({
       data: {
@@ -82,5 +98,85 @@ describe('Prisma Schema and Database Models', () => {
 
     // Clean up
     await prisma.showcaseItem.delete({ where: { id: item.id } });
+  });
+
+  it('persists a submission revision, editorial draft, review comment, and audit event', async () => {
+    const suffix = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const fixtureEmails = [
+      `workflow-author-${suffix}@nexus.test`,
+      `workflow-editor-${suffix}@nexus.test`,
+    ];
+
+    try {
+      const author = await prisma.user.create({
+        data: {
+          email: fixtureEmails[0],
+          fullName: 'Workflow Author',
+          role: 'CORE_MEMBER',
+          status: 'ACTIVE',
+        },
+      });
+      const editor = await prisma.user.create({
+        data: {
+          email: fixtureEmails[1],
+          fullName: 'Workflow Editor',
+          role: 'EDITOR',
+          status: 'ACTIVE',
+        },
+      });
+      const item = await prisma.showcaseItem.create({
+        data: {
+          title: 'Workflow persistence fixture',
+          slug: `workflow-persistence-${suffix}`,
+          summary: 'A fixture for the editorial persistence workflow.',
+          creatorId: author.id,
+          suggestedField: 'Robotics',
+          customProjectType: 'Embedded research prototype',
+          revisions: {
+            create: {
+              revisionNumber: 1,
+              snapshot: { title: 'Workflow persistence fixture' },
+              submittedById: author.id,
+            },
+          },
+          editorialDraft: {
+            create: {
+              assignedEditorId: editor.id,
+              overrides: { title: 'Edited workflow fixture' },
+            },
+          },
+          reviewComments: {
+            create: {
+              fieldKey: 'summary',
+              body: 'Please clarify the research contribution.',
+              audience: 'AUTHOR',
+              severity: 'REQUIRED',
+              authorId: editor.id,
+            },
+          },
+          auditEvents: {
+            create: {
+              actorId: editor.id,
+              action: 'EDITOR_ASSIGNED',
+            },
+          },
+        },
+        include: {
+          revisions: true,
+          editorialDraft: true,
+          reviewComments: true,
+          auditEvents: true,
+        },
+      });
+
+      expect(item.revisions).toHaveLength(1);
+      expect(item.editorialDraft?.assignedEditorId).toBe(editor.id);
+      expect(item.reviewComments).toHaveLength(1);
+      expect(item.auditEvents).toHaveLength(1);
+
+      await prisma.showcaseItem.delete({ where: { id: item.id } });
+    } finally {
+      await prisma.user.deleteMany({ where: { email: { in: fixtureEmails } } });
+    }
   });
 });

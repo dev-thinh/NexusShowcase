@@ -1,293 +1,337 @@
+import { CardAdminControls } from '@/components/card-admin-controls';
+import { showcaseHref } from '@/lib/showcase-navigation';
+import { MemberPagination } from '@/components/member-pagination';
+import { CardLink } from '@/components/card-link';
+import Link from 'next/link';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
+import { getSession as auth } from '@/lib/session';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
-import { ShowcaseCard } from '@/components/showcase-card';
-import { FeaturedFilmstrip } from '@/components/featured-filmstrip';
+import { HomeHero } from '@/components/home-hero';
 import { EmptyState } from '@/components/ui/empty-state';
-import { ItemType } from '@prisma/client';
+import { TypeBadge } from '@/components/ui/badge';
+import { CitationModal } from '@/components/citation-modal';
+import { publicUserSelect } from '@/lib/public-user';
+import { MemberCard } from '@/components/member-card';
+import type { MemberDirectoryEntry } from '@/lib/member-directory';
 import {
-  Sparkles,
   BookOpen,
-  Code2,
-  Trophy,
   Search,
-  Layers,
-  GraduationCap,
-  Cpu,
-  Brain,
-  MessageSquare,
-  Activity,
-  Server,
+  ExternalLink,
+  ArrowRight,
 } from 'lucide-react';
 
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ type?: string; year?: string; q?: string; domain?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
-  const params = await searchParams;
-  const typeFilter = params.type as ItemType | undefined;
-  const yearFilter = params.year ? parseInt(params.year) : undefined;
-  const searchQuery = params.q;
-  const domainFilter = params.domain;
+  const session = await auth();
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === 'ADMIN';
+  const isAuthenticated = !!session?.user;
 
-  const whereClause: any = {
+  const params = await searchParams;
+  const searchQuery = params.q?.trim();
+  let returnTo = searchQuery ? `/?q=${encodeURIComponent(searchQuery)}` : '/';
+
+  const baseWhere: Prisma.ShowcaseItemWhereInput = {
     status: 'PUBLISHED',
+    ...(isAuthenticated ? {} : { visibility: 'PUBLIC' }),
   };
 
-  if (typeFilter && ['RESEARCH_PAPER', 'PROJECT', 'ACHIEVEMENT'].includes(typeFilter)) {
-    whereClause.type = typeFilter;
-  }
-  if (yearFilter) {
-    whereClause.publishedYear = yearFilter;
-  }
-
-  const andConditions: any[] = [];
-
+  // Search Results Mode
   if (searchQuery) {
-    andConditions.push({
-      OR: [
-        { title: { contains: searchQuery, mode: 'insensitive' } },
-        { summary: { contains: searchQuery, mode: 'insensitive' } },
-      ],
-    });
-  }
-
-  if (domainFilter) {
-    const domainKeywordMap: Record<string, string[]> = {
-      ai: ['AI', 'Transformer', 'CNN', 'Deep Learning', 'Thị giác', 'Vision', 'Khuôn mặt'],
-      nlp: ['NLP', 'Ngôn ngữ', 'LLM', 'PhoLLM', 'Truy xuất', 'Retrieval', 'Văn bản'],
-      medical: ['Y tế', 'MRI', 'Não', 'Bệnh viện', 'Chẩn đoán', 'Medical'],
-      iot: ['IoT', 'Edge', 'Jetson', 'Nhúng', 'SmartLab', 'Phần cứng'],
-      systems: ['Server', 'Hạ tầng', 'GPU', 'Web', 'Cơ sở', 'Cluster'],
-    };
-
-    const keywords = domainKeywordMap[domainFilter] || [domainFilter];
-    andConditions.push({
-      OR: keywords.flatMap((kw) => [
-        { title: { contains: kw, mode: 'insensitive' } },
-        { summary: { contains: kw, mode: 'insensitive' } },
-      ]),
-    });
-  }
-
-  if (andConditions.length > 0) {
-    whereClause.AND = andConditions;
-  }
-
-  const [items, totalPapers, totalProjects, totalAchievements, pinnedItems] = await Promise.all([
-    prisma.showcaseItem.findMany({
-      where: whereClause,
+    const pageSize = 10;
+    const searchWhere: Prisma.ShowcaseItemWhereInput = {
+        ...baseWhere,
+        OR: [
+          { title: { contains: searchQuery, mode: 'insensitive' } },
+          { summary: { contains: searchQuery, mode: 'insensitive' } },
+          { contributors: { some: { OR: [
+            { user: { fullName: { contains: searchQuery, mode: 'insensitive' } } },
+            { externalName: { contains: searchQuery, mode: 'insensitive' } },
+          ] } } },
+        ],
+      };
+    const totalItems = await prisma.showcaseItem.count({ where: searchWhere });
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const requestedPage = Number(params.page);
+    const page = Number.isSafeInteger(requestedPage) && requestedPage > 0
+      ? Math.min(requestedPage, totalPages) : 1;
+    const searchPath = `/?q=${encodeURIComponent(searchQuery)}`;
+    returnTo = `${searchPath}${page > 1 ? `&page=${page}` : ''}`;
+    const searchItems = await prisma.showcaseItem.findMany({
+      omit: { authorDraft: true },
+      where: searchWhere,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       include: {
         contributors: {
-          include: { user: true },
+          include: { user: { select: publicUserSelect } },
           orderBy: { displayOrder: 'asc' },
         },
+        links: true,
+        category: { select: { id: true, name: true, slug: true } },
       },
-      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
+    });
+
+    return (
+      <div className="min-h-screen flex flex-col font-sans bg-background">
+        <Navbar />
+        <section className="border-b border-slate-200 bg-white py-8 sm:py-12">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Link href="/" className="text-xs font-semibold text-slate-500 hover:text-[#0F294A]">Trang chủ / Tìm kiếm</Link>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Thư viện công trình</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#0F294A] sm:text-4xl">Kết quả tìm kiếm</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-600">Khám phá nghiên cứu khoa học và dự án Robotics &amp; IoT của CLB.</p>
+            <form method="GET" action="/" role="search" aria-label="Tìm kiếm công trình" className="mt-6 flex max-w-3xl flex-col gap-2 sm:flex-row">
+              <div className="relative flex-1">
+                <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input type="search" name="q" defaultValue={searchQuery} aria-label="Từ khóa tìm kiếm" placeholder="Tìm kiếm bài báo, dự án robot, tác giả..." className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-12 pr-4 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]" />
+              </div>
+              <button type="submit" className="h-12 rounded-xl bg-brand-button px-6 text-sm font-semibold text-white transition hover:brightness-110">Tìm kiếm</button>
+            </form>
+            <p className="mt-3 text-xs leading-5 text-slate-500">Tìm theo tiêu đề, tóm tắt hoặc tên tác giả.</p>
+          </div>
+        </section>
+        <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="break-words text-lg font-semibold text-[#0F294A]">{totalItems} công trình cho “{searchQuery}”</h2>
+              {totalItems > 0 && <p className="mt-1 text-xs text-slate-500">Hiển thị {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalItems)} / {totalItems} công trình · Mới nhất trước</p>}
+            </div>
+            <Link href="/" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-600 hover:bg-slate-50">Xóa tìm kiếm</Link>
+          </div>
+          {totalItems === 0 ? (
+            <EmptyState icon={Search} title="Không tìm thấy công trình nào" description="Thử từ khóa ngắn hơn, kiểm tra chính tả hoặc tìm theo tên tác giả." actionLabel="Về trang chủ" actionHref="/" />
+          ) : (
+            <>
+              <div className="space-y-4">
+                {searchItems.map(item => {
+                  const paperLink = item.links.find(link => link.type === 'PAPER_URL');
+                  const sourceLink = paperLink ?? item.links.find(link => link.type === 'GITHUB');
+                  return (
+                    <article key={item.id} className="clickable-card panel-public grid gap-5 transition-shadow hover:shadow-md sm:grid-cols-[11rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-7">
+                      <CardLink slug={item.slug} returnTo={returnTo} />
+                      <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="flex aspect-[4/3] items-center justify-center self-start overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                        {item.thumbnailUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.thumbnailUrl} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 p-4 text-slate-400"><BookOpen aria-hidden="true" className="h-9 w-9 stroke-[1.25]" /><span className="text-xs">CLB Robotics &amp; IoT</span></div>
+                        )}
+                      </Link>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-slate-500">
+                          <TypeBadge type={item.type} size="sm" variant="outline" />
+                          {item.publishedYear && <span>{item.publishedYear}</span>}
+                        </div>
+                        {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
+                      </div>
+                        <h3 className="mt-3 break-words text-lg font-semibold leading-snug text-[#0F294A] sm:text-xl"><Link href={showcaseHref(item.slug, returnTo)} className="hover:underline">{item.title}</Link></h3>
+                        {item.contributors.length > 0 && <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600"><span className="font-semibold">Tác giả: </span>{item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}</p>}
+                        {item.issuer && <p className="mt-1 text-xs italic leading-5 text-slate-500">{item.issuer}</p>}
+                        <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-600">{item.summary}</p>
+                        <footer className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-100 pt-2">
+                          <Link href={showcaseHref(item.slug, returnTo)} className="inline-flex min-h-10 items-center gap-2 text-xs font-semibold text-[#0F294A] hover:underline">Xem công trình <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
+                          <CitationModal item={item} className="inline-flex min-h-10 items-center gap-2 text-xs font-semibold text-slate-600 hover:text-[#0F294A] hover:underline" />
+                          {sourceLink && <a href={sourceLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 text-xs text-slate-600 hover:text-[#0F294A] hover:underline">{paperLink ? 'Bài báo gốc' : 'Mã nguồn'} <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" /></a>}
+                        </footer>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
+                <p className="text-xs text-slate-500">Trang {page} / {totalPages} · 10 công trình mỗi trang</p>
+                <MemberPagination page={page} totalPages={totalPages} basePath={searchPath} ariaLabel="Phân trang kết quả tìm kiếm" />
+              </div>
+            </>
+          )}
+        </main>
+        <AcademicFooter />
+      </div>
+    );
+  }
+
+  const [featuredItems, members] = await Promise.all([
+    prisma.showcaseItem.findMany({
+      omit: { authorDraft: true },
+      where: baseWhere,
+      include: {
+        contributors: {
+          include: { user: { select: publicUserSelect } },
+          orderBy: { displayOrder: 'asc' },
+        },
+        links: true,
+      },
+      orderBy: [{ isPinned: 'desc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
+      take: 3,
     }),
-    prisma.showcaseItem.count({ where: { status: 'PUBLISHED', type: 'RESEARCH_PAPER' } }),
-    prisma.showcaseItem.count({ where: { status: 'PUBLISHED', type: 'PROJECT' } }),
-    prisma.showcaseItem.count({ where: { status: 'PUBLISHED', type: 'ACHIEVEMENT' } }),
-    prisma.showcaseItem.findMany({
-      where: { status: 'PUBLISHED', isPinned: true },
-      include: {
-        contributors: {
-          include: { user: true },
-          orderBy: { displayOrder: 'asc' },
-        },
+    prisma.user.findMany({
+      where: { status: 'ACTIVE', deletedAt: null, role: { in: ['ADMIN', 'CORE_MEMBER', 'MEMBER'] } },
+      select: {
+        ...publicUserSelect,
+        _count: { select: { contributions: { where: { item: baseWhere } } } },
       },
-      orderBy: { pinnedAt: 'desc' },
-      take: 10,
+      orderBy: [{ contributions: { _count: 'desc' } }, { fullName: 'asc' }],
     }),
   ]);
 
-  const needed = 10 - pinnedItems.length;
-  let fillItems: typeof pinnedItems = [];
-  if (needed > 0) {
-    const pinnedIds = pinnedItems.map((item) => item.id);
-    fillItems = await prisma.showcaseItem.findMany({
-      where: {
-        status: 'PUBLISHED',
-        id: { notIn: pinnedIds },
-      },
-      include: {
-        contributors: {
-          include: { user: true },
-          orderBy: { displayOrder: 'asc' },
-        },
-      },
-      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }],
-      take: needed,
-    });
-  }
+  const rolePriority: Record<string, number> = { ADMIN: 0, CORE_MEMBER: 1, MEMBER: 2 };
+  const keyMembers = [...members].sort((a, b) =>
+    rolePriority[a.role] - rolePriority[b.role]
+    || b._count.contributions - a._count.contributions
+    || a.fullName.localeCompare(b.fullName, 'vi'),
+  ).slice(0, 3);
 
-  const featuredItems = [...pinnedItems, ...fillItems];
-
-  const categories = [
-    { type: undefined, label: 'Tất cả công trình', icon: Layers },
-    { type: 'RESEARCH_PAPER', label: 'Bài báo nghiên cứu', icon: BookOpen },
-    { type: 'PROJECT', label: 'Dự án công nghệ', icon: Code2 },
-    { type: 'ACHIEVEMENT', label: 'Thành tích & Cống hiến', icon: Trophy },
-  ];
-
-  const domains = [
-    { key: undefined, label: 'Tất cả lĩnh vực', icon: Sparkles },
-    { key: 'ai', label: 'AI & Computer Vision', icon: Brain },
-    { key: 'nlp', label: 'NLP & Large Language Models', icon: MessageSquare },
-    { key: 'medical', label: 'Healthcare & Medical AI', icon: Activity },
-    { key: 'iot', label: 'IoT & Edge Computing', icon: Cpu },
-    { key: 'systems', label: 'Systems & Infrastructure', icon: Server },
+  const directions = [
+    { title: 'Trí tuệ nhân tạo & Thị giác máy tính', surface: 'border-[#cdd8df] bg-[#edf2f5]', description: 'Khám phá các mô hình học máy, nhận thức hình ảnh và ứng dụng AI trong hệ thống thông minh.' },
+    { title: 'Robot tự hành & Điều khiển', surface: 'border-[#dfd4c5] bg-[#f5f0e8]', description: 'Nghiên cứu định vị, lập kế hoạch chuyển động và khả năng tương tác của robot với môi trường.' },
+    { title: 'IoT & Hệ thống nhúng', surface: 'border-[#cfd8cb] bg-[#eef2eb]', description: 'Kết nối cảm biến, thiết kế thiết bị nhúng và phát triển các hệ thống thu thập dữ liệu thời gian thực.' },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans bg-background">
       <Navbar />
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-14 sm:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-100 text-slate-800 text-xs sm:text-sm font-semibold mb-5 shadow-2xs border border-slate-200">
-            <GraduationCap className="w-4 h-4 text-slate-700" />
-            <span>Khoa Công Nghệ Thông Tin • ĐH Khoa Học Tự Nhiên - ĐHQG-HCM</span>
+      <HomeHero />
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 max-w-7xl flex-1 space-y-14 sm:space-y-16 scroll-mt-32" id="home-content">
+        <section aria-labelledby="home-search-title" className="mx-auto max-w-2xl">
+          <div className="mb-5 text-center">
+            <h2 id="home-search-title" className="text-2xl font-semibold tracking-tight text-[#0F294A] sm:text-3xl">Khám phá kho công trình</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Tìm bài nghiên cứu, dự án và tác giả trong CLB.</p>
           </div>
-
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight font-serif">
-            Kho Lưu Trữ Công Trình &amp; Sáng Tạo Học Thuật
-          </h1>
-
-          <p className="mt-4 text-base sm:text-lg text-slate-600 max-w-3xl mx-auto leading-relaxed">
-            Lưu trữ và công bố các công trình nghiên cứu khoa học xuất bản, dự án công nghệ và thành tích của sinh viên CLB Nexus.
-          </p>
-
-          {/* Institutional Stats Counters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 max-w-3xl mx-auto mt-10 p-5 bg-white rounded-2xl border border-slate-200 shadow-xs">
-            <div className="p-3 text-center">
-              <div className="text-3xl sm:text-4xl font-black text-slate-900 font-serif">{totalPapers}</div>
-              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Bài Báo Khoa Học</div>
-            </div>
-            <div className="p-3 text-center sm:border-x sm:border-slate-100 border-y sm:border-y-0 border-slate-100 py-4 sm:py-3">
-              <div className="text-3xl sm:text-4xl font-black text-slate-900 font-serif">{totalProjects}</div>
-              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Dự Án Công Nghệ</div>
-            </div>
-            <div className="p-3 text-center">
-              <div className="text-3xl sm:text-4xl font-black text-amber-700 font-serif">{totalAchievements}</div>
-              <div className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">Giải Thưởng / Cống Hiến</div>
-            </div>
+        <form
+          id="home-search"
+          method="GET"
+          action="/"
+          className="scroll-mt-40 mx-auto flex max-w-2xl flex-col items-stretch gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center"
+          aria-label="Tìm kiếm công trình"
+        >
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <input
+              type="search"
+              name="q"
+              aria-label="Từ khóa tìm kiếm"
+              placeholder="Tìm kiếm bài báo, dự án robot, tác giả..."
+              className="w-full rounded-xl bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+            />
           </div>
-        </div>
-      </section>
-
-      {/* Featured Showcase Filmstrip Reel */}
-      <FeaturedFilmstrip items={featuredItems} />
-
-      {/* Main Showcase Feed */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
-        {/* Filter Navigation Bar */}
-        <div className="flex flex-col gap-4 pb-6 border-b border-slate-200 mb-8">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-            {/* Category Pills Tabs */}
-            <div className="flex flex-wrap gap-2.5">
-              {categories.map((c) => {
-                const Icon = c.icon;
-                const isActive = typeFilter === c.type;
-                const searchParamsObj = new URLSearchParams();
-                if (c.type) searchParamsObj.set('type', c.type);
-                if (domainFilter) searchParamsObj.set('domain', domainFilter);
-                if (searchQuery) searchParamsObj.set('q', searchQuery);
-                const href = `/?${searchParamsObj.toString()}`;
-
-                return (
-                  <a
-                    key={c.label}
-                    href={href}
-                    className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all cursor-pointer ${
-                      isActive
-                        ? 'bg-[#0F294A] text-white shadow-xs'
-                        : 'bg-white text-slate-700 hover:text-slate-900 hover:bg-slate-50 border border-slate-200'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span>{c.label}</span>
-                  </a>
-                );
-              })}
-            </div>
-
-            {/* Search Form */}
-            <form method="GET" action="/" className="flex items-center gap-2">
-              {typeFilter && <input type="hidden" name="type" value={typeFilter} />}
-              {domainFilter && <input type="hidden" name="domain" value={domainFilter} />}
-              <div className="relative flex-1 sm:flex-initial">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  name="q"
-                  defaultValue={searchQuery || ''}
-                  placeholder="Tìm bài báo, dự án, tác giả..."
-                  className="w-full sm:w-72 pl-10 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
-                />
-              </div>
-              <button
-                type="submit"
-                className="px-5 py-2.5 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-xl shadow-xs transition-colors cursor-pointer shrink-0"
-              >
-                Tìm
-              </button>
-            </form>
-          </div>
-
-          {/* Research Domain Topics Filter */}
-          <div className="flex items-center gap-2 overflow-x-auto pt-2 pb-1 scrollbar-none">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-1.5">
-              Lĩnh vực:
-            </span>
-            {domains.map((d) => {
-              const Icon = d.icon;
-              const isActive = domainFilter === d.key;
-              const searchParamsObj = new URLSearchParams();
-              if (typeFilter) searchParamsObj.set('type', typeFilter);
-              if (d.key) searchParamsObj.set('domain', d.key);
-              if (searchQuery) searchParamsObj.set('q', searchQuery);
-              const href = `/?${searchParamsObj.toString()}`;
-
+          <button
+            type="submit"
+            className="min-h-11 w-full shrink-0 cursor-pointer rounded-xl bg-brand-button px-5 text-sm font-semibold text-white transition-colors hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] focus-visible:ring-offset-2 sm:w-auto"
+          >
+            Tìm kiếm
+          </button>
+        </form>
+        </section>
+        
+        <section className="border-t border-slate-200 pt-10 sm:pt-12" aria-labelledby="featured-works-title">
+          <h2 id="featured-works-title" className="text-2xl font-semibold tracking-tight text-[#0F294A] sm:text-3xl">Công trình nổi bật</h2>
+          <div className="mt-6 grid gap-5">
+            {featuredItems.length === 0 ? (
+              <EmptyState title="Chưa có công trình nổi bật" description="Các công trình đã công bố sẽ xuất hiện tại đây." />
+            ) : featuredItems.map(item => {
+              const paperLink = item.links.find(link => link.type === 'PAPER_URL');
+              const sourceLink = paperLink ?? item.links.find(link => link.type === 'GITHUB');
               return (
-                <a
-                  key={d.label}
-                  href={href}
-                  className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold whitespace-nowrap transition-all cursor-pointer shrink-0 ${
-                    isActive
-                      ? 'bg-blue-50 text-blue-900 border border-blue-200 font-bold shadow-2xs'
-                      : 'bg-white text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-slate-200'
-                  }`}
-                >
-                  <Icon className="w-3.5 h-3.5 text-slate-500" />
-                  <span>{d.label}</span>
-                </a>
+                <article key={item.id} className="clickable-card panel-public grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white !p-0 transition-shadow hover:shadow-md md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
+                  <CardLink slug={item.slug} returnTo={returnTo} />
+                  <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-slate-50 md:aspect-auto md:min-h-56 md:border-b-0 md:border-r">
+                    {item.thumbnailUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-contain p-4" />
+                    ) : (
+                      <span className="text-center text-sm font-semibold tracking-wide text-slate-400">CLB Robotics &amp; IoT</span>
+                    )}
+                  </Link>
+                  <div className="flex min-w-0 flex-col px-5 py-4 sm:px-6 sm:py-5">
+                    <header>
+                      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-slate-600">
+                        <TypeBadge type={item.type} size="sm" variant="outline" />
+                        {item.publishedYear && <span>Năm {item.publishedYear}</span>}
+                      </div>
+                        {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
+                      </div>
+                      <h3 className="mt-2 line-clamp-2 text-lg font-semibold leading-snug tracking-tight text-[#0F294A] sm:text-xl" title={item.title}>
+                        <Link href={showcaseHref(item.slug, returnTo)} className="hover:text-[#0F294A] focus-visible:underline">{item.title}</Link>
+                      </h3>
+                      {item.contributors.length > 0 && (
+                        <p className="mt-1 truncate text-sm leading-relaxed text-slate-600" title={item.contributors.map(c => `${c.user?.fullName || c.externalName || ''}${c.role === 'ADVISOR' ? ' (GVHD)' : ''}`).join(', ')}>
+                          <span className="font-semibold">Tác giả: </span>
+                          {item.contributors.map((contributor, index) => (
+                            <span key={contributor.id}>
+                              {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="hover:text-[#0F294A]">{contributor.user.fullName}</Link> : contributor.externalName}
+                              {contributor.role === 'ADVISOR' ? ' (GVHD)' : ''}
+                              {index < item.contributors.length - 1 ? ', ' : ''}
+                            </span>
+                          ))}
+                        </p>
+                      )}
+                      {item.issuer && <p className="mt-1 text-sm italic leading-relaxed text-slate-600">{item.issuer}</p>}
+                    </header>
+                    <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-slate-600">{item.summary}</p>
+                    <footer className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-100 pt-1">
+                      {sourceLink && (
+                        <a href={sourceLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F294A] hover:underline">
+                          {paperLink ? 'Bài báo gốc' : 'Mã nguồn'} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                        </a>
+                      )}
+                      <CitationModal item={item} className="inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F294A] hover:underline" />
+                      <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#0F294A] hover:underline">
+                        Xem công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                      </Link>
+                    </footer>
+                  </div>
+                </article>
               );
             })}
-          </div>
-        </div>
 
-        {/* Content Showcase Grid */}
-        {items.length === 0 ? (
-          <EmptyState
-            title="Không tìm thấy công trình nào"
-            description="Không có bài báo hoặc dự án nào khớp với tiêu chí tìm kiếm hiện tại."
-            actionLabel="Xóa bộ lọc tìm kiếm"
-            actionHref="/"
-          />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-            {items.map((item) => (
-              <ShowcaseCard key={item.id} item={item} />
+          </div>
+        </section>
+
+        <section className="border-t border-slate-200 pt-10 sm:pt-12" aria-labelledby="research-directions-title">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Hướng nghiên cứu</p>
+          <h2 id="research-directions-title" className="mt-3 max-w-2xl text-2xl font-semibold leading-tight tracking-tight text-[#0F294A] sm:text-3xl">
+            Từ nghiên cứu đến hệ thống thông minh.
+          </h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {directions.map(({ title, description, surface }) => (
+              <article key={title} className={`rounded-xl border p-4 sm:p-5 ${surface}`}>
+                <h3 className="text-sm font-semibold leading-6 text-[#0F294A] sm:text-base">{title}</h3>
+                <p className="mt-1.5 text-sm leading-6 text-slate-600">{description}</p>
+              </article>
             ))}
           </div>
-        )}
-      </main>
+        </section>
 
-      {/* Institutional Academic Footer */}
+        <section className="border-t border-slate-200 pt-10 sm:pt-12" aria-labelledby="home-members-title">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Con người của CLB</p>
+              <h2 id="home-members-title" className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">Thành viên</h2>
+              <p className="mt-3 text-sm text-slate-600">Cùng nghiên cứu, cùng xây dựng và chia sẻ tri thức.</p>
+            </div>
+            <Link href="/members" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#0F294A] transition-colors hover:bg-slate-50">
+              Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </div>
+          {members.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {keyMembers.map(member => (
+                <MemberCard key={member.id} member={{ ...member, studentId: null } as MemberDirectoryEntry} group={member.role as MemberDirectoryEntry['role']} />
+              ))}
+            </div>
+          ) : <p className="panel-public text-sm text-slate-600">Thông tin thành viên đang được cập nhật.</p>}
+        </section>
+      </main>
       <AcademicFooter />
     </div>
   );
 }
+
