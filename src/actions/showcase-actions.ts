@@ -4,9 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/current-user';
 import { slugify } from '@/lib/slugify';
 import {
-  createShowcaseItemInputSchema,
   INVALID_ACTION_INPUT_ERROR,
-  reviewShowcaseItemInputSchema,
   showcaseItemIdSchema,
   toggleItemVisibilityInputSchema,
   type AttachmentInput,
@@ -20,6 +18,7 @@ import {
 import { buildSubmissionSnapshot } from '@/lib/submission-snapshot';
 import { revalidatePath } from 'next/cache';
 import { Prisma } from '@prisma/client';
+import { ARTICLE_PREFIX, publicationResources } from '@/lib/article-content';
 import type { ZodError } from 'zod';
 
 export type { AttachmentInput, ContributorInput, CreateShowcaseItemInput, LinkInput };
@@ -32,7 +31,7 @@ function validationFailure(error: ZodError): ActionResult<never> {
   const fieldErrors = Object.fromEntries(
     Object.entries(error.flatten().fieldErrors).filter((entry): entry is [string, string[]] => Boolean(entry[1]))
   );
-  return { success: false, error: INVALID_ACTION_INPUT_ERROR, fieldErrors };
+  return { success: false, error: 'Vui lòng kiểm tra các trường được đánh dấu.', fieldErrors };
 }
 
 export async function saveShowcaseDraftAction(
@@ -41,251 +40,121 @@ export async function saveShowcaseDraftAction(
 ): Promise<ActionResult<{ id: string; slug: string; status: string }>> {
   const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
   if (!user) return { success: false, error: 'Bạn không có quyền lưu bản nháp.' };
-
-  const parsed = showcaseDraftInputSchema.safeParse(input);
+  const normalized = isStructured(input.content ?? '') ? { ...input, resources: publicationResources(input.content ?? '', input.resources ?? []) } : input;
+  const parsed = showcaseDraftInputSchema.safeParse(normalized);
   if (!parsed.success) return validationFailure(parsed.error);
   const values = parsed.data;
-
-  const contributorCreates = values.contributors.map((contributor) => ({
-    userId: contributor.userId ?? null,
-    externalName: contributor.externalName ?? null,
-    externalAffiliation: contributor.externalAffiliation ?? null,
-    externalLink: contributor.externalLink ?? null,
-    role: contributor.role,
-    customRoleTitle: contributor.customRoleTitle ?? null,
-    displayOrder: contributor.displayOrder,
-  }));
-  const linkCreates = values.resources.filter((resource) => resource.kind === 'LINK').map((resource) => ({
-    label: resource.label,
-    url: resource.url,
-    type: resource.linkType ?? 'OTHER' as const,
-  }));
-  const attachmentCreates = values.resources.filter((resource) => resource.kind !== 'LINK').map((resource) => ({
-    fileName: resource.fileName ?? resource.label,
-    fileUrl: resource.url,
-    fileSize: resource.fileSize ?? 0,
-    mimeType: resource.mimeType ?? (resource.kind === 'IMAGE' ? 'image/webp' : 'application/pdf'),
-  }));
-
-  if (!itemId) {
-    let slug = slugify(values.title);
-    if (await prisma.showcaseItem.findUnique({ where: { slug } })) slug = `${slug}-${Date.now().toString().slice(-4)}`;
-    const created = await prisma.showcaseItem.create({
-      data: {
-        title: values.title,
-        slug,
-        summary: values.summary,
-        content: values.content,
-        publishedYear: values.publishedYear ?? new Date().getFullYear(),
-        suggestedField: values.suggestedField,
-        customProjectType: values.customProjectType,
-        creatorId: user.id,
-        contributors: { create: contributorCreates },
-        links: { create: linkCreates },
-        attachments: { create: attachmentCreates },
-      },
-      select: { id: true, slug: true, status: true },
-    });
-    return { success: true, data: created };
+  if (values.categoryId) {
+    const category = await prisma.category.findUnique({ where: { id: values.categoryId }, select: { slug: true } });
+    if (!category || category.slug !== (values.type === 'RESEARCH_PAPER' ? 'bai-bao-khoa-hoc' : 'robotics-iot')) return { success: false, error: 'Chuyên mục không khớp với loại công trình.' };
   }
-
+  const data = {
+    title: values.title, summary: values.summary, content: values.content,
+    type: values.type, categoryId: values.categoryId ?? null, thumbnailUrl: values.thumbnailUrl ?? null,
+    publishedYear: values.publishedYear ?? new Date().getFullYear(),
+    suggestedField: values.suggestedField, customProjectType: values.customProjectType,
+  };
+  const contributors = values.contributors.map(c => ({
+    userId: c.userId ?? null, externalName: c.externalName ?? null, externalAffiliation: c.externalAffiliation ?? null,
+    externalLink: c.externalLink ?? null, role: c.role, customRoleTitle: c.customRoleTitle ?? null, displayOrder: c.displayOrder,
+  }));
+  const links = values.resources.filter(r => r.kind === 'LINK').map(r => ({ label: r.label, url: r.url, type: r.linkType ?? 'OTHER' as const }));
+  const attachments = values.resources.filter(r => r.kind !== 'LINK').map(r => ({ fileName: r.fileName ?? r.label, fileUrl: r.url, fileSize: r.fileSize ?? 0, mimeType: r.mimeType ?? (r.kind === 'IMAGE' ? 'image/webp' : 'application/pdf') }));
+  if (!itemId) {
+    const slug = `${slugify(values.title) || 'cong-trinh'}-${crypto.randomUUID().slice(0, 8)}`;
+    const item = await prisma.showcaseItem.create({ data: { ...data, slug, creatorId: user.id,
+      contributors: { create: contributors }, links: { create: links }, attachments: { create: attachments },
+    }, select: { id: true, slug: true, status: true } });
+    return { success: true, data: item };
+  }
   const parsedId = showcaseItemIdSchema.safeParse(itemId);
   if (!parsedId.success) return validationFailure(parsedId.error);
-  const target = await prisma.showcaseItem.findUnique({ where: { id: parsedId.data } });
-  if (!target) return { success: false, error: 'Không tìm thấy công trình.' };
-  if (target.creatorId !== user.id && user.role !== 'ADMIN') return { success: false, error: 'Bạn không có quyền sửa bản nháp này.' };
-  if (!['DRAFT', 'REVISION_REQUESTED'].includes(target.status)) {
-    return { success: false, error: 'Trạng thái hiện tại không cho phép chỉnh sửa.' };
-  }
-
-  const updated = await prisma.$transaction(async (tx) => {
-    await Promise.all([
-      tx.itemContributor.deleteMany({ where: { itemId: target.id } }),
-      tx.itemLink.deleteMany({ where: { itemId: target.id } }),
-      tx.itemAttachment.deleteMany({ where: { itemId: target.id } }),
-    ]);
-    return tx.showcaseItem.update({
-      where: { id: target.id },
-      data: {
-        title: values.title,
-        summary: values.summary,
-        content: values.content,
-        publishedYear: values.publishedYear ?? target.publishedYear,
-        suggestedField: values.suggestedField,
-        customProjectType: values.customProjectType,
-        contributors: { create: contributorCreates },
-        links: { create: linkCreates },
-        attachments: { create: attachmentCreates },
-      },
-      select: { id: true, slug: true, status: true },
-    });
-  });
-  return { success: true, data: updated };
+  try {
+    return await prisma.$transaction(async tx => {
+      const target = await tx.showcaseItem.findUnique({ where: { id: parsedId.data } });
+      if (!target || target.creatorId !== user.id) return { success: false, error: 'Bạn không có quyền sửa bài này.' } as const;
+      const published = target.status === 'PUBLISHED';
+      if (published ? ['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(target.reviewStatus ?? '') : !['DRAFT', 'REVISION_REQUESTED'].includes(target.status)) return { success: false, error: 'Bài đang chờ duyệt hoặc không còn được chỉnh sửa.' } as const;
+      const update = await tx.showcaseItem.updateMany({ where: { id: target.id, reviewVersion: target.reviewVersion, status: target.status }, data: published
+        ? { authorDraft: JSON.parse(JSON.stringify(values)), reviewStatus: 'DRAFT', reviewVersion: { increment: 1 } }
+        : { ...data, reviewVersion: { increment: 1 } } });
+      if (update.count !== 1) return { success: false, error: 'Bài đã thay đổi. Vui lòng tải lại trang.' } as const;
+      if (!published) {
+        await tx.itemContributor.deleteMany({ where: { itemId: target.id } });
+        await tx.itemLink.deleteMany({ where: { itemId: target.id } });
+        await tx.itemAttachment.deleteMany({ where: { itemId: target.id } });
+        await tx.showcaseItem.update({ where: { id: target.id }, data: {
+          contributors: { create: contributors }, links: { create: links }, attachments: { create: attachments },
+        } });
+      }
+      return { success: true, data: { id: target.id, slug: target.slug, status: published ? 'DRAFT' : target.status } } as const;
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  } catch { return { success: false, error: 'Không lưu được vì bài vừa thay đổi. Vui lòng thử lại.' }; }
 }
 
-export async function submitShowcaseForReviewAction(
-  itemId: string
-): Promise<ActionResult<{ status: string; revisionNumber: number }>> {
+function isStructured(content: string) { return content.startsWith(ARTICLE_PREFIX); }
+
+export async function submitShowcaseForReviewAction(itemId: string): Promise<ActionResult<{ status: string; revisionNumber: number }>> {
   const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
   if (!user) return { success: false, error: 'Bạn không có quyền gửi duyệt.' };
   const parsedId = showcaseItemIdSchema.safeParse(itemId);
   if (!parsedId.success) return validationFailure(parsedId.error);
-
-  const item = await prisma.showcaseItem.findUnique({
-    where: { id: parsedId.data },
-    include: {
-      contributors: { include: { user: { select: { fullName: true } } } },
-      links: true,
-      attachments: true,
-    },
-  });
-  if (!item) return { success: false, error: 'Không tìm thấy công trình.' };
-  if (item.creatorId !== user.id && user.role !== 'ADMIN') return { success: false, error: 'Bạn không có quyền gửi công trình này.' };
-  if (!['DRAFT', 'REVISION_REQUESTED'].includes(item.status)) return { success: false, error: 'Trạng thái hiện tại không thể gửi duyệt.' };
-
-  const snapshot = buildSubmissionSnapshot(item);
-  const validSubmission = showcaseSubmissionInputSchema.safeParse(snapshot);
-  if (!validSubmission.success) return validationFailure(validSubmission.error);
-
-  const result = await prisma.$transaction(async (tx) => {
-    const latest = await tx.submissionRevision.aggregate({ where: { itemId: item.id }, _max: { revisionNumber: true } });
-    const revisionNumber = (latest._max.revisionNumber ?? 0) + 1;
-    await tx.submissionRevision.create({
-      data: { itemId: item.id, revisionNumber, snapshot: snapshot as unknown as Prisma.InputJsonValue, submittedById: user.id },
-    });
-    await tx.showcaseItem.update({
-      where: { id: item.id },
-      data: { status: 'PENDING_REVIEW', rejectionReason: null },
-    });
-    await tx.auditEvent.create({
-      data: { itemId: item.id, actorId: user.id, action: 'SUBMITTED_FOR_REVIEW', metadata: { revisionNumber } },
-    });
-    return { status: 'PENDING_REVIEW', revisionNumber };
-  });
-  return { success: true, data: result };
+  try {
+    const result = await prisma.$transaction(async tx => {
+      const item = await tx.showcaseItem.findUnique({ where: { id: parsedId.data }, include: {
+        contributors: { include: { user: { select: { fullName: true } } }, orderBy: { displayOrder: 'asc' } }, links: true, attachments: true,
+      } });
+      if (!item || item.creatorId !== user.id) return { success: false, error: 'Bạn không có quyền gửi công trình này.' } as const;
+      const published = item.status === 'PUBLISHED';
+      if (published ? !item.authorDraft || !['DRAFT', 'REVISION_REQUESTED', 'REJECTED'].includes(item.reviewStatus ?? '') : !['DRAFT', 'REVISION_REQUESTED'].includes(item.status)) return { success: false, error: 'Trạng thái hiện tại không thể gửi duyệt.' } as const;
+      const draft = published ? showcaseDraftInputSchema.parse(item.authorDraft) : null;
+      const raw = draft ?? buildSubmissionSnapshot(item);
+      const valid = showcaseSubmissionInputSchema.safeParse(raw);
+      if (!valid.success) return validationFailure(valid.error);
+      const values = valid.data;
+      if (!values.categoryId) return { success: false, error: 'Vui lòng chọn chuyên mục trước khi gửi duyệt.', fieldErrors: { categoryId: ['Chọn chuyên mục.'] as string[] } } as const;
+      const category = await tx.category.findUnique({ where: { id: values.categoryId }, select: { slug: true } });
+      if (!category || category.slug !== (values.type === 'RESEARCH_PAPER' ? 'bai-bao-khoa-hoc' : 'robotics-iot')) return { success: false, error: 'Chuyên mục không khớp với loại công trình.' } as const;
+      const members = await tx.user.findMany({ where: { id: { in: values.contributors.flatMap(c => c.userId ? [c.userId] : []) } }, select: { id: true, fullName: true } });
+      if (values.contributors.some(c => c.userId && !members.some(m => m.id === c.userId))) return { success: false, error: 'Một thành viên đóng góp không còn tồn tại.' } as const;
+      const snapshot = { ...values, contributors: values.contributors.map(c => ({ ...c, displayName: members.find(m => m.id === c.userId)?.fullName ?? c.externalName ?? null })) };
+      const latest = await tx.submissionRevision.aggregate({ where: { itemId: item.id }, _max: { revisionNumber: true } });
+      const revisionNumber = (latest._max.revisionNumber ?? 0) + 1;
+      const changed = await tx.showcaseItem.updateMany({ where: { id: item.id, reviewVersion: item.reviewVersion, status: item.status }, data: {
+        ...(published ? { reviewStatus: 'PENDING_REVIEW' as const } : { status: 'PENDING_REVIEW' as const }), reviewVersion: { increment: 1 }, rejectionReason: null,
+      } });
+      if (changed.count !== 1) return { success: false, error: 'Bài đã thay đổi. Vui lòng tải lại trang.' } as const;
+      await tx.submissionRevision.create({ data: { itemId: item.id, revisionNumber, snapshot: JSON.parse(JSON.stringify(snapshot)), submittedById: user.id } });
+      await tx.reviewComment.updateMany({ where: { itemId: item.id, status: 'OPEN', audience: 'AUTHOR' }, data: { status: 'RESOLVED', resolvedAt: new Date(), resolvedById: user.id } });
+      await tx.auditEvent.create({ data: { itemId: item.id, actorId: user.id, action: 'SUBMITTED_FOR_REVIEW', metadata: { revisionNumber, update: published } } });
+      return { success: true, data: { status: 'PENDING_REVIEW', revisionNumber } } as const;
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    try { revalidatePath('/dashboard'); revalidatePath('/admin/reviews'); } catch {}
+    return result;
+  } catch { return { success: false, error: 'Không gửi được bài. Vui lòng tải lại trang và thử lại.' }; }
 }
 
-export async function createShowcaseItemAction(input: CreateShowcaseItemInput) {
-  const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
-  if (!user) {
-    return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) và Quản trị viên mới có quyền đăng bài.' };
-  }
-
-  const parsedInput = createShowcaseItemInputSchema.safeParse(input);
-  if (!parsedInput.success) {
-    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
-  }
-  const values = parsedInput.data;
-
-  let slug = slugify(values.title);
-  const existing = await prisma.showcaseItem.findUnique({ where: { slug } });
-  if (existing) {
-    slug = `${slug}-${Date.now().toString().slice(-4)}`;
-  }
-
-  const status = values.submitForReview
-    ? 'PENDING_REVIEW'
-    : 'DRAFT';
-
-  const item = await prisma.showcaseItem.create({
-    data: {
-      title: values.title,
-      slug,
-      summary: values.summary,
-      content: values.content,
-      type: values.type,
-      scope: values.scope,
-      issuer: values.issuer,
-      thumbnailUrl: values.thumbnailUrl,
-      mediaDriveUrl: values.mediaDriveUrl || null,
-      tags: values.tags || [],
-      categoryId: values.categoryId || null,
-      visibility: values.visibility || 'PRIVATE',
-      status,
-      publishedAt: null,
-      publishedYear: values.publishedYear || new Date().getFullYear(),
-      creatorId: user.id,
-      contributors: {
-        create: values.contributors.map((c) => ({
-          userId: c.userId || null,
-          externalName: c.externalName || null,
-          externalAffiliation: c.externalAffiliation || null,
-          externalLink: c.externalLink || null,
-          role: c.role,
-          customRoleTitle: c.customRoleTitle || null,
-          displayOrder: c.displayOrder,
-        })),
-      },
-      links: {
-        create: values.links.map((l) => ({
-          label: l.label,
-          url: l.url,
-          type: l.type,
-        })),
-      },
-      attachments: {
-        create: (values.attachments || []).map((a) => ({
-          fileName: a.fileName,
-          fileUrl: a.fileUrl,
-          fileSize: a.fileSize,
-          mimeType: a.mimeType,
-        })),
-      },
-    },
-    include: {
-      contributors: true,
-      links: true,
-      attachments: true,
-    },
-  });
-
-  return { success: true, item };
+export async function createShowcaseItemAction(_input: CreateShowcaseItemInput) {
+  return { success: false, error: 'Vui lòng dùng workspace soạn thảo để lưu và gửi duyệt.' };
 }
 
 export async function reviewShowcaseItemAction(
   itemId: string,
   payload: { action: 'PUBLISH' | 'REJECT'; reason?: string }
 ) {
-  const admin = await getCurrentUser(['ADMIN']);
-  if (!admin) {
-    return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền kiểm duyệt bài.' };
-  }
-
-  const parsedInput = reviewShowcaseItemInputSchema.safeParse({ itemId, payload });
-  if (!parsedInput.success) {
-    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
-  }
-  itemId = parsedInput.data.itemId;
-  payload = parsedInput.data.payload;
-
-  const isPublish = payload.action === 'PUBLISH';
-  const target = await prisma.showcaseItem.findUnique({ where: { id: itemId }, select: { status: true } });
-  if (isPublish && target?.status !== 'READY_FOR_APPROVAL') {
-    return { success: false, error: 'Bài viết phải hoàn tất biên tập trước khi xuất bản.' };
-  }
-  const updated = await prisma.showcaseItem.update({
-    where: { id: itemId },
-    data: {
-      status: isPublish ? 'PUBLISHED' : 'REJECTED',
-      publishedAt: isPublish ? new Date() : undefined,
-      rejectionReason: isPublish ? null : payload.reason || 'Nội dung cần chỉnh sửa bổ sung.',
-      ...(isPublish ? {} : { isPinned: false, pinnedAt: null }),
-    },
-  });
-
-  try {
-    revalidatePath('/');
-    revalidatePath('/admin');
-    revalidatePath('/admin/reviews');
-    if (updated.slug) revalidatePath(`/showcase/${updated.slug}`);
-  } catch {
-    // Ignore cache revalidation errors outside request context
-  }
-
-  return { success: true, status: updated.status };
+  return { success: false, error: 'Vui lòng duyệt bản nộp trong trang phê duyệt.' };
 }
 
-export async function togglePinShowcaseItemAction(itemId: string) {
+export type PinActionResult = {
+  success: boolean;
+  isPinned?: boolean;
+  error?: string;
+  message?: string;
+  requiresReplacement?: boolean;
+  pinnedItems?: Array<{ id: string; title: string }>;
+};
+
+export async function togglePinShowcaseItemAction(itemId: string): Promise<PinActionResult> {
   const admin = await getCurrentUser(['ADMIN']);
   if (!admin) {
     return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền ghim công trình lên trang chủ.' };
@@ -316,6 +185,8 @@ export async function togglePinShowcaseItemAction(itemId: string) {
     try {
       revalidatePath('/');
       revalidatePath('/admin');
+      revalidatePath('/category/bai-bao-khoa-hoc');
+      revalidatePath('/category/robotics-iot');
       if (targetItem.slug) revalidatePath(`/showcase/${targetItem.slug}`);
     } catch {
       // Ignore in tests
@@ -324,34 +195,82 @@ export async function togglePinShowcaseItemAction(itemId: string) {
     return { success: true, isPinned: false, message: 'Đã bỏ ghim công trình khỏi trang chủ.' };
   }
 
-  // Pin item: check limit 10 FIFO
-  const pinnedItems = await prisma.showcaseItem.findMany({
-    where: { isPinned: true, status: 'PUBLISHED' },
-    orderBy: { pinnedAt: 'asc' },
-  });
-
-  if (pinnedItems.length >= 10) {
-    const oldest = pinnedItems[0];
-    await prisma.showcaseItem.update({
-      where: { id: oldest.id },
-      data: { isPinned: false, pinnedAt: null },
-    });
+  // Keep the capacity check and write atomic across simultaneous admin requests.
+  try {
+    const result = await prisma.$transaction(async tx => {
+      const pinnedCount = await tx.showcaseItem.count({
+        where: { isPinned: true, status: 'PUBLISHED' },
+      });
+      if (pinnedCount >= 3) {
+        const pinnedItems = await tx.showcaseItem.findMany({
+          where: { isPinned: true, status: 'PUBLISHED' },
+          select: { id: true, title: true },
+          orderBy: [{ pinnedAt: 'desc' }, { id: 'asc' }],
+        });
+        return { requiresReplacement: true as const, pinnedItems };
+      }
+      await tx.showcaseItem.update({
+        where: { id: itemId },
+        data: { isPinned: true, pinnedAt: new Date() },
+      });
+      return null;
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    if (result) {
+      return { success: false, ...result, error: 'Chỉ được ghim tối đa 3 công trình. Chọn một bài đang ghim để thay thế.' };
+    }
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034') {
+      return { success: false, error: 'Danh sách ghim vừa được cập nhật. Vui lòng tải lại và thử lại.' };
+    }
+    throw error;
   }
-
-  await prisma.showcaseItem.update({
-    where: { id: itemId },
-    data: { isPinned: true, pinnedAt: new Date() },
-  });
 
   try {
     revalidatePath('/');
     revalidatePath('/admin');
+    revalidatePath('/category/bai-bao-khoa-hoc');
+    revalidatePath('/category/robotics-iot');
     if (targetItem.slug) revalidatePath(`/showcase/${targetItem.slug}`);
   } catch {
     // Ignore in tests
   }
 
   return { success: true, isPinned: true, message: 'Đã ghim công trình lên trang chủ.' };
+}
+
+export async function replacePinnedShowcaseItemAction(itemId: string, replacedItemId: string): Promise<PinActionResult> {
+  const admin = await getCurrentUser(['ADMIN']);
+  if (!admin) return { success: false, error: 'Chỉ Quản trị viên (Admin) mới có quyền thay thế công trình ghim.' };
+  if (!showcaseItemIdSchema.safeParse(itemId).success || !showcaseItemIdSchema.safeParse(replacedItemId).success || itemId === replacedItemId) {
+    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
+  }
+
+  try {
+    const result = await prisma.$transaction(async tx => {
+      const target = await tx.showcaseItem.findUnique({ where: { id: itemId } });
+      const replaced = await tx.showcaseItem.findUnique({ where: { id: replacedItemId } });
+      if (!target || target.status !== 'PUBLISHED') return { success: false as const, error: 'Công trình mới không còn khả dụng để ghim.' };
+      if (target.isPinned) return { success: false as const, error: 'Công trình này đã được ghim. Vui lòng tải lại danh sách.' };
+      if (!replaced?.isPinned || replaced.status !== 'PUBLISHED') return { success: false as const, error: 'Bài bạn chọn không còn được ghim. Đóng hộp thoại và thử ghim lại để cập nhật danh sách.' };
+      const count = await tx.showcaseItem.count({ where: { isPinned: true, status: 'PUBLISHED' } });
+      if (count > 3) return { success: false as const, error: 'Danh sách cũ đang có hơn 3 bài ghim. Vui lòng bỏ ghim bớt trước khi thay thế.' };
+      await tx.showcaseItem.update({ where: { id: replacedItemId }, data: { isPinned: false, pinnedAt: null } });
+      await tx.showcaseItem.update({ where: { id: itemId }, data: { isPinned: true, pinnedAt: new Date() } });
+      return { success: true as const, slugs: [target.slug, replaced.slug] };
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    if (!result.success) return result;
+    revalidatePath('/');
+    revalidatePath('/admin');
+    revalidatePath('/category/bai-bao-khoa-hoc');
+    revalidatePath('/category/robotics-iot');
+    for (const slug of result.slugs) revalidatePath(`/showcase/${slug}`);
+    return { success: true, isPinned: true, message: 'Đã thay thế công trình nổi bật.' };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034') {
+      return { success: false, error: 'Danh sách ghim vừa thay đổi. Đóng hộp thoại và thử lại.' };
+    }
+    throw error;
+  }
 }
 
 export async function toggleItemVisibilityAction(itemId: string) {
@@ -386,6 +305,8 @@ export async function toggleItemVisibilityAction(itemId: string) {
     revalidatePath('/');
     revalidatePath('/dashboard');
     revalidatePath('/admin');
+    revalidatePath('/category/bai-bao-khoa-hoc');
+    revalidatePath('/category/robotics-iot');
     if (updated.slug) revalidatePath(`/showcase/${updated.slug}`);
   } catch {
     // Ignore in tests
@@ -395,118 +316,5 @@ export async function toggleItemVisibilityAction(itemId: string) {
 }
 
 export async function updateShowcaseItemAction(itemId: string, input: CreateShowcaseItemInput) {
-  const user = await getCurrentUser(['CORE_MEMBER', 'ADMIN']);
-  if (!user) {
-    return { success: false, error: 'Chỉ Thành viên nòng cốt (Core Member) và Quản trị viên mới có quyền cập nhật bài.' };
-  }
-
-  const parsedItemId = showcaseItemIdSchema.safeParse(itemId);
-  if (!parsedItemId.success) {
-    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
-  }
-  itemId = parsedItemId.data;
-
-  const parsedInput = createShowcaseItemInputSchema.safeParse(input);
-  if (!parsedInput.success) {
-    return { success: false, error: INVALID_ACTION_INPUT_ERROR };
-  }
-  const values = parsedInput.data;
-
-  const targetItem = await prisma.showcaseItem.findUnique({
-    where: { id: itemId },
-  });
-  if (!targetItem) {
-    return { success: false, error: 'Không tìm thấy công trình này.' };
-  }
-
-  const isAdmin = user.role === 'ADMIN';
-  if (!isAdmin && targetItem.creatorId !== user.id) {
-    return { success: false, error: 'Bạn không có quyền chỉnh sửa công trình này.' };
-  }
-
-  if (!isAdmin && targetItem.status === 'PUBLISHED') {
-    return { success: false, error: 'Không thể chỉnh sửa công trình đã được xuất bản.' };
-  }
-
-  let newStatus = targetItem.status;
-  let newRejectionReason = targetItem.rejectionReason;
-
-  if (targetItem.status === 'REJECTED' || targetItem.status === 'DRAFT') {
-    if (values.submitForReview) {
-      newStatus = 'PENDING_REVIEW';
-      newRejectionReason = null;
-    } else {
-      newStatus = 'DRAFT';
-    }
-  } else if (targetItem.status === 'PENDING_REVIEW') {
-    if (values.submitForReview) {
-      newStatus = 'PENDING_REVIEW';
-    } else {
-      newStatus = 'DRAFT';
-    }
-  }
-
-  const updatedItem = await prisma.$transaction(async (tx) => {
-    await tx.itemContributor.deleteMany({ where: { itemId } });
-    await tx.itemLink.deleteMany({ where: { itemId } });
-    await tx.itemAttachment.deleteMany({ where: { itemId } });
-
-    return tx.showcaseItem.update({
-      where: { id: itemId },
-      data: {
-        title: values.title,
-        summary: values.summary,
-        content: values.content,
-        type: values.type,
-        scope: values.scope,
-        issuer: values.issuer,
-        thumbnailUrl: values.thumbnailUrl,
-        mediaDriveUrl: values.mediaDriveUrl !== undefined ? values.mediaDriveUrl : targetItem.mediaDriveUrl,
-        tags: values.tags !== undefined ? values.tags : targetItem.tags,
-        categoryId: values.categoryId !== undefined ? values.categoryId : targetItem.categoryId,
-        visibility: values.visibility || targetItem.visibility,
-        status: newStatus,
-        rejectionReason: newRejectionReason,
-        publishedYear: values.publishedYear || targetItem.publishedYear || new Date().getFullYear(),
-        contributors: {
-          create: values.contributors.map((c) => ({
-            userId: c.userId || null,
-            externalName: c.externalName || null,
-            externalAffiliation: c.externalAffiliation || null,
-            externalLink: c.externalLink || null,
-            role: c.role,
-            customRoleTitle: c.customRoleTitle || null,
-            displayOrder: c.displayOrder,
-          })),
-        },
-        links: {
-          create: values.links.map((l) => ({
-            label: l.label,
-            url: l.url,
-            type: l.type,
-          })),
-        },
-        attachments: {
-          create: (values.attachments || []).map((a) => ({
-            fileName: a.fileName,
-            fileUrl: a.fileUrl,
-            fileSize: a.fileSize,
-            mimeType: a.mimeType,
-          })),
-        },
-      },
-    });
-  });
-
-  try {
-    revalidatePath('/');
-    revalidatePath('/dashboard');
-    revalidatePath('/admin');
-    revalidatePath('/admin/reviews');
-    if (updatedItem.slug) revalidatePath(`/showcase/${updatedItem.slug}`);
-  } catch {
-    // Ignore in tests
-  }
-
-  return { success: true, item: { id: updatedItem.id, slug: updatedItem.slug, status: updatedItem.status } };
+  return { success: false, error: 'Vui lòng dùng workspace soạn thảo để cập nhật bài.' };
 }
