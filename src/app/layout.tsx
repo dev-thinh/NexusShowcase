@@ -1,23 +1,28 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, JetBrains_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { PageReveal } from '@/components/page-reveal';
+import { DialogProvider } from '@/components/dialog-provider';
+import { NavigationTransitionProvider } from '@/components/navigation-transition';
+import { ImeInputSupport } from '@/components/ime-input-support';
 
-const plusJakartaSans = Plus_Jakarta_Sans({
+const inter = Inter({
   subsets: ['latin', 'vietnamese'],
-  weight: ['300', '400', '500', '600', '700', '800'],
+  weight: ['400', '600'],
+  style: ['normal', 'italic'],
   variable: '--font-sans',
   display: 'swap',
 });
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
+  weight: ['400', '600'],
   variable: '--font-mono',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Robotics & IoT Lab - Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM',
+  title: 'CLB Robotics & IoT - Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM',
   description: 'Trưng bày công trình nghiên cứu khoa học, dự án công nghệ và sản phẩm Robotics & IoT',
 };
 
@@ -27,17 +32,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="vi" className={`${plusJakartaSans.variable} ${jetbrainsMono.variable}`}>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400;1,600&display=swap"
-        />
-      </head>
-      <body className={`${plusJakartaSans.className} min-h-screen text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900`}>
-        {children}
+    <html lang="vi" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body className={`${inter.className} min-h-screen text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900`}>
+        <NavigationTransitionProvider>
+          <DialogProvider>
+            <ImeInputSupport />
+            <PageReveal />
+            {children}
+          </DialogProvider>
+        </NavigationTransitionProvider>
       </body>
     </html>
   );
