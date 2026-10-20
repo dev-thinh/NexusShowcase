@@ -5,6 +5,12 @@ import { Trash2 } from 'lucide-react';
 import type { ContributorInput } from '@/lib/action-schemas';
 import { filterAvailableClubMembers } from './member-search';
 
+const roleLabels: Record<ContributorInput['role'], string> = {
+  ADVISOR: 'Người hướng dẫn', FIRST_AUTHOR: 'Tác giả chính', CO_FIRST_AUTHOR: 'Đồng tác giả chính',
+  CO_AUTHOR: 'Đồng tác giả', CORRESPONDING_AUTHOR: 'Tác giả liên hệ', PROJECT_LEAD: 'Trưởng nhóm',
+  CONTRIBUTOR: '', CUSTOM: '',
+};
+
 interface ContributorEditorProps {
   value: ContributorInput[];
   clubMembers: Array<{ id: string; fullName: string }>;
@@ -62,7 +68,7 @@ export function ContributorEditor({ value, clubMembers, onChange }: ContributorE
       </div>
 
       <label className="mt-2 inline-flex min-h-11 items-center gap-2 text-sm text-slate-700">
-        <input type="checkbox" checked={showDetailedRoles} onChange={(event) => setShowDetailedRoles(event.target.checked)} />
+        <input type="checkbox" checked={showDetailedRoles} onChange={event => setShowDetailedRoles(event.target.checked)} />
         Vai trò chi tiết
       </label>
 
@@ -93,6 +99,7 @@ export function ContributorEditor({ value, clubMembers, onChange }: ContributorE
               setIsMemberSearchOpen(true);
             }}
             onKeyDown={(event) => {
+              if (event.nativeEvent.isComposing || event.nativeEvent.keyCode === 229) return;
               if (event.key === 'ArrowDown') {
                 event.preventDefault();
                 setIsMemberSearchOpen(true);
@@ -111,9 +118,7 @@ export function ContributorEditor({ value, clubMembers, onChange }: ContributorE
           />
 
             <div id="club-contributor-results" role="listbox" className="mt-2 max-h-64 w-full overflow-y-auto rounded-md border border-slate-200 bg-white p-1.5">
-              {!memberQuery.trim() ? (
-                <p className="px-3 py-2.5 text-sm text-slate-500">Nhập tên thành viên để tìm kiếm</p>
-              ) : memberResults.length === 0 ? (
+              {memberResults.length === 0 ? (
                 <p className="px-3 py-2.5 text-sm text-slate-500">Không tìm thấy thành viên phù hợp</p>
               ) : (
                 <>
@@ -125,6 +130,7 @@ export function ContributorEditor({ value, clubMembers, onChange }: ContributorE
                       role="option"
                       aria-selected={index === activeResult}
                       onMouseEnter={() => setActiveResult(index)}
+                      onMouseDown={event => event.preventDefault()}
                       onClick={() => addMember(member.id)}
                       className={`flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm transition-colors ${index === activeResult ? 'bg-slate-100 font-semibold text-slate-950' : 'text-slate-700 hover:bg-slate-50'}`}
                     >
@@ -149,10 +155,8 @@ export function ContributorEditor({ value, clubMembers, onChange }: ContributorE
                 <input value={contributor.externalName ?? ''} onChange={(event) => update(index, { externalName: event.target.value })} aria-label={`Tên người đóng góp ${index + 1}`} placeholder="Họ và tên" className="min-h-9 rounded-md border border-slate-300 px-3 text-sm" />
               )}
               {showDetailedRoles ? (
-                <select value={contributor.role} onChange={(event) => update(index, { role: event.target.value as ContributorInput['role'] })} aria-label={`Vai trò của người đóng góp ${index + 1}`} className="min-h-9 rounded-md border border-slate-300 bg-white px-3 text-sm">
-                  <option value="PROJECT_LEAD">Trưởng nhóm dự án</option><option value="FIRST_AUTHOR">Tác giả chính</option><option value="CO_AUTHOR">Đồng tác giả</option><option value="ADVISOR">Người hướng dẫn</option><option value="CONTRIBUTOR">Thành viên đóng góp</option>
-                </select>
-              ) : <span className="text-sm text-slate-500">Thành viên đóng góp</span>}
+              <input value={contributor.customRoleTitle ?? (contributor.role === 'CONTRIBUTOR' || contributor.role === 'CUSTOM' ? '' : roleLabels[contributor.role])} maxLength={100} onChange={event => update(index, { role: event.target.value.trim() ? 'CUSTOM' : 'CONTRIBUTOR', customRoleTitle: event.target.value })} aria-label={`Vai trò của người đóng góp ${index + 1}`} placeholder="Vai trò (tùy chọn)" className="min-h-9 min-w-0 rounded-md border border-slate-300 bg-white px-3 text-sm" />
+              ) : <span className="text-sm text-slate-500">{contributor.customRoleTitle || roleLabels[contributor.role] || 'Thành viên đóng góp'}</span>}
               <button type="button" onClick={() => onChange(value.filter((_, current) => current !== index).map((entry, order) => ({ ...entry, displayOrder: order })))} aria-label={`Xóa người đóng góp ${index + 1}`} className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-slate-500 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
             </div>
           );

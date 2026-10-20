@@ -12,8 +12,8 @@ const members = [
 ];
 
 describe('club member search', () => {
-  it('shows no members until the user enters a search term', () => {
-    expect(filterAvailableClubMembers(members, '   ', [])).toEqual([]);
+  it('shows available members before typing and excludes selected users', () => {
+    expect(filterAvailableClubMembers(members, '   ', ['1']).map(member => member.id)).toEqual(['2', '3', '4', '5', '6', '7']);
   });
 
   it('matches Vietnamese names without requiring accents or exact casing', () => {

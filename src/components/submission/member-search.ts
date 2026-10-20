@@ -10,7 +10,6 @@ export function filterAvailableClubMembers(
   limit = 6,
 ): ClubMemberOption[] {
   const normalizedQuery = normalizeSearchText(query.trim());
-  if (!normalizedQuery) return [];
 
   const selected = new Set(selectedUserIds);
   return members
