@@ -39,6 +39,7 @@ describe('submission snapshots', () => {
 
     expect(buildSubmissionSnapshot(source)).toEqual({
       ...snapshot,
+      type: 'PROJECT', categoryId: undefined, thumbnailUrl: undefined,
       content: '',
       publishedYear: new Date().getFullYear(),
       suggestedField: '',

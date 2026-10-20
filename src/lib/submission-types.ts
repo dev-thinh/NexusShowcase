@@ -16,6 +16,9 @@ export type SnapshotContributor = ContributorInput & {
 };
 
 export interface SubmissionSnapshot {
+  type?: 'RESEARCH_PAPER' | 'PROJECT';
+  categoryId?: string | null;
+  thumbnailUrl?: string | null;
   title: string;
   summary: string;
   content: string;
@@ -31,22 +34,23 @@ export interface EditorialOverrides {
   summary?: string;
   content?: string;
   thumbnailUrl?: string | null;
-  type?: ItemType;
+  type?: 'RESEARCH_PAPER' | 'PROJECT';
   categoryId?: string | null;
-  tags?: string[];
   issuer?: string | null;
   publishedYear?: number;
 }
 
 export interface EffectivePublication extends SubmissionSnapshot {
   thumbnailUrl?: string | null;
-  type?: ItemType;
+  type?: 'RESEARCH_PAPER' | 'PROJECT';
   categoryId?: string | null;
-  tags?: string[];
   issuer?: string | null;
 }
 
 export interface SubmissionSnapshotSource {
+  type?: ItemType;
+  categoryId?: string | null;
+  thumbnailUrl?: string | null;
   title: string;
   summary: string;
   content?: string | null;
@@ -69,6 +73,9 @@ export function mapShowcaseItemToSubmission(item: {
   title: string;
   summary: string;
   content: string | null;
+  type?: ItemType;
+  categoryId?: string | null;
+  thumbnailUrl?: string | null;
   publishedYear: number | null;
   suggestedField: string | null;
   customProjectType: string | null;
@@ -87,6 +94,9 @@ export function mapShowcaseItemToSubmission(item: {
 }): SubmissionSnapshot & { id: string } {
   return {
     id: item.id,
+    type: item.type === 'RESEARCH_PAPER' ? 'RESEARCH_PAPER' : 'PROJECT',
+    categoryId: item.categoryId,
+    thumbnailUrl: item.thumbnailUrl,
     title: item.title,
     summary: item.summary,
     content: item.content ?? '',

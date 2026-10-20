@@ -31,6 +31,9 @@ function buildResources(source: SubmissionSnapshotSource): SubmissionResource[] 
 
 export function buildSubmissionSnapshot(source: SubmissionSnapshotSource): SubmissionSnapshot {
   return {
+    type: source.type === 'RESEARCH_PAPER' ? 'RESEARCH_PAPER' : 'PROJECT',
+    categoryId: source.categoryId,
+    thumbnailUrl: source.thumbnailUrl,
     title: source.title,
     summary: source.summary,
     content: source.content ?? '',
