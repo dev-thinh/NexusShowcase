@@ -111,32 +111,31 @@ npm run build
 
 ---
 
-## 5. Editorial roles and publication workflow
+## 5. Đăng bài theo section và Admin duyệt trực tiếp
 
-- `CORE_MEMBER` completes a draft and submits it for review. Every submission creates an immutable `SubmissionRevision`, including contributor display names and the exact resource list.
-- Only the assigned `EDITOR` may edit publication fields, add/resolve feedback, request an author revision, or hand off an item while it is `PENDING_REVIEW`.
-- During `READY_FOR_APPROVAL`, the workspace is read-only. `ADMIN` may publish internally (`PRIVATE`, the default), publish publicly (`PUBLIC`), return the item to its Editor, or reject it.
-- `ADMIN` never sends feedback directly to the author. The Admin returns work to the Editor, who owns author communication.
-- Author resources are immutable throughout review. Editor and Admin may preview them and attach field feedback, but cannot rename, remove, replace, or exclude them from publication.
+- `CORE_MEMBER` và `ADMIN` có thể soạn bài; mỗi tác giả chỉ sửa bài của mình.
+- Abstract/tóm tắt và ít nhất một người đóng góp bắt buộc khi gửi. Lưu nháp chỉ cần tiêu đề.
+- Dự án không bắt buộc nội dung chi tiết. Bài nghiên cứu cần nội dung hoặc nguồn toàn văn.
+- Nội dung gồm section có tên và các khối văn bản, ảnh/biểu đồ, video, PDF, liên kết. Định dạng được giới hạn để giữ bố cục nhất quán. HTML tùy ý không được thực thi.
+- Liên kết/media trong section hiển thị trong nội dung. Tài nguyên đính kèm được quản lý riêng: tác giả đặt tên tùy ý rồi dán URL hoặc tải tệp bất kỳ (tối đa 25 MB/tệp). Các tài nguyên này hiển thị thành card không icon ở cột phải.
+- Tệp tài nguyên chung lưu tại `storage/resources/`, được phục vụ qua `/uploads/resources/[filename]` dưới dạng tải xuống. Khi triển khai cần giữ thư mục này trên ổ lưu trữ bền vững cùng các tệp upload hiện có.
+- Admin xem bản nộp chỉ đọc và chọn xuất bản nội bộ/công khai, yêu cầu chỉnh sửa hoặc từ chối. Không còn bước Editor.
 
 ```text
-DRAFT -> PENDING_REVIEW -> REVISION_REQUESTED -> PENDING_REVIEW
-                         -> REJECTED -> DRAFT (ADMIN reopen)
-PENDING_REVIEW -> READY_FOR_APPROVAL -> PUBLISHED -> ARCHIVED
-                                  \-> PENDING_REVIEW (ADMIN return)
+Bản nháp -> Chờ duyệt -> Đã xuất bản
+                   -> Cần chỉnh sửa -> Chờ duyệt
+                   -> Từ chối
 ```
 
-`REVISION_REQUESTED` remains editable by the author. `REJECTED` is read-only until an admin explicitly reopens it. Publication atomically materializes the latest submission plus editorial overrides, status, and visibility into `ShowcaseItem`; revisions, editorial drafts, comments, and audit events remain available for traceability.
+Tác giả có thể rút bài chờ duyệt về nháp. Mỗi lần gửi tạo `SubmissionRevision` bất biến. Khi sửa bài đã xuất bản, bản cập nhật lưu riêng ở `authorDraft`/`reviewStatus`; bản công khai vẫn giữ nguyên cho tới khi Admin duyệt. Quyết định duyệt dùng `reviewVersion` để ngăn thao tác trên bản cũ và xung đột.
 
-User-facing status labels are centralized and localized: `Bản nháp`, `Chờ biên tập`, `Chờ tác giả bổ sung`, `Chờ phê duyệt`, `Đã xuất bản`, `Không được phê duyệt`, and `Đã lưu trữ`. Raw enum tokens are not displayed in the interface.
-
-### Safe database migration
-
-Back up production data before deployment, configure `DATABASE_URL` for the intended database, and run:
+### Cập nhật database
 
 ```bash
 npx prisma generate
 npx prisma migrate deploy
 ```
 
-Use `npm run db:push` only for local development. Automated integration and E2E suites must use a separate `TEST_DATABASE_URL` containing `test` in its database name or schema.
+Migration mới chỉ thêm cột, chuyển Editor hiện hữu thành Core Member và gộp trạng thái chờ biên tập vào chờ duyệt. Enum/bảng biên tập cũ được giữ để bảo toàn lịch sử; không thể cấp quyền Editor mới. Các endpoint biên tập cũ ngừng nhận thay đổi.
+
+Các kiểm thử database luôn dùng `TEST_DATABASE_URL` riêng. Kiểm thử luồng mới nằm trong `tests/integration/direct-approval.test.ts`.
