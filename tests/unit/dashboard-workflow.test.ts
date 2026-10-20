@@ -11,7 +11,7 @@ describe('member workflow dashboard', () => {
   });
 
   it('offers editing only for drafts and requested revisions', () => {
-    const dashboard = read('src/app/dashboard/page.tsx');
+    const dashboard = read('src/components/my-posts.tsx');
     expect(dashboard).toContain("['DRAFT', 'REVISION_REQUESTED'].includes(item.status)");
     expect(dashboard).toContain("item.status === 'REJECTED'");
     expect(dashboard).toContain('Chỉ đọc');

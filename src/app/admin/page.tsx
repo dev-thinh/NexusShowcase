@@ -1,233 +1,56 @@
-import { auth } from '@/lib/auth';
+import { getSession as auth } from '@/lib/session';
 import { redirect } from 'next/navigation';
+import { pendingReviewWhere } from '@/lib/direct-review';
 import { prisma } from '@/lib/prisma';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
+import { ManagementHeader, ManagementNav, ManagementStat } from '@/components/management-layout';
 import { TypeBadge } from '@/components/ui/badge';
+import { AdminBulkPosts } from '@/components/admin-bulk-posts';
 import { PinToggleButton } from '@/components/pin-toggle-button';
+import { EmptyState } from '@/components/ui/empty-state';
 import Link from 'next/link';
-import {
-  ShieldCheck,
-  Clock,
-  Users,
-  ArrowRight,
-  Pin,
-  Sparkles,
-  ExternalLink,
-  Calendar,
-} from 'lucide-react';
+import { Clock, Users, ArrowRight, Pin, ExternalLink } from 'lucide-react';
 
 export default async function AdminDashboardPage() {
   const session = await auth();
-  if (!session?.user) {
-    redirect('/login');
-  }
-  if ((session.user as any).role !== 'ADMIN') {
-    redirect('/');
-  }
-  if ((session.user as any).mustChangePassword) {
-    redirect('/account/change-password');
-  }
+  if (!session?.user?.id) redirect('/login');
+  const actor = session.user as typeof session.user & { role?: string; mustChangePassword?: boolean };
+  if (actor.role !== 'ADMIN') redirect('/');
+  if (actor.mustChangePassword) redirect('/account/change-password');
 
-  const [pendingCount, totalMembers, pinnedItems] = await Promise.all([
-    prisma.showcaseItem.count({ where: { status: 'PENDING_REVIEW' } }),
+  const [pendingCount, totalMembers, pinnedCount, pinnedItems] = await Promise.all([
+    prisma.showcaseItem.count({ where: pendingReviewWhere }),
     prisma.user.count({ where: { status: 'ACTIVE' } }),
-    prisma.showcaseItem.findMany({
-      where: { status: 'PUBLISHED', isPinned: true },
-      orderBy: { pinnedAt: 'desc' },
-      take: 10,
-    }),
+    prisma.showcaseItem.count({ where: { status: 'PUBLISHED', isPinned: true } }),
+    prisma.showcaseItem.findMany({ where: { status: 'PUBLISHED', isPinned: true }, orderBy: { pinnedAt: 'desc' }, take: 10 }),
   ]);
 
-  const pinnedCount = pinnedItems.length;
-
-  return (
-    <div className="min-h-screen flex flex-col font-sans">
-      <Navbar />
-
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl flex-1">
-        {/* Banner */}
-        <div className="bg-[#0F294A] text-white p-5 sm:p-8 rounded-lg shadow-2xs mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border border-slate-800">
-          <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-md bg-white/10 text-amber-300 text-xs font-semibold mb-2.5 border border-white/15">
-              <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-              <span>Khu vực Quản trị Học thuật</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-              Trung tâm Quản trị Học thuật
-            </h1>
-            <p className="text-xs sm:text-sm text-slate-300 mt-1 max-w-2xl leading-relaxed">
-              Thẩm định công trình nghiên cứu xuất bản, quản lý bài ghim trang chủ và phân quyền thành viên.
-            </p>
-          </div>
-        </div>
-
-        {/* Action Widgets Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <Link
-            href="/admin/reviews"
-            className="panel-operational group hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
-                  <Clock className="w-5 h-5" />
-                </div>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
-                  Cần xử lý
-                </span>
-              </div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">Bài nộp đang chờ duyệt</h2>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Xem chi tiết công trình, phê duyệt xuất bản hoặc gửi phản hồi chỉnh sửa.
-              </p>
-            </div>
-
-            <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xl sm:text-2xl font-black text-amber-700">{pendingCount} bài</span>
-              <span className="text-xs font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                <span>Vào duyệt ngay</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </span>
-            </div>
-          </Link>
-
-          <Link
-            href="/admin/members"
-            className="panel-operational group hover:shadow-sm hover:border-slate-300 transition-all flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="w-10 h-10 rounded-lg bg-blue-50 text-blue-800 flex items-center justify-center font-bold border border-blue-200/80">
-                  <Users className="w-5 h-5" />
-                </div>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-800 border border-blue-200/80">
-                  Thành viên
-                </span>
-              </div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">Quản lý &amp; Phân quyền</h2>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Tạo tài khoản mới, phân quyền CORE MEMBER để đăng ký công trình.
-              </p>
-            </div>
-
-            <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xl sm:text-2xl font-black text-slate-900">{totalMembers} thành viên</span>
-              <span className="text-xs font-bold text-[#0F294A] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                <span>Quản lý danh sách</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </span>
-            </div>
-          </Link>
-
-          <div className="panel-operational flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between mb-3.5">
-                <div className="w-10 h-10 rounded-lg bg-amber-50 text-amber-700 flex items-center justify-center font-bold border border-amber-200/80">
-                  <Pin className="w-5 h-5" />
-                </div>
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-amber-50 text-amber-800 border border-amber-200/80">
-                  Trang chủ
-                </span>
-              </div>
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">Công trình đang ghim</h2>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Các công trình nghiên cứu và sáng tạo được ghim nổi bật trên trang chủ.
-              </p>
-            </div>
-
-            <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-xl sm:text-2xl font-black text-amber-700">{pinnedCount} bài</span>
-              <a
-                href="/"
-                target="_blank"
-                className="text-xs font-bold text-[#0F294A] hover:text-[#1E3A5F] hover:underline inline-flex items-center gap-1"
-              >
-                <span>Xem trang chủ</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Pinned Showcase Management Panel */}
-        <section className="panel-operational sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-5 border-b border-slate-100 mb-6">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/80 mb-1.5">
-                <Pin className="w-3.5 h-3.5" />
-                <span>Tiêu điểm đã ghim</span>
-              </div>
-              <h2 className="text-xl font-bold text-slate-900">
-                Danh Sách Công Trình Đang Ghim Nổi Bật
-              </h2>
-            </div>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-sm">
-              Quản lý trạng thái hiển thị công trình trên thanh cuộn tiêu điểm trang chủ.
-            </p>
-          </div>
-
-          {pinnedItems.length === 0 ? (
-            <div className="text-center py-12 px-4 rounded-xl bg-slate-50 border border-dashed border-slate-200">
-              <Sparkles className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <h3 className="text-sm font-bold text-slate-700">Chưa có công trình nào được ghim riêng</h3>
-              <p className="text-xs text-slate-500 mt-1 max-w-md mx-auto">
-                Chưa có công trình nào được ghim riêng. Các công trình mới xuất bản sẽ được tự động hiển thị làm tiêu điểm.
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {pinnedItems.map((item, idx) => (
-                <div
-                  key={item.id}
-                  className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50/60 px-3 -mx-3 rounded-xl transition-colors"
-                >
-                  <div className="flex items-start gap-3.5">
-                    <span className="w-6 text-center text-sm font-bold text-slate-400 mt-0.5">
-                      #{idx + 1}
-                    </span>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <TypeBadge type={item.type} size="sm" />
-                        <span className="text-xs text-slate-500 flex items-center gap-1 font-medium">
-                          <Calendar className="w-3.5 h-3.5" />
-                          {item.publishedYear}
-                        </span>
-                      </div>
-                      <Link
-                        href={`/showcase/${item.slug}`}
-                        className="text-base font-bold text-slate-900 hover:text-[#0F294A] transition-colors line-clamp-1"
-                      >
-                        {item.title}
-                      </Link>
-                      <p className="text-xs text-slate-500 line-clamp-1 mt-0.5">
-                        {item.summary}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
-                    <Link
-                      href={`/showcase/${item.slug}`}
-                      className="h-10 px-3.5 rounded-xl text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 border border-slate-200 shadow-2xs inline-flex items-center gap-1.5 transition-colors"
-                    >
-                      <span>Xem</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </Link>
-                    <PinToggleButton
-                      itemId={item.id}
-                      initialIsPinned={true}
-                      status={item.status}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+  return <div className="flex min-h-screen flex-col"><Navbar />
+    <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+      <ManagementHeader title="Tổng quan quản trị" description="Theo dõi bài chờ duyệt, thành viên và nội dung nổi bật.">
+        <AdminBulkPosts mode="pin" />
+        <AdminBulkPosts mode="visibility" />
+        <Link href="/admin/reviews" className="action-primary-detail">Phê duyệt bài đăng<ArrowRight aria-hidden="true" className="h-4 w-4" /></Link>
+      </ManagementHeader>
+      <ManagementNav active="overview" userId={session.user.id} isAdmin />
+      <div className="mb-6 grid grid-cols-3 gap-3">
+        <ManagementStat label="Bản nộp chờ duyệt" value={pendingCount} icon={Clock} href="/admin/reviews" attention={pendingCount > 0} />
+        <ManagementStat label="Thành viên hoạt động" value={totalMembers} icon={Users} href="/admin/members" />
+        <ManagementStat label="Công trình đang ghim" value={pinnedCount} icon={Pin} href="#pinned-items" />
+      </div>
+      <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <section id="pinned-items" className="panel-operational min-w-0 scroll-mt-32 !p-0 !shadow-none" aria-labelledby="pinned-title">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-5"><div><h2 id="pinned-title" className="text-lg font-semibold text-[#0F294A]">Nổi bật trên trang chủ</h2><p className="mt-1 text-xs text-slate-500">{pinnedCount > 3 ? `Đang ghim ${pinnedCount} công trình. Vui lòng bỏ ghim bớt để còn tối đa 3 bài.` : `${pinnedCount}/3 vị trí ghim. Ghim bài mới để chọn công trình cần thay thế khi đã đủ.`}</p></div><Link href="/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#0F294A]">Xem trang chủ<ExternalLink aria-hidden="true" className="h-3.5 w-3.5" /></Link></div>
+          {!pinnedItems.length ? <div className="p-4 sm:p-5"><EmptyState icon={Pin} title="Chưa có công trình được ghim" description="Mở một bài đã xuất bản để ghim lên trang chủ." /></div> : <div className="divide-y divide-slate-200">{pinnedItems.map((item, index) => <div key={item.id} className="flex flex-col justify-between gap-3 p-4 sm:p-5 xl:flex-row xl:items-center">
+            <div className="flex min-w-0 items-start gap-3"><span className="pt-0.5 text-xs font-semibold tabular-nums text-slate-400">{String(index + 1).padStart(2, '0')}</span><div className="min-w-0"><div className="mb-2 flex flex-wrap items-center gap-2"><TypeBadge type={item.type} size="sm" /><span className="text-xs text-slate-500">{item.publishedYear}</span></div><Link href={`/showcase/${item.slug}`} className="line-clamp-2 text-sm font-semibold leading-6 text-slate-900 hover:text-[#0F294A]">{item.title}</Link></div></div>
+            <div className="flex shrink-0 items-center gap-2 self-end xl:self-center"><Link href={`/showcase/${item.slug}`} className="action-secondary-card">Xem bài</Link><PinToggleButton itemTitle={item.title} itemId={item.id} initialIsPinned status={item.status} compact /></div>
+          </div>)}</div>}
         </section>
-      </main>
-
-      <AcademicFooter />
-    </div>
-  );
+        <aside className="space-y-4" aria-label="Tác vụ quản trị">
+          <div className="rounded-lg border border-blue-100 bg-blue-50/70 p-4"><h2 className={`text-sm font-semibold ${pendingCount ? 'text-amber-800' : 'text-[#0F294A]'}`}>{pendingCount ? `${pendingCount} bản nộp cần xem` : 'Đã xử lý hết bản nộp'}</h2><p className="mt-2 text-sm leading-6 text-slate-600">{pendingCount ? 'Xem nội dung và phản hồi để tác giả hoàn thiện bài đăng.' : 'Bản nộp mới sẽ xuất hiện trong danh sách phê duyệt.'}</p><Link href="/admin/reviews" className="mt-4 inline-flex min-h-10 w-full cursor-pointer items-center justify-center rounded-md bg-brand-button px-3 text-sm font-semibold text-white transition hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] focus-visible:ring-offset-2">Mở danh sách</Link></div>
+          <div className="rounded-lg border border-slate-200 bg-white p-4"><h2 className="mb-2 text-sm font-semibold text-slate-900">Truy cập nhanh</h2>{[{ href: '/admin/members', label: 'Quản lý thành viên' }, { href: '/dashboard', label: 'Bài đăng của tôi' }].map(({ href, label }) => <Link key={href} href={href} className="mt-2 flex min-h-11 cursor-pointer items-center justify-center rounded-md border border-slate-300 bg-slate-50 px-3 text-sm font-semibold text-[#0F294A] transition-colors hover:border-slate-400 hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] focus-visible:ring-offset-2">{label}</Link>)}</div>
+        </aside>
+      </div>
+    </main><AcademicFooter /></div>;
 }
