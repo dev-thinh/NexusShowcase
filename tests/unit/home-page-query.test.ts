@@ -34,32 +34,24 @@ describe('Home Page Minimalist Revamp', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
 
-    // The brand lockup stays on one line without button-like borders or a filled chip.
-    expect(content.match(/data-brand-lockup="home"/g) ?? []).toHaveLength(2);
-    expect(content).toContain('bg-slate-100/80');
-    expect(content).toContain('text-[#0F294A] text-xs sm:text-sm font-extrabold');
-    expect(content).not.toContain('rounded-xl bg-white border border-slate-200 shadow-xs');
-    expect(content).not.toContain('bg-emerald-400 animate-pulse');
-    expect(content).toContain('Robotics &amp; IoT Lab');
-    expect(content).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
-
-    // Title and Subtitle
-    expect(content).toContain('Nghiên Cứu Khoa Học &amp; Công Nghệ Robotics · IoT');
-    expect(content).toContain('CLB Robotics &amp; IoT HCMUS');
+    expect(content).toContain('<HomeHero />');
+    expect(content).toContain('Thư viện công trình');
+    expect(content).toContain('Kết quả tìm kiếm');
+    expect(content).toContain('role="search"');
+    expect(content).toContain('variant="outline"');
 
     // Central search bar
     expect(content).toContain('name="q"');
     expect(content).toContain('Tìm kiếm bài báo, dự án robot, tác giả...');
 
-    // Academic Lab Portal Sections
-    expect(content).toContain('Công Trình &amp; Bài Báo Khoa Học Mới Xuất Bản');
-    expect(content).toContain('Dự Án Robotics &amp; Hệ Thống Nhúng Tiêu Biểu');
-    expect(content).toContain('Dự Án Sáng Tạo &amp; Giải Pháp Khác');
-
-    // Direct Category navigation links
-    expect(content).toContain('/category/bai-bao-khoa-hoc');
-    expect(content).toContain('/category/robotics-iot');
-    expect(content).toContain('/category/du-an-sang-tao');
+    // The homepage combines work into one list alongside research directions.
+    expect(content).toContain('Hướng nghiên cứu');
+    expect(content).toContain('Công trình nổi bật');
+    expect(content).toContain('Thành viên');
+    expect(content).toContain('href="/members"');
+    expect(content).not.toContain('creativeProjects');
+    expect(content).not.toContain('roboticsProjects');
+    expect(content).toContain('take: 3');
 
     // Public content cards share the sitewide panel surface.
     expect(content).toContain('panel-public');

@@ -1,51 +1,71 @@
+import { CardAdminControls } from '@/components/card-admin-controls';
+import { showcaseHref } from '@/lib/showcase-navigation';
+import { MemberPagination } from '@/components/member-pagination';
+import { CardLink } from '@/components/card-link';
 import Link from 'next/link';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { getSession as auth } from '@/lib/session';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
+import { HomeHero } from '@/components/home-hero';
 import { EmptyState } from '@/components/ui/empty-state';
 import { TypeBadge } from '@/components/ui/badge';
 import { CitationModal } from '@/components/citation-modal';
 import { publicUserSelect } from '@/lib/public-user';
-import { buildHomepageCategoryWhere } from '@/lib/home-section-filters';
+import { MemberCard } from '@/components/member-card';
+import type { MemberDirectoryEntry } from '@/lib/member-directory';
 import {
   BookOpen,
   Search,
-  FileText,
   ExternalLink,
   ArrowRight,
-  Github,
-  Globe,
-  Cpu,
 } from 'lucide-react';
 
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
   const session = await auth();
+  const isAdmin = (session?.user as { role?: string } | undefined)?.role === 'ADMIN';
   const isAuthenticated = !!session?.user;
 
   const params = await searchParams;
   const searchQuery = params.q?.trim();
+  let returnTo = searchQuery ? `/?q=${encodeURIComponent(searchQuery)}` : '/';
 
-  const baseWhere: any = {
+  const baseWhere: Prisma.ShowcaseItemWhereInput = {
     status: 'PUBLISHED',
     ...(isAuthenticated ? {} : { visibility: 'PUBLIC' }),
   };
 
   // Search Results Mode
   if (searchQuery) {
-    const searchItems = await prisma.showcaseItem.findMany({
-      where: {
+    const pageSize = 10;
+    const searchWhere: Prisma.ShowcaseItemWhereInput = {
         ...baseWhere,
         OR: [
           { title: { contains: searchQuery, mode: 'insensitive' } },
           { summary: { contains: searchQuery, mode: 'insensitive' } },
-          { tags: { has: searchQuery } },
+          { contributors: { some: { OR: [
+            { user: { fullName: { contains: searchQuery, mode: 'insensitive' } } },
+            { externalName: { contains: searchQuery, mode: 'insensitive' } },
+          ] } } },
         ],
-      },
+      };
+    const totalItems = await prisma.showcaseItem.count({ where: searchWhere });
+    const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+    const requestedPage = Number(params.page);
+    const page = Number.isSafeInteger(requestedPage) && requestedPage > 0
+      ? Math.min(requestedPage, totalPages) : 1;
+    const searchPath = `/?q=${encodeURIComponent(searchQuery)}`;
+    returnTo = `${searchPath}${page > 1 ? `&page=${page}` : ''}`;
+    const searchItems = await prisma.showcaseItem.findMany({
+      omit: { authorDraft: true },
+      where: searchWhere,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
       include: {
         contributors: {
           include: { user: { select: publicUserSelect } },
@@ -54,624 +74,264 @@ export default async function HomePage({
         links: true,
         category: { select: { id: true, name: true, slug: true } },
       },
-      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
     });
 
     return (
-      <div className="min-h-screen flex flex-col font-sans bg-white">
+      <div className="min-h-screen flex flex-col font-sans bg-background">
         <Navbar />
-
-        {/* Hero Section */}
-        <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-100 bg-slate-50/60">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-            {/* Tech-badge Panel */}
-            <div data-brand-lockup="home" className="inline-flex items-center gap-3 sm:gap-3.5 px-3 py-2 rounded-lg bg-slate-100/80 mb-5 sm:mb-6">
-              <div className="flex items-center gap-2 shrink-0 text-[#0F294A] text-xs sm:text-sm font-extrabold tracking-wide">
-                <span className="w-1.5 h-1.5 rounded-[2px] bg-[#0F294A]/70" />
-                <span>Robotics &amp; IoT Lab</span>
-              </div>
-              <div className="hidden sm:block h-4 w-px bg-slate-200" />
-              <span className="text-[10px] sm:text-sm font-semibold text-slate-600 tracking-tight whitespace-nowrap">
-                Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
-              </span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Nghiên Cứu Khoa Học &amp; Công Nghệ Robotics · IoT
-            </h1>
-
-            <p className="mt-3.5 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-              Không gian công bố các công trình nghiên cứu khoa học xuất bản, hệ thống nhúng thông minh và dự án robot của thành viên CLB Robotics &amp; IoT HCMUS.
-            </p>
-
-            {/* Central Search Form */}
-            <form method="GET" action="/" className="mt-6 max-w-xl mx-auto flex items-center gap-2">
+        <section className="border-b border-slate-200 bg-white py-8 sm:py-12">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Link href="/" className="text-xs font-semibold text-slate-500 hover:text-[#0F294A]">Trang chủ / Tìm kiếm</Link>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Thư viện công trình</p>
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-[#0F294A] sm:text-4xl">Kết quả tìm kiếm</h1>
+            <p className="mt-3 text-sm leading-6 text-slate-600">Khám phá nghiên cứu khoa học và dự án Robotics &amp; IoT của CLB.</p>
+            <form method="GET" action="/" role="search" aria-label="Tìm kiếm công trình" className="mt-6 flex max-w-3xl flex-col gap-2 sm:flex-row">
               <div className="relative flex-1">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  name="q"
-                  defaultValue={searchQuery}
-                  placeholder="Tìm kiếm bài báo, dự án robot, tác giả..."
-                  className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
-                />
+                <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+                <input type="search" name="q" defaultValue={searchQuery} aria-label="Từ khóa tìm kiếm" placeholder="Tìm kiếm bài báo, dự án robot, tác giả..." className="h-12 w-full rounded-xl border border-slate-200 bg-slate-50 pl-12 pr-4 text-sm text-slate-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]" />
               </div>
-              <button
-                type="submit"
-                className="px-5 py-2.5 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg shadow-xs transition-colors cursor-pointer shrink-0"
-              >
-                Tìm kiếm
-              </button>
+              <button type="submit" className="h-12 rounded-xl bg-brand-button px-6 text-sm font-semibold text-white transition hover:brightness-110">Tìm kiếm</button>
             </form>
+            <p className="mt-3 text-xs leading-5 text-slate-500">Tìm theo tiêu đề, tóm tắt hoặc tên tác giả.</p>
           </div>
         </section>
-
-        {/* Search Results Feed */}
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-5 border-b border-slate-200 mb-6">
-            <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
-                Kết quả tìm kiếm
-              </span>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">
-                Tìm thấy {searchItems.length} công trình cho &quot;{searchQuery}&quot;
-              </h2>
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
+            <div className="min-w-0">
+              <h2 className="break-words text-lg font-semibold text-[#0F294A]">{totalItems} công trình cho “{searchQuery}”</h2>
+              {totalItems > 0 && <p className="mt-1 text-xs text-slate-500">Hiển thị {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalItems)} / {totalItems} công trình · Mới nhất trước</p>}
             </div>
-            <Link
-              href="/"
-              className="text-xs sm:text-sm font-semibold text-slate-600 hover:text-slate-900 px-3.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors self-start sm:self-auto"
-            >
-              Xóa tìm kiếm
-            </Link>
+            <Link href="/" className="inline-flex min-h-10 items-center rounded-lg border border-slate-200 bg-white px-4 text-xs font-semibold text-slate-600 hover:bg-slate-50">Xóa tìm kiếm</Link>
           </div>
-
-          {searchItems.length === 0 ? (
-            <EmptyState
-              title="Không tìm thấy công trình nào"
-              description={`Không có bài báo hoặc dự án nào khớp với từ khóa "${searchQuery}".`}
-              actionLabel="Xem toàn bộ chuyên mục"
-              actionHref="/"
-            />
+          {totalItems === 0 ? (
+            <EmptyState icon={Search} title="Không tìm thấy công trình nào" description="Thử từ khóa ngắn hơn, kiểm tra chính tả hoặc tìm theo tên tác giả." actionLabel="Về trang chủ" actionHref="/" />
           ) : (
-            <div className="space-y-4">
-              {searchItems.map((item) => {
-                const paperLink = item.links.find((l) => l.type === 'PAPER_URL');
-                return (
-                  <article
-                    key={item.id}
-                    className="panel-public hover:border-slate-300 hover:shadow-xs transition-all flex flex-col gap-3.5"
-                  >
-                    <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
-                      <TypeBadge type={item.type} size="sm" />
-                      {item.publishedYear && (
-                        <>
-                          <span>•</span>
-                          <span>Năm {item.publishedYear}</span>
-                        </>
-                      )}
-                      {item.issuer && (
-                        <>
-                          <span>•</span>
-                          <span className="text-slate-700 font-medium">{item.issuer}</span>
-                        </>
-                      )}
-                    </div>
-
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
-                      <Link
-                        href={`/showcase/${item.slug}`}
-                        className="hover:text-[#0F294A] transition-colors"
-                      >
-                        {item.title}
+            <>
+              <div className="space-y-4">
+                {searchItems.map(item => {
+                  const paperLink = item.links.find(link => link.type === 'PAPER_URL');
+                  const sourceLink = paperLink ?? item.links.find(link => link.type === 'GITHUB');
+                  return (
+                    <article key={item.id} className="clickable-card panel-public grid gap-5 transition-shadow hover:shadow-md sm:grid-cols-[11rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-7">
+                      <CardLink slug={item.slug} returnTo={returnTo} />
+                      <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="flex aspect-[4/3] items-center justify-center self-start overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
+                        {item.thumbnailUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={item.thumbnailUrl} alt={item.title} loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 p-4 text-slate-400"><BookOpen aria-hidden="true" className="h-9 w-9 stroke-[1.25]" /><span className="text-xs">CLB Robotics &amp; IoT</span></div>
+                        )}
                       </Link>
-                    </h3>
-
-                    {item.contributors.length > 0 && (
-                      <p className="text-xs sm:text-sm text-slate-700 font-medium">
-                        <span className="text-slate-500 font-normal">Tác giả: </span>
-                        {item.contributors.map((c, idx) => (
-                          <span key={c.id}>
-                            {c.user?.fullName || c.externalName}
-                            {c.role === 'ADVISOR' ? ' (GVHD)' : ''}
-                            {idx < item.contributors.length - 1 ? ', ' : ''}
-                          </span>
-                        ))}
-                      </p>
-                    )}
-
-                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
-                      {item.summary}
-                    </p>
-
-                    <div className="action-row-card">
-                      <CitationModal
-                        item={item}
-                        className="action-primary-card"
-                      />
-                      {paperLink && (
-                        <a
-                          href={paperLink.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="action-secondary-card"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-blue-600" />
-                          <span>Bài báo gốc</span>
-                          <ExternalLink className="w-3 h-3 text-slate-400" />
-                        </a>
-                      )}
-                      <Link
-                        href={`/showcase/${item.slug}`}
-                        className="action-secondary-card ml-auto group"
-                      >
-                        <span>Xem chi tiết</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </Link>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-slate-500">
+                          <TypeBadge type={item.type} size="sm" variant="outline" />
+                          {item.publishedYear && <span>{item.publishedYear}</span>}
+                        </div>
+                        {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
+                      </div>
+                        <h3 className="mt-3 break-words text-lg font-semibold leading-snug text-[#0F294A] sm:text-xl"><Link href={showcaseHref(item.slug, returnTo)} className="hover:underline">{item.title}</Link></h3>
+                        {item.contributors.length > 0 && <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-600"><span className="font-semibold">Tác giả: </span>{item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}</p>}
+                        {item.issuer && <p className="mt-1 text-xs italic leading-5 text-slate-500">{item.issuer}</p>}
+                        <p className="mt-3 line-clamp-3 break-words text-sm leading-6 text-slate-600">{item.summary}</p>
+                        <footer className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-100 pt-2">
+                          <Link href={showcaseHref(item.slug, returnTo)} className="inline-flex min-h-10 items-center gap-2 text-xs font-semibold text-[#0F294A] hover:underline">Xem công trình <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
+                          <CitationModal item={item} className="inline-flex min-h-10 items-center gap-2 text-xs font-semibold text-slate-600 hover:text-[#0F294A] hover:underline" />
+                          {sourceLink && <a href={sourceLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-2 text-xs text-slate-600 hover:text-[#0F294A] hover:underline">{paperLink ? 'Bài báo gốc' : 'Mã nguồn'} <ExternalLink aria-hidden="true" className="h-3.5 w-3.5" /></a>}
+                        </footer>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
+                <p className="text-xs text-slate-500">Trang {page} / {totalPages} · 10 công trình mỗi trang</p>
+                <MemberPagination page={page} totalPages={totalPages} basePath={searchPath} ariaLabel="Phân trang kết quả tìm kiếm" />
+              </div>
+            </>
           )}
         </main>
-
         <AcademicFooter />
       </div>
     );
   }
 
-  // Portal Mode (Default Homepage)
-  const [
-    researchPapers,
-    publishedPapersCount,
-    roboticsProjects,
-    activeProjectsCount,
-    creativeProjects,
-    creativeCount,
-  ] = await Promise.all([
-    // 1. Research Papers
+  const [featuredItems, members] = await Promise.all([
     prisma.showcaseItem.findMany({
-      where: {
-        ...baseWhere,
-        OR: [
-          { type: 'RESEARCH_PAPER' },
-          { category: { slug: 'bai-bao-khoa-hoc' } },
-        ],
-      },
+      omit: { authorDraft: true },
+      where: baseWhere,
       include: {
         contributors: {
           include: { user: { select: publicUserSelect } },
           orderBy: { displayOrder: 'asc' },
         },
         links: true,
-        category: { select: { id: true, name: true, slug: true } },
       },
-      orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ isPinned: 'desc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }],
       take: 3,
     }),
-    prisma.showcaseItem.count({
-      where: {
-        ...baseWhere,
-        OR: [
-          { type: 'RESEARCH_PAPER' },
-          { category: { slug: 'bai-bao-khoa-hoc' } },
-        ],
+    prisma.user.findMany({
+      where: { status: 'ACTIVE', deletedAt: null, role: { in: ['ADMIN', 'CORE_MEMBER', 'MEMBER'] } },
+      select: {
+        ...publicUserSelect,
+        _count: { select: { contributions: { where: { item: baseWhere } } } },
       },
-    }),
-    // 2. Robotics & IoT Projects
-    prisma.showcaseItem.findMany({
-      where: buildHomepageCategoryWhere('robotics-iot', baseWhere),
-      include: {
-        contributors: {
-          include: { user: { select: publicUserSelect } },
-          orderBy: { displayOrder: 'asc' },
-        },
-        links: true,
-        category: { select: { id: true, name: true, slug: true } },
-      },
-      orderBy: [{ isPinned: 'desc' }, { publishedYear: 'desc' }, { createdAt: 'desc' }],
-      take: 3,
-    }),
-    prisma.showcaseItem.count({
-      where: buildHomepageCategoryWhere('robotics-iot', baseWhere),
-    }),
-    // 3. Creative & Other Projects
-    prisma.showcaseItem.findMany({
-      where: buildHomepageCategoryWhere('du-an-sang-tao', baseWhere),
-      include: {
-        contributors: {
-          include: { user: { select: publicUserSelect } },
-          orderBy: { displayOrder: 'asc' },
-        },
-        links: true,
-        category: { select: { id: true, name: true, slug: true } },
-      },
-      orderBy: [{ isPinned: 'desc' }, { publishedYear: 'desc' }, { createdAt: 'desc' }],
-      take: 3,
-    }),
-    prisma.showcaseItem.count({
-      where: buildHomepageCategoryWhere('du-an-sang-tao', baseWhere),
+      orderBy: [{ contributions: { _count: 'desc' } }, { fullName: 'asc' }],
     }),
   ]);
 
-  // Reusable Project Card Renderer (for Block 2 & Block 3)
-  const renderProjectCard = (item: any) => {
-    const demoLink = item.links?.find((l: any) => l.type === 'LIVE_DEMO');
-    const githubLink = item.links?.find((l: any) => l.type === 'GITHUB');
+  const rolePriority: Record<string, number> = { ADMIN: 0, CORE_MEMBER: 1, MEMBER: 2 };
+  const keyMembers = [...members].sort((a, b) =>
+    rolePriority[a.role] - rolePriority[b.role]
+    || b._count.contributions - a._count.contributions
+    || a.fullName.localeCompare(b.fullName, 'vi'),
+  ).slice(0, 3);
 
-    return (
-      <article
-        key={item.id}
-        className="panel-public p-0 overflow-hidden hover:border-slate-300 hover:shadow-xs transition-all flex flex-col group"
-      >
-        {item.thumbnailUrl ? (
-          <div className="aspect-[16/10] w-full bg-slate-100 relative overflow-hidden">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={item.thumbnailUrl}
-              alt={item.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          </div>
-        ) : (
-          <div className="h-24 w-full bg-slate-50 border-b border-slate-100 flex items-center justify-center gap-2 text-slate-400">
-            <Cpu className="w-5 h-5 text-slate-400" />
-            <span className="text-xs font-semibold text-slate-500">Mô hình kỹ thuật Lab</span>
-          </div>
-        )}
-
-        <div className="p-4 sm:p-5 flex flex-col flex-1">
-          {/* Meta line */}
-          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500 mb-2">
-            <TypeBadge type={item.type} size="sm" />
-            {item.publishedYear && (
-              <>
-                <span>•</span>
-                <span>Năm {item.publishedYear}</span>
-              </>
-            )}
-            {item.issuer && (
-              <>
-                <span>•</span>
-                <span className="text-slate-700 font-medium truncate max-w-[140px]">{item.issuer}</span>
-              </>
-            )}
-          </div>
-
-          {/* Title */}
-          <h3 className="text-base sm:text-lg font-bold text-slate-900 leading-snug line-clamp-2 mb-1.5">
-            <Link
-              href={`/showcase/${item.slug}`}
-              className="hover:text-[#0F294A] transition-colors"
-            >
-              {item.title}
-            </Link>
-          </h3>
-
-          {/* Engineers / Contributors */}
-          {item.contributors.length > 0 && (
-            <p className="text-xs text-slate-700 font-medium mb-2 truncate">
-              <span className="text-slate-500 font-normal">Kỹ sư: </span>
-              {item.contributors.map((c: any, idx: number) => (
-                <span key={c.id}>
-                  {c.user?.fullName || c.externalName}
-                  {idx < item.contributors.length - 1 ? ', ' : ''}
-                </span>
-              ))}
-            </p>
-          )}
-
-          {/* Summary */}
-          <p className="text-xs sm:text-sm text-slate-600 line-clamp-2 leading-relaxed flex-1">
-            {item.summary}
-          </p>
-
-          {/* Tags */}
-          {item.tags && item.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1 mt-2.5">
-              {item.tags.slice(0, 3).map((tag: string) => (
-                <span
-                  key={tag}
-                  className="text-[11px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-medium"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Action Footer */}
-          <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-100 text-xs">
-            <div className="flex items-center gap-2.5">
-              {githubLink && (
-                <a
-                  href={githubLink.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-slate-600 hover:text-slate-900 inline-flex items-center gap-1 font-semibold"
-                  title="Mã nguồn GitHub"
-                >
-                  <Github className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Code</span>
-                </a>
-              )}
-              {demoLink && (
-                <a
-                  href={demoLink.url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-emerald-700 hover:text-emerald-900 inline-flex items-center gap-1 font-semibold"
-                  title="Demo thực tế"
-                >
-                  <Globe className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Demo</span>
-                </a>
-              )}
-            </div>
-
-            <Link
-              href={`/showcase/${item.slug}`}
-              className="text-xs font-bold text-[#0F294A] hover:text-[#1E3A5F] inline-flex items-center gap-1 ml-auto group/btn"
-            >
-              <span>Chi tiết</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-        </div>
-      </article>
-    );
-  };
+  const directions = [
+    { title: 'Trí tuệ nhân tạo & Thị giác máy tính', surface: 'border-[#cdd8df] bg-[#edf2f5]', description: 'Khám phá các mô hình học máy, nhận thức hình ảnh và ứng dụng AI trong hệ thống thông minh.' },
+    { title: 'Robot tự hành & Điều khiển', surface: 'border-[#dfd4c5] bg-[#f5f0e8]', description: 'Nghiên cứu định vị, lập kế hoạch chuyển động và khả năng tương tác của robot với môi trường.' },
+    { title: 'IoT & Hệ thống nhúng', surface: 'border-[#cfd8cb] bg-[#eef2eb]', description: 'Kết nối cảm biến, thiết kế thiết bị nhúng và phát triển các hệ thống thu thập dữ liệu thời gian thực.' },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-white">
+    <div className="min-h-screen flex flex-col font-sans bg-background">
       <Navbar />
-
-      {/* Hero Section */}
-      <section className="relative overflow-hidden py-10 sm:py-14 border-b border-slate-100 bg-slate-50/60">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl text-center relative z-10">
-          {/* Tech-badge Panel */}
-          <div data-brand-lockup="home" className="inline-flex items-center gap-3 sm:gap-3.5 px-3 py-2 rounded-lg bg-slate-100/80 mb-5 sm:mb-6">
-            <div className="flex items-center gap-2 shrink-0 text-[#0F294A] text-xs sm:text-sm font-extrabold tracking-wide">
-              <span className="w-1.5 h-1.5 rounded-[2px] bg-[#0F294A]/70" />
-              <span>Robotics &amp; IoT Lab</span>
-            </div>
-            <div className="hidden sm:block h-4 w-px bg-slate-200" />
-            <span className="text-[10px] sm:text-sm font-semibold text-slate-600 tracking-tight whitespace-nowrap">
-              Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
-            </span>
+      <HomeHero />
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 max-w-7xl flex-1 space-y-14 sm:space-y-16 scroll-mt-32" id="home-content">
+        <section aria-labelledby="home-search-title" className="mx-auto max-w-2xl">
+          <div className="mb-5 text-center">
+            <h2 id="home-search-title" className="text-2xl font-semibold tracking-tight text-[#0F294A] sm:text-3xl">Khám phá kho công trình</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-600">Tìm bài nghiên cứu, dự án và tác giả trong CLB.</p>
           </div>
-
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
-            Nghiên Cứu Khoa Học &amp; Công Nghệ Robotics · IoT
-          </h1>
-
-          <p className="mt-3.5 text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
-            Không gian công bố các công trình nghiên cứu khoa học xuất bản, hệ thống nhúng thông minh và dự án robot của thành viên CLB Robotics &amp; IoT HCMUS.
-          </p>
-
-          {/* Central Search Form */}
-          <form method="GET" action="/" className="mt-7 max-w-xl mx-auto flex items-center gap-2">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-              <input
-                type="text"
-                name="q"
-                placeholder="Tìm kiếm bài báo, dự án robot, tác giả..."
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-slate-200 rounded-lg text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors shadow-2xs"
-              />
-            </div>
-            <button
-              type="submit"
-              className="px-5 py-2.5 text-sm font-bold bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg shadow-xs transition-colors cursor-pointer shrink-0"
-            >
-              Tìm kiếm
-            </button>
-          </form>
-        </div>
-      </section>
-
-      {/* Main Academic Portal Content */}
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 max-w-7xl flex-1 space-y-14 sm:space-y-16">
+        <form
+          id="home-search"
+          method="GET"
+          action="/"
+          className="scroll-mt-40 mx-auto flex max-w-2xl flex-col items-stretch gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm sm:flex-row sm:items-center"
+          aria-label="Tìm kiếm công trình"
+        >
+          <div className="relative min-w-0 flex-1">
+            <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" aria-hidden="true" />
+            <input
+              type="search"
+              name="q"
+              aria-label="Từ khóa tìm kiếm"
+              placeholder="Tìm kiếm bài báo, dự án robot, tác giả..."
+              className="w-full rounded-xl bg-slate-50 py-3 pl-10 pr-4 text-sm text-slate-900 placeholder:text-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#0F294A]"
+            />
+          </div>
+          <button
+            type="submit"
+            className="min-h-11 w-full shrink-0 cursor-pointer rounded-xl bg-brand-button px-5 text-sm font-semibold text-white transition-colors hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] focus-visible:ring-offset-2 sm:w-auto"
+          >
+            Tìm kiếm
+          </button>
+        </form>
+        </section>
         
-        {/* PHÂN KHU 1: NGHIÊN CỨU KHOA HỌC (Layout Ngang: Bất đối xứng 2 cột Trái - Phải) */}
-        <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start pb-12 sm:pb-16 border-b border-slate-200">
-          {/* Cột Trái (lg:col-span-4): Tiêu đề, Định hướng & Link xem tất cả */}
-          <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4">
-            <div className="inline-flex items-center gap-2 px-2.5 py-1 rounded-md bg-blue-50 text-blue-800 border border-blue-200 text-xs font-bold uppercase tracking-wider">
-              <BookOpen className="w-3.5 h-3.5 text-blue-700" />
-              <span>Xuất bản khoa học</span>
-            </div>
-
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
-              Công Trình &amp; Bài Báo Khoa Học Mới Xuất Bản
-            </h2>
-
-            <p className="text-sm text-slate-600 leading-relaxed">
-              Các công trình nghiên cứu khoa học của thành viên Lab được công bố tại các hội thảo và tạp chí chuyên ngành uy tín trong nước và quốc tế.
-            </p>
-
-            <div className="pt-2">
-              <Link
-                href="/category/bai-bao-khoa-hoc"
-                data-home-view-all
-                className="action-primary-card group"
-              >
-                <span>Xem tất cả ({publishedPapersCount})</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </div>
-          </div>
-
-          {/* Cột Phải (lg:col-span-8): Danh sách bài báo theo Card Ngang học thuật */}
-          <div className="lg:col-span-8 space-y-4">
-            {researchPapers.length === 0 ? (
-              <div className="text-center py-10 bg-slate-50/60 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
-                Chưa có bài báo khoa học nào được công bố công khai.
-              </div>
-            ) : (
-              researchPapers.map((item) => {
-                const paperLink = item.links?.find((l: any) => l.type === 'PAPER_URL');
-                return (
-                  <article
-                    key={item.id}
-                    className="panel-public hover:border-slate-300 hover:shadow-xs transition-all flex flex-col gap-3.5"
-                  >
-                    <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
-                      <TypeBadge type={item.type} size="sm" />
-                      {item.publishedYear && (
-                        <>
-                          <span>•</span>
-                          <span>Năm {item.publishedYear}</span>
-                        </>
-                      )}
-                      {item.issuer && (
-                        <>
-                          <span>•</span>
-                          <span className="text-slate-700 font-medium">{item.issuer}</span>
-                        </>
-                      )}
-                    </div>
-
-                    <h3 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
-                      <Link
-                        href={`/showcase/${item.slug}`}
-                        className="hover:text-[#0F294A] transition-colors"
-                      >
-                        {item.title}
-                      </Link>
-                    </h3>
-
-                    {item.contributors.length > 0 && (
-                      <p className="text-xs sm:text-sm text-slate-700 font-medium">
-                        <span className="text-slate-500 font-normal">Tác giả: </span>
-                        {item.contributors.map((c: any, idx: number) => (
-                          <span key={c.id}>
-                            {c.user?.fullName || c.externalName}
-                            {c.role === 'ADVISOR' ? ' (GVHD)' : ''}
-                            {idx < item.contributors.length - 1 ? ', ' : ''}
-                          </span>
-                        ))}
-                      </p>
+        <section className="border-t border-slate-200 pt-10 sm:pt-12" aria-labelledby="featured-works-title">
+          <h2 id="featured-works-title" className="text-2xl font-semibold tracking-tight text-[#0F294A] sm:text-3xl">Công trình nổi bật</h2>
+          <div className="mt-6 grid gap-5">
+            {featuredItems.length === 0 ? (
+              <EmptyState title="Chưa có công trình nổi bật" description="Các công trình đã công bố sẽ xuất hiện tại đây." />
+            ) : featuredItems.map(item => {
+              const paperLink = item.links.find(link => link.type === 'PAPER_URL');
+              const sourceLink = paperLink ?? item.links.find(link => link.type === 'GITHUB');
+              return (
+                <article key={item.id} className="clickable-card panel-public grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white !p-0 transition-shadow hover:shadow-md md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
+                  <CardLink slug={item.slug} returnTo={returnTo} />
+                  <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-slate-50 md:aspect-auto md:min-h-56 md:border-b-0 md:border-r">
+                    {item.thumbnailUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-contain p-4" />
+                    ) : (
+                      <span className="text-center text-sm font-semibold tracking-wide text-slate-400">CLB Robotics &amp; IoT</span>
                     )}
-
-                    <p className="text-xs sm:text-sm text-slate-600 line-clamp-3 leading-relaxed">
-                      {item.summary}
-                    </p>
-
-                    <div className="action-row-card">
-                      <CitationModal
-                        item={item}
-                        className="action-primary-card"
-                      />
-                      {paperLink && (
-                        <a
-                          href={paperLink.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="action-secondary-card"
-                        >
-                          <FileText className="w-3.5 h-3.5 text-blue-600" />
-                          <span>Bài báo gốc</span>
-                          <ExternalLink className="w-3 h-3 text-slate-400" />
+                  </Link>
+                  <div className="flex min-w-0 flex-col px-5 py-4 sm:px-6 sm:py-5">
+                    <header>
+                      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-slate-600">
+                        <TypeBadge type={item.type} size="sm" variant="outline" />
+                        {item.publishedYear && <span>Năm {item.publishedYear}</span>}
+                      </div>
+                        {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
+                      </div>
+                      <h3 className="mt-2 line-clamp-2 text-lg font-semibold leading-snug tracking-tight text-[#0F294A] sm:text-xl" title={item.title}>
+                        <Link href={showcaseHref(item.slug, returnTo)} className="hover:text-[#0F294A] focus-visible:underline">{item.title}</Link>
+                      </h3>
+                      {item.contributors.length > 0 && (
+                        <p className="mt-1 truncate text-sm leading-relaxed text-slate-600" title={item.contributors.map(c => `${c.user?.fullName || c.externalName || ''}${c.role === 'ADVISOR' ? ' (GVHD)' : ''}`).join(', ')}>
+                          <span className="font-semibold">Tác giả: </span>
+                          {item.contributors.map((contributor, index) => (
+                            <span key={contributor.id}>
+                              {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="hover:text-[#0F294A]">{contributor.user.fullName}</Link> : contributor.externalName}
+                              {contributor.role === 'ADVISOR' ? ' (GVHD)' : ''}
+                              {index < item.contributors.length - 1 ? ', ' : ''}
+                            </span>
+                          ))}
+                        </p>
+                      )}
+                      {item.issuer && <p className="mt-1 text-sm italic leading-relaxed text-slate-600">{item.issuer}</p>}
+                    </header>
+                    <p className="mt-2 line-clamp-3 break-words text-sm leading-6 text-slate-600">{item.summary}</p>
+                    <footer className="mt-2 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-100 pt-1">
+                      {sourceLink && (
+                        <a href={sourceLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F294A] hover:underline">
+                          {paperLink ? 'Bài báo gốc' : 'Mã nguồn'} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
                         </a>
                       )}
-                      <Link
-                        href={`/showcase/${item.slug}`}
-                        className="action-secondary-card ml-auto group"
-                      >
-                        <span>Xem chi tiết đề tài</span>
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      <CitationModal item={item} className="inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F294A] hover:underline" />
+                      <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#0F294A] hover:underline">
+                        Xem công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
-                    </div>
-                  </article>
-                );
-              })
-            )}
+                    </footer>
+                  </div>
+                </article>
+              );
+            })}
+
           </div>
         </section>
 
-        {/* PHÂN KHU 2: ROBOTICS & IOT (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
-        <section className="space-y-6 pb-12 sm:pb-16 border-b border-slate-200">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
-            <div>
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-                  Phần cứng &amp; Tự động hóa
-                </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
-                  Dự Án Robotics &amp; Hệ Thống Nhúng Tiêu Biểu
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                  Robot tự hành, giải pháp vi điều khiển và thiết bị IoT thông minh do thành viên CLB chế tạo.
-                </p>
-              </div>
-            </div>
+        <section className="border-t border-slate-200 pt-10 sm:pt-12" aria-labelledby="research-directions-title">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Hướng nghiên cứu</p>
+          <h2 id="research-directions-title" className="mt-3 max-w-2xl text-2xl font-semibold leading-tight tracking-tight text-[#0F294A] sm:text-3xl">
+            Từ nghiên cứu đến hệ thống thông minh.
+          </h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {directions.map(({ title, description, surface }) => (
+              <article key={title} className={`rounded-xl border p-4 sm:p-5 ${surface}`}>
+                <h3 className="text-sm font-semibold leading-6 text-[#0F294A] sm:text-base">{title}</h3>
+                <p className="mt-1.5 text-sm leading-6 text-slate-600">{description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
 
-            <Link
-              href="/category/robotics-iot"
-              data-home-view-all
-              className="action-primary-card group shrink-0 self-start sm:self-auto"
-            >
-              <span>Xem tất cả ({activeProjectsCount})</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+        <section className="border-t border-slate-200 pt-10 sm:pt-12" aria-labelledby="home-members-title">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">Con người của CLB</p>
+              <h2 id="home-members-title" className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">Thành viên</h2>
+              <p className="mt-3 text-sm text-slate-600">Cùng nghiên cứu, cùng xây dựng và chia sẻ tri thức.</p>
+            </div>
+            <Link href="/members" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#0F294A] transition-colors hover:bg-slate-50">
+              Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-
-          {roboticsProjects.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50/60 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
-              Chưa có dự án kỹ thuật nào được công bố công khai.
+          {members.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+              {keyMembers.map(member => (
+                <MemberCard key={member.id} member={{ ...member, studentId: null } as MemberDirectoryEntry} group={member.role as MemberDirectoryEntry['role']} />
+              ))}
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {roboticsProjects.map((item) => renderProjectCard(item))}
-            </div>
-          )}
+          ) : <p className="panel-public text-sm text-slate-600">Thông tin thành viên đang được cập nhật.</p>}
         </section>
-
-        {/* PHÂN KHU 3: DỰ ÁN & SÁNG TẠO (Layout Dọc: Tiêu đề trên - Lưới Card dưới) */}
-        <section className="space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 pb-4 border-b border-slate-200">
-            <div>
-              <div>
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-500 block">
-                  Đổi mới &amp; Ứng dụng
-                </span>
-                <h2 className="text-xl sm:text-2xl font-bold text-slate-900 leading-tight">
-                  Dự Án Sáng Tạo &amp; Giải Pháp Khác
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-600 mt-0.5">
-                  Các sản phẩm phần mềm, sáng kiến công nghệ ứng dụng và giải pháp sáng tạo của sinh viên.
-                </p>
-              </div>
-            </div>
-
-            {creativeCount > 0 && (
-              <Link
-                href="/category/du-an-sang-tao"
-                data-home-view-all
-                className="action-primary-card group shrink-0 self-start sm:self-auto"
-              >
-                <span>Xem tất cả ({creativeCount})</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            )}
-          </div>
-
-          {creativeProjects.length === 0 ? (
-            <div className="text-center py-10 bg-slate-50/60 rounded-xl border border-dashed border-slate-200 text-slate-500 text-sm">
-              Chưa có công trình sáng tạo nào được công bố công khai.
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {creativeProjects.map((item) => renderProjectCard(item))}
-            </div>
-          )}
-        </section>
-
       </main>
-
-      {/* Institutional Academic Footer */}
       <AcademicFooter />
     </div>
   );
 }
+

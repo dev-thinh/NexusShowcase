@@ -28,12 +28,12 @@ describe('homepage category filters', () => {
     });
   });
 
-  it('keeps all three homepage section CTAs visually and verbally consistent', () => {
+  it('replaces category feeds with a combined featured list and member directory link', () => {
     const page = readFileSync(resolve(process.cwd(), 'src/app/page.tsx'), 'utf8');
 
-    expect(page.match(/<span>Xem tất cả \(\{/g) ?? []).toHaveLength(3);
-    expect(page).not.toContain('Xem tất cả bài báo');
-    expect(page).not.toContain('Xem tất cả dự án');
-    expect(page.match(/data-home-view-all\s+className="action-primary-card/g) ?? []).toHaveLength(3);
+    expect(page).not.toContain('data-home-view-all');
+    expect(page).not.toContain('buildHomepageCategoryWhere');
+    expect(page).toContain('featuredItems.map');
+    expect(page).toContain('href="/members"');
   });
 });
