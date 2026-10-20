@@ -17,31 +17,17 @@ async function seedCategories() {
     },
   });
 
-  // 2. Bài báo Khoa học
+  // 2. Nghiên cứu khoa học
   const catPapers = await prisma.category.upsert({
     where: { slug: 'bai-bao-khoa-hoc' },
     update: { isNavFeatured: true, displayOrder: 2, layoutType: 'BIBLIOGRAPHY' },
     create: {
-      name: 'Bài báo Khoa học',
+      name: 'Nghiên cứu khoa học',
       slug: 'bai-bao-khoa-hoc',
       description: 'Các công trình nghiên cứu khoa học được công bố tại các hội thảo và tạp chí chuyên ngành.',
       layoutType: 'BIBLIOGRAPHY',
       isNavFeatured: true,
       displayOrder: 2,
-    },
-  });
-
-  // 3. Dự án & Sáng tạo
-  const catCreative = await prisma.category.upsert({
-    where: { slug: 'du-an-sang-tao' },
-    update: { isNavFeatured: true, displayOrder: 3, layoutType: 'SHOWCASE_GRID' },
-    create: {
-      name: 'Dự án & Sáng tạo',
-      slug: 'du-an-sang-tao',
-      description: 'Các sản phẩm phần mềm, sáng kiến công nghệ ứng dụng và giải pháp sáng tạo của sinh viên.',
-      layoutType: 'SHOWCASE_GRID',
-      isNavFeatured: true,
-      displayOrder: 3,
     },
   });
 
@@ -59,12 +45,6 @@ async function seedCategories() {
       where: { id: publishedItems[1].id },
       data: { categoryId: catRobotics.id, visibility: 'PUBLIC' },
     });
-    if (publishedItems.length >= 3) {
-      await prisma.showcaseItem.update({
-        where: { id: publishedItems[2].id },
-        data: { categoryId: catCreative.id, visibility: 'PUBLIC' },
-      });
-    }
     if (publishedItems.length >= 4) {
       await prisma.showcaseItem.update({
         where: { id: publishedItems[3].id },
