@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useTransition } from 'react';
-import { useRouter } from 'next/navigation';
+import { signOut } from 'next-auth/react';
 import { changePasswordAction } from '@/actions/account-actions';
 import { CheckCircle2, AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 
 export function ChangePasswordForm() {
-  const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -38,10 +37,7 @@ export function ChangePasswordForm() {
         setError(res.error || 'Đổi mật khẩu thất bại.');
       } else {
         setSuccess(true);
-        setTimeout(() => {
-          router.push('/dashboard');
-          router.refresh();
-        }, 1500);
+        await signOut({ callbackUrl: '/login?passwordChanged=1' });
       }
     });
   };
@@ -51,7 +47,7 @@ export function ChangePasswordForm() {
       <div className="panel-detail sm:p-7">
         <div className="pb-4 border-b border-slate-100">
           <div className="min-w-0">
-            <h2 className="text-xl font-bold text-slate-900 tracking-tight leading-tight">
+            <h2 className="text-xl font-semibold text-slate-900 tracking-tight leading-tight">
               Đổi Mật Khẩu
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 truncate max-w-sm mt-0.5">
@@ -66,7 +62,7 @@ export function ChangePasswordForm() {
             className="mt-4 p-3 rounded-md bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-start gap-2.5"
           >
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <div className="font-medium leading-relaxed">{error}</div>
+            <div className="font-semibold leading-relaxed">{error}</div>
           </div>
         )}
 
@@ -76,7 +72,7 @@ export function ChangePasswordForm() {
             className="mt-4 p-3 rounded-md bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-center gap-2.5"
           >
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <div className="font-semibold">Đổi mật khẩu thành công! Đang chuyển hướng...</div>
+            <div className="font-semibold">Đổi mật khẩu thành công! Vui lòng đăng nhập lại bằng mật khẩu mới.</div>
           </div>
         )}
 
@@ -87,6 +83,7 @@ export function ChangePasswordForm() {
             </label>
             <input
               type="password"
+              autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
@@ -101,6 +98,7 @@ export function ChangePasswordForm() {
             </label>
             <input
               type="password"
+              autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
@@ -115,6 +113,7 @@ export function ChangePasswordForm() {
             </label>
             <input
               type="password"
+              autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 text-slate-900 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-600"
@@ -126,7 +125,7 @@ export function ChangePasswordForm() {
           <button
             type="submit"
             disabled={isPending || success}
-            className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-[#0F294A] hover:bg-[#1a3a63] text-white text-sm font-semibold transition-colors disabled:opacity-50"
+            className="w-full mt-2 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg bg-brand-button hover:brightness-110 text-white text-sm font-semibold transition-colors disabled:opacity-50"
           >
             {isPending ? (
               <>
