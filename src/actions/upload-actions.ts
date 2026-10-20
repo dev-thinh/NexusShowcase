@@ -30,7 +30,7 @@ export async function uploadFileAction(formData: FormData): Promise<UploadResult
   }
 
   const file = formData.get('file') as File | null;
-  const type = formData.get('type') as string; // 'thumbnail' | 'pdf'
+  const type = formData.get('type') as string; // 'thumbnail' | 'pdf' | 'resource'
 
   if (!file || typeof file === 'string' || file.size === 0) {
     return { success: false, code: 'INVALID_FILE', error: 'Vui lòng chọn một tệp hợp lệ.' };
@@ -38,8 +38,9 @@ export async function uploadFileAction(formData: FormData): Promise<UploadResult
 
   const isThumbnail = type === 'thumbnail';
   const isPdf = type === 'pdf';
+  const isResource = type === 'resource';
 
-  if (!isThumbnail && !isPdf) {
+  if (!isThumbnail && !isPdf && !isResource) {
     return { success: false, code: 'INVALID_FILE', error: 'Loại tệp không được hỗ trợ.' };
   }
 
@@ -53,6 +54,27 @@ export async function uploadFileAction(formData: FormData): Promise<UploadResult
         isThumbnail ? '5MB' : '25MB'
       }.`,
     };
+  }
+
+  if (isResource) {
+    // General resources are stored outside public/ and always served as downloads.
+    const extension = path.extname(file.name).slice(1).toLowerCase();
+    const storedExtension = /^[a-z0-9]{1,16}$/.test(extension) ? extension : 'bin';
+    const storedFileName = `${crypto.randomUUID()}.${storedExtension}`;
+    try {
+      const directory = path.join(process.cwd(), 'storage', 'resources');
+      await mkdir(directory, { recursive: true });
+      await writeFile(path.join(directory, storedFileName), Buffer.from(await file.arrayBuffer()));
+      return {
+        success: true,
+        url: `/uploads/resources/${storedFileName}`,
+        fileName: path.basename(file.name).replace(/[\r\n]/g, '').slice(0, 160) || `resource.${storedExtension}`,
+        fileSize: file.size,
+        mimeType: 'application/octet-stream',
+      };
+    } catch {
+      return { success: false, code: 'UPLOAD_FAILED', error: 'Không lưu được tài nguyên. Vui lòng thử lại.' };
+    }
   }
 
   const validMimes = isThumbnail

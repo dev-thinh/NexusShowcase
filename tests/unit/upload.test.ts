@@ -112,3 +112,24 @@ describe('Upload File Action Unit Tests', () => {
     expect(result.url).toMatch(/^\/uploads\/documents\/[\w-]+\.pdf$/);
   });
 });
+
+describe('general resource uploads', () => {
+  it.each(['dataset.csv', 'model.onnx', 'design.step', 'slides.pptx', 'source.zip', 'README'])('accepts %s as a downloadable resource', async fileName => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: 'core-1', role: 'CORE_MEMBER' } } as never);
+    const data = new FormData();
+    data.append('type', 'resource');
+    data.append('file', new File(['resource bytes'], fileName, { type: 'application/octet-stream' }));
+    const result = await uploadFileAction(data);
+    expect(result).toMatchObject({ success: true, fileName, fileSize: 14, mimeType: 'application/octet-stream' });
+    expect(result.url).toMatch(/^\/uploads\/resources\/[\w-]+\.[a-z0-9]+$/);
+    expect(filesystem.writeFile.mock.calls.at(-1)?.[0]).toContain('/storage/resources/');
+    expect(filesystem.writeFile.mock.calls.at(-1)?.[0]).not.toContain('/public/');
+  });
+  it('keeps the 25 MB limit for general resource files', async () => {
+    vi.mocked(auth).mockResolvedValueOnce({ user: { id: 'core-1', role: 'CORE_MEMBER' } } as never);
+    const data = new FormData();
+    data.append('type', 'resource');
+    data.append('file', new File([new Uint8Array(25 * 1024 * 1024 + 1)], 'model.onnx'));
+    expect(await uploadFileAction(data)).toMatchObject({ success: false, code: 'INVALID_FILE' });
+  });
+});
