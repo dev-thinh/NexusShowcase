@@ -1,3 +1,4 @@
+import { CustomSelect } from '@/components/ui/custom-select';
 import React, { useState } from 'react';
 import type { SubmissionResource, SubmissionSnapshot } from '@/lib/submission-types';
 import { formatResourceMetadata } from '@/lib/resource-presentation';
@@ -42,36 +43,19 @@ export function SourceRevisionView({
         {revisions.length > 1 && (
           <div className="flex items-center gap-2">
             <span className="text-xs text-slate-500">Lần nộp:</span>
-            <select
-              value={selectedRevisionNumber}
-              onChange={(e) => onSelectRevision?.(Number(e.target.value))}
-              className="text-xs border border-slate-300 rounded px-2 py-1 bg-white"
-            >
-              {revisions.map((rev) => (
-                <option key={rev.id} value={rev.revisionNumber}>
-                  Lần {rev.revisionNumber} ({new Date(rev.submittedAt).toLocaleDateString('vi-VN')})
-                </option>
-              ))}
-            </select>
+            <CustomSelect ariaLabel="Lần nộp" value={String(selectedRevisionNumber)} onChange={value => onSelectRevision?.(Number(value))} options={revisions.map(rev => ({ value: String(rev.revisionNumber), label: `Lần ${rev.revisionNumber} (${new Date(rev.submittedAt).toLocaleDateString('vi-VN')})` }))} />
           </div>
         )}
       </div>
 
       <div className="space-y-4 text-sm">
         <div>
-          <span className="text-xs font-medium text-slate-500 block mb-1">Tiêu đề công trình</span>
-          <p className="font-medium text-slate-900">{snapshot.title || 'Chưa có tiêu đề'}</p>
+          <span className="text-xs font-semibold text-slate-500 block mb-1">Tiêu đề công trình</span>
+          <p className="font-semibold text-slate-900">{snapshot.title || 'Chưa có tiêu đề'}</p>
         </div>
 
         <div>
-          <span className="text-xs font-medium text-slate-500 block mb-1">Gợi ý lĩnh vực</span>
-          <p className="text-slate-700">
-            {snapshot.suggestedField || snapshot.customProjectType || 'Chưa có gợi ý'}
-          </p>
-        </div>
-
-        <div>
-          <span className="text-xs font-medium text-slate-500 block mb-1">Tóm tắt</span>
+          <span className="text-xs font-semibold text-slate-500 block mb-1">Tóm tắt</span>
           <p className="text-slate-700 whitespace-pre-line leading-relaxed">
             {snapshot.summary || 'Chưa có tóm tắt'}
           </p>
@@ -79,7 +63,7 @@ export function SourceRevisionView({
 
         {snapshot.content && (
           <div>
-            <span className="text-xs font-medium text-slate-500 block mb-1">Nội dung chi tiết</span>
+            <span className="text-xs font-semibold text-slate-500 block mb-1">Nội dung chi tiết</span>
             <div className="panel-nested text-slate-700 whitespace-pre-line leading-relaxed text-xs">
               {snapshot.content}
             </div>
@@ -87,7 +71,7 @@ export function SourceRevisionView({
         )}
 
         <div>
-          <span className="text-xs font-medium text-slate-500 block mb-2">Tác giả và người tham gia</span>
+          <span className="text-xs font-semibold text-slate-500 block mb-2">Tác giả và người tham gia</span>
           {snapshot.contributors.length === 0 ? (
             <p className="text-xs text-slate-400 italic">Không có danh sách tác giả</p>
           ) : (
@@ -95,7 +79,7 @@ export function SourceRevisionView({
               {snapshot.contributors.map((contrib, idx) => (
                 <li key={idx} className="p-2.5 flex items-center justify-between">
                   <div>
-                    <span className="font-medium text-slate-900">
+                    <span className="font-semibold text-slate-900">
                       {contrib.externalName ?? contrib.displayName ?? memberNamesById[contrib.userId ?? ''] ?? 'Thành viên'}
                     </span>
                     {contrib.externalAffiliation && (
@@ -114,7 +98,7 @@ export function SourceRevisionView({
         </div>
 
         <div>
-          <span className="text-xs font-medium text-slate-500 block mb-2">Tài nguyên đính kèm</span>
+          <span className="text-xs font-semibold text-slate-500 block mb-2">Tài nguyên đính kèm</span>
           {snapshot.resources.length === 0 ? (
             <p className="text-xs text-slate-400 italic">Không có tài nguyên</p>
           ) : (
@@ -124,7 +108,7 @@ export function SourceRevisionView({
                 return (
                 <li key={idx} className="p-2.5 flex items-center justify-between gap-3">
                   <div>
-                    <span className="font-medium text-slate-900">{metadata.primary}</span>
+                    <span className="font-semibold text-slate-900">{metadata.primary}</span>
                     <span className="text-slate-500 block text-[11px]">{metadata.secondary}</span>
                   </div>
                   <button type="button" onClick={() => setPreviewResource(res)} className="action-secondary-detail shrink-0" aria-label={`Xem tài nguyên ${res.label}`}>

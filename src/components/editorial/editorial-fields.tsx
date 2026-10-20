@@ -1,3 +1,4 @@
+import { CustomSelect } from '@/components/ui/custom-select';
 import React from 'react';
 import type { ItemType } from '@prisma/client';
 import type { EditorialOverrides, SubmissionSnapshot } from '@/lib/submission-types';
@@ -42,7 +43,6 @@ export function EditorialFields({
   const currentCategory = overrides.categoryId !== undefined ? overrides.categoryId : '';
   const currentType = (overrides.type !== undefined ? overrides.type : 'PROJECT') as ItemType;
   const currentYear = overrides.publishedYear !== undefined ? overrides.publishedYear : snapshot.publishedYear;
-  const currentTags = overrides.tags !== undefined ? overrides.tags.join(', ') : '';
   const currentIssuer = overrides.issuer !== undefined ? (overrides.issuer ?? '') : '';
   const currentThumbnail = overrides.thumbnailUrl !== undefined ? (overrides.thumbnailUrl ?? '') : '';
 
@@ -79,21 +79,7 @@ export function EditorialFields({
               </div>
             )}
           </div>
-          <select
-            id="editorial-category"
-            value={currentCategory ?? ''}
-            onChange={(e) => onChangeOverride('categoryId', e.target.value || null)}
-            disabled={disabled}
-            className="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs bg-white text-slate-900"
-            required
-          >
-            <option value="">-- Chọn chuyên mục phân loại --</option>
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id}>
-                {cat.name}
-              </option>
-            ))}
-          </select>
+          <CustomSelect id="editorial-category" value={currentCategory ?? ''} onChange={value => onChangeOverride('categoryId', value || null)} disabled={disabled} required options={[{ value: '', label: 'Chọn chuyên mục phân loại' }, ...categories.map(cat => ({ value: cat.id, label: cat.name }))]} />
           <FieldReviewComments
             fieldKey="categoryId"
             comments={comments}
@@ -129,7 +115,7 @@ export function EditorialFields({
             value={currentTitle}
             onChange={(e) => onChangeOverride('title', e.target.value)}
             disabled={disabled}
-            className="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs bg-white text-slate-900 font-medium"
+            className="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs bg-white text-slate-900 font-semibold"
           />
           <FieldReviewComments
             fieldKey="title"
@@ -150,20 +136,10 @@ export function EditorialFields({
                 Loại nội dung
               </label>
             {overrides.type !== undefined && !disabled && (
-                <button type="button" onClick={() => onRestoreField('type')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
+                <button type="button" onClick={() => onRestoreField('type')} className="text-[11px] font-semibold text-blue-700 hover:underline">Khôi phục bản gốc</button>
               )}
             </div>
-            <select
-              id="editorial-type"
-              value={currentType}
-              onChange={(e) => onChangeOverride('type', e.target.value as ItemType)}
-              disabled={disabled}
-              className="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs bg-white text-slate-900"
-            >
-              <option value="PROJECT">Dự án (Project)</option>
-              <option value="RESEARCH_PAPER">Bài báo nghiên cứu (Research Paper)</option>
-              <option value="ACHIEVEMENT">Thành tích / Giải thưởng (Achievement)</option>
-            </select>
+            <CustomSelect id="editorial-type" value={currentType} onChange={value => onChangeOverride('type', value as 'PROJECT' | 'RESEARCH_PAPER')} disabled={disabled} options={[{ value: 'PROJECT', label: 'Robotics & IoT' }, { value: 'RESEARCH_PAPER', label: 'Nghiên cứu khoa học' }]} />
           </div>
 
           <div>
@@ -175,7 +151,7 @@ export function EditorialFields({
                 Năm công bố
               </label>
               {overrides.publishedYear !== undefined && !disabled && (
-                <button type="button" onClick={() => onRestoreField('publishedYear')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
+                <button type="button" onClick={() => onRestoreField('publishedYear')} className="text-[11px] font-semibold text-blue-700 hover:underline">Khôi phục bản gốc</button>
               )}
             </div>
             <input
@@ -263,39 +239,8 @@ export function EditorialFields({
           />
         </div>
 
-        {/* Tags & Issuer */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label
-                htmlFor="editorial-tags"
-                className="text-xs font-semibold text-slate-700"
-              >
-                Tags (cách nhau bởi dấu phẩy)
-              </label>
-              {overrides.tags !== undefined && !disabled && (
-                <button type="button" onClick={() => onRestoreField('tags')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
-              )}
-            </div>
-            <input
-              id="editorial-tags"
-              type="text"
-              value={currentTags}
-              onChange={(e) =>
-                onChangeOverride(
-                  'tags',
-                  e.target.value
-                    .split(',')
-                    .map((s) => s.trim())
-                    .filter(Boolean)
-                )
-              }
-              placeholder="AI, Robotics, Web"
-              disabled={disabled}
-              className="w-full border border-slate-300 rounded px-2.5 py-1.5 text-xs bg-white text-slate-900"
-            />
-          </div>
-
+        {/* Issuer */}
+        <div>
           <div>
             <div className="flex items-center justify-between mb-1">
               <label
@@ -305,7 +250,7 @@ export function EditorialFields({
                 Đơn vị / Hội nghị công bố
               </label>
               {overrides.issuer !== undefined && !disabled && (
-                <button type="button" onClick={() => onRestoreField('issuer')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
+                <button type="button" onClick={() => onRestoreField('issuer')} className="text-[11px] font-semibold text-blue-700 hover:underline">Khôi phục bản gốc</button>
               )}
             </div>
             <input
@@ -330,7 +275,7 @@ export function EditorialFields({
               Ảnh đại diện (Thumbnail URL)
             </label>
             {overrides.thumbnailUrl !== undefined && !disabled && (
-              <button type="button" onClick={() => onRestoreField('thumbnailUrl')} className="text-[11px] font-medium text-blue-700 hover:underline">Khôi phục bản gốc</button>
+              <button type="button" onClick={() => onRestoreField('thumbnailUrl')} className="text-[11px] font-semibold text-blue-700 hover:underline">Khôi phục bản gốc</button>
             )}
           </div>
           <input

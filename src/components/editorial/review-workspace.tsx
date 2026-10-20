@@ -1,5 +1,7 @@
 'use client';
 
+import { useDialog } from '@/components/dialog-provider';
+import { CustomSelect } from '@/components/ui/custom-select';
 import React, { useState, useTransition } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -65,6 +67,7 @@ export function ReviewWorkspace({
   memberNamesById = {},
 }: ReviewWorkspaceProps) {
   const router = useRouter();
+  const dialog = useDialog();
   const [isPending, startTransition] = useTransition();
 
   const [activeTab, setActiveTab] = useState<'source' | 'editorial'>('editorial');
@@ -88,8 +91,15 @@ export function ReviewWorkspace({
 
   const [comments, setComments] = useState<CommentItem[]>(initialComments);
   const [publicationVisibility, setPublicationVisibility] = useState<ItemVisibility>('PRIVATE');
+  const isPendingReview = item.status === 'PENDING_REVIEW';
+  const isUnassigned = !editorialDraft?.assignedEditorId;
+  const canClaim = currentUser.role === 'EDITOR' && isPendingReview && isUnassigned;
+  const isAssignedToOtherEditor = currentUser.role === 'EDITOR' &&
+    isPendingReview &&
+    Boolean(editorialDraft?.assignedEditorId) &&
+    editorialDraft?.assignedEditorId !== currentUser.id;
   const canEdit = currentUser.role === 'EDITOR' &&
-    item.status === 'PENDING_REVIEW' &&
+    isPendingReview &&
     editorialDraft?.assignedEditorId === currentUser.id;
   const isApproval = currentUser.role === 'ADMIN' && item.status === 'READY_FOR_APPROVAL';
   const [statusMessage, setStatusMessage] = useState<{
@@ -135,6 +145,19 @@ export function ReviewWorkspace({
     });
   };
 
+  const handleClaim = () => {
+    setStatusMessage(null);
+    startTransition(async () => {
+      const res = await assignEditorAction(item.id, currentUser.id);
+      if (res.success) {
+        setStatusMessage({ type: 'success', text: 'Đã nhận bài để biên tập.' });
+        router.refresh();
+      } else {
+        setStatusMessage({ type: 'error', text: res.error });
+      }
+    });
+  };
+
   const handleAddComment = async (
     fieldKey: string,
     body: string,
@@ -163,7 +186,7 @@ export function ReviewWorkspace({
         ...prev,
       ]);
     } else if (!res.success) {
-      alert(res.error);
+      await dialog.alert({ title: 'Không xử lý được phản hồi', message: res.error });
     }
   };
 
@@ -174,7 +197,7 @@ export function ReviewWorkspace({
         prev.map((c) => (c.id === commentId ? { ...c, status: 'RESOLVED' } : c))
       );
     } else {
-      alert(res.error);
+      await dialog.alert({ title: 'Không xử lý được phản hồi', message: res.error });
     }
   };
 
@@ -292,7 +315,7 @@ export function ReviewWorkspace({
           <div className="flex items-center gap-3">
             <Link
               href="/admin/reviews"
-              className="text-xs text-slate-500 hover:text-slate-800 font-medium"
+              className="text-xs text-slate-500 hover:text-slate-800 font-semibold"
             >
               ← Danh sách xét duyệt
             </Link>
@@ -307,7 +330,7 @@ export function ReviewWorkspace({
             <Link
               href={previewUrl}
               target="_blank"
-              className="px-3 py-1.5 text-xs font-medium text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50"
+              className="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white border border-slate-300 rounded hover:bg-slate-50"
             >
               Xem trước
             </Link>
@@ -346,7 +369,7 @@ export function ReviewWorkspace({
             role="tab"
             aria-selected={activeTab === 'source'}
             onClick={() => setActiveTab('source')}
-            className={`flex-1 py-2.5 text-xs font-medium border-b-2 ${
+            className={`flex-1 py-2.5 text-xs font-semibold border-b-2 ${
               activeTab === 'source'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
@@ -359,7 +382,7 @@ export function ReviewWorkspace({
             role="tab"
             aria-selected={activeTab === 'editorial'}
             onClick={() => setActiveTab('editorial')}
-            className={`flex-1 py-2.5 text-xs font-medium border-b-2 ${
+            className={`flex-1 py-2.5 text-xs font-semibold border-b-2 ${
               activeTab === 'editorial'
                 ? 'border-blue-600 text-blue-600'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
@@ -395,6 +418,28 @@ export function ReviewWorkspace({
               activeTab === 'editorial' ? 'block' : 'hidden lg:block'
             }`}
           >
+            {!canEdit && currentUser.role === 'EDITOR' && isPendingReview && (
+              <div className="flex items-center justify-between gap-4 rounded-md border border-slate-200 bg-slate-50 px-4 py-3">
+                <p className="text-xs leading-relaxed text-slate-600">
+                  {canClaim
+                    ? 'Bài chưa có biên tập viên phụ trách. Nhận bài để bắt đầu chỉnh sửa.'
+                    : isAssignedToOtherEditor
+                      ? 'Bài đang được một biên tập viên khác phụ trách.'
+                      : 'Bản biên tập đang ở chế độ chỉ đọc.'}
+                </p>
+                {canClaim && (
+                  <button
+                    type="button"
+                    onClick={handleClaim}
+                    disabled={isPending}
+                    className="action-primary-detail shrink-0"
+                  >
+                    Nhận biên tập
+                  </button>
+                )}
+              </div>
+            )}
+
             <EditorialFields
               snapshot={activeSnapshot}
               overrides={overrides}
@@ -455,16 +500,7 @@ export function ReviewWorkspace({
             {isApproval && (
               <>
                 <label className="sr-only" htmlFor="publication-visibility">Phạm vi xuất bản</label>
-                <select
-                  id="publication-visibility"
-                  value={publicationVisibility}
-                  onChange={(event) => setPublicationVisibility(event.target.value as ItemVisibility)}
-                  disabled={isPending}
-                  className="h-8 rounded-md border border-slate-300 bg-white px-2 text-xs font-medium text-slate-700"
-                >
-                  <option value="PRIVATE">Nội bộ</option>
-                  <option value="PUBLIC">Công khai</option>
-                </select>
+                <CustomSelect id="publication-visibility" value={publicationVisibility} onChange={value => setPublicationVisibility(value as ItemVisibility)} disabled={isPending} options={[{ value: 'PRIVATE', label: 'Nội bộ' }, { value: 'PUBLIC', label: 'Công khai' }]} />
                 <button
                   type="button"
                   onClick={() => {
@@ -496,7 +532,7 @@ export function ReviewWorkspace({
                     setModalReason('');
                   }}
                   disabled={isPending}
-                  className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded hover:bg-red-100 disabled:opacity-50"
+                  className="px-3 py-1.5 text-xs font-semibold text-red-700 bg-red-50 border border-red-200 rounded hover:bg-red-100 disabled:opacity-50"
                 >
                   Không phê duyệt
                 </button>
@@ -508,7 +544,7 @@ export function ReviewWorkspace({
       {/* Action Dialog Modal */}
       {modalMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4 text-slate-900 border border-slate-200">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4 text-center text-slate-900 border border-slate-200">
             <h3 className="text-sm font-semibold">
               {modalMode === 'return' && 'Trả lại bản biên tập cho Editor'}
               {modalMode === 'author_revision' && 'Yêu cầu tác giả bổ sung thông tin'}
@@ -530,7 +566,7 @@ export function ReviewWorkspace({
               className="w-full border border-slate-300 rounded p-2 text-xs bg-white text-slate-900"
               required
             />
-            <div className="flex items-center justify-end gap-2">
+            <div className="flex items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={() => setModalMode(null)}
@@ -542,7 +578,7 @@ export function ReviewWorkspace({
                 type="button"
                 onClick={handleExecuteModalAction}
                 disabled={isPending || !modalReason.trim()}
-                className="px-4 py-1.5 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50"
+                className="px-4 py-1.5 text-xs font-semibold text-white bg-brand-button rounded hover:brightness-110 disabled:opacity-50"
               >
                 Xác nhận
               </button>

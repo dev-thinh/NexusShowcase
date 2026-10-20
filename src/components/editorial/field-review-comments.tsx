@@ -1,3 +1,4 @@
+import { CustomSelect } from '@/components/ui/custom-select';
 import React, { useState } from 'react';
 
 export interface CommentItem {
@@ -66,7 +67,7 @@ export function FieldReviewComments({
               }`}
             >
               <div className="flex items-center justify-between gap-2 mb-1">
-                <div className="flex items-center gap-1.5 font-medium text-[11px]">
+                <div className="flex items-center gap-1.5 font-semibold text-[11px]">
                   <span
                     className={`px-1.5 py-0.2 rounded text-[10px] font-semibold ${
                       comment.audience === 'AUTHOR'
@@ -107,7 +108,7 @@ export function FieldReviewComments({
             <button
               type="button"
               onClick={() => setIsOpen(true)}
-              className="text-[11px] text-blue-600 hover:text-blue-800 font-medium"
+              className="text-[11px] text-blue-600 hover:text-blue-800 font-semibold"
             >
               + Thêm phản hồi trường này
             </button>
@@ -122,25 +123,11 @@ export function FieldReviewComments({
                 required
               />
               <div className="flex items-center justify-between gap-2 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <select
-                    value={audience}
-                    onChange={(e) => setAudience(e.target.value as any)}
-                    className="text-[11px] border border-slate-300 rounded px-1.5 py-0.5 bg-white"
-                  >
-                    <option value="EDITORIAL">Nội bộ (Editor / Admin)</option>
-                    <option value="AUTHOR">Gửi tác giả (Author)</option>
-                  </select>
-                  <select
-                    value={severity}
-                    onChange={(e) => setSeverity(e.target.value as any)}
-                    className="text-[11px] border border-slate-300 rounded px-1.5 py-0.5 bg-white"
-                  >
-                    <option value="REQUIRED">Bắt buộc</option>
-                    <option value="SUGGESTION">Gợi ý</option>
-                  </select>
+                <div className="flex flex-wrap items-center gap-2">
+                  <CustomSelect ariaLabel="Người nhận phản hồi" value={audience} onChange={value => setAudience(value as 'EDITORIAL' | 'AUTHOR')} options={[{ value: 'EDITORIAL', label: 'Nội bộ (Editor / Admin)' }, { value: 'AUTHOR', label: 'Gửi tác giả (Author)' }]} />
+                  <CustomSelect ariaLabel="Mức độ phản hồi" value={severity} onChange={value => setSeverity(value as 'REQUIRED' | 'SUGGESTION')} options={[{ value: 'REQUIRED', label: 'Bắt buộc' }, { value: 'SUGGESTION', label: 'Gợi ý' }]} />
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setIsOpen(false)}
@@ -151,7 +138,7 @@ export function FieldReviewComments({
                   <button
                     type="submit"
                     disabled={loading || !body.trim()}
-                    className="px-2.5 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                    className="px-2.5 py-1 bg-brand-button text-white rounded hover:brightness-110 disabled:opacity-50"
                   >
                     Lưu phản hồi
                   </button>

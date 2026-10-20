@@ -67,11 +67,20 @@ describe('academic review workspace', () => {
     expect(workspace).toContain('Công khai');
   });
 
+  it('lets an editor claim an unassigned pending review before editing', () => {
+    const workspace = read('src/components/editorial/review-workspace.tsx');
+    expect(workspace).toContain("const canClaim = currentUser.role === 'EDITOR'");
+    expect(workspace).toContain('Nhận biên tập');
+    expect(workspace).toContain('assignEditorAction(item.id, currentUser.id)');
+    expect(workspace).toContain('Bài đang được một biên tập viên khác phụ trách.');
+  });
+
   it('secures routes and provides editorial preview', () => {
     const reviewRoute = read('src/app/admin/reviews/[id]/page.tsx');
     const previewRoute = read('src/app/admin/reviews/[id]/preview/page.tsx');
-    expect(reviewRoute).toContain("getCurrentUser(['EDITOR', 'ADMIN'])");
-    expect(previewRoute).toContain("getCurrentUser(['EDITOR', 'ADMIN'])");
-    expect(previewRoute).toContain('mergeEditorialOverrides');
+    expect(reviewRoute).toContain("getCurrentUser(['ADMIN'])");
+    expect(previewRoute).toContain('redirect(');
+    expect(reviewRoute).toContain('ApprovalControls');
+    expect(reviewRoute).toContain('SubmissionPreview');
   });
 });
