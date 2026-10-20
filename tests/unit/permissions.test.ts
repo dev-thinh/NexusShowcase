@@ -16,17 +16,17 @@ describe('RBAC Permission Helpers', () => {
     expect(canUserUpload(null)).toBe(false);
   });
 
-  it('allows editors and admins to review submissions', () => {
+  it('allows only admins to review submissions', () => {
     expect(canUserReview({ role: 'ADMIN' })).toBe(true);
-    expect(canUserReview({ role: 'EDITOR' })).toBe(true);
+    expect(canUserReview({ role: 'EDITOR' })).toBe(false);
     expect(canUserReview({ role: 'CORE_MEMBER' })).toBe(false);
     expect(canUserReview({ role: 'MEMBER' })).toBe(false);
     expect(canUserReview(null)).toBe(false);
   });
 
   it('separates publication editing from final publishing', () => {
-    expect(canUserEditPublication({ role: 'EDITOR' })).toBe(true);
-    expect(canUserEditPublication({ role: 'ADMIN' })).toBe(true);
+    expect(canUserEditPublication({ role: 'EDITOR' })).toBe(false);
+    expect(canUserEditPublication({ role: 'ADMIN' })).toBe(false);
     expect(canUserEditPublication({ role: 'CORE_MEMBER' })).toBe(false);
     expect(canUserPublish({ role: 'EDITOR' })).toBe(false);
     expect(canUserPublish({ role: 'ADMIN' })).toBe(true);
