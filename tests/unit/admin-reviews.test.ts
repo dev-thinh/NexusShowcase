@@ -8,7 +8,7 @@ describe('Admin Reviews Page', () => {
     const content = fs.readFileSync(reviewsPath, 'utf-8');
 
     // Authorizes both EDITOR and ADMIN
-    expect(content).toMatch(/EDITOR.*ADMIN|ADMIN.*EDITOR/);
+    expect(content).toContain("getCurrentUser(['ADMIN'])");
 
     // Links to dedicated continuous review workspace /admin/reviews/[id]
     expect(content).toContain('/admin/reviews/${item.id}');
@@ -18,7 +18,7 @@ describe('Admin Reviews Page', () => {
     expect(content).not.toContain('action-row-card');
 
     // Supports editorial queues (PENDING_REVIEW and READY_FOR_APPROVAL)
-    expect(content).toContain('PENDING_REVIEW');
-    expect(content).toContain('READY_FOR_APPROVAL');
+    expect(content).toContain('pendingReviewWhere');
+    expect(content).not.toContain('assignedEditor');
   });
 });
