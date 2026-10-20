@@ -8,7 +8,7 @@ describe('Members Directory Page', () => {
     expect(fs.existsSync(pagePath)).toBe(true);
 
     const content = fs.readFileSync(pagePath, 'utf-8');
-    expect(content).toContain('Thành viên Robotics &amp; IoT Lab');
+    expect(content).toContain('Thành viên CLB Robotics &amp; IoT');
     expect(content).toContain('{members.length} thành viên');
     expect(content).not.toContain('Nhân sự &amp; Nghiên cứu viên');
     expect(content).not.toContain('Mạng lưới sinh viên');
@@ -24,20 +24,11 @@ describe('Members Directory Page', () => {
     expect(content).toContain('href="/members/all"');
   });
 
-  it('keeps member detail and its loading state geometrically aligned', () => {
-    const detail = fs.readFileSync(
-      path.resolve(process.cwd(), 'src/app/members/[id]/page.tsx'),
-      'utf-8',
-    );
-    const loading = fs.readFileSync(
-      path.resolve(process.cwd(), 'src/app/members/[id]/loading.tsx'),
-      'utf-8',
-    );
-
+  it('keeps the profile visible until the destination is ready', () => {
+    const detail = fs.readFileSync(path.resolve(process.cwd(), 'src/app/members/[id]/page.tsx'), 'utf-8');
     expect(detail).toContain('panel-detail');
     expect(detail).toContain('panel-nested');
-    expect(loading).toContain('panel-detail');
-    expect(loading).toContain('panel-nested');
+    expect(fs.existsSync(path.resolve(process.cwd(), 'src/app/members/[id]/loading.tsx'))).toBe(false);
   });
 
   it('uses shared accessible cards and server-link pagination', () => {

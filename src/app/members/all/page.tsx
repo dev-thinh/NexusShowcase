@@ -13,8 +13,8 @@ import { prisma } from '@/lib/prisma';
 import { publicUserSelect } from '@/lib/public-user';
 
 export const metadata = {
-  title: 'Tất cả thành viên - Robotics & IoT Lab',
-  description: 'Danh sách thành viên Robotics & IoT Lab.',
+  title: 'Tất cả thành viên - CLB Robotics & IoT',
+  description: 'Danh sách thành viên CLB Robotics & IoT.',
 };
 
 export default async function AllMembersPage({
@@ -49,14 +49,14 @@ export default async function AllMembersPage({
         <header className="mb-8 pb-6 border-b border-slate-200">
           <Link
             href="/members"
-            className="mb-5 inline-flex items-center gap-2 text-sm font-bold text-slate-600 hover:text-[#0F294A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] rounded"
+            className="mb-5 inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-[#0F294A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A] rounded"
           >
             <ArrowLeft aria-hidden="true" className="w-4 h-4" />
             Quay lại trang thành viên
           </Link>
 
           <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 leading-tight tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-slate-900 leading-tight tracking-tight">
                 Tất cả thành viên
               </h1>
               <p className="mt-1.5 text-sm sm:text-base font-semibold text-slate-500">
