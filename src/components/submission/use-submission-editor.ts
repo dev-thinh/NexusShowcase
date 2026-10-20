@@ -1,6 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { articleFromLegacy, standaloneResources, serializeArticle } from '@/lib/article-content';
 import { saveShowcaseDraftAction, submitShowcaseForReviewAction } from '@/actions/showcase-actions';
 import type { ShowcaseDraftInput } from '@/lib/action-schemas';
 
@@ -30,12 +32,15 @@ export function createInitialSubmissionState(
     data: {
       title: initialData.title ?? '',
       summary: initialData.summary ?? '',
-      content: initialData.content ?? '',
-      publishedYear: initialData.publishedYear,
+      content: serializeArticle(articleFromLegacy(initialData.content ?? '')),
+      type: initialData.type ?? 'PROJECT',
+      categoryId: initialData.categoryId ?? null,
+      thumbnailUrl: initialData.thumbnailUrl ?? null,
+      publishedYear: initialData.publishedYear ?? new Date().getFullYear(),
       suggestedField: initialData.suggestedField ?? '',
       customProjectType: initialData.customProjectType ?? '',
       contributors: initialData.contributors ?? [],
-      resources: initialData.resources ?? [],
+      resources: standaloneResources(initialData.content ?? '', initialData.resources ?? []),
     },
     fieldErrors: {},
     saveState: 'idle',
@@ -70,6 +75,8 @@ export function submissionEditorReducer(
 }
 
 export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & { id?: string }) {
+  const router = useRouter();
+  const busyRef = useRef(false);
   const [state, dispatch] = useReducer(submissionEditorReducer, initialData, createInitialSubmissionState);
 
   useEffect(() => {
@@ -85,7 +92,13 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
 
   const saveDraft = useCallback(async () => {
     dispatch({ type: 'saving' });
-    const result = await saveShowcaseDraftAction(state.itemId, state.data);
+    let result;
+    try {
+      result = await saveShowcaseDraftAction(state.itemId, state.data);
+    } catch {
+      dispatch({ type: 'failed', error: 'Không lưu được. Kiểm tra kết nối và thử lại.' });
+      return null;
+    }
     if (!result.success) {
       dispatch({ type: 'failed', error: result.error, fieldErrors: result.fieldErrors });
       return null;
@@ -95,15 +108,24 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
   }, [state.data, state.itemId]);
 
   const submitForReview = useCallback(async () => {
-    const itemId = await saveDraft();
-    if (!itemId) return false;
-    const result = await submitShowcaseForReviewAction(itemId);
-    if (!result.success) {
-      dispatch({ type: 'errors', error: result.error, fieldErrors: result.fieldErrors });
+    if (busyRef.current) return false;
+    busyRef.current = true;
+    try {
+      const itemId = await saveDraft();
+      if (!itemId) return false;
+      dispatch({ type: 'saving' });
+      const result = await submitShowcaseForReviewAction(itemId);
+      if (!result.success) {
+        dispatch({ type: 'failed', error: result.error, fieldErrors: result.fieldErrors });
+        return false;
+      }
+      router.replace('/dashboard?submitted=1');
+      return true;
+    } catch {
+      dispatch({ type: 'failed', error: 'Không gửi được bài. Bản nháp đã lưu vẫn được giữ lại.' });
       return false;
-    }
-    return true;
-  }, [saveDraft]);
+    } finally { busyRef.current = false; }
+  }, [saveDraft, router]);
 
   return { state, updateField, saveDraft, submitForReview };
 }
