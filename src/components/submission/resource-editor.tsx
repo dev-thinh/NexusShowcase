@@ -5,62 +5,63 @@ import { Trash2 } from 'lucide-react';
 import { uploadFileAction } from '@/actions/upload-actions';
 import type { SubmissionResource } from '@/lib/submission-types';
 
-export function ResourceEditor({ value, onChange }: { value: SubmissionResource[]; onChange: (value: SubmissionResource[]) => void }) {
+export function ResourceEditor({ value, onChange, onBusy }: { value: SubmissionResource[]; onChange: (value: SubmissionResource[]) => void; onBusy?: (busy: boolean) => void }) {
+  const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
   const [isResourceMenuOpen, setIsResourceMenuOpen] = useState(false);
   const add = (kind: SubmissionResource['kind']) => {
-    onChange([...value, { kind, label: '', url: '' }]);
+    onChange([...value, { kind, label: '', url: '', ...(kind === 'LINK' ? { linkType: 'OTHER' as const } : {}) }]);
     setIsResourceMenuOpen(false);
   };
   const update = (index: number, patch: Partial<SubmissionResource>) => onChange(value.map((entry, current) => current === index ? { ...entry, ...patch } : entry));
   const upload = async (index: number, file?: File) => {
-    if (!file) return;
+    if (!file || uploading) return;
+    setUploading(true);
+    onBusy?.(true);
     setMessage('Đang tải lên…');
-    const data = new FormData();
-    data.append('file', file);
-    data.append('type', value[index].kind === 'IMAGE' ? 'thumbnail' : 'pdf');
-    const result = await uploadFileAction(data);
-    if (!result.success || !result.url) return setMessage(result.error ?? 'Tải lên thất bại.');
-    update(index, { url: result.url, label: result.fileName ?? file.name, fileName: result.fileName, fileSize: result.fileSize, mimeType: result.mimeType });
-    setMessage('Đã tải lên.');
+    try {
+      const data = new FormData();
+      data.append('file', file);
+      data.append('type', 'resource');
+      const result = await uploadFileAction(data);
+      if (!result.success || !result.url) { setMessage(result.error ?? 'Tải lên thất bại.'); return; }
+      const label = value[index].label.trim() || result.fileName || file.name;
+      update(index, { url: result.url, label, fileName: label, fileSize: result.fileSize, mimeType: result.mimeType });
+      setMessage('Đã tải lên.');
+    } catch {
+      setMessage('Không tải được tệp. Vui lòng thử lại.');
+    } finally {
+      setUploading(false);
+      onBusy?.(false);
+    }
   };
 
   return (
-    <div className="mt-5">
-      <div
-        className="relative"
-        onBlur={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsResourceMenuOpen(false);
-        }}
-      >
-        <button
-          type="button"
-          aria-haspopup="menu"
-          aria-expanded={isResourceMenuOpen}
-          aria-controls="add-resource-menu"
-          onClick={() => setIsResourceMenuOpen((current) => !current)}
-          className="action-secondary-detail min-h-11 w-full"
-        >
+    <div className="mt-5" aria-busy={uploading}>
+      <div className="relative" onBlur={event => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsResourceMenuOpen(false);
+      }} onKeyDown={event => {
+        if (event.key === 'Escape') { setIsResourceMenuOpen(false); event.currentTarget.querySelector('button')?.focus(); }
+      }}>
+        <button type="button" aria-expanded={isResourceMenuOpen} aria-controls="add-resource-options" onClick={() => setIsResourceMenuOpen(open => !open)} className="action-secondary-detail min-h-11 w-full">
           Thêm tài nguyên
         </button>
-        {isResourceMenuOpen && (
-          <div id="add-resource-menu" role="menu" className="absolute z-30 mt-2 w-full rounded-md border border-slate-200 bg-white p-1.5 shadow-lg shadow-slate-900/10">
-            <button type="button" role="menuitem" onClick={() => add('IMAGE')} className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:outline-none">Hình ảnh</button>
-            <button type="button" role="menuitem" onClick={() => add('DOCUMENT')} className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:outline-none">Tài liệu PDF</button>
-            <button type="button" role="menuitem" onClick={() => add('LINK')} className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-950 focus:bg-slate-100 focus:outline-none">Liên kết</button>
-          </div>
-        )}
+        {isResourceMenuOpen && <div id="add-resource-options" className="absolute z-30 mt-2 w-full rounded-md border border-slate-200 bg-white p-1.5 shadow-lg shadow-slate-900/10">
+          <button type="button" onClick={() => add('DOCUMENT')} className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm text-slate-700 hover:bg-slate-100">Tệp</button>
+          <button type="button" onClick={() => add('LINK')} className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm text-slate-700 hover:bg-slate-100">Liên kết</button>
+        </div>}
       </div>
       <p className="mt-2 text-sm text-slate-600" aria-live="polite">{message}</p>
       <div className="space-y-3">
         {value.map((resource, index) => (
-          <div key={`${resource.kind}-${index}`} className="panel-nested grid gap-3 !p-3 shadow-none xl:grid-cols-[7rem_minmax(0,1fr)_2.75rem] xl:items-start">
-            <span className="text-sm font-semibold text-slate-700">{resource.kind === 'IMAGE' ? 'Hình ảnh' : resource.kind === 'DOCUMENT' ? 'Tài liệu PDF' : 'Liên kết'}</span>
-            <div className="grid gap-2">
-              <input value={resource.label} onChange={(event) => update(index, { label: event.target.value })} aria-label={`Tên tài nguyên ${index + 1}`} placeholder="Tên hiển thị" className="min-h-11 rounded-md border border-slate-300 px-3 text-sm" />
-              {resource.kind === 'LINK' ? <input type="url" value={resource.url} onChange={(event) => update(index, { url: event.target.value })} aria-label={`URL tài nguyên ${index + 1}`} placeholder="https://" className="min-h-11 rounded-md border border-slate-300 px-3 text-sm" /> : <input type="file" accept={resource.kind === 'IMAGE' ? 'image/jpeg,image/png,image/webp' : 'application/pdf'} onChange={(event) => void upload(index, event.target.files?.[0])} aria-label={`Chọn tệp cho tài nguyên ${index + 1}`} className="block min-h-11 w-full text-sm text-slate-700 file:mr-3 file:min-h-11 file:border-0 file:bg-slate-100 file:px-3 file:font-semibold" />}
+          <div key={`${resource.kind}-${index}`} className="panel-nested grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 !p-3 shadow-none">
+            <span className="col-span-2 text-sm font-semibold text-slate-700">{resource.kind === 'LINK' ? 'Liên kết' : 'Tệp'}</span>
+            <div className="grid min-w-0 gap-2">
+              <input value={resource.label} onChange={(event) => update(index, { label: event.target.value, ...(resource.kind !== 'LINK' ? { fileName: event.target.value } : {}) })} maxLength={160} aria-label={`Tên tài nguyên ${index + 1}`} placeholder="Tên hiển thị" className="min-h-11 min-w-0 w-full rounded-md border border-slate-300 px-3 text-sm" />
+              {resource.kind === 'LINK' ? <input type="url" value={resource.url} onChange={(event) => update(index, { url: event.target.value })} aria-label={`URL tài nguyên ${index + 1}`} placeholder="https://" className="min-h-11 min-w-0 w-full rounded-md border border-slate-300 px-3 text-sm" /> : <input type="file" onChange={(event) => void upload(index, event.target.files?.[0])} aria-label={`Chọn tệp cho tài nguyên ${index + 1}`} className="block min-h-11 w-full text-sm text-slate-700 file:mr-3 file:min-h-11 file:border-0 file:bg-slate-100 file:px-3 file:font-semibold" />}
+              {resource.kind !== 'LINK' && resource.url && <a href={resource.url} target="_blank" rel="noopener noreferrer" className="break-words text-sm text-[#0F294A] hover:underline">{resource.label || resource.fileName || 'Xem tệp đã tải lên'}</a>}
             </div>
-            <button type="button" onClick={() => onChange(value.filter((_, current) => current !== index))} aria-label={`Xóa tài nguyên ${index + 1}`} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-transparent text-slate-500 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
+            <button type="button" onClick={() => onChange(value.filter((_, current) => current !== index))} aria-label={`Xóa tài nguyên ${index + 1}`} title="Xóa tài nguyên" className="inline-flex h-11 w-11 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-rose-50 hover:text-rose-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><Trash2 aria-hidden="true" className="h-4 w-4" /></button>
           </div>
         ))}
       </div>
