@@ -68,37 +68,22 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
 interface TypeBadgeProps {
   type: ItemType;
   size?: 'sm' | 'md';
+  variant?: 'subtle' | 'outline';
 }
 
-export function TypeBadge({ type, size = 'md' }: TypeBadgeProps) {
-  const configs = {
-    RESEARCH_PAPER: {
-      label: 'Bài báo nghiên cứu',
-      classes: 'bg-blue-50/80 text-blue-900 border-blue-200/70',
-      icon: FileText,
-    },
-    PROJECT: {
-      label: 'Dự án công nghệ',
-      classes: 'bg-indigo-50/80 text-indigo-900 border-indigo-200/70',
-      icon: Code2,
-    },
-    ACHIEVEMENT: {
-      label: 'Thành tích & Cống hiến',
-      classes: 'bg-amber-50/80 text-amber-900 border-amber-200/70',
-      icon: Trophy,
-    },
-  };
-
-  const config = configs[type] || configs.RESEARCH_PAPER;
-  const Icon = config.icon;
+export function TypeBadge({ type, size = 'md', variant = 'subtle' }: TypeBadgeProps) {
+  const isRobotics = type === 'PROJECT';
+  const label = isRobotics ? 'Robotics & IoT' : 'Nghiên cứu khoa học';
+  const classes = variant === 'outline'
+    ? 'bg-transparent text-slate-700 border-slate-300'
+    : isRobotics
+    ? 'bg-indigo-50/80 text-indigo-900 border-indigo-200/70'
+    : 'bg-blue-50/80 text-blue-900 border-blue-200/70';
   const sizeClasses = size === 'sm' ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs';
 
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-md font-semibold border shadow-2xs ${sizeClasses} ${config.classes}`}
-    >
-      <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
-      <span>{config.label}</span>
+    <span className={`inline-flex items-center rounded-md font-semibold border ${variant === 'subtle' ? 'shadow-2xs' : ''} ${sizeClasses} ${classes}`}>
+      {label}
     </span>
   );
 }

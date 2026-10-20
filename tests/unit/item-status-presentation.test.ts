@@ -6,7 +6,7 @@ describe('item status presentation', () => {
   it('provides a localized label for every workflow status', () => {
     expect(ITEM_STATUS_LABELS).toEqual({
       DRAFT: 'Bản nháp',
-      PENDING_REVIEW: 'Chờ biên tập',
+      PENDING_REVIEW: 'Chờ duyệt',
       REVISION_REQUESTED: 'Chờ tác giả bổ sung',
       READY_FOR_APPROVAL: 'Chờ phê duyệt',
       PUBLISHED: 'Đã xuất bản',
@@ -16,7 +16,7 @@ describe('item status presentation', () => {
   });
 
   it('returns the shared Vietnamese label', () => {
-    expect(getItemStatusLabel(ItemStatus.PENDING_REVIEW)).toBe('Chờ biên tập');
+    expect(getItemStatusLabel(ItemStatus.PENDING_REVIEW)).toBe('Chờ duyệt');
     expect(getItemStatusLabel(ItemStatus.REVISION_REQUESTED)).toBe('Chờ tác giả bổ sung');
     expect(getItemStatusLabel(ItemStatus.REJECTED)).toBe('Không được phê duyệt');
     expect(getItemStatusLabel(ItemStatus.READY_FOR_APPROVAL)).toBe('Chờ phê duyệt');
