@@ -13,6 +13,21 @@ describe('form and modal panel consistency', () => {
     expect(workspace).toContain('action-primary-detail');
     expect(workspace).toContain('action-secondary-detail');
   });
+
+  it('keeps the author fields and section inputs at a consistent readable size', () => {
+    for (const file of ['src/components/submission/basic-information-fields.tsx', 'src/components/submission/section-editor.tsx']) {
+      const content = read(file);
+      expect(content).toContain('rounded-md');
+      expect(content).toContain('px-3 py-2.5 text-sm');
+    }
+  });
+
+  it('uses a read-only article preview with separate admin decision controls', () => {
+    const preview = read('src/components/submission-preview.tsx');
+    expect(preview).toContain('ArticleContent');
+    expect(preview).not.toMatch(/<input|<textarea/);
+    expect(read('src/components/approval-controls.tsx')).toContain('Quyết định phê duyệt');
+  });
   it.each([
     'src/app/login/login-form.tsx',
     'src/components/contact-form.tsx',

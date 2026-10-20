@@ -6,7 +6,7 @@ const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file)
 
 describe('operational panel consistency', () => {
   it.each([
-    'src/app/dashboard/page.tsx',
+    'src/components/my-posts.tsx',
     'src/app/admin/page.tsx',
     'src/app/admin/reviews/page.tsx',
     'src/components/admin-member-table.tsx',
@@ -15,9 +15,9 @@ describe('operational panel consistency', () => {
   });
 
   it.each(['src/app/dashboard/loading.tsx', 'src/app/admin/loading.tsx'])(
-    'matches operational geometry in %s',
+    'keeps the current page until the management destination is ready: %s',
     (file) => {
-      expect(read(file)).toContain('panel-operational');
+      expect(fs.existsSync(path.resolve(process.cwd(), file))).toBe(false);
     },
   );
 });
