@@ -10,7 +10,7 @@ vi.mock('@/lib/prisma', () => ({ prisma: mockPrisma }));
 
 import { getFeaturedNavCategories } from '@/lib/nav-categories';
 
-describe('getFeaturedNavCategories (Zero Empty State & Top 3 Limit)', () => {
+describe('getFeaturedNavCategories (Two content categories)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
@@ -42,7 +42,7 @@ describe('getFeaturedNavCategories (Zero Empty State & Top 3 Limit)', () => {
     expect(result[0].count).toBe(1);
   });
 
-  it('limits to Top 3 featured categories even if more qualify', async () => {
+  it('limits navigation to two categories', async () => {
     mockPrisma.category.findMany.mockResolvedValue([
       { id: '1', name: 'Cat 1', slug: 'cat-1', layoutType: 'SHOWCASE_GRID', displayOrder: 1, items: [{ id: 'i1' }] },
       { id: '2', name: 'Cat 2', slug: 'cat-2', layoutType: 'SHOWCASE_GRID', displayOrder: 2, items: [{ id: 'i2' }] },
@@ -51,7 +51,10 @@ describe('getFeaturedNavCategories (Zero Empty State & Top 3 Limit)', () => {
     ]);
 
     const result = await getFeaturedNavCategories(true);
-    expect(result).toHaveLength(3);
-    expect(result.map((c) => c.slug)).toEqual(['cat-1', 'cat-2', 'cat-3']);
+    expect(result).toHaveLength(2);
+    expect(result.map((c) => c.slug)).toEqual(['cat-1', 'cat-2']);
+    expect(mockPrisma.category.findMany).toHaveBeenCalledWith(expect.objectContaining({
+      where: { isNavFeatured: true, slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } },
+    }));
   });
 });

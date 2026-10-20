@@ -16,6 +16,7 @@ export async function getFeaturedNavCategories(isAuthenticated: boolean): Promis
   const categories = await prisma.category.findMany({
     where: {
       isNavFeatured: true,
+      slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] },
     },
     include: {
       items: {
@@ -28,10 +29,10 @@ export async function getFeaturedNavCategories(isAuthenticated: boolean): Promis
     },
   });
 
-  // Zero Empty State: filter out categories with 0 published items, and take top 3
+  // Show the two supported categories when they have published items.
   return categories
     .filter((cat) => cat.items.length > 0)
-    .slice(0, 3)
+    .slice(0, 2)
     .map((cat) => ({
       id: cat.id,
       name: cat.name,
