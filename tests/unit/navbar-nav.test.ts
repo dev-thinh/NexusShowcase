@@ -7,12 +7,12 @@ describe('Navbar Nav Component Structure', () => {
     const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
     const content = fs.readFileSync(navbarNavPath, 'utf-8');
 
-    // Tab renamed to 'Bài đăng' (2 words), only shown when authenticated
+    // Personal actions belong to the authenticated profile disclosure.
     expect(content).toContain('Bài đăng');
     expect(content).not.toContain('<span>Dashboard</span>');
-    expect(content).toContain('{user && (');
-    expect(content).toContain('href="/dashboard"');
-    expect(content).toContain('bg-[#0F294A]');
+    expect(content).toContain('aria-controls="profile-navigation"');
+    expect(content).toContain("href: '/dashboard'");
+    expect(content).toContain('bg-brand-button');
 
     // Contains links to members and contact
     expect(content).toContain('href="/members"');
@@ -30,24 +30,27 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).not.toContain('aria-label="Lối tắt Quản trị"');
   });
 
-  it('streamlines center navigation to core tabs while passing featured categories', () => {
+  it('renders core tabs without querying unused category counts', () => {
     const navbarPath = path.resolve(process.cwd(), 'src/components/navbar.tsx');
     const content = fs.readFileSync(navbarPath, 'utf-8');
 
-    expect(content).toContain('getFeaturedNavCategories');
-    expect(content).toContain('featuredCategories');
+    expect(content).not.toContain('getFeaturedNavCategories');
+    expect(content).not.toContain('featuredCategories');
     expect(content).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
 
     const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
-    expect(navContent).not.toContain('{featuredCategories.map');
+    expect(navContent).toContain("name: 'Nghiên cứu khoa học'");
+    expect(navContent).toContain("name: 'Robotics & IoT'");
+    expect(navContent).toContain('slug: \'bai-bao-khoa-hoc\'');
+    expect(navContent).toContain('slug: \'robotics-iot\'');
   });
 
   it('exposes review queue to EDITOR while hiding member administration', () => {
     const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
 
-    expect(navContent).toContain("role === 'EDITOR'");
+    expect(navContent).toContain("canUserReview(user)");
     expect(navContent).toContain('/admin/reviews');
   });
 });
