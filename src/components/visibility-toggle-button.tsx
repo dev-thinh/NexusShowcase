@@ -29,21 +29,21 @@ export function VisibilityToggleButton({ itemId, initialVisibility }: Visibility
       onClick={handleToggle}
       disabled={isPending}
       type="button"
-      className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors cursor-pointer ${
+      className={`action-toggle-detail cursor-pointer ${
         isPublic
-          ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100'
-          : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'
+          ? 'text-emerald-800 border-emerald-300 hover:border-emerald-500'
+          : 'text-amber-800 border-amber-300 hover:border-amber-500'
       }`}
       title="Bấm để chuyển đổi giữa Công khai cho khách và Chỉ lưu hành nội bộ"
     >
       {isPending ? (
-        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+        <Loader2 className="w-4 h-4 animate-spin" />
       ) : isPublic ? (
-        <Globe className="w-3.5 h-3.5 text-emerald-600" />
+        <Globe className="w-4 h-4 text-emerald-600" />
       ) : (
-        <Lock className="w-3.5 h-3.5 text-amber-600" />
+        <Lock className="w-4 h-4 text-amber-600" />
       )}
-      <span>{isPublic ? '🌐 Công khai cho khách' : '🔒 Chỉ nội bộ CLB'}</span>
+      <span>{isPublic ? 'Công khai cho khách' : 'Chỉ nội bộ CLB'}</span>
     </button>
   );
 }
