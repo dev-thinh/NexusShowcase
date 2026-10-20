@@ -1,81 +1,59 @@
-import { describe, it, expect } from 'vitest';
-import fs from 'fs';
-import path from 'path';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-describe('Split-Screen Login Page Layout and Neutral Language', () => {
-  it('implements split-screen layout with club mission and escape navigation links', () => {
-    const pagePath = path.resolve(process.cwd(), 'src/app/login/page.tsx');
-    const content = fs.readFileSync(pagePath, 'utf-8');
+const mocks = vi.hoisted(() => ({ params: new URLSearchParams() }));
+vi.mock('@/components/navbar', () => ({ Navbar: () => React.createElement('header', null, 'CLB Robotics & IoT') }));
+vi.mock('next/navigation', () => ({ useSearchParams: () => mocks.params }));
+vi.mock('@/app/login/actions', () => ({ loginAction: vi.fn() }));
+vi.stubGlobal('React', React);
 
-    // Header Navbar is preserved
-    expect(content).toContain('<Navbar');
+import LoginPage from '@/app/login/page';
+import { LoginForm } from '@/app/login/login-form';
 
-    // No AcademicFooter as requested
-    expect(content).not.toContain('<AcademicFooter');
+beforeEach(() => { mocks.params = new URLSearchParams(); });
 
-    // The content area fills the viewport below the 64px navbar, while the
-    // left introduction starts flush with the top edge of the login form.
-    expect(content).toContain('max-w-7xl');
-    expect(content).toContain('min-h-[calc(100dvh-4rem)]');
-    expect(content).toContain('grid-cols-1 lg:grid-cols-12');
-    expect(content).toContain('grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-start');
-
-    // Split-screen structure: aside (club mission) and main
-    expect(content).toContain('<aside');
-    expect(content).toContain('<main');
-
-    // Consistent light theme: the aside stays light even when small controls use navy
-    expect(content).not.toMatch(/<aside[^>]*bg-\[#0F294A\]/);
-
-    // System name and lab focus
-    expect(content).toContain('Robotics & IoT Lab');
-    expect(content).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
-    expect(content).toContain('Ươm mầm nghiên cứu');
-    expect(content).not.toContain('Khoa CNTT · ĐH Khoa học Tự nhiên');
-
-    // Escape hatch navigation buttons on the left bottom
-    expect(content).toContain('href="/"');
-    expect(content).toContain('href="/contact"');
-    expect(content).toContain('Trang chủ');
-    expect(content).toContain('Liên hệ');
+describe('login page', () => {
+  it('restores the original split-screen login layout', async () => {
+    const html = renderToStaticMarkup(await LoginPage());
+    expect(html).toContain('lg:grid-cols-12');
+    expect(html).toContain('Ươm mầm nghiên cứu');
+    expect(html).toContain('max-w-7xl');
+    expect(html).toContain('sm:px-6');
+    expect(html).toContain('lg:px-8');
+    expect(html.match(/<h1\b/g)).toHaveLength(2);
+    expect(html).toContain('max-w-lg');
+    expect(html).not.toContain('<footer');
+    expect(html).toContain('href="/"');
+    expect(html).toContain('href="/contact"');
   });
 
-  it('uses a borderless static brand lockup and keeps navy for the home button', () => {
-    const pagePath = path.resolve(process.cwd(), 'src/app/login/page.tsx');
-    const content = fs.readFileSync(pagePath, 'utf-8');
-
-    expect(content).toContain('data-brand-lockup="login"');
-    expect(content).toContain('bg-slate-100/80');
-    expect(content).not.toContain('bg-emerald-400 animate-pulse');
-    expect(content).not.toContain('rounded-md bg-[#0F294A] text-white text-xs');
-    expect(content).toContain('hover:bg-[#1E3A5F]');
-    expect(content).toContain('bg-white hover:bg-slate-50 text-slate-800');
+  it('preserves the original branding, background and navigation links', async () => {
+    const html = renderToStaticMarkup(await LoginPage());
+    expect(html).toContain('CLB Robotics &amp; IoT');
+    expect(html).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
+    expect(html).toContain('href="/contact"');
+    expect(html).toContain('href="/"');
+    expect(html).toContain('blur-3xl');
   });
 
-  it('ensures login form uses neutral language, larger max-w-lg styling, and clean inputs', () => {
-    const formPath = path.resolve(process.cwd(), 'src/app/login/login-form.tsx');
-    const content = fs.readFileSync(formPath, 'utf-8');
-
-    // Neutral titles and labels
-    expect(content).toContain('Đăng nhập');
-    expect(content).not.toContain('Nhập thông tin tài khoản để tiếp tục');
-    expect(content).toContain('Tài khoản hoặc Email');
-    expect(content).toContain('Mật khẩu');
-
-    // No jargon or club-exclusive wording
-    expect(content).not.toContain('Xác Thực Thành Viên');
-    expect(content).not.toContain('Cổng quản trị &amp; công bố nghiên cứu');
-
-    // Larger dimensions and rounded-lg
-    expect(content).toContain('max-w-lg');
-    expect(content).toContain('rounded-lg');
+  it('provides labeled inputs, password-manager autocomplete and password visibility control', () => {
+    const html = renderToStaticMarkup(React.createElement(LoginForm));
+    expect(html).toContain('for="identifier"');
+    expect(html).toContain('for="password"');
+    expect(html).toContain('autoComplete="username"');
+    expect(html).toContain('autoComplete="current-password"');
+    expect(html).toContain('type="password"');
+    expect(html).toContain('aria-label="Hiện mật khẩu"');
+    expect(html).toContain('aria-pressed="false"');
+    expect(html).toContain('type="submit"');
+    expect(html).toContain('uppercase');
   });
 
-  it('keeps the login icon inline with its title instead of hanging in the page gutter', () => {
-    const formPath = path.resolve(process.cwd(), 'src/app/login/login-form.tsx');
-    const content = fs.readFileSync(formPath, 'utf-8');
-
-    expect(content).toContain('flex items-center gap-3 pb-4');
-    expect(content).not.toContain('heading-gutter-icon');
+  it('shows the password-change confirmation', () => {
+    mocks.params = new URLSearchParams('passwordChanged=1');
+    const html = renderToStaticMarkup(React.createElement(LoginForm));
+    expect(html).toContain('role="status"');
+    expect(html).toContain('Đã đổi mật khẩu thành công');
   });
 });

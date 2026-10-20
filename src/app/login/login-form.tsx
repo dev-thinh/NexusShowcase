@@ -68,21 +68,25 @@ export function LoginForm() {
   return (
     <div className="max-w-lg w-full mx-auto">
       <div className="panel-detail">
-        {/* Header với icon trần to bằng tiêu đề */}
         <div className="flex items-center gap-3 pb-4 border-b border-slate-100">
           <LogIn aria-hidden="true" className="w-7 h-7 text-[#0F294A] shrink-0" />
-          <h1 className="text-2xl font-extrabold text-slate-900 leading-tight">
-            Đăng nhập
-          </h1>
+          <h1 className="text-2xl font-semibold text-slate-900 leading-tight">Đăng nhập</h1>
         </div>
+
+        {searchParams.get('passwordChanged') === '1' && (
+          <p role="status" className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+            Đã đổi mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.
+          </p>
+        )}
 
         {error && (
           <div
+            id="login-error"
             role="alert"
             className="mt-4 p-3.5 rounded-lg bg-rose-50 border border-rose-200 text-rose-800 text-sm flex items-center gap-2.5 animate-in fade-in"
           >
             <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-            <div className="font-medium">{error}</div>
+            <div className="font-semibold">{error}</div>
           </div>
         )}
 
@@ -98,26 +102,30 @@ export function LoginForm() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <form noValidate onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
             <label
               htmlFor="identifier"
-              className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2"
+              className="block text-xs sm:text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2"
             >
               Tài khoản hoặc Email
             </label>
             <div className="relative">
-              <User className="w-4.5 h-4.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <User aria-hidden="true" className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 id="identifier"
                 name="identifier"
                 type="text"
                 autoComplete="username"
+                autoCapitalize="none"
+                spellCheck={false}
+                required
+                aria-describedby={error ? 'login-error' : undefined}
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
                 placeholder="Nhập tên đăng nhập hoặc email..."
                 disabled={isPending}
-                className="w-full pl-10 pr-4 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
+                className="w-full pl-10 pr-4 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-semibold disabled:opacity-50"
               />
             </div>
           </div>
@@ -125,30 +133,34 @@ export function LoginForm() {
           <div>
             <label
               htmlFor="password"
-              className="block text-xs sm:text-sm font-bold text-slate-700 uppercase tracking-wider mb-2"
+              className="block text-xs sm:text-sm font-semibold text-slate-700 uppercase tracking-wider mb-2"
             >
               Mật khẩu
             </label>
             <div className="relative">
-              <Lock className="w-4.5 h-4.5 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Lock aria-hidden="true" className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 id="password"
                 name="password"
                 type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
+                required
+                aria-describedby={error ? 'login-error' : undefined}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
                 disabled={isPending}
-                className="w-full pl-10 pr-10 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-medium disabled:opacity-50"
+                className="w-full pl-10 pr-10 py-3 text-sm sm:text-base bg-white hover:border-slate-300 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 text-slate-900 transition-all font-semibold disabled:opacity-50"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
+                disabled={isPending}
+                aria-pressed={showPassword}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1 rounded-md transition-colors cursor-pointer"
                 aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
               >
-                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showPassword ? <EyeOff aria-hidden="true" className="w-4 h-4" /> : <Eye aria-hidden="true" className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -156,7 +168,7 @@ export function LoginForm() {
           <button
             type="submit"
             disabled={isPending}
-            className="w-full mt-3 py-3 px-5 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white font-bold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
+            className="w-full mt-3 py-3 px-5 rounded-lg bg-brand-button hover:brightness-110 active:scale-[0.98] text-white font-semibold text-sm sm:text-base shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]"
           >
             {isPending ? (
               <>
@@ -176,7 +188,7 @@ export function LoginForm() {
           <span>Chưa có tài khoản? </span>
           <Link
             href="/contact"
-            className="font-bold text-[#0F294A] hover:underline"
+            className="font-semibold text-[#0F294A] hover:underline"
           >
             Liên hệ ban quản trị
           </Link>
