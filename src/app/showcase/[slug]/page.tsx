@@ -1,42 +1,43 @@
+import { ResourceLinks } from '@/components/resource-links';
+import { standaloneResources } from '@/lib/article-content';
+import { buildSubmissionSnapshot } from '@/lib/submission-snapshot';
+import { ArticleContent, ArticleTableOfContents } from '@/components/article-content';
+import { parseArticleContent } from '@/lib/article-content';
+import { showcaseReturnTarget } from '@/lib/showcase-navigation';
 import { notFound, redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { auth } from '@/lib/auth';
+import { getSession as auth } from '@/lib/session';
 import { Navbar } from '@/components/navbar';
 import { AcademicFooter } from '@/components/academic-footer';
 import { VideoPlayer } from '@/components/video-player';
-import { StatusBadge, TypeBadge, RoleBadge } from '@/components/ui/badge';
+import { StatusBadge, TypeBadge } from '@/components/ui/badge';
 import { CitationModal } from '@/components/citation-modal';
-import { PinToggleButton } from '@/components/pin-toggle-button';
-import { VisibilityToggleButton } from '@/components/visibility-toggle-button';
+import { CardAdminControls } from '@/components/card-admin-controls';
 import { publicUserSelect } from '@/lib/public-user';
 import Link from 'next/link';
 import {
   ArrowLeft,
   FileText,
-  Github,
-  Globe,
-  Calendar,
-  Building2,
-  ExternalLink,
-  GraduationCap,
   Download,
   Eye,
   Clock,
-  AlertTriangle,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ShowcaseDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ returnTo?: string }>;
 }) {
   const { slug } = await params;
   const session = await auth();
   const currentUser = session?.user as any;
 
   const item = await prisma.showcaseItem.findUnique({
+    omit: { authorDraft: true },
     where: { slug },
     include: {
       contributors: {
@@ -60,19 +61,31 @@ export default async function ShowcaseDetailPage({
     redirect(`/login?callbackUrl=/showcase/${slug}`);
   }
 
+  const structured = parseArticleContent(item.content);
   const videoLink = item.links.find((l) => l.type === 'VIDEO_EMBED');
-  const paperLink = item.links.find((l) => l.type === 'PAPER_URL');
-  const githubLink = item.links.find((l) => l.type === 'GITHUB');
-  const liveDemoLink = item.links.find((l) => l.type === 'LIVE_DEMO');
-  const otherLinks = item.links.filter(
-    (l) => !['VIDEO_EMBED', 'PAPER_URL', 'GITHUB', 'LIVE_DEMO'].includes(l.type)
-  );
+  const sidebarResources = standaloneResources(item.content ?? '', buildSubmissionSnapshot(item).resources);
+
+  const categorySlug = item.type === 'PROJECT' ? 'robotics-iot' : 'bai-bao-khoa-hoc';
+  const categoryName = item.type === 'PROJECT' ? 'Robotics & IoT' : 'Nghiên cứu khoa học';
+  const source = await searchParams;
+  const backHref = showcaseReturnTarget(source?.returnTo, `/category/${categorySlug}`);
+  const backLabel = backHref.startsWith('/?') || backHref === '/' ? 'Quay lại trang chủ'
+    : backHref.startsWith('/category/robotics-iot') ? 'Robotics & IoT'
+    : backHref.startsWith('/category/bai-bao-khoa-hoc') ? 'Nghiên cứu khoa học' : categoryName;
+  const documents = item.attachments.filter(attachment => !attachment.mimeType.startsWith('image/'));
+  const figures = item.attachments.filter(attachment => attachment.mimeType.startsWith('image/') && attachment.fileUrl !== item.thumbnailUrl);
+  const contributorRoles: Record<string, string> = {
+    ADVISOR: 'Người hướng dẫn', FIRST_AUTHOR: 'Tác giả chính', CO_FIRST_AUTHOR: 'Đồng tác giả chính',
+    CO_AUTHOR: 'Đồng tác giả', CORRESPONDING_AUTHOR: 'Tác giả liên hệ', PROJECT_LEAD: 'Trưởng nhóm',
+    CONTRIBUTOR: 'Thành viên đóng góp', CUSTOM: 'Thành viên',
+  };
 
   return (
     <div className="min-h-screen flex flex-col font-sans">
       <Navbar />
-
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-6xl flex-1">
+      <main className="flex-1">
+        <header className="border-b border-slate-200 bg-gradient-to-br from-blue-50 via-slate-50 to-white">
+          <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
         {/* Preview Banner for Admin / Creator */}
         {item.status !== 'PUBLISHED' && (
           <div className="panel-callout mb-6 bg-amber-50 border-amber-200 text-amber-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
@@ -80,14 +93,14 @@ export default async function ShowcaseDetailPage({
               <Clock className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-extrabold text-sm sm:text-base">
+                  <span className="font-semibold text-sm sm:text-base">
                     Chế độ xem trước công trình nghiên cứu
                   </span>
                   <StatusBadge status={item.status} />
                 </div>
                 <p className="text-xs sm:text-sm text-amber-800">
                   {item.status === 'PENDING_REVIEW'
-                    ? 'Bài nộp đang chờ thẩm định học thuật và xét duyệt xuất bản.'
+                    ? 'Bài nộp đang chờ Admin phê duyệt.'
                     : item.status === 'DRAFT'
                     ? 'Bản nháp cá nhân. Chưa gửi yêu cầu xét duyệt xuất bản.'
                     : `Công trình cần chỉnh sửa bổ sung: ${item.rejectionReason || 'Vui lòng cập nhật lại theo yêu cầu.'}`}
@@ -99,18 +112,18 @@ export default async function ShowcaseDetailPage({
             {currentUser?.role === 'ADMIN' && ['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.status) && (
               <Link
                 href={`/admin/reviews/${item.id}`}
-                className="px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg text-xs font-bold transition-all shadow-xs"
+                className="px-4 py-2 bg-brand-button hover:brightness-110 text-white rounded-lg text-xs font-semibold transition-all shadow-xs"
               >
-                Mở không gian biên tập
+                Mở trang phê duyệt
               </Link>
             )}
-            {(item.status === 'DRAFT' || item.status === 'REJECTED') && (
+            {(item.status === 'DRAFT' || item.status === 'REVISION_REQUESTED') && (
               ((currentUser?.id === item.creatorId && (currentUser?.role === 'CORE_MEMBER' || currentUser?.role === 'ADMIN')) || currentUser?.role === 'ADMIN') ? (
                 <Link
                   href={`/dashboard/items/${item.id}/edit`}
-                  className="px-4 py-2 bg-[#0F294A] hover:bg-[#1E3A5F] text-white rounded-lg text-xs font-bold transition-all shadow-xs"
+                  className="px-4 py-2 bg-brand-button hover:brightness-110 text-white rounded-lg text-xs font-semibold transition-all shadow-xs"
                 >
-                  {item.status === 'REJECTED' ? 'Sửa & Gửi lại duyệt' : 'Chỉnh sửa bài viết'}
+                  {item.status === 'REVISION_REQUESTED' ? 'Sửa & Gửi lại duyệt' : 'Chỉnh sửa bài viết'}
                 </Link>
               ) : currentUser?.id === item.creatorId && currentUser?.role === 'MEMBER' ? (
                 <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-amber-100 text-amber-800 border border-amber-200">
@@ -122,288 +135,142 @@ export default async function ShowcaseDetailPage({
           </div>
         )}
 
-        {/* Breadcrumb Back Link */}
-        <Link
-          href={currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' ? '/admin/reviews' : '/'}
-          className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0F294A] mb-6 transition-colors group"
-        >
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          <span>
-            {currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW'
-              ? 'Quay lại danh sách duyệt bài'
-              : 'Quay lại danh mục công trình'}
-          </span>
-        </Link>
 
-        {/* Paper Header Card */}
-        <header className="panel-detail mb-6">
-          <div className="flex flex-wrap items-center gap-2.5 mb-3.5">
-            <TypeBadge type={item.type} />
-            <span
-              className={`inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-md border ${
-                item.visibility === 'PUBLIC'
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : 'bg-amber-50 text-amber-700 border-amber-200'
-              }`}
-            >
-              {item.visibility === 'PUBLIC' ? '🌐 Công khai' : '🔒 Nội bộ'}
-            </span>
-            <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              <span>Năm công bố: {item.publishedYear}</span>
+            <Link href={currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' ? '/admin/reviews' : backHref} className="mb-6 inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-slate-500 transition-colors hover:text-[#0F294A]">
+              <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+              {currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW' ? 'Quay lại danh sách duyệt bài' : backLabel}
+            </Link>
+            <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-500">
+              <TypeBadge type={item.type} variant="outline" />
+              {item.publishedYear && <span>{item.publishedYear}</span>}
+              {item.isPinned && <span className="font-semibold text-[#0F294A]">Công trình tiêu biểu</span>}
             </div>
-            {item.issuer && (
-              <div className="flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200">
-                <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                <span>{item.issuer}</span>
-              </div>
-            )}
-            {item.tags && item.tags.length > 0 && (
-              <div className="flex flex-wrap items-center gap-1.5 ml-auto">
-                {item.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs px-2 py-0.5 rounded-md bg-slate-100 text-slate-600 font-medium border border-slate-200"
-                  >
-                    #{tag}
+            <h1 className="max-w-5xl break-words text-2xl font-semibold leading-snug tracking-tight text-[#0F294A] sm:text-3xl lg:text-4xl">{item.title}</h1>
+            {item.contributors.length > 0 && (
+              <p className="mt-3 max-w-4xl text-sm leading-7 text-slate-600 sm:text-base">
+                {item.contributors.map((contributor, index) => (
+                  <span key={contributor.id}>
+                    {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="hover:text-[#0F294A]">{contributor.user.fullName}</Link> : contributor.externalName || 'Thành viên'}
+                    {contributor.role === 'ADVISOR' && <sup className="ml-0.5 text-xs" title="Người hướng dẫn">†</sup>}
+                    {index < item.contributors.length - 1 ? ', ' : ''}
                   </span>
                 ))}
-              </div>
+              </p>
             )}
-          </div>
+            {item.issuer && <p className="mt-3 text-sm italic leading-relaxed text-slate-500">{item.issuer}</p>}
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight">
-            {item.title}
-          </h1>
-
-          <div className="panel-nested mt-5">
-            <h2 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-              Tóm tắt đề tài (Abstract)
-            </h2>
-            <p className="text-sm sm:text-base text-slate-700 leading-relaxed font-normal">
-              {item.summary}
-            </p>
-          </div>
-
-          {/* Standardized Uniform Action Cards Panel */}
-          <div className="action-row-detail">
-            {/* Citation Generator */}
-            <CitationModal
-              item={item}
-              className="action-primary-detail"
-            />
-
-            {/* Admin Visibility Toggle */}
-            {currentUser?.role === 'ADMIN' && (
-              <VisibilityToggleButton
-                itemId={item.id}
-                initialVisibility={item.visibility}
-              />
-            )}
-
-            {/* Admin Pin Toggle */}
-            {currentUser?.role === 'ADMIN' && item.status === 'PUBLISHED' && (
-              <PinToggleButton
-                itemId={item.id}
-                initialIsPinned={item.isPinned}
-                status={item.status}
-              />
-            )}
-
-            {paperLink && (
-              <a
-                href={paperLink.url}
-                target="_blank"
-                rel="noreferrer"
-                className="action-secondary-detail group"
-              >
-                <FileText className="w-4 h-4 text-blue-600 shrink-0" />
-                <span>Đọc bài báo gốc</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" />
-              </a>
-            )}
-
-            {githubLink && (
-              <a
-                href={githubLink.url}
-                target="_blank"
-                rel="noreferrer"
-                className="action-secondary-detail group"
-              >
-                <Github className="w-4 h-4 text-slate-900 shrink-0" />
-                <span>Mã nguồn GitHub</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" />
-              </a>
-            )}
-
-            {liveDemoLink && (
-              <a
-                href={liveDemoLink.url}
-                target="_blank"
-                rel="noreferrer"
-                className="action-secondary-detail group"
-              >
-                <Globe className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Trang web chạy thử</span>
-                <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-600 shrink-0" />
-              </a>
-            )}
-
-            {otherLinks.map((link) => (
-              <a
-                key={link.id}
-                href={link.url}
-                target="_blank"
-                rel="noreferrer"
-                className="action-secondary-detail group"
-              >
-                <ExternalLink className="w-4 h-4 text-slate-400 group-hover:text-slate-600 shrink-0" />
-                <span>{link.label}</span>
-              </a>
-            ))}
           </div>
         </header>
 
-        {/* Video Demo Section */}
-        {videoLink && (
-          <section className="panel-detail mb-6">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-              <span>Video Trình Diễn &amp; Demo</span>
-            </h2>
-            <VideoPlayer url={videoLink.url} title={item.title} />
-          </section>
-        )}
+        <div className="container mx-auto grid max-w-7xl items-start gap-10 px-4 py-9 sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-14 lg:px-8">
+          <article className="min-w-0 space-y-8 sm:space-y-10">
+            <section id="abstract" aria-labelledby="abstract-title" className="scroll-mt-24">
+              <h2 id="abstract-title" className="mb-3 text-base font-semibold text-[#0F294A]">Tóm tắt</h2>
+              <p className="whitespace-pre-line break-words text-base leading-8 text-slate-700">{item.summary}</p>
+            </section>
 
-        {/* Full-Text PDF & Attachments Section */}
-        {item.attachments && item.attachments.length > 0 && (
-          <section className="panel-detail mb-6">
-            <div className="flex items-center justify-between mb-3.5">
-              <h2 className="text-base sm:text-lg font-bold text-slate-900">
-                <span>Tài Liệu Toàn Văn &amp; Phụ Lục Nghiên Cứu</span>
-              </h2>
-              <span className="text-xs text-slate-500 font-semibold">
-                {item.attachments.length} tệp đính kèm
-              </span>
-            </div>
+            {item.thumbnailUrl && (
+              <figure className="space-y-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} className="mx-auto block h-auto max-h-[32rem] max-w-full rounded-md object-contain" />
+                <figcaption className="text-center text-xs leading-6 text-slate-500">Hình tổng quan công trình</figcaption>
+              </figure>
+            )}
 
-            <div className="space-y-2.5">
-              {item.attachments.map((att) => (
-                <div
-                  key={att.id}
-                  className="panel-nested flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-100/60 transition-colors"
-                >
-                  <div className="flex items-center gap-3 truncate">
-                    <div className="w-9 h-9 rounded-md bg-rose-50 text-rose-700 font-bold text-xs flex items-center justify-center shrink-0 border border-rose-200/80">
-                      PDF
-                    </div>
-                    <div className="truncate">
-                      <div className="font-bold text-slate-900 text-sm truncate">
-                        {att.fileName}
-                      </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
-                        {(att.fileSize / (1024 * 1024)).toFixed(2)} MB • {att.mimeType}
-                      </div>
-                    </div>
-                  </div>
+            {item.content && <ArticleContent content={item.content} />}
 
-                  <div className="flex items-center gap-2 shrink-0">
-                    <a
-                      href={att.fileUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="h-9 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 hover:text-slate-900 text-xs font-semibold transition-all shadow-2xs inline-flex items-center gap-1.5 active:scale-[0.98]"
-                    >
-                      <Eye className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Xem online</span>
-                    </a>
-                    <a
-                      href={att.fileUrl}
-                      download={att.fileName}
-                      className="h-9 px-3.5 rounded-lg bg-[#0F294A] hover:bg-[#1E3A5F] text-white text-xs font-bold transition-all shadow-xs inline-flex items-center gap-1.5 active:scale-[0.98]"
-                    >
-                      <Download className="w-3.5 h-3.5 text-blue-200" />
-                      <span>Tải về PDF</span>
-                    </a>
-                  </div>
+            {!structured && figures.length > 0 && (
+              <section id="figures" aria-labelledby="figures-title" className="scroll-mt-24">
+                <h2 id="figures-title" className="mb-4 text-base font-semibold text-[#0F294A]">Hình ảnh &amp; Thực nghiệm</h2>
+                <div className="space-y-6">
+                  {figures.map((figure, index) => (
+                    <figure key={figure.id} className="space-y-2">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={figure.fileUrl} alt={figure.fileName} loading="lazy" className="mx-auto block h-auto max-h-[36rem] max-w-full rounded-md object-contain" />
+                      <figcaption className="text-center text-sm text-slate-500">Hình {index + 1}. {figure.fileName}</figcaption>
+                    </figure>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
-        )}
+              </section>
+            )}
 
-        {/* Authors Section */}
-        <section className="panel-detail mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900">
-              <span>Tác giả &amp; Người hướng dẫn</span>
-            </h2>
-            <span className="text-xs text-slate-500 font-semibold">{item.contributors.length} thành viên</span>
-          </div>
+            {!structured && videoLink && (
+              <section id="demo" aria-labelledby="demo-title" className="scroll-mt-24">
+                <h2 id="demo-title" className="mb-4 text-base font-semibold text-[#0F294A]">Video trình diễn</h2>
+                <VideoPlayer url={videoLink.url} title={item.title} />
+              </section>
+            )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-            {item.contributors.map((c) => {
-              const name = c.user?.fullName || c.externalName || 'Thành viên ẩn danh';
-              const isAdvisor = c.role === 'ADVISOR';
-
-              return (
-                <div
-                  key={c.id}
-                  className={`panel-nested flex items-start gap-3.5 transition-all ${
-                    isAdvisor
-                      ? 'bg-purple-50/40 border-purple-200 hover:border-purple-300'
-                      : 'bg-slate-50/70 border-slate-200 hover:bg-slate-50'
-                  }`}
-                >
-                  <div
-                    className={`w-10 h-10 rounded-full font-bold flex items-center justify-center text-sm shrink-0 shadow-2xs ${
-                      isAdvisor
-                        ? 'bg-purple-600 text-white'
-                        : 'bg-[#0F294A]/10 text-[#0F294A]'
-                    }`}
-                  >
-                    {isAdvisor ? <GraduationCap className="w-4 h-4" /> : name.charAt(0)}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2">
-                      {c.user ? (
-                        <Link
-                          href={`/members/${c.user.id}`}
-                          className="font-bold text-slate-900 hover:text-[#0F294A] transition-colors truncate block text-sm sm:text-base"
-                        >
-                          {name}
-                        </Link>
-                      ) : (
-                        <span className="font-bold text-slate-900 truncate block text-sm sm:text-base">{name}</span>
-                      )}
+            {!structured && documents.length > 0 && (
+              <section id="documents" aria-labelledby="documents-title" className="scroll-mt-24">
+                <h2 id="documents-title" className="mb-3 text-base font-semibold text-[#0F294A]">Toàn văn &amp; Tài liệu đính kèm</h2>
+                <div className="divide-y divide-slate-200 border-y border-slate-200">
+                  {documents.map(document => (
+                    <div key={document.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
+                      <div className="flex min-w-0 flex-1 items-center gap-3">
+                        <FileText className="h-5 w-5 shrink-0 text-slate-400" aria-hidden="true" />
+                        <div className="min-w-0">
+                          <p className="break-words text-sm font-semibold text-slate-800">{document.fileName}</p>
+                          <p className="mt-1 text-xs text-slate-500">{(document.fileSize / (1024 * 1024)).toFixed(2)} MB · {document.mimeType}</p>
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-3">
+                        <a href={document.fileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 text-xs font-semibold text-[#0F294A] hover:underline"><Eye className="h-3.5 w-3.5" aria-hidden="true" />Xem</a>
+                        <a href={document.fileUrl} download={document.fileName} className="inline-flex min-h-10 items-center gap-1.5 text-xs font-semibold text-[#0F294A] hover:underline"><Download className="h-3.5 w-3.5" aria-hidden="true" />Tải về</a>
+                      </div>
                     </div>
-
-                    <div className="mt-1">
-                      <RoleBadge role={c.role} customTitle={c.customRoleTitle} />
-                    </div>
-
-                    {c.externalAffiliation && (
-                      <p className="text-xs text-slate-500 mt-1 truncate">{c.externalAffiliation}</p>
-                    )}
-                  </div>
+                  ))}
                 </div>
-              );
-            })}
-          </div>
-        </section>
+              </section>
+            )}
+          </article>
 
-        {/* Markdown Content Section */}
-        {item.content && (
-          <section className="panel-detail">
-            <h2 className="text-base sm:text-lg font-bold text-slate-900 mb-3.5">Nội dung chi tiết</h2>
-            <div className="text-sm sm:text-base text-slate-700 leading-relaxed whitespace-pre-line font-sans">
-              {item.content}
-            </div>
-          </section>
-        )}
+          <aside className="min-w-0 space-y-7 border-t border-slate-200 pt-6 lg:sticky lg:top-24 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0" aria-label="Tài nguyên và nhóm thực hiện">
+            <ArticleTableOfContents content={item.content ?? ''} />
+            <section aria-labelledby="resources-title">
+              <h2 id="resources-title" className="mb-4 text-base font-semibold text-[#0F294A]">Tài nguyên</h2>
+              <div className="flex flex-col items-stretch gap-2">
+                <ResourceLinks resources={sidebarResources} />
+                <CitationModal item={item} className="action-secondary-detail" />
+              </div>
+            </section>
+
+
+            {item.contributors.length > 0 && (
+              <section className="border-t border-slate-200 pt-6" aria-labelledby="authors-title">
+                <h2 id="authors-title" className="mb-4 text-base font-semibold text-[#0F294A]">Nhóm thực hiện</h2>
+                <ul className="space-y-4">
+                  {item.contributors.map(contributor => {
+                    const name = contributor.user?.fullName || contributor.externalName || 'Thành viên';
+                    return (
+                      <li key={contributor.id} className="flex items-start gap-3">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-200/70 text-xs font-semibold text-[#0F294A]" aria-hidden="true">{name.charAt(0)}</span>
+                        <div className="min-w-0">
+                          {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="text-sm font-semibold text-slate-800 hover:text-[#0F294A]">{name}</Link> : <span className="text-sm font-semibold text-slate-800">{name}</span>}
+                          <p className="mt-1 text-xs leading-5 text-slate-500">{contributor.customRoleTitle || contributorRoles[contributor.role]}</p>
+                          {contributor.externalAffiliation && <p className="mt-1 text-xs leading-5 text-slate-500">{contributor.externalAffiliation}</p>}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
+
+
+
+
+            {currentUser?.role === 'ADMIN' && (
+              <section className="border-t border-slate-200 pt-6" aria-label="Quản lý công trình">
+                <h2 className="mb-3 text-base font-semibold text-[#0F294A]">Quản lý</h2>
+                <div className="flex flex-wrap gap-2">
+                  <CardAdminControls variant="detail" itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} showPin={item.status === 'PUBLISHED'} />
+                </div>
+              </section>
+            )}
+          </aside>
+        </div>
       </main>
-
-      {/* Institutional Academic Footer */}
       <AcademicFooter />
     </div>
   );
