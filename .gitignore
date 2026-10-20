@@ -41,3 +41,6 @@ next-env.d.ts
 
 # local git worktrees
 .worktrees/
+
+# uploaded resource files
+/storage/resources/
