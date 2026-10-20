@@ -60,14 +60,13 @@ describe('action schemas', () => {
     }).success).toBe(false);
   });
 
-  it('validates flexible submission fields: tags, mediaDriveUrl, categoryId, proposedCategory', () => {
+  it('validates flexible submission fields: mediaDriveUrl, categoryId, proposedCategory', () => {
     const validFlexible = {
       title: 'Robotics Autonomous Rover',
       summary: 'Dự án xe tự hành với LiDAR và STM32.',
       type: 'PROJECT' as const,
       categoryId: 'cjr012345678901234567890',
       proposedCategory: 'Robotics',
-      tags: ['Robotics', 'LiDAR', 'STM32'],
       mediaDriveUrl: 'https://drive.google.com/drive/folders/test123456',
       visibility: 'PUBLIC' as const,
       contributors: [],
@@ -77,7 +76,6 @@ describe('action schemas', () => {
     const parsed = createShowcaseItemInputSchema.safeParse(validFlexible);
     expect(parsed.success).toBe(true);
     if (parsed.success) {
-      expect(parsed.data.tags).toEqual(['Robotics', 'LiDAR', 'STM32']);
       expect(parsed.data.mediaDriveUrl).toBe('https://drive.google.com/drive/folders/test123456');
     }
   });
@@ -123,7 +121,7 @@ describe('submission workflow schemas', () => {
     }).success).toBe(false);
     expect(showcaseDraftInputSchema.safeParse({
       ...base,
-      resources: Array.from({ length: 21 }, (_, index) => ({
+      resources: Array.from({ length: 201 }, (_, index) => ({
         kind: 'LINK',
         label: `Resource ${index}`,
         url: 'https://example.test/resource',
