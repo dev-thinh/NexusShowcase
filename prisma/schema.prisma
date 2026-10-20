@@ -145,6 +145,9 @@ model ShowcaseItem {
   slug              String         @unique
   summary           String
   content           String?
+  authorDraft       Json?
+  reviewStatus      ItemStatus?
+  reviewVersion     Int            @default(0)
   type              ItemType       @default(PROJECT)
   suggestedField    String?
   customProjectType String?
@@ -159,7 +162,6 @@ model ShowcaseItem {
   isPinned          Boolean        @default(false)
   pinnedAt          DateTime?
   mediaDriveUrl     String?
-  tags              String[]       @default([])
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
 
@@ -172,7 +174,6 @@ model ShowcaseItem {
   contributors   ItemContributor[]
   links          ItemLink[]
   attachments    ItemAttachment[]
-  itemTags       ItemTag[]
   revisions      SubmissionRevision[]
   editorialDraft EditorialDraft?
   reviewComments ReviewComment[]
@@ -296,24 +297,4 @@ model ItemAttachment {
   item ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("item_attachments")
-}
-
-model Tag {
-  id    String    @id @default(cuid())
-  name  String    @unique
-  slug  String    @unique
-  items ItemTag[]
-
-  @@map("tags")
-}
-
-model ItemTag {
-  itemId String
-  tagId  String
-
-  item ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
-  tag  Tag          @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([itemId, tagId])
-  @@map("item_tags")
 }

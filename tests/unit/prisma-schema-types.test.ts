@@ -24,7 +24,9 @@ describe('Prisma Schema Definitions', () => {
 
     expect(content).toMatch(/visibility\s+ItemVisibility/);
     expect(content).toMatch(/mediaDriveUrl\s+String\?/);
-    expect(content).toMatch(/tags\s+String\[\]/);
+    expect(content).not.toMatch(/tags\s+String\[\]/);
+    expect(content).not.toContain('model Tag {');
+    expect(content).not.toContain('model ItemTag {');
     expect(content).toMatch(/category\s+Category\?/);
   });
 
