@@ -7,10 +7,14 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
+    fontWeight: {
+      normal: 'var(--font-weight-normal)',
+      semibold: 'var(--font-weight-emphasis)',
+    },
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', '"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['var(--font-sans)', '"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-sans)', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['var(--font-sans)', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
         mono: ['var(--font-mono)', '"JetBrains Mono"', 'Menlo', 'monospace'],
       },
       colors: {
