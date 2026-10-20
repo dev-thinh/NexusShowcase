@@ -30,7 +30,7 @@ export function AdminCreateMemberModal() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [studentId, setStudentId] = useState('');
-  const [role, setRole] = useState<'MEMBER' | 'CORE_MEMBER' | 'EDITOR'>('MEMBER');
+  const [role, setRole] = useState<'MEMBER' | 'CORE_MEMBER'>('MEMBER');
   const [password, setPassword] = useState('');
 
   const handleOpen = () => {
@@ -85,22 +85,22 @@ export function AdminCreateMemberModal() {
     <>
       <button
         onClick={handleOpen}
-        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F294A] hover:bg-[#1E3A5F] active:scale-[0.98] text-white text-xs font-bold shadow-xs transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F294A]/20"
+        className="action-primary-detail"
       >
         <UserPlus className="w-4 h-4 text-white/80" />
-        <span>Thêm thành viên mới</span>
+        <span>Thêm thành viên</span>
       </button>
 
       <Modal
         isOpen={isOpen}
         onClose={() => !loading && setIsOpen(false)}
-        title="Tạo Tài Khoản Thành Viên Mới"
+        title="Thêm thành viên"
         description="Cấp quyền truy cập hệ thống nghiên cứu cho sinh viên hoặc nghiên cứu viên."
       >
         {temporaryPassword ? (
           <div className="space-y-4 py-2">
-            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-xs space-y-2">
-              <div className="flex items-center gap-2 text-emerald-800 font-bold text-sm">
+            <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-md text-xs space-y-2">
+              <div className="flex items-center gap-2 text-emerald-800 font-semibold text-sm">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600" />
                 <span>Tài khoản đã được tạo thành công!</span>
               </div>
@@ -109,10 +109,10 @@ export function AdminCreateMemberModal() {
               </p>
             </div>
 
-            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+            <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-md flex items-center justify-between">
               <div>
                 <span className="block text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Mật khẩu tạm thời</span>
-                <span className="text-sm font-mono font-bold text-slate-900">{temporaryPassword}</span>
+                <span className="text-sm font-mono font-semibold text-slate-900">{temporaryPassword}</span>
               </div>
               <button
                 type="button"
@@ -139,7 +139,7 @@ export function AdminCreateMemberModal() {
             {error && (
               <div
                 role="alert"
-                className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-xl text-xs flex items-center gap-2"
+                className="p-3 bg-rose-50 border border-rose-200 text-rose-800 rounded-md text-xs flex items-center gap-2"
               >
                 <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
                 <span>{error}</span>
@@ -147,7 +147,7 @@ export function AdminCreateMemberModal() {
             )}
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Họ và tên thành viên *
               </label>
               <div className="relative">
@@ -158,14 +158,14 @@ export function AdminCreateMemberModal() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="VD: Nguyễn Văn A"
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Tên đăng nhập / Email *
                 </label>
                 <div className="relative">
@@ -176,13 +176,13 @@ export function AdminCreateMemberModal() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="VD: 22120001 hoặc email..."
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
                   Mã số sinh viên (MSSV)
                 </label>
                 <div className="relative">
@@ -192,19 +192,19 @@ export function AdminCreateMemberModal() {
                     value={studentId}
                     onChange={(e) => setStudentId(e.target.value)}
                     placeholder="VD: 22120001"
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
+                    className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 transition-colors"
                   />
                 </div>
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label className="block text-xs font-semibold text-slate-700 mb-1.5">
                 Phân quyền ban đầu *
               </label>
               <div className="grid grid-cols-2 gap-2.5">
                 <label
-                  className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                  className={`flex items-start gap-2.5 p-3 rounded-md border text-xs cursor-pointer transition-all ${
                     role === 'MEMBER'
                       ? 'bg-blue-50/50 border-blue-300 text-blue-900 font-semibold'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -219,7 +219,7 @@ export function AdminCreateMemberModal() {
                     className="mt-0.5 accent-[#0F294A]"
                   />
                   <div>
-                    <div className="flex items-center gap-1 font-bold text-slate-900">
+                    <div className="flex items-center gap-1 font-semibold text-slate-900">
                       <UserCheck className="w-3.5 h-3.5 text-[#0F294A]" />
                       <span>MEMBER</span>
                     </div>
@@ -230,7 +230,7 @@ export function AdminCreateMemberModal() {
                 </label>
 
                 <label
-                  className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
+                  className={`flex items-start gap-2.5 p-3 rounded-md border text-xs cursor-pointer transition-all ${
                     role === 'CORE_MEMBER'
                       ? 'bg-blue-50/50 border-blue-300 text-blue-900 font-semibold'
                       : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -245,7 +245,7 @@ export function AdminCreateMemberModal() {
                     className="mt-0.5 accent-[#0F294A]"
                   />
                   <div>
-                    <div className="flex items-center gap-1 font-bold text-slate-900">
+                    <div className="flex items-center gap-1 font-semibold text-slate-900">
                       <Shield className="w-3.5 h-3.5 text-blue-700" />
                       <span>CORE MEMBER</span>
                     </div>
@@ -255,36 +255,12 @@ export function AdminCreateMemberModal() {
                   </div>
                 </label>
 
-                <label
-                  className={`flex items-start gap-2.5 p-3 rounded-xl border text-xs cursor-pointer transition-all ${
-                    role === 'EDITOR'
-                      ? 'bg-blue-50/50 border-blue-300 text-blue-900 font-semibold'
-                      : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="EDITOR"
-                    checked={role === 'EDITOR'}
-                    onChange={() => setRole('EDITOR')}
-                    className="mt-0.5 accent-[#0F294A]"
-                  />
-                  <div>
-                    <div className="flex items-center gap-1 font-bold text-slate-900">
-                      <Shield className="w-3.5 h-3.5 text-amber-700" />
-                      <span>EDITOR</span>
-                    </div>
-                    <p className="text-[11px] text-slate-500 font-normal mt-0.5">
-                      Ban biên tập, xét duyệt và chuẩn hóa bài nộp
-                    </p>
-                  </div>
-                </label>
+
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Mật khẩu khởi tạo
               </label>
               <div className="relative">
@@ -294,7 +270,7 @@ export function AdminCreateMemberModal() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Để trống để tự động tạo mật khẩu ngẫu nhiên"
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-mono transition-colors"
+                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0F294A]/15 focus:border-slate-400 font-mono transition-colors"
                 />
               </div>
               <p className="text-[11px] text-slate-500 mt-1">
