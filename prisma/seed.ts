@@ -11,9 +11,7 @@ async function main() {
     await prisma.itemAttachment.deleteMany();
     await prisma.itemLink.deleteMany();
     await prisma.itemContributor.deleteMany();
-    await prisma.itemTag.deleteMany();
     await prisma.showcaseItem.deleteMany();
-    await prisma.tag.deleteMany();
     await prisma.user.deleteMany();
   }
 
@@ -46,7 +44,7 @@ async function main() {
       status: 'ACTIVE',
       mustChangePassword: false,
       sessionVersion: 1,
-      bio: 'Tài khoản Quản trị viên Phòng Lab Nghiên cứu Khoa học & CLB Nexus, Khoa CNTT - ĐH KHTN ĐHQG-HCM.',
+      bio: 'Tài khoản Quản trị viên CLB Nexus, Khoa CNTT - ĐH KHTN ĐHQG-HCM.',
     },
   });
 
