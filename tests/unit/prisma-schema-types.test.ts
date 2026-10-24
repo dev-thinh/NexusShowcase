@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+import { describe, expect, it } from 'vitest';
 
 describe('Prisma Schema Definitions', () => {
   it('contains ItemVisibility enum, CategoryLayout enum, and Category model in schema.prisma', () => {

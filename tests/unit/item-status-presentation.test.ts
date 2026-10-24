@@ -1,6 +1,6 @@
+import { getItemStatusLabel, ITEM_STATUS_LABELS } from '@/features/publications/model/status';
 import { ItemStatus } from '@prisma/client';
 import { describe, expect, it } from 'vitest';
-import { getItemStatusLabel, ITEM_STATUS_LABELS } from '@/lib/item-status-presentation';
 
 describe('item status presentation', () => {
   it('provides a localized label for every workflow status', () => {

@@ -1,28 +1,28 @@
+import { ManagementNav } from '@/app/(shell)/_components/management-layout';
+import { adminMemberClientSelect } from '@/features/identity/model/public-user';
+import { MyPosts, type MyPost } from '@/features/submissions/components/my-posts';
+import { matchesPostFilter } from '@/features/submissions/model/dashboard-items';
+import { DialogProvider } from '@/shared/dialogs/dialog-provider';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { DialogProvider } from '@/components/dialog-provider';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { ManagementNav } from '@/components/management-layout';
-import { MyPosts, type MyPost } from '@/components/my-posts';
-import { matchesPostFilter } from '@/lib/dashboard-items';
-import { adminMemberClientSelect } from '@/lib/public-user';
 
-const mocks = vi.hoisted(() => ({ auth: vi.fn(), userFind: vi.fn(), members: vi.fn(), items: vi.fn(), itemCount: vi.fn(), memberCount: vi.fn() }));
+const mocks = vi.hoisted(() => ({ auth: vi.fn(), userFind: vi.fn(), members: vi.fn(), items: vi.fn(), itemCount: vi.fn(), memberCount: vi.fn(), groups: vi.fn() }));
 vi.mock('server-only', () => ({}));
-vi.mock('@/lib/auth', () => ({ auth: mocks.auth }));
-vi.mock('@/lib/prisma', () => ({ prisma: { user: { findUnique: mocks.userFind, findMany: mocks.members, count: mocks.memberCount }, showcaseItem: { findMany: mocks.items, count: mocks.itemCount } } }));
-vi.mock('@/components/navbar', () => ({ Navbar: () => <header>CLB Robotics &amp; IoT</header> }));
-vi.mock('@/components/academic-footer', () => ({ AcademicFooter: () => <footer>CLB Robotics &amp; IoT</footer> }));
+vi.mock('@/features/identity/server/auth', () => ({ auth: mocks.auth }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { user: { groupBy: mocks.groups, findUnique: mocks.userFind, findMany: mocks.members, count: mocks.memberCount }, showcaseItem: { groupBy: mocks.groups, findMany: mocks.items, count: mocks.itemCount } } }));
+vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => <header>CLB Robotics &amp; IoT</header> }));
+vi.mock('@/shared/ui/academic-footer', () => ({ AcademicFooter: () => <footer>CLB Robotics &amp; IoT</footer> }));
 vi.mock('next/navigation', () => ({ usePathname: () => '/dashboard', useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }), redirect: (url: string) => { throw new Error(`redirect:${url}`); }, notFound: () => { throw new Error('notFound'); } }));
-vi.mock('@/actions/admin-actions', () => ({ createMemberAction: vi.fn(), updateUserRoleAction: vi.fn(), deleteMemberAction: vi.fn() }));
-vi.mock('@/actions/showcase-actions', () => ({ replacePinnedShowcaseItemAction: vi.fn(), togglePinShowcaseItemAction: vi.fn() }));
-vi.mock('@/actions/approval-actions', () => ({ withdrawSubmissionAction: vi.fn() }));
+vi.mock('@/features/identity/server/member-actions', () => ({ createMemberAction: vi.fn(), updateUserRoleAction: vi.fn(), deleteMemberAction: vi.fn() }));
+vi.mock('@/features/publications/server/actions', () => ({ setShowcasePinAction: vi.fn() }));
+vi.mock('@/features/review/server/actions', () => ({ withdrawSubmissionAction: vi.fn() }));
 vi.stubGlobal('React', React);
 
-import AdminDashboardPage from '@/app/admin/page';
-import AdminMembersPage from '@/app/admin/members/page';
-import DashboardPage from '@/app/dashboard/page';
-import MemberProfilePage from '@/app/members/[id]/page';
+import AdminMembersPage from '@/app/(shell)/(account)/admin/members/page';
+import AdminDashboardPage from '@/app/(shell)/(account)/admin/page';
+import DashboardPage from '@/app/(shell)/(account)/dashboard/page';
+import MemberProfilePage from '@/app/(shell)/(site)/members/[id]/page';
 
 const post: MyPost = { id: 'post-1', slug: 'robot-tu-hanh', title: 'Robot tự hành', summary: 'Hệ thống điều hướng trong nhà', type: 'PROJECT', status: 'DRAFT', reviewStatus: null, reviewVersion: 0, rejectionReason: null, publishedYear: 2026, updatedAt: new Date('2026-10-17T00:00:00Z'), thumbnailUrl: null };
 const member = { id: 'member-1', fullName: 'Nguyễn An', role: 'CORE_MEMBER', mustChangePassword: false, avatarUrl: null, bio: 'Nghiên cứu robot và hệ thống nhúng.', githubUrl: 'https://github.com/example', linkedinUrl: null, googleScholarUrl: null, portfolioUrl: null, createdAt: new Date('2026-01-01'), createdItems: [post], contributions: [] };
@@ -35,6 +35,7 @@ beforeEach(() => {
   mocks.memberCount.mockResolvedValue(3);
   mocks.itemCount.mockImplementation(({ where }) => Promise.resolve(where.isPinned ? 12 : 2));
   mocks.items.mockResolvedValue([]);
+  mocks.groups.mockResolvedValue([{ status: 'DRAFT', reviewStatus: null, _count: { _all: 1 } }]);
 });
 
 describe('management pages', () => {
@@ -55,7 +56,7 @@ describe('management pages', () => {
   });
 
   it('keeps private member fields out of client row queries', async () => {
-    const html = renderToStaticMarkup(await AdminMembersPage());
+    const html = renderToStaticMarkup(await AdminMembersPage({ searchParams: Promise.resolve({}) }));
     expect(mocks.members).toHaveBeenCalledWith(expect.objectContaining({ select: adminMemberClientSelect }));
     expect(html).toContain('Nguyễn An');
     expect(html).toContain('Thu quyền đăng bài');
@@ -63,21 +64,21 @@ describe('management pages', () => {
   });
 
   it('loads only the fields required for the author list and shows the create action', async () => {
-    const html = renderToStaticMarkup(await DashboardPage());
+    const html = renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) }));
     expect(html).toContain('Bài đăng của tôi');
     expect(html).toContain('Đăng bài mới');
-    const query = mocks.userFind.mock.calls[0][0];
-    expect(query.include.createdItems.select).not.toHaveProperty('authorDraft');
-    expect(query.include.createdItems.select).not.toHaveProperty('content');
+    const query = mocks.items.mock.calls[0][0];
+    expect(query.select).not.toHaveProperty('authorDraft');
+    expect(query.select).not.toHaveProperty('content');
   });
 
   it('offers draft editing and locks pending submissions until they are withdrawn', () => {
-    const draft = renderToStaticMarkup(<MyPosts items={[post]} isUploader />);
+    const draft = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader />);
     expect(draft).toContain(`/dashboard/items/${post.id}/edit`);
-    const pending = renderToStaticMarkup(<DialogProvider><MyPosts items={[{ ...post, status: 'PENDING_REVIEW' }]} isUploader /></DialogProvider>);
+    const pending = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PENDING_REVIEW' }]} isUploader /></DialogProvider>);
     expect(pending).toContain('Rút bài để sửa');
     expect(pending).not.toContain(`/dashboard/items/${post.id}/edit`);
-    const readOnly = renderToStaticMarkup(<MyPosts items={[post]} isUploader={false} />);
+    const readOnly = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader={false} />);
     expect(readOnly).toContain('Chỉ đọc');
     expect(readOnly).not.toContain(`/dashboard/items/${post.id}/edit`);
   });

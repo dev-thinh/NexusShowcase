@@ -1,5 +1,5 @@
+import { createDialogController } from '@/shared/dialogs/controller';
 import { describe, expect, it, vi } from 'vitest';
-import { createDialogController } from '@/lib/dialog-controller';
 
 const request = (title: string) => ({ mode: 'confirm' as const, title, message: 'Xác nhận thao tác.' });
 

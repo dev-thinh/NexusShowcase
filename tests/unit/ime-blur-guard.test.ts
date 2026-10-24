@@ -1,5 +1,5 @@
+import { installImeBlurGuard } from '@/shared/lib/ime-blur-guard';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { installImeBlurGuard } from '@/lib/ime-blur-guard';
 
 class Input extends EventTarget {
   type = 'text';

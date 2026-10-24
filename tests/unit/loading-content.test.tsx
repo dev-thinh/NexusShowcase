@@ -1,8 +1,8 @@
+import { LoadingCards, LoadingTitle } from '@/shared/ui/loading-content';
+import fs from 'node:fs';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import fs from 'node:fs';
-import { LoadingCards, LoadingTitle } from '@/components/loading-content';
 
 vi.stubGlobal('React', React);
 vi.mock('next/navigation', () => ({ usePathname: () => '/admin/members' }));
@@ -10,10 +10,11 @@ vi.mock('next/navigation', () => ({ usePathname: () => '/admin/members' }));
 describe('data loading boundaries', () => {
   it('loads category and member data inside the page shell', () => {
     expect(fs.existsSync('src/app/loading.tsx')).toBe(false);
+    expect(fs.readFileSync('src/app/(shell)/loading.tsx', 'utf8')).not.toContain('Navbar');
     expect(fs.existsSync('src/app/category/loading.tsx')).toBe(false);
     expect(fs.existsSync('src/app/members/loading.tsx')).toBe(false);
-    const category = fs.readFileSync('src/app/category/[slug]/page.tsx', 'utf8');
-    const members = fs.readFileSync('src/app/members/page.tsx', 'utf8');
+    const category = fs.readFileSync('src/app/(shell)/(site)/category/[slug]/page.tsx', 'utf8');
+    const members = fs.readFileSync('src/app/(shell)/(site)/members/page.tsx', 'utf8');
     expect(category).toContain('fallback={<LoadingCards />}><CategoryResults />');
     expect(members).toContain('fallback={<LoadingCards members />}><MemberResults />');
   });
@@ -27,7 +28,7 @@ describe('data loading boundaries', () => {
 
   it('keeps the current page visible while navigation is pending', () => {
     const css = fs.readFileSync('src/app/globals.css', 'utf8');
-    const transition = fs.readFileSync('src/components/navigation-transition.tsx', 'utf8');
+    const transition = fs.readFileSync('src/shared/navigation/navigation-transition.tsx', 'utf8');
     expect(css).not.toContain('[data-navigation-pending="true"] main');
     expect(transition).not.toContain('createPortal');
   });
