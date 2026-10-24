@@ -1,0 +1,133 @@
+{
+  "timestamp": "2026-10-22T06:20:09.900Z",
+  "baseURL": "http://127.0.0.1:3002",
+  "budgetMs": 2000,
+  "mode": "cold browser, cache disabled, local production",
+  "browser": "155.0.8059.85",
+  "authenticated": true,
+  "samples": [
+    {
+      "route": "/",
+      "status": 200,
+      "finalPath": "/",
+      "contentMs": 653,
+      "featuredMs": 1604,
+      "passed": true
+    },
+    {
+      "route": "/category/bai-bao-khoa-hoc",
+      "status": 200,
+      "finalPath": "/category/bai-bao-khoa-hoc",
+      "contentMs": 574,
+      "passed": true
+    },
+    {
+      "route": "/category/robotics-iot",
+      "status": 200,
+      "finalPath": "/category/robotics-iot",
+      "contentMs": 1455,
+      "passed": true
+    },
+    {
+      "route": "/members",
+      "status": 200,
+      "finalPath": "/members",
+      "contentMs": 741,
+      "passed": true
+    },
+    {
+      "route": "/members/all",
+      "status": 200,
+      "finalPath": "/members/all",
+      "contentMs": 541,
+      "passed": true
+    },
+    {
+      "route": "/contact",
+      "status": 200,
+      "finalPath": "/contact",
+      "contentMs": 621,
+      "passed": true
+    },
+    {
+      "route": "/login",
+      "status": 200,
+      "finalPath": "/login",
+      "contentMs": 819,
+      "passed": true
+    },
+    {
+      "route": "/showcase/mock-robot-giao-hang",
+      "status": 200,
+      "finalPath": "/showcase/mock-robot-giao-hang",
+      "contentMs": 1150,
+      "passed": true
+    },
+    {
+      "route": "/members/cmvgzlnu60000urdgiov9nq4v",
+      "status": 200,
+      "finalPath": "/members/cmvgzlnu60000urdgiov9nq4v",
+      "contentMs": 1262,
+      "passed": true
+    },
+    {
+      "route": "/account/change-password",
+      "status": 200,
+      "finalPath": "/account/change-password",
+      "contentMs": 918,
+      "passed": true
+    },
+    {
+      "route": "/dashboard",
+      "status": 200,
+      "finalPath": "/dashboard",
+      "contentMs": 890,
+      "passed": true
+    },
+    {
+      "route": "/dashboard/items/new",
+      "status": 200,
+      "finalPath": "/dashboard/items/new",
+      "contentMs": 951,
+      "passed": true
+    },
+    {
+      "route": "/admin",
+      "status": 200,
+      "finalPath": "/admin",
+      "contentMs": 787,
+      "passed": true
+    },
+    {
+      "route": "/admin/members",
+      "status": 200,
+      "finalPath": "/admin/members",
+      "contentMs": 956,
+      "passed": true
+    },
+    {
+      "route": "/admin/reviews",
+      "status": 200,
+      "finalPath": "/admin/reviews",
+      "contentMs": 667,
+      "passed": true
+    },
+    {
+      "route": "/admin/reviews/cmvgzqy1s0007uraomf89ttvn",
+      "status": 200,
+      "finalPath": "/admin/reviews/cmvgzqy1s0007uraomf89ttvn",
+      "contentMs": 817,
+      "passed": true
+    },
+    {
+      "route": "/admin/reviews/cmvgzqy1s0007uraomf89ttvn/preview",
+      "status": 200,
+      "finalPath": "/admin/reviews/cmvgzqy1s0007uraomf89ttvn/preview",
+      "contentMs": 858,
+      "passed": true
+    }
+  ],
+  "skipped": [
+    "Editor: no editable draft owned by configured admin; no data created."
+  ]
+}
