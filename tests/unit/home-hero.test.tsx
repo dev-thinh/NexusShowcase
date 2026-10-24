@@ -1,15 +1,15 @@
-import React from 'react';
+import { HomeHero } from '@/features/publications/components/home-hero';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { HomeHero } from '@/components/home-hero';
 
 describe('HomeHero', () => {
-  it('gives homepage visitors clear routes into the showcase and search', () => {
+  it('opens the entire library through one primary action', () => {
     const markup = renderToStaticMarkup(<HomeHero />);
 
     expect(markup).toContain('id="home-hero-title"');
-    expect(markup).toContain('href="#home-content"');
-    expect(markup).toContain('href="#home-search"');
+    expect(markup).toContain('href="/explore"');
+    expect(markup).not.toContain('href="#home-search"');
+    expect(markup).not.toContain('home-hero__secondary-action');
   });
 
   it('marks the animated technical artwork as decorative', () => {

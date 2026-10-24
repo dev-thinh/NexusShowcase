@@ -1,0 +1,3510 @@
+{
+  "timestamp": "2026-10-21T14:25:20.058Z",
+  "environment": {
+    "node": "v24.20.0",
+    "platform": "win32",
+    "arch": "x64",
+    "cpus": 12,
+    "browser": "155.0.4283.62",
+    "browserChannel": "msedge",
+    "viewport": {
+      "width": 1440,
+      "height": 1000
+    },
+    "production": true
+  },
+  "scope": "Serial navigation observation windows; auth and SQL events include prefetch/background work. Exact request-level query attribution is unavailable. Cold-browser samples use fresh browser contexts with a possibly warm server/database. RSC bytes are decoded response bodies, not compressed wire sizes.",
+  "datasets": [
+    {
+      "timestamp": "2026-10-21T14:25:20.060Z",
+      "items": 20,
+      "members": 100,
+      "warmRuns": 10,
+      "samples": [
+        {
+          "correlationId": "d394a897-c165-4d03-aaed-facd659321b0",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592700325,
+          "windowEnd": 1792592700879,
+          "clickToPendingMs": 10.599999997764826,
+          "clickToShellMs": 134.30000000074506,
+          "clickToDataMs": 134.30000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 2,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "ebfa3e19-e174-4553-b3b0-0f1caf0dd56a",
+          "route": "/category/robotics-iot",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592702535,
+          "windowEnd": 1792592702873,
+          "clickToPendingMs": 5.799999997019768,
+          "clickToShellMs": 50,
+          "clickToDataMs": 50,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 5,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "8f116e20-c581-4df9-b304-763cfb3e8830",
+          "route": "/members",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592704925,
+          "windowEnd": 1792592705308,
+          "clickToPendingMs": 10.399999998509884,
+          "clickToShellMs": 68.69999999925494,
+          "clickToDataMs": 68.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 4,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "dad3fc37-0ee4-4b3c-8b05-a891929f8ce6",
+          "route": "/",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592707729,
+          "windowEnd": 1792592707973,
+          "clickToPendingMs": 7.100000001490116,
+          "clickToShellMs": 68,
+          "clickToDataMs": 68,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "1452680b-69f8-4f7e-bbb2-169c6a9f6bee",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592709722,
+          "windowEnd": 1792592710000,
+          "clickToPendingMs": 5.599999997764826,
+          "clickToShellMs": 49.5,
+          "clickToDataMs": 49.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 4,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "9e925c04-fee5-4342-921c-57bbbb73e7c3",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592710003,
+          "windowEnd": 1792592710187,
+          "clickToPendingMs": 1.6000000014901161,
+          "clickToShellMs": 29.200000002980232,
+          "clickToDataMs": 29.200000002980232,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 7,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "52f394dd-2ae0-4ad0-a607-d2af3524c1ec",
+          "route": "/members",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592710190,
+          "windowEnd": 1792592710373,
+          "clickToPendingMs": 1.1000000014901161,
+          "clickToShellMs": 26.899999998509884,
+          "clickToDataMs": 26.899999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 8,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "7bd45243-a793-40df-abb5-152fea7c0039",
+          "route": "/",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592710378,
+          "windowEnd": 1792592710880,
+          "clickToPendingMs": 4.199999999254942,
+          "clickToShellMs": 54.899999998509884,
+          "clickToDataMs": 358.30000000074506,
+          "authMs": 4.397399999999834,
+          "queryCount": 6,
+          "queryMs": 17,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 4.397399999999834,
+              "timestamp": 1792592710471
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592710475
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592710478
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592710480
+            },
+            {
+              "name": "query",
+              "durationMs": 7,
+              "timestamp": 1792592710484
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592710485
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592710487
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "001968de-81f2-4c70-a3ee-877005bdc4c3",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592710885,
+          "windowEnd": 1792592711051,
+          "clickToPendingMs": 1.3999999985098839,
+          "clickToShellMs": 32.69999999925494,
+          "clickToDataMs": 32.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "8a4cc118-c89f-45fa-b505-b6750db121bc",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592711056,
+          "windowEnd": 1792592711237,
+          "clickToPendingMs": 4.600000001490116,
+          "clickToShellMs": 39.19999999925494,
+          "clickToDataMs": 39.19999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "ae909f5f-1aa0-47eb-ad92-43fef7e42764",
+          "route": "/members",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592711241,
+          "windowEnd": 1792592711392,
+          "clickToPendingMs": 1.300000000745058,
+          "clickToShellMs": 21.900000002235174,
+          "clickToDataMs": 21.900000002235174,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "3a357b1b-1121-418f-a076-d07886801ea1",
+          "route": "/",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592711395,
+          "windowEnd": 1792592711873,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 86.90000000223517,
+          "clickToDataMs": 345.9000000022352,
+          "authMs": 2.804599999999482,
+          "queryCount": 6,
+          "queryMs": 13,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 2.804599999999482,
+              "timestamp": 1792592711461
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592711466
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592711469
+            },
+            {
+              "name": "query",
+              "durationMs": 4,
+              "timestamp": 1792592711472
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592711472
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592711474
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592711476
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "1ff265c8-1971-40cc-9ad0-e8e27c4f8bef",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592711879,
+          "windowEnd": 1792592712073,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 52.70000000298023,
+          "clickToDataMs": 52.70000000298023,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "ee060607-83aa-47e4-9c98-9a8cfc4787c3",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592712077,
+          "windowEnd": 1792592712243,
+          "clickToPendingMs": 1.300000000745058,
+          "clickToShellMs": 34.600000001490116,
+          "clickToDataMs": 34.600000001490116,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "e6a76b84-dc61-4e56-8e77-709e122f480a",
+          "route": "/members",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592712247,
+          "windowEnd": 1792592712411,
+          "clickToPendingMs": 1.199999999254942,
+          "clickToShellMs": 35.5,
+          "clickToDataMs": 35.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "1cfbd1ea-afaa-497e-9395-835e450c90c4",
+          "route": "/",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592712415,
+          "windowEnd": 1792592712910,
+          "clickToPendingMs": 4.5,
+          "clickToShellMs": 95.19999999925494,
+          "clickToDataMs": 362.19999999925494,
+          "authMs": 6.252700000000914,
+          "queryCount": 6,
+          "queryMs": 15,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 6.252700000000914,
+              "timestamp": 1792592712484
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592712488
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592712491
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592712494
+            },
+            {
+              "name": "query",
+              "durationMs": 5,
+              "timestamp": 1792592712495
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592712498
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592712500
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "c96b54c2-6eff-4ce4-871d-b4d720de09bb",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592712915,
+          "windowEnd": 1792592713113,
+          "clickToPendingMs": 1.4000000022351742,
+          "clickToShellMs": 58.600000001490116,
+          "clickToDataMs": 58.600000001490116,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "b33e24bd-d173-475d-ae88-1ea704805dae",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592713118,
+          "windowEnd": 1792592713285,
+          "clickToPendingMs": 1.300000000745058,
+          "clickToShellMs": 37.600000001490116,
+          "clickToDataMs": 37.600000001490116,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "15271a8e-afec-4415-ad07-03824dce173a",
+          "route": "/members",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592713289,
+          "windowEnd": 1792592713447,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 40.19999999925494,
+          "clickToDataMs": 40.19999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "716e2cc5-22fd-4fd8-bc9b-d79e9de223f8",
+          "route": "/",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592713464,
+          "windowEnd": 1792592713947,
+          "clickToPendingMs": 1.5,
+          "clickToShellMs": 76.10000000149012,
+          "clickToDataMs": 329.5,
+          "authMs": 3.246999999999389,
+          "queryCount": 7,
+          "queryMs": 9,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 3.246999999999389,
+              "timestamp": 1792592713559
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592713562
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592713563
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592713564
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592713566
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592713566
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592713567
+            },
+            {
+              "name": "query",
+              "durationMs": 0,
+              "timestamp": 1792592713568
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "bb813e95-b9b3-46b9-a99d-8d1e760ac160",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592713953,
+          "windowEnd": 1792592714134,
+          "clickToPendingMs": 3,
+          "clickToShellMs": 42.899999998509884,
+          "clickToDataMs": 42.899999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "6b1f2f95-4472-4653-aec1-c54056b52a41",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592714140,
+          "windowEnd": 1792592714320,
+          "clickToPendingMs": 1.1000000014901161,
+          "clickToShellMs": 29.399999998509884,
+          "clickToDataMs": 29.399999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "527f4b65-2179-4ef7-9c77-c3012d4dfdbe",
+          "route": "/members",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592714325,
+          "windowEnd": 1792592714477,
+          "clickToPendingMs": 2.2000000029802322,
+          "clickToShellMs": 24.800000000745058,
+          "clickToDataMs": 24.800000000745058,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "999f82d7-f6ea-45a1-9fd2-daabb4354435",
+          "route": "/",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592714481,
+          "windowEnd": 1792592714955,
+          "clickToPendingMs": 1.699999999254942,
+          "clickToShellMs": 69.19999999925494,
+          "clickToDataMs": 348.80000000074506,
+          "authMs": 3.4206000000012864,
+          "queryCount": 7,
+          "queryMs": 21,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 3.4206000000012864,
+              "timestamp": 1792592714548
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592714554
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592714554
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592714560
+            },
+            {
+              "name": "query",
+              "durationMs": 5,
+              "timestamp": 1792592714561
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592714564
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592714567
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592714570
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "b35a9a31-4f1c-4b8f-9934-0750a7c1f138",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592714959,
+          "windowEnd": 1792592715144,
+          "clickToPendingMs": 0.8000000007450581,
+          "clickToShellMs": 53.69999999925494,
+          "clickToDataMs": 53.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "8c6b14e0-7765-4491-8dcb-290c11e50e20",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592715148,
+          "windowEnd": 1792592715314,
+          "clickToPendingMs": 1.5,
+          "clickToShellMs": 38.30000000074506,
+          "clickToDataMs": 38.30000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "97f95c06-3ff9-49a8-95d9-6cf80014d7f9",
+          "route": "/members",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592715318,
+          "windowEnd": 1792592715485,
+          "clickToPendingMs": 1.1000000014901161,
+          "clickToShellMs": 31.300000000745058,
+          "clickToDataMs": 31.300000000745058,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "421da064-788a-42e8-a578-1a563e5295be",
+          "route": "/",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592715488,
+          "windowEnd": 1792592715965,
+          "clickToPendingMs": 1.2999999970197678,
+          "clickToShellMs": 55.69999999925494,
+          "clickToDataMs": 345.19999999925494,
+          "authMs": 1.7175999999999476,
+          "queryCount": 6,
+          "queryMs": 13,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 1.7175999999999476,
+              "timestamp": 1792592715559
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592715563
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592715567
+            },
+            {
+              "name": "query",
+              "durationMs": 4,
+              "timestamp": 1792592715568
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592715569
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592715571
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592715574
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "e6fd1df9-d5ab-4010-9293-576544a1e411",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592715970,
+          "windowEnd": 1792592716163,
+          "clickToPendingMs": 1.699999999254942,
+          "clickToShellMs": 55.5,
+          "clickToDataMs": 55.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "28eadbbd-9bcc-4142-bc61-a879ce7ffa9c",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592716166,
+          "windowEnd": 1792592716346,
+          "clickToPendingMs": 2.699999999254942,
+          "clickToShellMs": 41.80000000074506,
+          "clickToDataMs": 41.80000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "af812fa1-736c-4194-9101-e92ec6e1005d",
+          "route": "/members",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592716350,
+          "windowEnd": 1792592716485,
+          "clickToPendingMs": 1.3999999985098839,
+          "clickToShellMs": 24.300000000745058,
+          "clickToDataMs": 24.300000000745058,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "b8c0f808-cbb4-4a89-97ca-fb35ed2f76bf",
+          "route": "/",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592716489,
+          "windowEnd": 1792592716992,
+          "clickToPendingMs": 0.6999999992549419,
+          "clickToShellMs": 57.900000002235174,
+          "clickToDataMs": 352.19999999925494,
+          "authMs": 1.7360000000007858,
+          "queryCount": 6,
+          "queryMs": 19,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 1.7360000000007858,
+              "timestamp": 1792592716557
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592716561
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592716564
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592716567
+            },
+            {
+              "name": "query",
+              "durationMs": 6,
+              "timestamp": 1792592716568
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592716571
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592716574
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "6698ed24-2c45-491c-aada-7535fde4ad41",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592716996,
+          "windowEnd": 1792592717208,
+          "clickToPendingMs": 2.099999997764826,
+          "clickToShellMs": 65.5,
+          "clickToDataMs": 65.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "eb43dd00-7fce-45b2-9454-db8830a72a3f",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592717213,
+          "windowEnd": 1792592717380,
+          "clickToPendingMs": 1.800000000745058,
+          "clickToShellMs": 43.5,
+          "clickToDataMs": 43.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "f34ce40d-d95f-493f-9d81-cc65ce9d3c4d",
+          "route": "/members",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592717385,
+          "windowEnd": 1792592717535,
+          "clickToPendingMs": 1.5,
+          "clickToShellMs": 16.800000000745058,
+          "clickToDataMs": 16.800000000745058,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "49d7ed7f-7b74-46e4-898e-d43afa95c4fa",
+          "route": "/",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592717539,
+          "windowEnd": 1792592718010,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 46.600000001490116,
+          "clickToDataMs": 338.80000000074506,
+          "authMs": 2.0689999999995052,
+          "queryCount": 6,
+          "queryMs": 9,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 2.0689999999995052,
+              "timestamp": 1792592717607
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592717610
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592717613
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592717614
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592717615
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592717618
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592717618
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "581c7ee9-0f50-4a73-a0d5-f61355e75b58",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592718017,
+          "windowEnd": 1792592718180,
+          "clickToPendingMs": 1.300000000745058,
+          "clickToShellMs": 33.80000000074506,
+          "clickToDataMs": 33.80000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "0b0af8ee-3728-468d-9106-6d1128abe333",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592718184,
+          "windowEnd": 1792592718349,
+          "clickToPendingMs": 1.7000000029802322,
+          "clickToShellMs": 26.700000002980232,
+          "clickToDataMs": 26.700000002980232,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "a03aa822-1a2d-4db4-aba0-bbf3f0d76d86",
+          "route": "/members",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592718353,
+          "windowEnd": 1792592718504,
+          "clickToPendingMs": 1.4000000022351742,
+          "clickToShellMs": 24.400000002235174,
+          "clickToDataMs": 24.400000002235174,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "1b359e35-9974-4ea3-849a-87da0ff11f0a",
+          "route": "/",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592718509,
+          "windowEnd": 1792592718984,
+          "clickToPendingMs": 0.5,
+          "clickToShellMs": 55.80000000074506,
+          "clickToDataMs": 349.5999999977648,
+          "authMs": 1.7875000000021828,
+          "queryCount": 6,
+          "queryMs": 15,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 1.7875000000021828,
+              "timestamp": 1792592718573
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592718577
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592718580
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592718582
+            },
+            {
+              "name": "query",
+              "durationMs": 5,
+              "timestamp": 1792592718584
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592718586
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592718588
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "b14720c9-8395-424b-96ff-823c3f575193",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592718989,
+          "windowEnd": 1792592719184,
+          "clickToPendingMs": 1.699999999254942,
+          "clickToShellMs": 38.69999999925494,
+          "clickToDataMs": 38.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "1d558528-26e4-41f9-88dd-0ddf0fd0dbfd",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592719189,
+          "windowEnd": 1792592719353,
+          "clickToPendingMs": 1.199999999254942,
+          "clickToShellMs": 30.400000002235174,
+          "clickToDataMs": 30.400000002235174,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "b1fd80da-d88d-452c-ae61-2596e9cb0088",
+          "route": "/members",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592719358,
+          "windowEnd": 1792592719511,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 24.399999998509884,
+          "clickToDataMs": 24.399999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "fd3499c2-2c16-42fa-96ed-000ab5413545",
+          "route": "/",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592719514,
+          "windowEnd": 1792592720006,
+          "clickToPendingMs": 1.6000000014901161,
+          "clickToShellMs": 67.10000000149012,
+          "clickToDataMs": 350.19999999925494,
+          "authMs": 3.856999999999971,
+          "queryCount": 6,
+          "queryMs": 9,
+          "rscBytes": 28480,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 3.856999999999971,
+              "timestamp": 1792592719607
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592719610
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592719613
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592719615
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592719615
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592719616
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592719618
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work."
+          }
+        }
+      ],
+      "summary": [
+        {
+          "route": "/category/bai-bao-khoa-hoc",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 1.550000000745058,
+              "p95": 5.599999997764826
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 51.100000001490116,
+              "p95": 65.5
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 51.100000001490116,
+              "p95": 65.5
+            },
+            "authMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryCount": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "rscBytes": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            }
+          }
+        },
+        {
+          "route": "/category/robotics-iot",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 1.550000000745058,
+              "p95": 4.600000001490116
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 36.100000001490116,
+              "p95": 43.5
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 36.100000001490116,
+              "p95": 43.5
+            },
+            "authMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryCount": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "rscBytes": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            }
+          }
+        },
+        {
+          "route": "/members",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 1.25,
+              "p95": 2.2000000029802322
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 24.600000001490116,
+              "p95": 40.19999999925494
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 24.600000001490116,
+              "p95": 40.19999999925494
+            },
+            "authMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryCount": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "rscBytes": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            }
+          }
+        },
+        {
+          "route": "/",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 1.3999999985098839,
+              "p95": 4.5
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 62.500000001862645,
+              "p95": 95.19999999925494
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 349.19999999925494,
+              "p95": 362.19999999925494
+            },
+            "authMs": {
+              "availableSamples": 10,
+              "median": 3.0257999999994354,
+              "p95": 6.252700000000914
+            },
+            "queryCount": {
+              "availableSamples": 10,
+              "median": 6,
+              "p95": 7
+            },
+            "queryMs": {
+              "availableSamples": 10,
+              "median": 14,
+              "p95": 21
+            },
+            "rscBytes": {
+              "availableSamples": 1,
+              "median": 28480,
+              "p95": 28480
+            }
+          }
+        }
+      ]
+    },
+    {
+      "timestamp": "2026-10-21T14:26:59.402Z",
+      "items": 1000,
+      "members": 100,
+      "warmRuns": 10,
+      "samples": [
+        {
+          "correlationId": "66ba2ff7-2476-40e5-bfc1-14b5f96a3a42",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592797335,
+          "windowEnd": 1792592797894,
+          "clickToPendingMs": 7.5,
+          "clickToShellMs": 139.10000000149012,
+          "clickToDataMs": 139.10000000149012,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 2,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "66a389d8-ad7d-4a5d-949c-6476eafe8f2d",
+          "route": "/category/robotics-iot",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592799909,
+          "windowEnd": 1792592800937,
+          "clickToPendingMs": 19.199999999254942,
+          "clickToShellMs": 132.30000000074506,
+          "clickToDataMs": 132.30000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 3,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "c11be52e-1c3a-48ed-913e-1ceecd8d2e77",
+          "route": "/members",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592803185,
+          "windowEnd": 1792592803835,
+          "clickToPendingMs": 8.100000001490116,
+          "clickToShellMs": 66.69999999925494,
+          "clickToDataMs": 66.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 5,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "6dcd2988-b3c3-433d-8cde-74999af4e448",
+          "route": "/",
+          "mode": "cold-browser",
+          "run": 0,
+          "windowStart": 1792592806078,
+          "windowEnd": 1792592806403,
+          "clickToPendingMs": 7.5,
+          "clickToShellMs": 80.29999999701977,
+          "clickToDataMs": 80.29999999701977,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "e462f44e-6954-44b5-9eb2-2b73676a41b2",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592808113,
+          "windowEnd": 1792592808462,
+          "clickToPendingMs": 8.399999998509884,
+          "clickToShellMs": 52.899999998509884,
+          "clickToDataMs": 52.899999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 4,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "25b07e6f-c6d0-45d4-b730-afb82517d433",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592808473,
+          "windowEnd": 1792592808662,
+          "clickToPendingMs": 1.800000000745058,
+          "clickToShellMs": 26.700000002980232,
+          "clickToDataMs": 26.700000002980232,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 5,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "c1a36f3e-30a4-4982-a0ed-ac0f8e46d3db",
+          "route": "/members",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592808668,
+          "windowEnd": 1792592808938,
+          "clickToPendingMs": 1.6000000014901161,
+          "clickToShellMs": 30.5,
+          "clickToDataMs": 30.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 11,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "c1bc9e50-fcca-4fe9-877f-840aead0350b",
+          "route": "/",
+          "mode": "warm",
+          "run": 1,
+          "windowStart": 1792592808950,
+          "windowEnd": 1792592809463,
+          "clickToPendingMs": 1.8999999985098839,
+          "clickToShellMs": 87,
+          "clickToDataMs": 379.5,
+          "authMs": 17.569400000000314,
+          "queryCount": 6,
+          "queryMs": 34,
+          "rscBytes": 28523,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 17.569400000000314,
+              "timestamp": 1792592809052
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592809059
+            },
+            {
+              "name": "query",
+              "durationMs": 9,
+              "timestamp": 1792592809068
+            },
+            {
+              "name": "query",
+              "durationMs": 13,
+              "timestamp": 1792592809074
+            },
+            {
+              "name": "query",
+              "durationMs": 4,
+              "timestamp": 1792592809074
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592809078
+            },
+            {
+              "name": "query",
+              "durationMs": 4,
+              "timestamp": 1792592809082
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work."
+          }
+        },
+        {
+          "correlationId": "5f084568-c5e8-4b24-9420-583ea9511e63",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592809468,
+          "windowEnd": 1792592809698,
+          "clickToPendingMs": 2.100000001490116,
+          "clickToShellMs": 29.400000002235174,
+          "clickToDataMs": 29.400000002235174,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "71b732fe-491b-4e14-bf65-fe8ee32f8afe",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592809706,
+          "windowEnd": 1792592809867,
+          "clickToPendingMs": 1.5999999977648258,
+          "clickToShellMs": 26.899999998509884,
+          "clickToDataMs": 26.899999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "4034777a-27c7-45f2-a18d-ed6d87a7ed5d",
+          "route": "/members",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592809871,
+          "windowEnd": 1792592810081,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 57.899999998509884,
+          "clickToDataMs": 57.899999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "606d6878-5098-4b66-a79b-94fb07d78f3c",
+          "route": "/",
+          "mode": "warm",
+          "run": 2,
+          "windowStart": 1792592810085,
+          "windowEnd": 1792592810592,
+          "clickToPendingMs": 1.5999999977648258,
+          "clickToShellMs": 63.599999997764826,
+          "clickToDataMs": 355.5999999977648,
+          "authMs": 5.027899999999136,
+          "queryCount": 6,
+          "queryMs": 31,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 5.027899999999136,
+              "timestamp": 1792592810170
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592810174
+            },
+            {
+              "name": "query",
+              "durationMs": 7,
+              "timestamp": 1792592810182
+            },
+            {
+              "name": "query",
+              "durationMs": 4,
+              "timestamp": 1792592810187
+            },
+            {
+              "name": "query",
+              "durationMs": 12,
+              "timestamp": 1792592810188
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592810191
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592810194
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "cb479731-382d-4763-8f44-1ce4f55be069",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592810598,
+          "windowEnd": 1792592810824,
+          "clickToPendingMs": 2.699999999254942,
+          "clickToShellMs": 65.89999999850988,
+          "clickToDataMs": 65.89999999850988,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "2b757a0d-7df7-46d0-bfc9-c7f831c4c566",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592810828,
+          "windowEnd": 1792592811026,
+          "clickToPendingMs": 3,
+          "clickToShellMs": 72.69999999925494,
+          "clickToDataMs": 72.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "ae1c36f7-eed8-484a-a716-da245b3f4f20",
+          "route": "/members",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592811032,
+          "windowEnd": 1792592811196,
+          "clickToPendingMs": 1.5,
+          "clickToShellMs": 39.80000000074506,
+          "clickToDataMs": 39.80000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "bbb8a0ff-d10a-4440-8864-b4d4f0176a73",
+          "route": "/",
+          "mode": "warm",
+          "run": 3,
+          "windowStart": 1792592811200,
+          "windowEnd": 1792592811600,
+          "clickToPendingMs": 4.5,
+          "clickToShellMs": 241.39999999850988,
+          "clickToDataMs": 241.39999999850988,
+          "authMs": 29.750300000003335,
+          "queryCount": 7,
+          "queryMs": 27,
+          "rscBytes": 28523,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 29.750300000003335,
+              "timestamp": 1792592811362
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592811377
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592811378
+            },
+            {
+              "name": "query",
+              "durationMs": 5,
+              "timestamp": 1792592811385
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592811455
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592811456
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592811456
+            },
+            {
+              "name": "query",
+              "durationMs": 13,
+              "timestamp": 1792592811456
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work."
+          }
+        },
+        {
+          "correlationId": "b1af631a-ca4b-4704-bbc5-8747edd7a3f1",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592811607,
+          "windowEnd": 1792592811801,
+          "clickToPendingMs": 1.3999999985098839,
+          "clickToShellMs": 43.69999999925494,
+          "clickToDataMs": 43.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "81590607-5f02-481b-b862-9696f1f48a4e",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592811808,
+          "windowEnd": 1792592812002,
+          "clickToPendingMs": 1.5,
+          "clickToShellMs": 39.399999998509884,
+          "clickToDataMs": 39.399999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "37c78f73-2db7-46d8-a810-7f7e1045d44b",
+          "route": "/members",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592812005,
+          "windowEnd": 1792592812238,
+          "clickToPendingMs": 2.5,
+          "clickToShellMs": 96,
+          "clickToDataMs": 96,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "9fc70181-6660-4739-87da-1462d5d6046a",
+          "route": "/",
+          "mode": "warm",
+          "run": 4,
+          "windowStart": 1792592812247,
+          "windowEnd": 1792592812732,
+          "clickToPendingMs": 1.300000000745058,
+          "clickToShellMs": 56.599999997764826,
+          "clickToDataMs": 348.5,
+          "authMs": 3.234200000002602,
+          "queryCount": 7,
+          "queryMs": 31,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 3.234200000002602,
+              "timestamp": 1792592812328
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592812331
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592812332
+            },
+            {
+              "name": "query",
+              "durationMs": 4,
+              "timestamp": 1792592812339
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592812342
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592812344
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592812346
+            },
+            {
+              "name": "query",
+              "durationMs": 19,
+              "timestamp": 1792592812352
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "74dcda06-2460-434c-81f5-d8722aaf24c5",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592812737,
+          "windowEnd": 1792592812903,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 37.30000000074506,
+          "clickToDataMs": 37.30000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "c6481d1e-0064-42d2-8c32-7a388d5c4a8f",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592812908,
+          "windowEnd": 1792592813089,
+          "clickToPendingMs": 1.0999999977648258,
+          "clickToShellMs": 58.69999999925494,
+          "clickToDataMs": 58.69999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "886cc5d5-68fd-4d4f-b116-f9c8b2cdad6c",
+          "route": "/members",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592813092,
+          "windowEnd": 1792592813246,
+          "clickToPendingMs": 1.0999999977648258,
+          "clickToShellMs": 39.80000000074506,
+          "clickToDataMs": 39.80000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "61566ded-b1bb-4dd0-8e09-bb5ee84ad949",
+          "route": "/",
+          "mode": "warm",
+          "run": 5,
+          "windowStart": 1792592813249,
+          "windowEnd": 1792592813700,
+          "clickToPendingMs": 1.5,
+          "clickToShellMs": 46.099999997764826,
+          "clickToDataMs": 333.19999999925494,
+          "authMs": 2.3718000000008033,
+          "queryCount": 6,
+          "queryMs": 13,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 2.3718000000008033,
+              "timestamp": 1792592813308
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592813311
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592813314
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592813316
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592813318
+            },
+            {
+              "name": "query",
+              "durationMs": 6,
+              "timestamp": 1792592813318
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592813320
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "da98bb3b-9b6c-4e3b-8867-e4f9eb5a6b14",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592813705,
+          "windowEnd": 1792592813932,
+          "clickToPendingMs": 1.800000000745058,
+          "clickToShellMs": 75,
+          "clickToDataMs": 75,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "66742da5-ff48-480d-87ef-cf5c408a3da2",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592813937,
+          "windowEnd": 1792592814101,
+          "clickToPendingMs": 1.3999999985098839,
+          "clickToShellMs": 32.5,
+          "clickToDataMs": 32.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "fe96b323-e50b-4a30-a410-e88ae2f19b86",
+          "route": "/members",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592814105,
+          "windowEnd": 1792592814258,
+          "clickToPendingMs": 1.300000000745058,
+          "clickToShellMs": 32.30000000074506,
+          "clickToDataMs": 32.30000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "f933a6bc-7c0c-4a7d-9b54-9fd7f0efa68f",
+          "route": "/",
+          "mode": "warm",
+          "run": 6,
+          "windowStart": 1792592814262,
+          "windowEnd": 1792592814768,
+          "clickToPendingMs": 1.0999999977648258,
+          "clickToShellMs": 65.19999999925494,
+          "clickToDataMs": 350.5999999977648,
+          "authMs": 4.59059999999954,
+          "queryCount": 6,
+          "queryMs": 22,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 4.59059999999954,
+              "timestamp": 1792592814333
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592814336
+            },
+            {
+              "name": "query",
+              "durationMs": 4,
+              "timestamp": 1792592814342
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592814344
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592814347
+            },
+            {
+              "name": "query",
+              "durationMs": 11,
+              "timestamp": 1792592814349
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592814350
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "59969f79-2aa0-4a7b-920e-76a172ba24d0",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592814775,
+          "windowEnd": 1792592815001,
+          "clickToPendingMs": 1.3999999985098839,
+          "clickToShellMs": 68,
+          "clickToDataMs": 68,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "53c212c4-fe4d-4434-8dec-1ef1f368971a",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592815006,
+          "windowEnd": 1792592815218,
+          "clickToPendingMs": 4.800000000745058,
+          "clickToShellMs": 71.40000000223517,
+          "clickToDataMs": 71.40000000223517,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "3b10eaed-c4ea-4b44-b24b-14fd693d9264",
+          "route": "/members",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592815225,
+          "windowEnd": 1792592815389,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 47.099999997764826,
+          "clickToDataMs": 47.099999997764826,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "751e38d2-c059-4125-a8e8-d2f0c762e177",
+          "route": "/",
+          "mode": "warm",
+          "run": 7,
+          "windowStart": 1792592815398,
+          "windowEnd": 1792592815911,
+          "clickToPendingMs": 0.6999999992549419,
+          "clickToShellMs": 58.600000001490116,
+          "clickToDataMs": 346.1000000014901,
+          "authMs": 5.547500000000582,
+          "queryCount": 6,
+          "queryMs": 15,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 5.547500000000582,
+              "timestamp": 1792592815496
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592815499
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592815503
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592815505
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592815507
+            },
+            {
+              "name": "query",
+              "durationMs": 6,
+              "timestamp": 1792592815507
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592815510
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "81c9455c-3523-4e46-a637-56341c3f73cf",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592815918,
+          "windowEnd": 1792592816191,
+          "clickToPendingMs": 4.900000002235174,
+          "clickToShellMs": 55.5,
+          "clickToDataMs": 55.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "409e52cc-ffbc-473f-bfe8-dbfbacf50145",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592816196,
+          "windowEnd": 1792592816363,
+          "clickToPendingMs": 1.5,
+          "clickToShellMs": 41.099999997764826,
+          "clickToDataMs": 41.099999997764826,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "f6f52c6b-e448-4104-9217-020779bba8ed",
+          "route": "/members",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592816367,
+          "windowEnd": 1792592816532,
+          "clickToPendingMs": 3.199999999254942,
+          "clickToShellMs": 30.899999998509884,
+          "clickToDataMs": 30.899999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "00e2d9ea-82ff-4490-88d4-d4062e92ff05",
+          "route": "/",
+          "mode": "warm",
+          "run": 8,
+          "windowStart": 1792592816538,
+          "windowEnd": 1792592817044,
+          "clickToPendingMs": 2.5,
+          "clickToShellMs": 63.599999997764826,
+          "clickToDataMs": 343.29999999701977,
+          "authMs": 1.8449000000000524,
+          "queryCount": 6,
+          "queryMs": 14,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 1.8449000000000524,
+              "timestamp": 1792592816630
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592816633
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592816635
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592816637
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592816638
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592816640
+            },
+            {
+              "name": "query",
+              "durationMs": 6,
+              "timestamp": 1792592816641
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "d1c90a9b-0f83-4d17-9de4-db92a22be0a4",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592817048,
+          "windowEnd": 1792592817229,
+          "clickToPendingMs": 1.8999999985098839,
+          "clickToShellMs": 55.19999999925494,
+          "clickToDataMs": 55.19999999925494,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "a1ebafc5-63c6-480e-b64d-f323ca1dd77f",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592817233,
+          "windowEnd": 1792592817398,
+          "clickToPendingMs": 1.4000000022351742,
+          "clickToShellMs": 35.400000002235174,
+          "clickToDataMs": 35.400000002235174,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "bd9d97c6-8ca8-4ca9-96fa-f9ad8073b10a",
+          "route": "/members",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592817402,
+          "windowEnd": 1792592817553,
+          "clickToPendingMs": 1.5999999977648258,
+          "clickToShellMs": 26.899999998509884,
+          "clickToDataMs": 26.899999998509884,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "c93a2f86-a4df-4b79-a07e-c5c038ef1c37",
+          "route": "/",
+          "mode": "warm",
+          "run": 9,
+          "windowStart": 1792592817558,
+          "windowEnd": 1792592818081,
+          "clickToPendingMs": 1,
+          "clickToShellMs": 59.80000000074506,
+          "clickToDataMs": 348.5999999977648,
+          "authMs": 2.3083999999980733,
+          "queryCount": 6,
+          "queryMs": 15,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 2.3083999999980733,
+              "timestamp": 1792592817636
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592817639
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592817642
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592817644
+            },
+            {
+              "name": "query",
+              "durationMs": 0,
+              "timestamp": 1792592817645
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592817646
+            },
+            {
+              "name": "query",
+              "durationMs": 8,
+              "timestamp": 1792592817649
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "f3c6d408-5531-4cfa-9cb5-93664bf1cf2f",
+          "route": "/category/bai-bao-khoa-hoc",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592818086,
+          "windowEnd": 1792592818359,
+          "clickToPendingMs": 4.600000001490116,
+          "clickToShellMs": 114.80000000074506,
+          "clickToDataMs": 114.80000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "4a664d26-9593-47ae-920f-2858a9e6638a",
+          "route": "/category/robotics-iot",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592818367,
+          "windowEnd": 1792592818607,
+          "clickToPendingMs": 1.199999999254942,
+          "clickToShellMs": 67.30000000074506,
+          "clickToDataMs": 67.30000000074506,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "9c212908-7345-428b-bcc2-31fc681e9d5e",
+          "route": "/members",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592818616,
+          "windowEnd": 1792592818837,
+          "clickToPendingMs": 1.0999999977648258,
+          "clickToShellMs": 51.5,
+          "clickToDataMs": 51.5,
+          "authMs": null,
+          "queryCount": null,
+          "queryMs": null,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [],
+          "rscResponses": 0,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "authMs": "No auth operation event observed in this window (route/router cache or no auth work).",
+            "queryCount": "No query events observed; unavailable, not an inferred zero.",
+            "queryMs": "No query events observed; unavailable, not an inferred zero.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        },
+        {
+          "correlationId": "29decd97-98a7-4f1c-b45c-214349e78f3a",
+          "route": "/",
+          "mode": "warm",
+          "run": 10,
+          "windowStart": 1792592818842,
+          "windowEnd": 1792592819348,
+          "clickToPendingMs": 1.3999999985098839,
+          "clickToShellMs": 61.599999997764826,
+          "clickToDataMs": 347.19999999925494,
+          "authMs": 6.160899999998946,
+          "queryCount": 6,
+          "queryMs": 13,
+          "rscBytes": null,
+          "requestQueryCount": null,
+          "requestQueryMs": null,
+          "serverEvents": [
+            {
+              "name": "auth",
+              "durationMs": 6.160899999998946,
+              "timestamp": 1792592818933
+            },
+            {
+              "name": "query",
+              "durationMs": 2,
+              "timestamp": 1792592818936
+            },
+            {
+              "name": "query",
+              "durationMs": 3,
+              "timestamp": 1792592818939
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592818940
+            },
+            {
+              "name": "query",
+              "durationMs": 1,
+              "timestamp": 1792592818942
+            },
+            {
+              "name": "query",
+              "durationMs": 0,
+              "timestamp": 1792592818943
+            },
+            {
+              "name": "query",
+              "durationMs": 6,
+              "timestamp": 1792592818944
+            }
+          ],
+          "rscResponses": 1,
+          "outcome": "visible",
+          "unavailable": {
+            "requestQueryCount": "Prisma engine events cannot be attributed reliably to individual Next requests.",
+            "requestQueryMs": "Serial window query durations include prefetch/background work.",
+            "rscBytes": "No complete RSC response body observed inside window (router cache or unavailable body)."
+          }
+        }
+      ],
+      "summary": [
+        {
+          "route": "/category/bai-bao-khoa-hoc",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 2,
+              "p95": 8.399999998509884
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 55.34999999962747,
+              "p95": 114.80000000074506
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 55.34999999962747,
+              "p95": 114.80000000074506
+            },
+            "authMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryCount": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "rscBytes": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            }
+          }
+        },
+        {
+          "route": "/category/robotics-iot",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 1.5,
+              "p95": 4.800000000745058
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 40.249999998137355,
+              "p95": 72.69999999925494
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 40.249999998137355,
+              "p95": 72.69999999925494
+            },
+            "authMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryCount": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "rscBytes": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            }
+          }
+        },
+        {
+          "route": "/members",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 1.400000000372529,
+              "p95": 3.199999999254942
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 39.80000000074506,
+              "p95": 96
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 39.80000000074506,
+              "p95": 96
+            },
+            "authMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryCount": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "queryMs": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            },
+            "rscBytes": {
+              "availableSamples": 0,
+              "median": null,
+              "p95": null
+            }
+          }
+        },
+        {
+          "route": "/",
+          "warm": {
+            "clickToPendingMs": {
+              "availableSamples": 10,
+              "median": 1.449999999254942,
+              "p95": 4.5
+            },
+            "clickToShellMs": {
+              "availableSamples": 10,
+              "median": 62.599999997764826,
+              "p95": 241.39999999850988
+            },
+            "clickToDataMs": {
+              "availableSamples": 10,
+              "median": 347.84999999962747,
+              "p95": 379.5
+            },
+            "authMs": {
+              "availableSamples": 10,
+              "median": 4.809249999999338,
+              "p95": 29.750300000003335
+            },
+            "queryCount": {
+              "availableSamples": 10,
+              "median": 6,
+              "p95": 7
+            },
+            "queryMs": {
+              "availableSamples": 10,
+              "median": 18.5,
+              "p95": 34
+            },
+            "rscBytes": {
+              "availableSamples": 2,
+              "median": 28523,
+              "p95": 28523
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "metricDefinitions": {
+    "clickToPendingMs": "Captured click to first observed pending marker.",
+    "clickToShellMs": "Captured click to visible destination shell and active navigation tab.",
+    "clickToDataMs": "First-visible-data: captured click to the expected visible fixture heading after the destination shell. This is not complete-page or all-data-settled time.",
+    "completePageDataMs": "unavailable: no complete-page settled marker is instrumented",
+    "authMs": "Sum of numeric auth operation durations emitted inside the serial observation window.",
+    "queryCount": "Number of Prisma SQL duration events emitted inside the serial observation window; not exact request count.",
+    "queryMs": "Sum of Prisma SQL duration events emitted inside the serial observation window.",
+    "rscBytes": "Sum of complete decoded RSC bodies observed during the window, including prefetch."
+  }
+}

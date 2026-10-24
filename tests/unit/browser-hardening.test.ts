@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest';
-import nextConfig from '../../next.config';
 import fs from 'fs';
 import path from 'path';
+import { describe, expect, it } from 'vitest';
+import nextConfig from '../../next.config';
 
 describe('Browser Hardening & Security Headers', () => {
   it('configures security headers for all routes in next.config.ts', async () => {
@@ -29,7 +29,7 @@ describe('Browser Hardening & Security Headers', () => {
   });
 
   it('ensures login form contains no hardcoded default credentials in source code', () => {
-    const loginFormPath = path.resolve(__dirname, '../../src/app/login/login-form.tsx');
+    const loginFormPath = path.resolve(__dirname, '../../src/features/identity/components/login-form.tsx');
     const content = fs.readFileSync(loginFormPath, 'utf-8');
 
     expect(content).not.toContain('admin123');

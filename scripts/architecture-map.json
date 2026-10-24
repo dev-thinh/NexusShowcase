@@ -1,0 +1,476 @@
+{
+  "moves": [
+    {
+      "from": "src/lib/prisma.ts",
+      "to": "src/server/db/prisma.ts"
+    },
+    {
+      "from": "src/lib/auth.ts",
+      "to": "src/features/identity/server/auth.ts"
+    },
+    {
+      "from": "src/lib/session.ts",
+      "to": "src/features/identity/server/session.ts"
+    },
+    {
+      "from": "src/lib/permissions.ts",
+      "to": "src/features/identity/model/permissions.ts"
+    },
+    {
+      "from": "src/lib/public-user.ts",
+      "to": "src/features/identity/model/public-user.ts"
+    },
+    {
+      "from": "src/lib/article-content.ts",
+      "to": "src/features/submissions/model/article.ts"
+    },
+    {
+      "from": "src/lib/submission-types.ts",
+      "to": "src/features/submissions/model/snapshot.ts"
+    },
+    {
+      "from": "src/lib/submission-snapshot.ts",
+      "to": "src/features/submissions/model/snapshot-mapper.ts"
+    },
+    {
+      "from": "src/lib/bulk-posts.ts",
+      "to": "src/features/publications/model/bulk-posts.ts"
+    },
+    {
+      "from": "src/lib/citation.ts",
+      "to": "src/features/publications/model/citation.ts"
+    },
+    {
+      "from": "src/lib/showcase-navigation.ts",
+      "to": "src/features/publications/model/navigation.ts"
+    },
+    {
+      "from": "src/lib/item-status-presentation.ts",
+      "to": "src/features/publications/model/status.ts"
+    },
+    {
+      "from": "src/lib/dashboard-items.ts",
+      "to": "src/features/submissions/model/dashboard-items.ts"
+    },
+    {
+      "from": "src/lib/member-directory.ts",
+      "to": "src/features/members/model/directory.ts"
+    },
+    {
+      "from": "src/lib/file-signatures.ts",
+      "to": "src/features/assets/model/file-signatures.ts"
+    },
+    {
+      "from": "src/lib/dialog-controller.ts",
+      "to": "src/shared/dialogs/controller.ts"
+    },
+    {
+      "from": "src/lib/ime-blur-guard.ts",
+      "to": "src/shared/lib/ime-blur-guard.ts"
+    },
+    {
+      "from": "src/lib/slugify.ts",
+      "to": "src/shared/lib/slugify.ts"
+    },
+    {
+      "from": "src/lib/video-parser.ts",
+      "to": "src/shared/lib/video-parser.ts"
+    },
+    {
+      "from": "src/actions/admin-actions.ts",
+      "to": "src/features/identity/server/member-actions.ts"
+    },
+    {
+      "from": "src/actions/account-actions.ts",
+      "to": "src/features/identity/server/account-actions.ts"
+    },
+    {
+      "from": "src/actions/upload-actions.ts",
+      "to": "src/features/assets/server/actions.ts"
+    },
+    {
+      "from": "src/actions/bulk-post-actions.ts",
+      "to": "src/features/publications/server/bulk-actions.ts"
+    },
+    {
+      "from": "src/components/submission-preview.tsx",
+      "to": "src/features/submissions/components/submission-preview.tsx"
+    },
+    {
+      "from": "src/components/my-posts.tsx",
+      "to": "src/features/submissions/components/my-posts.tsx"
+    },
+    {
+      "from": "src/components/withdraw-submission-button.tsx",
+      "to": "src/features/submissions/components/withdraw-submission-button.tsx"
+    },
+    {
+      "from": "src/components/article-content.tsx",
+      "to": "src/features/submissions/components/article-content.tsx"
+    },
+    {
+      "from": "src/components/resource-links.tsx",
+      "to": "src/features/submissions/components/resource-links.tsx"
+    },
+    {
+      "from": "src/components/approval-controls.tsx",
+      "to": "src/features/review/components/approval-controls.tsx"
+    },
+    {
+      "from": "src/components/showcase-card.tsx",
+      "to": "src/features/publications/components/showcase-card.tsx"
+    },
+    {
+      "from": "src/components/card-link.tsx",
+      "to": "src/features/publications/components/card-link.tsx"
+    },
+    {
+      "from": "src/components/card-admin-controls.tsx",
+      "to": "src/features/publications/components/card-admin-controls.tsx"
+    },
+    {
+      "from": "src/components/citation-modal.tsx",
+      "to": "src/features/publications/components/citation-modal.tsx"
+    },
+    {
+      "from": "src/components/pin-toggle-button.tsx",
+      "to": "src/features/publications/components/pin-toggle-button.tsx"
+    },
+    {
+      "from": "src/components/pin-management.tsx",
+      "to": "src/features/publications/components/pin-management.tsx"
+    },
+    {
+      "from": "src/components/admin-bulk-posts.tsx",
+      "to": "src/features/publications/components/admin-bulk-posts.tsx"
+    },
+    {
+      "from": "src/components/home-hero.tsx",
+      "to": "src/features/publications/components/home-hero.tsx"
+    },
+    {
+      "from": "src/components/member-card.tsx",
+      "to": "src/features/members/components/member-card.tsx"
+    },
+    {
+      "from": "src/components/member-section-heading.tsx",
+      "to": "src/features/members/components/member-section-heading.tsx"
+    },
+    {
+      "from": "src/components/admin-create-member-modal.tsx",
+      "to": "src/features/identity/components/admin-create-member-modal.tsx"
+    },
+    {
+      "from": "src/components/admin-delete-member-modal.tsx",
+      "to": "src/features/identity/components/admin-delete-member-modal.tsx"
+    },
+    {
+      "from": "src/components/admin-member-table.tsx",
+      "to": "src/features/identity/components/admin-member-table.tsx"
+    },
+    {
+      "from": "src/components/admin-role-toggle.tsx",
+      "to": "src/features/identity/components/admin-role-toggle.tsx"
+    },
+    {
+      "from": "src/components/change-password-form.tsx",
+      "to": "src/features/identity/components/change-password-form.tsx"
+    },
+    {
+      "from": "src/components/sign-out-button.tsx",
+      "to": "src/features/identity/components/sign-out-button.tsx"
+    },
+    {
+      "from": "src/components/navbar.tsx",
+      "to": "src/app/(shell)/_components/navbar.tsx"
+    },
+    {
+      "from": "src/components/navbar-nav.tsx",
+      "to": "src/app/(shell)/_components/navbar-nav.tsx"
+    },
+    {
+      "from": "src/components/management-nav.tsx",
+      "to": "src/app/(shell)/_components/management-nav.tsx"
+    },
+    {
+      "from": "src/components/management-layout.tsx",
+      "to": "src/app/(shell)/_components/management-layout.tsx"
+    },
+    {
+      "from": "src/components/video-player.tsx",
+      "to": "src/shared/ui/video-player.tsx"
+    },
+    {
+      "from": "src/components/loading-content.tsx",
+      "to": "src/shared/ui/loading-content.tsx"
+    },
+    {
+      "from": "src/components/page-reveal.tsx",
+      "to": "src/shared/ui/page-reveal.tsx"
+    },
+    {
+      "from": "src/components/ime-input-support.tsx",
+      "to": "src/shared/ui/ime-input-support.tsx"
+    },
+    {
+      "from": "src/components/academic-footer.tsx",
+      "to": "src/shared/ui/academic-footer.tsx"
+    },
+    {
+      "from": "src/components/member-pagination.tsx",
+      "to": "src/shared/ui/member-pagination.tsx"
+    },
+    {
+      "from": "src/components/navigation-link.tsx",
+      "to": "src/shared/navigation/navigation-link.tsx"
+    },
+    {
+      "from": "src/components/navigation-transition.tsx",
+      "to": "src/shared/navigation/navigation-transition.tsx"
+    },
+    {
+      "from": "src/components/dialog-provider.tsx",
+      "to": "src/shared/dialogs/dialog-provider.tsx"
+    },
+    {
+      "from": "src/components/ui/badge.tsx",
+      "to": "src/features/publications/components/badges.tsx"
+    },
+    {
+      "from": "src/components/ui/custom-select.tsx",
+      "to": "src/shared/ui/custom-select.tsx"
+    },
+    {
+      "from": "src/components/ui/empty-state.tsx",
+      "to": "src/shared/ui/empty-state.tsx"
+    },
+    {
+      "from": "src/components/ui/modal.tsx",
+      "to": "src/shared/ui/modal.tsx"
+    },
+    {
+      "from": "src/components/ui/skeleton.tsx",
+      "to": "src/shared/ui/skeleton.tsx"
+    },
+    {
+      "from": "src/components/ui/tooltip.tsx",
+      "to": "src/shared/ui/tooltip.tsx"
+    },
+    {
+      "from": "src/components/submission/basic-information-fields.tsx",
+      "to": "src/features/submissions/components/basic-information-fields.tsx"
+    },
+    {
+      "from": "src/components/submission/contributor-editor.tsx",
+      "to": "src/features/submissions/components/contributor-editor.tsx"
+    },
+    {
+      "from": "src/components/submission/member-search.ts",
+      "to": "src/features/submissions/components/member-search.ts"
+    },
+    {
+      "from": "src/components/submission/resource-editor.tsx",
+      "to": "src/features/submissions/components/resource-editor.tsx"
+    },
+    {
+      "from": "src/components/submission/review-comments.tsx",
+      "to": "src/features/submissions/components/review-comments.tsx"
+    },
+    {
+      "from": "src/components/submission/section-editor.tsx",
+      "to": "src/features/submissions/components/section-editor.tsx"
+    },
+    {
+      "from": "src/components/submission/submission-action-bar.tsx",
+      "to": "src/features/submissions/components/submission-action-bar.tsx"
+    },
+    {
+      "from": "src/components/submission/submission-editor.tsx",
+      "to": "src/features/submissions/components/submission-editor.tsx"
+    },
+    {
+      "from": "src/components/submission/thumbnail-picker.tsx",
+      "to": "src/features/submissions/components/thumbnail-picker.tsx"
+    },
+    {
+      "from": "src/components/submission/use-submission-editor.ts",
+      "to": "src/features/submissions/components/use-submission-editor.ts"
+    },
+    {
+      "from": "src/app/page.tsx",
+      "to": "src/app/(shell)/(site)/page.tsx"
+    },
+    {
+      "from": "src/app/category/[slug]/page.tsx",
+      "to": "src/app/(shell)/(site)/category/[slug]/page.tsx"
+    },
+    {
+      "from": "src/app/members/all/page.tsx",
+      "to": "src/app/(shell)/(site)/members/all/page.tsx"
+    },
+    {
+      "from": "src/app/members/page.tsx",
+      "to": "src/app/(shell)/(site)/members/page.tsx"
+    },
+    {
+      "from": "src/app/members/[id]/page.tsx",
+      "to": "src/app/(shell)/(site)/members/[id]/page.tsx"
+    },
+    {
+      "from": "src/app/showcase/[slug]/page.tsx",
+      "to": "src/app/(shell)/(site)/showcase/[slug]/page.tsx"
+    },
+    {
+      "from": "src/app/contact/page.tsx",
+      "to": "src/app/(shell)/(site)/contact/page.tsx"
+    },
+    {
+      "from": "src/app/dashboard/items/new/page.tsx",
+      "to": "src/app/(shell)/(account)/dashboard/items/new/page.tsx"
+    },
+    {
+      "from": "src/app/dashboard/items/[id]/edit/page.tsx",
+      "to": "src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx"
+    },
+    {
+      "from": "src/app/dashboard/page.tsx",
+      "to": "src/app/(shell)/(account)/dashboard/page.tsx"
+    },
+    {
+      "from": "src/app/admin/members/page.tsx",
+      "to": "src/app/(shell)/(account)/admin/members/page.tsx"
+    },
+    {
+      "from": "src/app/admin/page.tsx",
+      "to": "src/app/(shell)/(account)/admin/page.tsx"
+    },
+    {
+      "from": "src/app/admin/reviews/page.tsx",
+      "to": "src/app/(shell)/(account)/admin/reviews/page.tsx"
+    },
+    {
+      "from": "src/app/admin/reviews/[id]/page.tsx",
+      "to": "src/app/(shell)/(account)/admin/reviews/[id]/page.tsx"
+    },
+    {
+      "from": "src/app/admin/reviews/[id]/preview/page.tsx",
+      "to": "src/app/(shell)/(account)/admin/reviews/[id]/preview/page.tsx"
+    },
+    {
+      "from": "src/app/account/change-password/page.tsx",
+      "to": "src/app/(shell)/(account)/account/change-password/page.tsx"
+    },
+    {
+      "from": "src/app/login/actions.ts",
+      "to": "src/app/(shell)/(auth)/login/actions.ts"
+    },
+    {
+      "from": "src/app/login/login-form.tsx",
+      "to": "src/app/(shell)/(auth)/login/login-form.tsx"
+    },
+    {
+      "from": "src/app/login/page.tsx",
+      "to": "src/app/(shell)/(auth)/login/page.tsx"
+    },
+    {
+      "from": "src/app/(shell)/(auth)/login/login-form.tsx",
+      "to": "src/features/identity/components/login-form.tsx"
+    },
+    {
+      "from": "src/app/(shell)/(auth)/login/actions.ts",
+      "to": "src/features/identity/server/login-actions.ts"
+    },
+    {
+      "from": "vitest.config.ts",
+      "to": "vitest.config.mts"
+    },
+    {
+      "from": "vitest.integration.config.ts",
+      "to": "vitest.integration.config.mts"
+    }
+  ],
+  "split": [
+    {
+      "from": "src/lib/action-schemas.ts",
+      "to": [
+        "src/shared/lib/validation.ts",
+        "src/features/submissions/model/input.ts",
+        "src/features/review/model/legacy-input.ts",
+        "src/features/identity/model/member-input.ts"
+      ]
+    },
+    {
+      "from": "src/lib/direct-review.ts",
+      "to": [
+        "src/features/review/model/review-state.ts",
+        "src/features/submissions/model/workflow-state.ts",
+        "src/features/review/server/review-snapshot.ts",
+        "src/features/submissions/model/draft.ts"
+      ]
+    },
+    {
+      "from": "src/actions/showcase-actions.ts",
+      "to": [
+        "src/features/submissions/server/actions.ts",
+        "src/features/publications/server/actions.ts"
+      ]
+    },
+    {
+      "from": "src/actions/approval-actions.ts",
+      "to": [
+        "src/features/review/server/actions.ts",
+        "src/features/submissions/server/actions.ts"
+      ]
+    }
+  ],
+  "deleted": [
+    "src/components/contact-form.tsx",
+    "src/components/featured-filmstrip.tsx",
+    "src/components/visibility-toggle-button.tsx",
+    "src/components/submission/optional-details.tsx",
+    "src/lib/home-section-filters.ts",
+    "src/lib/nav-categories.ts",
+    "src/lib/resource-presentation.ts",
+    "src/actions/editorial-actions.ts",
+    "src/features/review/model/legacy-input.ts",
+    "tests/unit/nav-categories.test.ts",
+    "tests/unit/home-section-filters.test.ts",
+    "tests/unit/resource-presentation.test.ts",
+    "tests/unit/review-workspace.test.tsx",
+    "tests/unit/retired-editorial-actions.test.ts",
+    "tests/unit/retired-showcase-actions.test.ts",
+    "tests/unit/action-schemas.test.ts",
+    "tests/unit/bulk-posts.test.ts",
+    "src/components/editorial/editorial-fields.tsx",
+    "src/components/editorial/field-review-comments.tsx",
+    "src/components/editorial/resource-preview-modal.tsx",
+    "src/components/editorial/review-checklist.tsx",
+    "src/components/editorial/review-workspace.tsx",
+    "src/components/editorial/source-revision-view.tsx",
+    "src/app/loading.tsx"
+  ],
+  "allowedFeatureDependencies": {
+    "identity": [],
+    "assets": [
+      "identity"
+    ],
+    "publications": [
+      "identity"
+    ],
+    "submissions": [
+      "identity",
+      "assets",
+      "publications",
+      "members"
+    ],
+    "review": [
+      "identity",
+      "submissions",
+      "publications"
+    ],
+    "members": [
+      "identity",
+      "publications"
+    ]
+  }
+}

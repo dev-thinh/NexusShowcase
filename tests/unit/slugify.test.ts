@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { slugify } from '@/lib/slugify';
+import { slugify } from '@/shared/lib/slugify';
+import { describe, expect, it } from 'vitest';
 
 describe('Slugify Generator', () => {
   it('should transform Vietnamese diacritics into url-friendly slug', () => {

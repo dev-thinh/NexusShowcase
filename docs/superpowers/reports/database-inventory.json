@@ -1,0 +1,15 @@
+{
+  "timestamp": "2026-10-21T09:50:55.161Z",
+  "readOnly": true,
+  "managedHistoryPresent": false,
+  "history": [],
+  "identifierCollisions": [],
+  "assets": {
+    "referenced": 1,
+    "provisionalUnreferenced": 16,
+    "incompleteSources": [
+      "unrecognized-local-asset-path"
+    ]
+  },
+  "deletedFiles": 0
+}

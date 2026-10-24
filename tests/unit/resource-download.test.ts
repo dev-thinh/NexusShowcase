@@ -1,6 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { GET } from '@/app/uploads/resources/[filename]/route';
-import { submissionResourceSchema } from '@/lib/action-schemas';
+import { submissionResourceSchema } from '@/features/submissions/model/input';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 const filesystem = vi.hoisted(() => ({ readFile: vi.fn() }));
 vi.mock('fs/promises', () => filesystem);
 

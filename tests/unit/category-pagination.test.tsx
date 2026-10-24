@@ -1,3 +1,5 @@
+vi.mock('server-only', () => ({}));
+import CategoryPageShell from '@/app/(shell)/(site)/category/[slug]/page';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -6,12 +8,11 @@ const mocks = vi.hoisted(() => ({
   session: null as null | { user: { id: string; role?: string } },
   category: vi.fn(), count: vi.fn(), findMany: vi.fn(),
 }));
-vi.mock('@/lib/prisma', () => ({ prisma: { category: { findUnique: mocks.category }, showcaseItem: { count: mocks.count, findMany: mocks.findMany } } }));
-vi.mock('@/actions/showcase-actions', () => ({ replacePinnedShowcaseItemAction: vi.fn(), togglePinShowcaseItemAction: vi.fn(), toggleItemVisibilityAction: vi.fn() }));
-vi.mock('@/lib/auth', () => ({ auth: () => mocks.session }));
-vi.mock('@/components/navbar', () => ({ Navbar: () => null }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { category: { findUnique: mocks.category }, showcaseItem: { count: mocks.count, findMany: mocks.findMany } } }));
+vi.mock('@/features/publications/server/actions', () => ({ setShowcasePinAction: vi.fn(), setShowcaseVisibilityAction: vi.fn() }));
+vi.mock('@/features/identity/server/auth', () => ({ auth: () => mocks.session }));
+vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => null }));
 vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: vi.fn() }), notFound: () => { throw new Error('404'); }, redirect: () => { throw new Error('redirect'); } }));
-import CategoryPageShell from '@/app/category/[slug]/page';
 
 // Resolve server components under Suspense before checking completed data markup.
 async function resolveServerChildren(node: React.ReactNode): Promise<React.ReactNode> {

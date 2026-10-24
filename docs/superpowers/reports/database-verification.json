@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-10-21T14:20:48.452Z",
+  "freshSchemaDiff": "empty",
+  "legacySchemaDiff": "empty",
+  "invariants": {
+    "roleAndSession": true,
+    "livePreserved": true,
+    "draftPreserved": true,
+    "historyPreserved": true,
+    "workflowVersion": true,
+    "editorialPreserved": true,
+    "auditAndCommentsPreserved": true,
+    "cascadePreserved": true
+  },
+  "migrationHashes": {
+    "20261001_initial_baseline": "e673bb31b25403708e2d05e61355854a01863a06c5daa6f4f6a1bc047e7e6961",
+    "20261014_submission_editor_workflow": "c5290c8b732ada5df1222dd64a6147b5609560afb92875de5b3256ed6932a4c5",
+    "20261018_author_sections_direct_review": "ff4e4b2007f61fe762975ba21ff2b5cf641471c0b0540585297939505fd2d4c9",
+    "20261019_remove_item_tags": "1959197808fb1812cf647d6610e05feba6a928287f58ced9f166c020c44f09a9"
+  },
+  "runtimeMutations": false
+}

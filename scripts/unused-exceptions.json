@@ -1,0 +1,4 @@
+{
+  "src/features/publications/server/actions.ts#reopenShowcaseAction": "Approved administrative lifecycle contract; direct DB invariants retained, UI has no current caller.",
+  "src/features/publications/server/actions.ts#archiveShowcaseAction": "Approved administrative lifecycle contract; archive clears pin atomically, UI has no current caller."
+}

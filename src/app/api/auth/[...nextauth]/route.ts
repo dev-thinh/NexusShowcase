@@ -1,4 +1,4 @@
-import { handlers } from '@/lib/auth';
+import { handlers } from '@/features/identity/server/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(req: NextRequest) {

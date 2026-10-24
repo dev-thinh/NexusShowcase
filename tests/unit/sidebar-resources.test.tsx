@@ -1,12 +1,12 @@
+import { ResourceLinks } from '@/features/submissions/components/resource-links';
+import { createInitialSubmissionState } from '@/features/submissions/components/use-submission-editor';
+import { articleFromLegacy, articleResources, publicationResources, serializeArticle, standaloneResources } from '@/features/submissions/model/article';
+import type { SubmissionResource } from '@/features/submissions/model/snapshot';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { articleFromLegacy, serializeArticle, publicationResources, standaloneResources, articleResources } from '@/lib/article-content';
-import { ResourceLinks } from '@/components/resource-links';
-import { createInitialSubmissionState } from '@/components/submission/use-submission-editor';
-import type { SubmissionResource } from '@/lib/submission-types';
 vi.stubGlobal('React', React);
-vi.mock('@/actions/showcase-actions', () => ({ saveShowcaseDraftAction: vi.fn(), submitShowcaseForReviewAction: vi.fn() }));
+vi.mock('@/features/submissions/server/actions', () => ({ saveShowcaseDraftAction: vi.fn(), submitShowcaseForReviewAction: vi.fn() }));
 
 const dataset: SubmissionResource = { kind: 'LINK', label: 'Tải dataset', url: 'https://example.com/dataset.zip', linkType: 'OTHER' };
 const pdf: SubmissionResource = { kind: 'DOCUMENT', label: 'Báo cáo', url: '/uploads/documents/report.pdf' };

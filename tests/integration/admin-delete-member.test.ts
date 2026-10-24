@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeAll, vi } from 'vitest';
-import { prisma } from '@/lib/prisma';
-import { createMemberAction, deleteMemberAction } from '@/actions/admin-actions';
+import { createMemberAction, deleteMemberAction } from '@/features/identity/server/member-actions';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { prisma } from '../fixtures/database';
 
 const currentUserMock = vi.hoisted(() => ({
   actor: null as {
@@ -11,8 +11,8 @@ const currentUserMock = vi.hoisted(() => ({
   } | null,
 }));
 
-vi.mock('@/lib/current-user', () => ({
-  getCurrentUser: vi.fn(async (allowedRoles?: string[]) => {
+vi.mock('@/features/identity/server/actor', () => ({
+  getActor: vi.fn(async (allowedRoles?: string[]) => {
     const actor = currentUserMock.actor;
     if (!actor || (allowedRoles && !allowedRoles.includes(actor.role))) return null;
     return actor;
@@ -24,8 +24,7 @@ describe('Admin Delete Member Action', () => {
   let testMember: any;
 
   beforeAll(async () => {
-    adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-    if (!adminUser) throw new Error('No admin user found');
+    adminUser = await prisma.user.create({ data: { fullName: 'Delete member admin', email: 'delete-admin@nexus.test', role: 'ADMIN', status: 'ACTIVE' } });
 
     currentUserMock.actor = adminUser;
     const created = await createMemberAction({
@@ -33,7 +32,8 @@ describe('Admin Delete Member Action', () => {
       email: `delete-test-${Date.now()}@student.hcmus.edu.vn`,
       role: 'MEMBER',
     });
-    testMember = created.user;
+    if (!created.success) throw Error(created.error);
+    testMember = created.data.user;
   });
 
   it('should reject deletion if caller is not an ADMIN', async () => {
@@ -46,6 +46,7 @@ describe('Admin Delete Member Action', () => {
     };
     const res = await deleteMemberAction(testMember.id);
     expect(res.success).toBe(false);
+    if (res.success) throw Error('Expected failure');
     expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
   });
 
@@ -53,6 +54,7 @@ describe('Admin Delete Member Action', () => {
     currentUserMock.actor = adminUser;
     const res = await deleteMemberAction(adminUser.id);
     expect(res.success).toBe(false);
+    if (res.success) throw Error('Expected failure');
     expect(res.error).toContain('Quản trị viên không thể tự xóa tài khoản của chính mình');
   });
 
@@ -70,6 +72,7 @@ describe('Admin Delete Member Action', () => {
 
     const res = await deleteMemberAction(tempAdmin.id);
     expect(res.success).toBe(false);
+    if (res.success) throw Error('Expected failure');
     expect(res.error).toContain('Không thể xóa tài khoản Quản trị viên');
 
     await prisma.user.delete({ where: { id: tempAdmin.id } });
@@ -79,7 +82,8 @@ describe('Admin Delete Member Action', () => {
     currentUserMock.actor = adminUser;
     const res = await deleteMemberAction(testMember.id);
     expect(res.success).toBe(true);
-    expect(res.message).toContain('thành công');
+    if (!res.success) throw Error(res.error);
+    expect(res.data.message).toContain('thành công');
 
     // The record remains for attribution and audit history.
     const found = await prisma.user.findUnique({ where: { id: testMember.id } });

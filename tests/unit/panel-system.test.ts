@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
 import postcss from 'postcss';
 import tailwindcss from 'tailwindcss';
+import { describe, expect, it } from 'vitest';
 
 describe('sitewide panel system', () => {
   const css = fs.readFileSync(path.resolve(process.cwd(), 'src/app/globals.css'), 'utf-8');

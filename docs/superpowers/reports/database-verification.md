@@ -1,0 +1,11 @@
+# Database verification — 2026-10-21
+
+The original migration chain failed fresh installation with P3018 because it began by altering the absent Role enum. After adding the generated pre-editorial baseline, both fresh deploy and staged legacy upgrade produce an empty schema diff against the current Prisma schema. [Machine report](database-verification.json) records actual migration SHA256 values and all8 fixture invariants passing. Existing migration SQL was not edited. The checksum unit test compares normalized LF content for cross-platform Git checkouts; the report retains actual local byte hashes.
+
+Legacy fixtures retain live title/content/visibility, unpublished authorDraft content, immutable revision JSON including historical tags, editorial title, audit/comment history and cascade constraints. Existing migration behavior converts EDITOR to CORE_MEMBER, increments sessionVersion and moves READY_FOR_APPROVAL to PENDING_REVIEW. Removed tags are stripped only from editable JSON; historical snapshots remain unchanged.
+
+The verifier uses only two generated empty schemas in the dedicated test database. Catalog identity is verified before creation/writes/cleanup. No runtime reset, deploy or resolve was performed. The earlier red run also cleaned up its owned schemas. The pre-editorial fixture is verified against historical schema `bbd53af^` and the exact three incremental SQL files, rather than inferred from README.
+
+[Read-only runtime inventory](database-inventory.json): no managed migration table is present,0 identifier collision groups,16 provisionally unreferenced uploads and an incomplete templated-path source. All assets remain; no account casing/role/data migration was applied. Existing runtime installation therefore needs a deliberate schema/history reconciliation before any rollout. This report does not authorize it.
+
+Real seed integration ran bootstrap and20-post mock seed twice in an owned test schema:20 PUBLIC mock posts, no duplicates, existing PRIVATE content unchanged. Test compose configuration validates locally; its new ephemeral service was not launched because the already available dedicated PostgreSQL16 database supported the checks. See [operations](../../database-operations.md) for fresh, unmanaged and managed installation procedures.

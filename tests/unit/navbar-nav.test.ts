@@ -1,10 +1,10 @@
-import { describe, it, expect } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+import { describe, expect, it } from 'vitest';
 
 describe('Navbar Nav Component Structure', () => {
   it('implements the exact requested order and naming', () => {
-    const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
+    const navbarNavPath = path.resolve(process.cwd(), 'src/app/(shell)/_components/navbar-nav.tsx');
     const content = fs.readFileSync(navbarNavPath, 'utf-8');
 
     // Personal actions belong to the authenticated profile disclosure.
@@ -31,14 +31,14 @@ describe('Navbar Nav Component Structure', () => {
   });
 
   it('renders core tabs without querying unused category counts', () => {
-    const navbarPath = path.resolve(process.cwd(), 'src/components/navbar.tsx');
+    const navbarPath = path.resolve(process.cwd(), 'src/app/(shell)/_components/navbar.tsx');
     const content = fs.readFileSync(navbarPath, 'utf-8');
 
     expect(content).not.toContain('getFeaturedNavCategories');
     expect(content).not.toContain('featuredCategories');
     expect(content).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
 
-    const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
+    const navbarNavPath = path.resolve(process.cwd(), 'src/app/(shell)/_components/navbar-nav.tsx');
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
     expect(navContent).toContain("name: 'Nghiên cứu khoa học'");
     expect(navContent).toContain("name: 'Robotics & IoT'");
@@ -47,7 +47,7 @@ describe('Navbar Nav Component Structure', () => {
   });
 
   it('exposes review queue to EDITOR while hiding member administration', () => {
-    const navbarNavPath = path.resolve(process.cwd(), 'src/components/navbar-nav.tsx');
+    const navbarNavPath = path.resolve(process.cwd(), 'src/app/(shell)/_components/navbar-nav.tsx');
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
 
     expect(navContent).toContain("canUserReview(user)");

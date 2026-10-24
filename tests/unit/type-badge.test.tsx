@@ -1,8 +1,7 @@
-import React from 'react';
-import { renderToStaticMarkup } from 'react-dom/server';
+import { StatusBadge, TypeBadge } from '@/features/publications/components/badges';
 import { ItemStatus, ItemType } from '@prisma/client';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { StatusBadge, TypeBadge } from '@/components/ui/badge';
 
 describe('TypeBadge shape', () => {
   it('shows only the two supported labels without decorative icons', () => {

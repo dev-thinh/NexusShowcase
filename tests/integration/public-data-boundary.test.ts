@@ -1,77 +1,34 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import MemberProfilePage from '@/app/(shell)/(site)/members/[id]/page';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { prisma } from '../fixtures/database';
+const session = vi.hoisted(() => ({ authenticated: false }));
+vi.mock('@/features/identity/server/session', () => ({ getSession: async () => session.authenticated ? { user: { id: 'viewer', role: 'MEMBER' } } : null }));
+vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => null }));
+vi.mock('@/shared/ui/academic-footer', () => ({ AcademicFooter: () => null }));
 
-const mocks = vi.hoisted(() => ({
-  auth: vi.fn(),
-  findMany: vi.fn(),
-}));
-
-vi.mock('@/lib/auth', () => ({ auth: mocks.auth }));
-vi.mock('@/lib/prisma', () => ({ prisma: { user: { findMany: mocks.findMany } } }));
-vi.mock('server-only', () => ({}));
-
-import AdminMembersPage from '@/app/admin/members/page';
-import { adminMemberClientSelect, publicUserSelect, toPublicUser } from '@/lib/public-user';
-
-describe('public user data boundary', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
+describe('real member profile visibility boundary', () => {
+  let userId: string;
+  beforeAll(async () => {
+    const user = await prisma.user.create({ data: { email: 'boundary@nexus.test', fullName: 'Public author', role: 'MEMBER', status: 'ACTIVE', studentId: 'secret-student', passwordHash: 'secret-hash' } });
+    userId = user.id;
+    for (const [slug, status, visibility] of [['visible-title', 'PUBLISHED', 'PUBLIC'], ['private-title', 'PUBLISHED', 'PRIVATE'], ['draft-title', 'DRAFT', 'PUBLIC']] as const) {
+      await prisma.showcaseItem.create({ data: { title: slug, slug, summary: 'Summary', content: 'secret-content', authorDraft: { secret: 'secret-draft' }, status, visibility, creatorId: user.id, contributors: { create: { userId: user.id, role: 'CO_AUTHOR' } } } });
+    }
   });
-
-  it('serializes a user without password, email, or student ID', () => {
-    const publicUser = toPublicUser({
-      id: 'member-id',
-      fullName: 'Public Member',
-      email: 'private@nexus.test',
-      studentId: '2012345',
-      passwordHash: 'never-serialize-this',
-      avatarUrl: null,
-      bio: null,
-      githubUrl: null,
-      linkedinUrl: null,
-      googleScholarUrl: null,
-      portfolioUrl: null,
-      role: 'MEMBER',
-      status: 'ACTIVE',
-    });
-
-    expect(publicUser).toEqual({
-      id: 'member-id',
-      fullName: 'Public Member',
-      avatarUrl: null,
-      bio: null,
-      githubUrl: null,
-      linkedinUrl: null,
-      googleScholarUrl: null,
-      portfolioUrl: null,
-      role: 'MEMBER',
-    });
-    expect(JSON.stringify(publicUser)).not.toContain('passwordHash');
-    expect(JSON.stringify(publicUser)).not.toContain('private@nexus.test');
-    expect(JSON.stringify(publicUser)).not.toContain('2012345');
+  it('renders only PUBLIC published contributions for guests', async () => {
+    session.authenticated = false;
+    const html = renderToStaticMarkup(await MemberProfilePage({ params: Promise.resolve({ id: userId }) }));
+    expect(html).toContain('visible-title');
+    expect(html).not.toContain('private-title');
+    expect(html).not.toContain('draft-title');
+    expect(html).not.toContain('secret-');
   });
-
-  it('does not select credentials or direct identifiers for public queries', () => {
-    expect(publicUserSelect).not.toHaveProperty('passwordHash');
-    expect(publicUserSelect).not.toHaveProperty('email');
-    expect(publicUserSelect).not.toHaveProperty('studentId');
-  });
-
-  it('selects only safe fields for admin member client rows', () => {
-    expect(adminMemberClientSelect).toEqual({
-      id: true,
-      fullName: true,
-      role: true,
-      createdAt: true,
-    });
-  });
-
-  it('uses the safe admin member selector in the real page query', async () => {
-    mocks.auth.mockResolvedValue({ user: { id: 'admin-id', role: 'ADMIN' } });
-    mocks.findMany.mockRejectedValue(new Error('stop after capturing query'));
-
-    await expect(AdminMembersPage()).rejects.toThrow('stop after capturing query');
-
-    const [query] = mocks.findMany.mock.calls[0];
-    expect(query.select).toBe(adminMemberClientSelect);
+  it('allows authenticated members to see internal published contributions', async () => {
+    session.authenticated = true;
+    const html = renderToStaticMarkup(await MemberProfilePage({ params: Promise.resolve({ id: userId }) }));
+    expect(html).toContain('private-title');
+    expect(html).not.toContain('draft-title');
+    expect(html).not.toContain('secret-');
   });
 });

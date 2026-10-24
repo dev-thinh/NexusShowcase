@@ -1,186 +1,78 @@
-import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
-import { prisma } from '@/lib/prisma';
-import { togglePinShowcaseItemAction } from '@/actions/showcase-actions';
+import { setShowcasePinAction } from '@/features/publications/server/actions';
+import type { User } from '@prisma/client';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { prisma, withTestFixtures } from '../fixtures/database';
 
-const currentUserMock = vi.hoisted(() => ({
-  actor: null as {
-    id: string;
-    fullName: string;
-    role: 'ADMIN' | 'CORE_MEMBER' | 'MEMBER';
-    status: 'ACTIVE';
-  } | null,
+const session = vi.hoisted(() => ({ actor: null as User | null }));
+vi.mock('@/features/identity/server/actor', () => ({
+  getActor: async (roles?: string[]) => session.actor && (!roles || roles.includes(session.actor.role)) ? session.actor : null,
 }));
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
+let admin: User, member: User;
+beforeAll(async () => {
+  admin = await prisma.user.create({ data: { fullName: 'Pin admin', email: 'pin-admin@nexus.test', role: 'ADMIN', status: 'ACTIVE' } });
+  member = await prisma.user.create({ data: { fullName: 'Pin member', email: 'pin-member@nexus.test', role: 'MEMBER', status: 'ACTIVE' } });
+});
+afterEach(async () => { await prisma.showcaseItem.deleteMany({ where: { creatorId: admin.id } }); });
+async function item(pinned = false, status: 'PUBLISHED' | 'ARCHIVED' = 'PUBLISHED') {
+  return prisma.showcaseItem.create({ data: {
+    title: 'Pin fixture', slug: crypto.randomUUID(), summary: 'Pin contract', creatorId: admin.id,
+    status, isPinned: pinned, pinnedAt: pinned ? new Date() : null,
+  } });
+}
 
-vi.mock('@/lib/current-user', () => ({
-  getCurrentUser: vi.fn(async (allowedRoles?: string[]) => {
-    const actor = currentUserMock.actor;
-    if (!actor || (allowedRoles && !allowedRoles.includes(actor.role))) return null;
-    return actor;
-  }),
-}));
-
-describe('Showcase Pinning Action', () => {
-  let adminUser: any;
-  let regularUser: any;
-  const createdItemIds: string[] = [];
-  let preExistingPinnedIds: string[] = [];
-
-  beforeAll(async () => {
-    adminUser = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-    if (!adminUser) {
-      adminUser = await prisma.user.create({
-        data: {
-          email: `admin-pin-${Date.now()}@nexus.hcmus.edu.vn`,
-          fullName: 'Admin Pin Test',
-          role: 'ADMIN',
-          status: 'ACTIVE',
-        },
-      });
-    }
-
-    regularUser = await prisma.user.create({
-      data: {
-        email: `member-pin-${Date.now()}@nexus.hcmus.edu.vn`,
-        fullName: 'Member Pin Test',
-        role: 'MEMBER',
-        status: 'ACTIVE',
-      },
-    });
+describe('three-pin capacity and explicit replacement', () => {
+  it('denies member pinning and replacement without changing either item', async () => {
+    const old = await item(true), candidate = await item();
+    session.actor = member;
+    expect((await setShowcasePinAction({ itemId: candidate.id, enabled: true })).success).toBe(false);
+    expect((await setShowcasePinAction({ itemId: candidate.id, enabled: true, replaceItemIds: [old.id] })).success).toBe(false);
+    expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id: candidate.id } })).isPinned).toBe(false);
+    expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id: old.id } })).isPinned).toBe(true);
   });
-
-  afterAll(async () => {
-    if (createdItemIds.length > 0) {
-      await prisma.showcaseItem.deleteMany({
-        where: { id: { in: createdItemIds } },
-      });
-    }
-    if (preExistingPinnedIds.length > 0) {
-      await prisma.showcaseItem.updateMany({
-        where: { id: { in: preExistingPinnedIds } },
-        data: { isPinned: true, pinnedAt: new Date() },
-      });
-    }
+  it('allows admin pin and unpin and rejects archived articles', async () => {
+    session.actor = admin;
+    const candidate = await item();
+    expect(await setShowcasePinAction({ itemId: candidate.id, enabled: true })).toMatchObject({ success: true, data: { isPinned: true } });
+    expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id: candidate.id } })).pinnedAt).not.toBeNull();
+    expect(await setShowcasePinAction({ itemId: candidate.id, enabled: false })).toMatchObject({ success: true, data: { isPinned: false } });
+    expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id: candidate.id } })).pinnedAt).toBeNull();
+    expect((await setShowcasePinAction({ itemId: (await item(false, 'ARCHIVED')).id, enabled: true })).success).toBe(false);
   });
-
-  it('should forbid non-admin from pinning item', async () => {
-    currentUserMock.actor = regularUser;
-    const item = await prisma.showcaseItem.create({
-      data: {
-        title: 'Bài báo test quyền',
-        slug: `test-pin-perm-${Date.now()}`,
-        summary: 'Tóm tắt',
-        type: 'RESEARCH_PAPER',
-        publishedYear: 2026,
-        status: 'PUBLISHED',
-        creatorId: adminUser.id,
-      },
-    });
-    createdItemIds.push(item.id);
-
-    const result = await togglePinShowcaseItemAction(item.id);
-    expect(result.success).toBe(false);
-    expect(result.error).toContain('Chỉ Quản trị viên');
-  });
-
-  it('should toggle pin and unpin successfully by admin', async () => {
-    currentUserMock.actor = adminUser;
-    const item = await prisma.showcaseItem.create({
-      data: {
-        title: 'Bài báo test toggle pin',
-        slug: `test-pin-toggle-${Date.now()}`,
-        summary: 'Tóm tắt',
-        type: 'RESEARCH_PAPER',
-        publishedYear: 2026,
-        status: 'PUBLISHED',
-        creatorId: adminUser.id,
-      },
-    });
-    createdItemIds.push(item.id);
-
-    // Pin
-    const pinRes = await togglePinShowcaseItemAction(item.id);
-    expect(pinRes.success).toBe(true);
-    expect(pinRes.isPinned).toBe(true);
-
-    const pinnedItem = await prisma.showcaseItem.findUnique({ where: { id: item.id } });
-    expect(pinnedItem?.isPinned).toBe(true);
-    expect(pinnedItem?.pinnedAt).not.toBeNull();
-
-    // Unpin
-    const unpinRes = await togglePinShowcaseItemAction(item.id);
-    expect(unpinRes.success).toBe(true);
-    expect(unpinRes.isPinned).toBe(false);
-
-    const unpinnedItem = await prisma.showcaseItem.findUnique({ where: { id: item.id } });
-    expect(unpinnedItem?.isPinned).toBe(false);
-    expect(unpinnedItem?.pinnedAt).toBeNull();
-  });
-
-  it('should enforce FIFO eviction when pinning exceeds 10 items', async () => {
-    currentUserMock.actor = adminUser;
-    // Reset all pinned items to ensure clean state
-    const previouslyPinned = await prisma.showcaseItem.findMany({
-      where: { isPinned: true },
-      select: { id: true },
-    });
-    preExistingPinnedIds = previouslyPinned.map((p) => p.id);
-    if (preExistingPinnedIds.length > 0) {
-      await prisma.showcaseItem.updateMany({
-        where: { id: { in: preExistingPinnedIds } },
-      data: { isPinned: false, pinnedAt: null },
-      });
+  it('requires a chosen replacement for the fourth pin and preserves all other pins', async () => {
+    session.actor = admin;
+    const old = await Promise.all([item(true), item(true), item(true)]);
+    const candidate = await item();
+    expect(await setShowcasePinAction({ itemId: candidate.id, enabled: true })).toMatchObject({ success: false, details: { requiresReplacement: true } });
+    expect(await prisma.showcaseItem.count({ where: { isPinned: true } })).toBe(3);
+    expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id: candidate.id } })).isPinned).toBe(false);
+    expect((await setShowcasePinAction({ itemId: candidate.id, enabled: true, replaceItemIds: [old[1].id] })).success).toBe(true);
+    expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id: old[1].id } })).isPinned).toBe(false);
+    for (const id of [old[0].id, old[2].id, candidate.id]) {
+      expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id } })).isPinned).toBe(true);
     }
-
-    // Create 10 pinned items with sequential pinnedAt
-    const items: any[] = [];
-    const baseTime = Date.now() - 100000;
-    for (let i = 0; i < 10; i++) {
-      const itm = await prisma.showcaseItem.create({
-        data: {
-          title: `Bài báo ghim số ${i + 1}`,
-          slug: `test-pin-fifo-${i}-${Date.now()}`,
-          summary: `Tóm tắt số ${i + 1}`,
-          type: 'RESEARCH_PAPER',
-          publishedYear: 2026,
-          status: 'PUBLISHED',
-          isPinned: true,
-          pinnedAt: new Date(baseTime + i * 1000),
-          creatorId: adminUser.id,
-        },
-      });
-      items.push(itm);
-      createdItemIds.push(itm.id);
-    }
-
-    const oldestItem = items[0];
-
-    // Create the 11th item and pin it
-    const item11 = await prisma.showcaseItem.create({
-      data: {
-        title: 'Bài báo thứ 11 cần ghim',
-        slug: `test-pin-fifo-11-${Date.now()}`,
-        summary: 'Tóm tắt 11',
-        type: 'RESEARCH_PAPER',
-        publishedYear: 2026,
-        status: 'PUBLISHED',
-        isPinned: false,
-        creatorId: adminUser.id,
-      },
+    expect(await prisma.showcaseItem.count({ where: { isPinned: true } })).toBe(3);
+  });
+  it('does not exceed three pins under simultaneous requests', async () => {
+    session.actor = admin;
+    await Promise.all([item(true), item(true)]);
+    const candidates = await Promise.all([item(), item()]);
+    const results = await Promise.all(candidates.map(candidate => setShowcasePinAction({ itemId: candidate.id, enabled: true })));
+    expect(results.filter(result => result.success)).toHaveLength(1);
+    expect(await prisma.showcaseItem.count({ where: { isPinned: true } })).toBe(3);
+  });
+  it('cleans one fixture without changing pins in another fixture', async () => {
+    const survivor = await item(true);
+    let cleanedSchema = '';
+    await withTestFixtures(async isolated => {
+      cleanedSchema = isolated.prefix;
+      const owner = await isolated.prisma.user.create({ data: { fullName: 'Nested fixture', email: isolated.prefix + '@nexus.test' } });
+      await isolated.prisma.showcaseItem.create({ data: { title: 'Owned', slug: isolated.prefix, summary: '', creatorId: owner.id, status: 'PUBLISHED', isPinned: true } });
+      expect(await isolated.prisma.showcaseItem.count({ where: { isPinned: true } })).toBe(1);
+      expect(await prisma.showcaseItem.count({ where: { isPinned: true } })).toBe(1);
     });
-    createdItemIds.push(item11.id);
-
-    const pin11Res = await togglePinShowcaseItemAction(item11.id);
-    expect(pin11Res.success).toBe(true);
-    expect(pin11Res.isPinned).toBe(true);
-
-    // Oldest item must now be unpinned
-    const refreshedOldest = await prisma.showcaseItem.findUnique({ where: { id: oldestItem.id } });
-    expect(refreshedOldest?.isPinned).toBe(false);
-
-    // Total pinned items count must still be exactly 10
-    const totalPinned = await prisma.showcaseItem.count({
-      where: { isPinned: true, status: 'PUBLISHED' },
-    });
-    expect(totalPinned).toBe(10);
+    expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id: survivor.id } })).isPinned).toBe(true);
+    const remaining = await prisma.$queryRaw<Array<{ present: boolean }>>`SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_namespace WHERE nspname = ${cleanedSchema}) AS present`;
+    expect(remaining[0].present).toBe(false);
   });
 });

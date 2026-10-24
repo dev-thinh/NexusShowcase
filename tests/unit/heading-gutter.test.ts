@@ -3,20 +3,18 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
 const headingSources = [
-  'src/app/page.tsx',
-  'src/app/category/[slug]/page.tsx',
-  'src/app/contact/page.tsx',
-  'src/app/members/page.tsx',
-  'src/app/members/all/page.tsx',
-  'src/app/members/[id]/page.tsx',
-  'src/app/showcase/[slug]/page.tsx',
-  'src/app/dashboard/items/new/page.tsx',
-  'src/app/dashboard/items/[id]/edit/page.tsx',
-  'src/components/change-password-form.tsx',
-  'src/components/contact-form.tsx',
-  'src/components/featured-filmstrip.tsx',
-  'src/components/submission/submission-editor.tsx',
-  'src/components/member-section-heading.tsx',
+  'src/app/(shell)/(site)/page.tsx',
+  'src/app/(shell)/(site)/category/[slug]/page.tsx',
+  'src/app/(shell)/(site)/contact/page.tsx',
+  'src/app/(shell)/(site)/members/page.tsx',
+  'src/app/(shell)/(site)/members/all/page.tsx',
+  'src/app/(shell)/(site)/members/[id]/page.tsx',
+  'src/app/(shell)/(site)/showcase/[slug]/page.tsx',
+  'src/app/(shell)/(account)/dashboard/items/new/page.tsx',
+  'src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx',
+  'src/features/identity/components/change-password-form.tsx',
+  'src/features/submissions/components/submission-editor.tsx',
+  'src/features/members/components/member-section-heading.tsx',
 ];
 
 describe('sitewide heading alignment', () => {
@@ -28,11 +26,11 @@ describe('sitewide heading alignment', () => {
 
   it('aligns member directory content with the footer container', () => {
     const members = readFileSync(
-      resolve(process.cwd(), 'src/app/members/page.tsx'),
+      resolve(process.cwd(), 'src/app/(shell)/(site)/members/page.tsx'),
       'utf8',
     );
     const allMembers = readFileSync(
-      resolve(process.cwd(), 'src/app/members/all/page.tsx'),
+      resolve(process.cwd(), 'src/app/(shell)/(site)/members/all/page.tsx'),
       'utf8',
     );
 
@@ -46,12 +44,12 @@ describe('sitewide heading alignment', () => {
 describe('footer content alignment', () => {
   const gutters = ['container', 'mx-auto', 'max-w-7xl', 'px-4', 'sm:px-6', 'lg:px-8'];
   const files = [
-    'src/app/page.tsx', 'src/app/category/[slug]/page.tsx', 'src/app/contact/page.tsx',
-    'src/app/admin/page.tsx', 'src/app/admin/members/page.tsx', 'src/app/admin/reviews/page.tsx',
-    'src/app/admin/reviews/[id]/page.tsx', 'src/app/dashboard/page.tsx',
-    'src/app/dashboard/items/new/page.tsx', 'src/app/dashboard/items/[id]/edit/page.tsx',
-    'src/app/members/page.tsx', 'src/app/members/all/page.tsx', 'src/app/members/[id]/page.tsx',
-    'src/app/login/page.tsx', 'src/app/account/change-password/page.tsx', 'src/app/showcase/[slug]/page.tsx',
+    'src/app/(shell)/(site)/page.tsx', 'src/app/(shell)/(site)/category/[slug]/page.tsx', 'src/app/(shell)/(site)/contact/page.tsx',
+    'src/app/(shell)/(account)/admin/page.tsx', 'src/app/(shell)/(account)/admin/members/page.tsx', 'src/app/(shell)/(account)/admin/reviews/page.tsx',
+    'src/app/(shell)/(account)/admin/reviews/[id]/page.tsx', 'src/app/(shell)/(account)/dashboard/page.tsx',
+    'src/app/(shell)/(account)/dashboard/items/new/page.tsx', 'src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx',
+    'src/app/(shell)/(site)/members/page.tsx', 'src/app/(shell)/(site)/members/all/page.tsx', 'src/app/(shell)/(site)/members/[id]/page.tsx',
+    'src/app/(shell)/(auth)/login/page.tsx', 'src/app/(shell)/(account)/account/change-password/page.tsx', 'src/app/(shell)/(site)/showcase/[slug]/page.tsx',
   ];
   it.each(files)('%s matches the footer width and responsive gutters', file => {
     const source = readFileSync(resolve(process.cwd(), file), 'utf8');
@@ -60,7 +58,7 @@ describe('footer content alignment', () => {
     expect(containers.some(classes => gutters.every(token => classes.includes(token)))).toBe(true);
   });
   it('lets the submission form fill its aligned page container', () => {
-    for (const file of ['src/app/dashboard/items/new/page.tsx', 'src/app/dashboard/items/[id]/edit/page.tsx', 'src/components/submission/submission-editor.tsx']) {
+    for (const file of ['src/app/(shell)/(account)/dashboard/items/new/page.tsx', 'src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx', 'src/features/submissions/components/submission-editor.tsx']) {
       expect(readFileSync(resolve(process.cwd(), file), 'utf8')).not.toContain('max-w-6xl');
     }
   });

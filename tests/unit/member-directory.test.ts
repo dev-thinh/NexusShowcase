@@ -1,11 +1,9 @@
-import { describe, expect, it } from 'vitest';
 import {
-  MEMBER_GROUP_LABELS,
-  normalizeMemberPage,
-  paginateMembers,
-  sortMembersByContribution,
-  type MemberDirectoryEntry,
-} from '@/lib/member-directory';
+MEMBER_GROUP_LABELS,
+sortMembersByContribution,
+type MemberDirectoryEntry,
+} from '@/features/members/model/directory';
+import { describe, expect, it } from 'vitest';
 
 const member = (
   id: string,
@@ -20,7 +18,6 @@ const member = (
   linkedinUrl: null,
   googleScholarUrl: null,
   portfolioUrl: null,
-  studentId: null,
   role: 'MEMBER',
   _count: { contributions },
 });
@@ -44,27 +41,4 @@ describe('member directory', () => {
     expect(result.map(({ id }) => id)).toEqual(['2', '3', '1']);
   });
 
-  it.each([
-    { raw: undefined, total: 3, expected: 1 },
-    { raw: 'abc', total: 3, expected: 1 },
-    { raw: '-2', total: 3, expected: 1 },
-    { raw: '9', total: 3, expected: 3 },
-  ])('normalizes page $raw to $expected', ({ raw, total, expected }) => {
-    expect(normalizeMemberPage(raw, total)).toBe(expected);
-  });
-
-  it('returns one page slice and page metadata', () => {
-    const result = paginateMembers(
-      Array.from({ length: 8 }, (_, index) =>
-        member(String(index), `User ${index}`, 8 - index),
-      ),
-      '2',
-      6,
-    );
-
-    expect(result.items.map(({ id }) => id)).toEqual(['6', '7']);
-    expect(result.page).toBe(2);
-    expect(result.totalPages).toBe(2);
-    expect(result.totalItems).toBe(8);
-  });
 });

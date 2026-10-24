@@ -7,15 +7,14 @@ const source = (path: string) => readFileSync(join(root, path), 'utf8');
 
 describe('sitewide public panel audit', () => {
   it.each([
-    'src/components/showcase-card.tsx',
-    'src/components/featured-filmstrip.tsx',
-    'src/app/members/page.tsx',
-    'src/app/category/[slug]/page.tsx',
+    'src/features/publications/components/showcase-card.tsx',
+    'src/app/(shell)/(site)/members/page.tsx',
+    'src/app/(shell)/(site)/category/[slug]/page.tsx',
   ])('%s uses the shared public panel treatment', (path) => {
     expect(source(path)).toContain('panel-public');
   });
 
   it('shared empty states use the nested panel treatment', () => {
-    expect(source('src/components/ui/empty-state.tsx')).toContain('panel-nested');
+    expect(source('src/shared/ui/empty-state.tsx')).toContain('panel-nested');
   });
 });

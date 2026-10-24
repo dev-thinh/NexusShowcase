@@ -1,10 +1,10 @@
+import { DialogProvider } from '@/shared/dialogs/dialog-provider';
+import { NavigationTransitionProvider } from '@/shared/navigation/navigation-transition';
+import { ImeInputSupport } from '@/shared/ui/ime-input-support';
+import { PageReveal } from '@/shared/ui/page-reveal';
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
-import { PageReveal } from '@/components/page-reveal';
-import { DialogProvider } from '@/components/dialog-provider';
-import { NavigationTransitionProvider } from '@/components/navigation-transition';
-import { ImeInputSupport } from '@/components/ime-input-support';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -33,7 +33,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="vi" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className={`${inter.className} min-h-screen text-slate-900 font-sans antialiased selection:bg-blue-100 selection:text-blue-900`}>
+      <body className={`${inter.className} min-h-screen text-[#1F2937] font-sans antialiased selection:bg-[#FFFFFF] selection:text-[#1F2937]`}>
         <NavigationTransitionProvider>
           <DialogProvider>
             <ImeInputSupport />

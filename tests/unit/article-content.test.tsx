@@ -1,10 +1,11 @@
+import { createMemberInputSchema } from '@/features/identity/model/member-input';
+import { ArticleContent } from '@/features/submissions/components/article-content';
+import { ARTICLE_PREFIX, articleFromLegacy, articleResources, articleSubmissionErrors, parseArticleContent, serializeArticle } from '@/features/submissions/model/article';
+import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
+import { parseVideoEmbedUrl } from '@/shared/lib/video-parser';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { ARTICLE_PREFIX, articleFromLegacy, articleResources, articleSubmissionErrors, parseArticleContent, serializeArticle } from '@/lib/article-content';
-import { showcaseDraftInputSchema, showcaseSubmissionInputSchema, createMemberInputSchema } from '@/lib/action-schemas';
-import { ArticleContent } from '@/components/article-content';
-import { parseVideoEmbedUrl } from '@/lib/video-parser';
 vi.stubGlobal('React', React);
 const contributor = { externalName: 'Tác giả', role: 'CONTRIBUTOR' as const, displayOrder: 0 };
 const doc = articleFromLegacy('Kết quả **thử nghiệm**', [{ kind: 'IMAGE', label: 'Biểu đồ', url: '/uploads/thumbnails/chart.png' }, { kind: 'LINK', label: 'Demo', url: 'https://youtu.be/dQw4w9WgXcQ', linkType: 'VIDEO_EMBED' }, { kind: 'LINK', label: 'GitHub', url: 'https://github.com/lab/robot' }]);
