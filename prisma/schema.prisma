@@ -7,6 +7,15 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model HomeMomentsGallery {
+  id        String   @id
+  photos    Json
+  version   Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@map("home_moments_gallery")
+}
+
 enum Role {
   GUEST
   MEMBER
