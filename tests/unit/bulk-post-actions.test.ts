@@ -1,10 +1,11 @@
+import { saveBulkPostStatesAction, searchBulkPostsAction } from '@/features/publications/server/bulk-actions';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ admin: vi.fn(), findMany: vi.fn(), count: vi.fn(), updateMany: vi.fn(), transaction: vi.fn() }));
-vi.mock('@/lib/current-user', () => ({ getCurrentUser: mocks.admin }));
-vi.mock('@/lib/prisma', () => ({ prisma: { $transaction: mocks.transaction, showcaseItem: { count: mocks.count, findMany: mocks.findMany } } }));
+vi.mock('server-only', () => ({}));
+vi.mock('@/features/identity/server/actor', () => ({ getActor: mocks.admin }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { $transaction: mocks.transaction, showcaseItem: { count: mocks.count, findMany: mocks.findMany } } }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
-import { updateBulkPostsAction, searchBulkPostsAction, saveBulkPostStatesAction } from '@/actions/bulk-post-actions';
 
 const itemId = 'cjr012345678901234567890';
 beforeEach(() => {
@@ -14,26 +15,6 @@ beforeEach(() => {
   mocks.count.mockResolvedValue(0);
   mocks.updateMany.mockResolvedValue({ count: 1 });
   mocks.transaction.mockImplementation(async callback => callback({ showcaseItem: mocks }));
-});
-
-describe('independent bulk pin and visibility changes', () => {
-  it.each([
-    ['PIN', { isPinned: true, pinnedAt: expect.any(Date) }],
-    ['UNPIN', { isPinned: false, pinnedAt: null }],
-    ['PUBLIC', { visibility: 'PUBLIC' }],
-    ['PRIVATE', { visibility: 'PRIVATE' }],
-  ])('%s only updates the requested setting', async (action, data) => {
-    expect(await updateBulkPostsAction({ itemIds: [itemId], action })).toEqual({ success: true, count: 1 });
-    expect(mocks.updateMany).toHaveBeenCalledOnce();
-    expect(mocks.updateMany).toHaveBeenCalledWith({
-      where: { id: { in: [itemId] }, status: 'PUBLISHED' }, data,
-    });
-  });
-
-  it('rejects the former combined operation before accessing the database', async () => {
-    expect(await updateBulkPostsAction({ itemIds: [itemId], action: 'PIN_PUBLIC' })).toMatchObject({ success: false });
-    expect(mocks.transaction).not.toHaveBeenCalled();
-  });
 });
 
 describe('bulk post status filters', () => {
@@ -80,7 +61,7 @@ describe('saving checkbox states', () => {
     const result = await saveBulkPostStatesAction({ mode, changes: [
       { itemId, enabled: false }, { itemId: secondId, enabled: true },
     ] });
-    expect(result).toEqual({ success: true, count: 2 });
+    expect(result).toMatchObject({ success: true, data: { count: 2 } });
     expect(mocks.updateMany).toHaveBeenCalledTimes(2);
     expect(mocks.updateMany).toHaveBeenNthCalledWith(1, {
       where: { id: { in: [itemId] }, status: 'PUBLISHED' },
@@ -100,7 +81,7 @@ describe('saving checkbox states', () => {
     mocks.count.mockResolvedValue(3);
     expect(await saveBulkPostStatesAction({ mode: 'pin', changes: [
       { itemId, enabled: false }, { itemId: secondId, enabled: true },
-    ] })).toMatchObject({ success: false, requiredReplacements: 1 });
+    ] })).toMatchObject({ success: false, details: { requiredReplacements: 1 } });
     expect(mocks.updateMany).not.toHaveBeenCalled();
   });
 

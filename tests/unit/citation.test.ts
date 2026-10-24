@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { generateBibTeX, generateAPA, generateIEEE, getCitationKey } from '@/lib/citation';
+import { generateAPA, generateBibTeX, generateIEEE, getCitationKey } from '@/features/publications/model/citation';
+import { describe, expect, it } from 'vitest';
 
 describe('Academic Citation Generator', () => {
   const samplePaper = {

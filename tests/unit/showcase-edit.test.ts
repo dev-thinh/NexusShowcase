@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
 import fs from 'fs';
 import path from 'path';
+import { describe, expect, it } from 'vitest';
 
-const source = fs.readFileSync(path.resolve(process.cwd(), 'src/app/dashboard/items/[id]/edit/page.tsx'), 'utf8');
+const source = fs.readFileSync(path.resolve(process.cwd(), 'src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx'), 'utf8');
 
 describe('member edit route guards', () => {
   it('allows only draft and revision-requested records into the member editor', () => {
