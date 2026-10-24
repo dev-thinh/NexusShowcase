@@ -1,11 +1,7 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
-  ],
+  content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     fontWeight: {
       normal: 'var(--font-weight-normal)',
@@ -50,23 +46,23 @@ const config: Config = {
           subtle: 'var(--accent-subtle)',
         },
         navy: {
-          50: '#F0F5FA',
-          100: '#DFEAF5',
-          200: '#BFD5EC',
-          300: '#8EB6DF',
-          400: '#5692CF',
-          500: '#2E72BE',
-          600: '#1E58A3',
-          700: '#1A4683',
-          800: '#163B6E',
-          900: '#0F294A',
-          950: '#08172B',
+          50: '#FFFFFF',
+          100: '#FFFFFF',
+          200: '#153D67',
+          300: '#153D67',
+          400: '#153D67',
+          500: '#153D67',
+          600: '#153D67',
+          700: '#153D67',
+          800: '#153D67',
+          900: '#153D67',
+          950: '#153D67',
         },
         scholar: {
-          gold: '#B45309',
-          goldlight: '#FEF3C7',
+          gold: '#153D67',
+          goldlight: '#FFFFFF',
           paper: '#FFFFFF',
-          parchment: '#F8FAFC',
+          parchment: '#FFFFFF',
           border: '#E2E8F0',
         },
       },

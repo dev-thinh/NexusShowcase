@@ -38,6 +38,8 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  distDir: process.env.NEXUS_TEST_BUILD === '1' ? '.next-harness'
+    : process.env.NEXUS_PREVIEW_BUILD === '1' ? '.next-preview' : '.next',
   experimental: {
     serverActions: {
       bodySizeLimit: '30mb',
