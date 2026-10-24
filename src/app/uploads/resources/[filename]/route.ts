@@ -1,4 +1,4 @@
-import { readFile } from 'fs/promises';
+import { readStoredAsset } from '@/features/assets/server/delivery';
 import path from 'path';
 
 export const runtime = 'nodejs';
@@ -9,7 +9,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ file
     return new Response('Không tìm thấy tài nguyên.', { status: 404 });
   }
   try {
-    const bytes = await readFile(path.join(process.cwd(), 'storage', 'resources', filename));
+    const bytes = await readStoredAsset(`/uploads/resources/${filename}`);
     const requestedName = new URL(request.url).searchParams.get('name');
     const label = (requestedName || filename).replace(/[\r\n/\\]/g, '').slice(0, 160);
     const extension = path.extname(filename);
