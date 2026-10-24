@@ -1,7 +1,13 @@
+import { uploadFileAction } from '@/features/assets/server/actions';
+import path from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { uploadFileAction } from '@/actions/upload-actions';
 
-vi.mock('@/lib/auth', () => ({ auth: vi.fn() }));
+vi.mock('@/features/identity/server/auth', () => ({ auth: vi.fn() }));
+vi.mock('server-only', () => ({}));
+vi.mock('@/server/db/prisma', () => ({ prisma: { user: { findUnique: async () => {
+  const session = await vi.mocked(auth).mock.results.at(-1)?.value as { user?: { id: string; role: string; mustChangePassword?: boolean } } | null;
+  return session?.user ? { ...session.user, status: 'ACTIVE' } : null;
+} } } }));
 
 const filesystem = vi.hoisted(() => ({
   mkdir: vi.fn(),
@@ -10,7 +16,7 @@ const filesystem = vi.hoisted(() => ({
 
 vi.mock('fs/promises', () => filesystem);
 
-import { auth } from '@/lib/auth';
+import { auth } from '@/features/identity/server/auth';
 
 describe('Upload File Action Unit Tests', () => {
   beforeEach(() => {
@@ -30,6 +36,18 @@ describe('Upload File Action Unit Tests', () => {
     expect(result).toMatchObject({ success: false, code: 'UNAUTHORIZED' });
   });
 
+  it('rejects forced-password uploads through action and HTTP without writing', async () => {
+    vi.mocked(auth).mockResolvedValue({ user: { id: 'core-1', role: 'CORE_MEMBER', mustChangePassword: true } } as never);
+    const data = new FormData();
+    data.append('type', 'resource');
+    data.append('file', new File(['bytes'], 'test.txt'));
+    expect(await uploadFileAction(data)).toMatchObject({ success: false, code: 'UNAUTHORIZED' });
+    const { POST } = await import('@/app/api/upload/route');
+    const response = await POST({ formData: async () => data } as never);
+    expect(response.status).toBe(403);
+    expect(filesystem.writeFile).not.toHaveBeenCalled();
+  });
+
   it('rejects an invalid declared MIME type for a thumbnail', async () => {
     (auth as any).mockResolvedValueOnce({ user: { id: 'core-1', role: 'CORE_MEMBER' } });
     const formData = new FormData();
@@ -38,7 +56,7 @@ describe('Upload File Action Unit Tests', () => {
 
     const result = await uploadFileAction(formData);
 
-    expect(result).toMatchObject({ success: false, code: 'INVALID_FILE' });
+    expect(result).toMatchObject({ success: false, code: 'VALIDATION' });
   });
 
   it('rejects an empty or missing file', async () => {
@@ -48,7 +66,7 @@ describe('Upload File Action Unit Tests', () => {
 
     const result = await uploadFileAction(formData);
 
-    expect(result).toMatchObject({ success: false, code: 'INVALID_FILE' });
+    expect(result).toMatchObject({ success: false, code: 'VALIDATION' });
   });
 
   it('rejects an image with an allowed MIME type but a non-image signature', async () => {
@@ -59,7 +77,7 @@ describe('Upload File Action Unit Tests', () => {
 
     const result = await uploadFileAction(formData);
 
-    expect(result).toMatchObject({ success: false, code: 'INVALID_FILE' });
+    expect(result).toMatchObject({ success: false, code: 'VALIDATION' });
     expect(filesystem.writeFile).not.toHaveBeenCalled();
   });
 
@@ -71,7 +89,7 @@ describe('Upload File Action Unit Tests', () => {
 
     const result = await uploadFileAction(formData);
 
-    expect(result).toMatchObject({ success: false, code: 'INVALID_FILE' });
+    expect(result).toMatchObject({ success: false, code: 'VALIDATION' });
     expect(filesystem.writeFile).not.toHaveBeenCalled();
   });
 
@@ -83,8 +101,8 @@ describe('Upload File Action Unit Tests', () => {
 
     const result = await uploadFileAction(formData);
 
-    expect(result).toMatchObject({ success: true, mimeType: 'image/png', fileName: 'avatar.png' });
-    expect(result.url).toMatch(/^\/uploads\/thumbnails\/[\w-]+\.png$/);
+    expect(result).toMatchObject({ success: true, data: { mimeType: 'image/png', fileName: 'avatar.png' } });
+    expect(result.success ? result.data.url : undefined).toMatch(/^\/uploads\/thumbnails\/[\w-]+\.png$/);
   });
 
   it('returns a generic error when the local filesystem write fails', async () => {
@@ -96,8 +114,8 @@ describe('Upload File Action Unit Tests', () => {
 
     const result = await uploadFileAction(formData);
 
-    expect(result).toMatchObject({ success: false, code: 'UPLOAD_FAILED' });
-    expect(result.error).not.toContain('secret');
+    expect(result).toMatchObject({ success: false, code: 'INTERNAL' });
+    expect(!result.success ? result.error : undefined).not.toContain('secret');
   });
 
   it('accepts an authenticated, signature-verified PDF resource', async () => {
@@ -108,8 +126,8 @@ describe('Upload File Action Unit Tests', () => {
 
     const result = await uploadFileAction(formData);
 
-    expect(result).toMatchObject({ success: true, mimeType: 'application/pdf', fileName: 'research.pdf' });
-    expect(result.url).toMatch(/^\/uploads\/documents\/[\w-]+\.pdf$/);
+    expect(result).toMatchObject({ success: true, data: { mimeType: 'application/pdf', fileName: 'research.pdf' } });
+    expect(result.success ? result.data.url : undefined).toMatch(/^\/uploads\/documents\/[\w-]+\.pdf$/);
   });
 });
 
@@ -120,16 +138,16 @@ describe('general resource uploads', () => {
     data.append('type', 'resource');
     data.append('file', new File(['resource bytes'], fileName, { type: 'application/octet-stream' }));
     const result = await uploadFileAction(data);
-    expect(result).toMatchObject({ success: true, fileName, fileSize: 14, mimeType: 'application/octet-stream' });
-    expect(result.url).toMatch(/^\/uploads\/resources\/[\w-]+\.[a-z0-9]+$/);
-    expect(filesystem.writeFile.mock.calls.at(-1)?.[0]).toContain('/storage/resources/');
-    expect(filesystem.writeFile.mock.calls.at(-1)?.[0]).not.toContain('/public/');
+    expect(result).toMatchObject({ success: true, data: { fileName, fileSize: 14, mimeType: 'application/octet-stream' } });
+    expect(result.success ? result.data.url : undefined).toMatch(/^\/uploads\/resources\/[\w-]+\.[a-z0-9]+$/);
+    expect(filesystem.writeFile.mock.calls.at(-1)?.[0]).toContain(path.join('storage', 'resources'));
+    expect(filesystem.writeFile.mock.calls.at(-1)?.[0]).not.toContain(`${path.sep}public${path.sep}`);
   });
   it('keeps the 25 MB limit for general resource files', async () => {
     vi.mocked(auth).mockResolvedValueOnce({ user: { id: 'core-1', role: 'CORE_MEMBER' } } as never);
     const data = new FormData();
     data.append('type', 'resource');
     data.append('file', new File([new Uint8Array(25 * 1024 * 1024 + 1)], 'model.onnx'));
-    expect(await uploadFileAction(data)).toMatchObject({ success: false, code: 'INVALID_FILE' });
+    expect(await uploadFileAction(data)).toMatchObject({ success: false, code: 'VALIDATION' });
   });
 });
