@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { prisma } from '@/lib/prisma';
+import { describe, expect, it } from 'vitest';
+import { prisma } from '../fixtures/database';
 
 describe('Member Automatic Portfolio', () => {
   it('should find items where member is tagged as contributor', async () => {
@@ -13,8 +13,7 @@ describe('Member Automatic Portfolio', () => {
       },
     });
 
-    const admin = await prisma.user.findFirst({ where: { role: 'ADMIN' } });
-    if (!admin) throw new Error('Admin not found in DB');
+    const admin = await prisma.user.create({ data: { fullName: 'Portfolio creator', email: 'portfolio-admin@nexus.test', role: 'ADMIN', status: 'ACTIVE' } });
 
     const testItem = await prisma.showcaseItem.create({
       data: {
