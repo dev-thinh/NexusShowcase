@@ -17,10 +17,11 @@ async function main() {
 
   const existingAdmin = await prisma.user.findFirst({
     where: { role: 'ADMIN' },
+    select: { id: true },
   });
 
   if (existingAdmin) {
-    console.log(`ℹ️ Tài khoản Quản trị viên đã tồn tại (${existingAdmin.email}). Bỏ qua khởi tạo admin mới.`);
+    console.log('Tài khoản quản trị đã tồn tại. Giữ nguyên dữ liệu hiện có.');
     return;
   }
 
@@ -35,7 +36,7 @@ async function main() {
 
   const adminPasswordHash = await bcrypt.hash(rawPassword, 10);
 
-  const admin = await prisma.user.create({
+  await prisma.user.create({
     data: {
       email,
       fullName: 'Quản Trị Viên Học Thuật (Admin)',
@@ -48,12 +49,12 @@ async function main() {
     },
   });
 
-  console.log(`✅ Khởi tạo thành công tài khoản quản trị: ${admin.email}`);
+  console.log('Khởi tạo thành công tài khoản quản trị.');
 }
 
 main()
-  .catch((e) => {
-    console.error('❌ Lỗi seed database:', e);
+  .catch(() => {
+    console.error('Bootstrap thất bại. Kiểm tra kết nối DB và BOOTSTRAP_ADMIN_PASSWORD; chi tiết kết nối không được ghi log.');
     process.exit(1);
   })
   .finally(async () => {
