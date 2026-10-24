@@ -33,7 +33,7 @@ try {
   await new Promise((resolve, reject) => { probe.once('error', reject); probe.listen(port, hostname, resolve); });
   await new Promise((resolve, reject) => probe.close(error => error ? reject(error) : resolve()));
   console.log('Building all routes before starting the production preview...');
-  const code = await run(['build']);
+  const code = await run(['build', '--webpack']);
   if (code !== 0 || stopping) process.exitCode = code || 1;
   else process.exitCode = await run(['start', '--hostname', hostname, '--port', String(port)]);
 } catch (error) {

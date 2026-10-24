@@ -6,8 +6,8 @@
     "postcss": "$postcss"
   },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "preview": "node scripts/start-production.mjs",
     "check:pages": "node scripts/check-cold-pages.mjs",
@@ -39,7 +39,7 @@
     "@prisma/client": "^6.0.0",
     "bcryptjs": "^2.4.3",
     "lucide-react": "^0.468.0",
-    "next": "^15.5.28",
+    "next": "^16.4.3",
     "next-auth": "^5.0.0-beta.32",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

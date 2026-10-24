@@ -17,7 +17,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "incremental": true,
     "plugins": [
       {
@@ -36,7 +36,10 @@
     ".next-harness/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-preview/types/**/*.ts"
+    ".next-preview/types/**/*.ts",
+    ".next-harness/dev/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    ".next-preview/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

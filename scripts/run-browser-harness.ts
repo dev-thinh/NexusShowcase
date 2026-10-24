@@ -80,7 +80,7 @@ async function main() {
       writeFileSync(events, '');
       const env = { ...process.env, ASSET_STORAGE: 'local', NEXUS_TEST_BUILD: '1', DATABASE_URL: databaseUrl.toString(), NEXTAUTH_URL: baseUrl, AUTH_URL: baseUrl, PERF_METRICS: '1', HARNESS_MANIFEST: manifest, HARNESS_BASE_URL: baseUrl, HARNESS_EVENTS: events, HARNESS_ITEMS: String(items) };
       console.log(`Building isolated production harness: ${items} items / 100 members`);
-      const buildCode = await completion(child(next, ['build'], { ...env, PERF_METRICS: '0' }));
+      const buildCode = await completion(child(next, ['build', '--webpack'], { ...env, PERF_METRICS: '0' }));
       if (buildCode) throw Error(`Production build exited ${buildCode}.`);
       server = child(next, ['start', '--hostname', '127.0.0.1', '--port', String(port)], env, line => {
         const match = line.match(/^\[perf\] (\{.*\})$/);

@@ -16,14 +16,14 @@ test('both homepage entry points open the full library without a search term', a
   await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT.', exact: true })).toBeVisible();
 });
 
-test('search and reset keep the library title and destination', async ({ page }) => {
+for (const resetLinkIndex of [0, 1]) test(`search and reset keep the library title and destination via reset link ${resetLinkIndex + 1}`, async ({ page }) => {
   await page.goto('/explore');
   await page.getByRole('searchbox', { name: 'Từ khóa tìm kiếm' }).fill('library-no-matching-results');
   await page.getByRole('button', { name: 'Áp dụng', exact: true }).click();
   await expect(page).toHaveURL(/\/explore\?q=library-no-matching-results/);
   await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT.', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Không tìm thấy công trình phù hợp' })).toBeVisible();
-  await page.getByRole('link', { name: 'Xóa bộ lọc', exact: true }).first().click();
+  await page.getByRole('link', { name: 'Xóa bộ lọc', exact: true }).nth(resetLinkIndex).click();
   await expect(page).toHaveURL(/\/explore$/);
   await expect(page.getByRole('heading', { name: 'Tất cả công trình · 20 công trình' })).toBeVisible();
 });
@@ -35,13 +35,15 @@ test('legacy search links redirect with query and page intact', async ({ page })
   await expect(page.locator('main article')).toHaveCount(10);
 });
 
-test('library pagination completes without leaving the loading screen', async ({ page }) => {
+test('library pagination repeatedly completes without leaving the loading screen', async ({ page }) => {
   await page.goto('/explore');
-  await page.getByRole('navigation', { name: 'Phân trang kho công trình' }).getByRole('link', { name: '2', exact: true }).click();
-  await expect(page).toHaveURL(/\/explore\?page=2$/);
-  await expect(page.getByRole('heading', { name: 'Tất cả công trình · 20 công trình' })).toBeVisible();
-  await expect(page.locator('main article')).toHaveCount(10);
-  await expect(page.locator('[data-destination-loading]')).toHaveCount(0);
+  for (const destination of [2, 1, 2, 1]) {
+    await page.getByRole('navigation', { name: 'Phân trang kho công trình' }).getByRole('link', { name: String(destination), exact: true }).click();
+    await expect(page).toHaveURL(destination === 2 ? /\/explore\?page=2$/ : /\/explore$/);
+    await expect(page.getByRole('heading', { name: 'Tất cả công trình · 20 công trình' })).toBeVisible();
+    await expect(page.locator('main article')).toHaveCount(10);
+    await expect(page.locator('[data-destination-loading]')).toHaveCount(0);
+  }
 });
 
 test('section tabs connect all publications, research and robotics', async ({ page }) => {
