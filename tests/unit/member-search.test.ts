@@ -1,5 +1,18 @@
+import { filterAvailableClubMembers } from '@/features/submissions/components/member-search';
+import { createLatestRequestGate } from '@/shared/lib/latest-request';
 import { describe, expect, it } from 'vitest';
-import { filterAvailableClubMembers } from '@/components/submission/member-search';
+
+it('ignores an older lookup that finishes after the latest request', async () => {
+  const gate = createLatestRequestGate();
+  let releaseOld!: () => void;
+  let visible = '';
+  const oldId = gate.next();
+  const old = new Promise<void>(resolve => { releaseOld = resolve; }).then(() => { if (gate.isCurrent(oldId)) visible = 'old'; });
+  const latestId = gate.next();
+  await Promise.resolve().then(() => { if (gate.isCurrent(latestId)) visible = 'latest'; });
+  releaseOld(); await old;
+  expect(visible).toBe('latest');
+});
 
 const members = [
   { id: '1', fullName: 'Nguyễn An' },
