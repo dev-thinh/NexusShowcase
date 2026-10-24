@@ -5,6 +5,11 @@
 
 # testing
 /coverage
+/.npm-cache/
+/.playwright/
+/.harness/
+/test-results/
+/playwright-report/
 
 # next.js
 /.next/
@@ -44,3 +49,14 @@ next-env.d.ts
 
 # uploaded resource files
 /storage/resources/
+
+# isolated production browser harness build
+/.next-harness/
+/.next-preview/
+/.tmp/local-image-cleanup-*.json
+
+# Local investigation output and runtime media are not source artifacts.
+/.tmp/
+/.superpowers/
+/storage/*.json
+/public/uploads/
