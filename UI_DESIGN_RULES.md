@@ -1,4 +1,6 @@
 # NEXUS SHOWCASE - BỘ QUY CHUẨN THIẾT KẾ UI/UX (DESIGN SYSTEM RULES)
+
+> Refactor 2026-10-21: giữ giao diện đang chạy làm chuẩn. Computed style tại 390/768/1440 được đối chiếu trong `docs/superpowers/reports/presentation/`; việc gộp CSS không thay màu, font hay hình học. Navbar thuộc shell chung, active theo route đã commit; pending phản hồi riêng. Reveal là progressive enhancement, không được giữ nội dung ở opacity 0 hoặc chạy khi reduced motion bật. Chỉ đăng ký DOM mới sau streaming, cleanup observer/animation khi đổi route. Các mô tả lịch sử bên dưới không cho phép tự thiết kế lại giao diện.
 > **Phiên bản:** 1.1.0  
 > **Áp dụng:** Toàn bộ hệ thống NexusShowcase (Khoa CNTT - ĐH Khoa học Tự nhiên, ĐHQG-HCM)  
 > **Nguyên tắc cốt lõi:** THỐNG NHẤT - RÕ RÀNG - KHOÁNG ĐẠT - DỄ SỬ DỤNG (Swiss Modernism Academic Theme)
