@@ -23,7 +23,7 @@ CI dùng Node22, unit/typecheck/build trên Windows/Linux và PostgreSQL16 cho i
 
 ## 1. Công nghệ chính
 
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router, Server Actions)
+- **Framework**: [Next.js 16.4](https://nextjs.org/) (App Router, Server Actions)
 - **UI & Styling**: React 19, Tailwind CSS, Lucide Icons
 - **Cơ sở dữ liệu**: PostgreSQL, [Prisma ORM 6](https://www.prisma.io/)
 - **Xác thực**: [NextAuth v5](https://authjs.dev/) (`@auth/core` 0.41.3+ / `next-auth@5.0.0-beta.32`)
@@ -34,7 +34,7 @@ CI dùng Node22, unit/typecheck/build trên Windows/Linux và PostgreSQL16 cho i
 ## 2. Hướng dẫn cài đặt cục bộ (Local Setup)
 
 ### 2.1. Yêu cầu môi trường
-- Node.js >= 20.x
+- Node.js >= 20.9 (CI dùng Node.js 22)
 - PostgreSQL cục bộ (mặc định cổng `5434` hoặc tùy chỉnh qua env)
 
 ### 2.2. Thiết lập cấu hình môi trường
