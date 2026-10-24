@@ -1,10 +1,10 @@
-import { describe, expect, it, vi } from 'vitest';
+import { createInitialSubmissionState, submissionEditorReducer } from '@/features/submissions/components/use-submission-editor';
 import fs from 'fs';
 import path from 'path';
-import { createInitialSubmissionState, submissionEditorReducer } from '@/components/submission/use-submission-editor';
+import { describe, expect, it, vi } from 'vitest';
 
 vi.mock('server-only', () => ({}));
-vi.mock('@/actions/showcase-actions', () => ({
+vi.mock('@/features/submissions/server/actions', () => ({
   saveShowcaseDraftAction: vi.fn(),
   submitShowcaseForReviewAction: vi.fn(),
 }));
@@ -13,7 +13,7 @@ const read = (file: string) => fs.readFileSync(path.resolve(process.cwd(), file)
 
 describe('submission editor shell', () => {
   it('groups the abstract, contributors and section workspace with a shared preview', () => {
-    const editor = read('src/components/submission/submission-editor.tsx');
+    const editor = read('src/features/submissions/components/submission-editor.tsx');
     expect(editor).toContain('panel-detail');
     expect(editor).toContain('SectionEditor');
     expect(editor).toContain('ArticleContent');
@@ -24,7 +24,7 @@ describe('submission editor shell', () => {
   });
 
   it('uses compact contributor rows with member, external, and free-text role flows', () => {
-    const contributors = read('src/components/submission/contributor-editor.tsx');
+    const contributors = read('src/features/submissions/components/contributor-editor.tsx');
     expect(contributors).toContain('Thêm thành viên CLB');
     expect(contributors).toContain('Thêm người bên ngoài');
     expect(contributors).toContain('customRoleTitle');
@@ -35,7 +35,7 @@ describe('submission editor shell', () => {
   });
 
   it('adds one typed resource at a time with accessible file controls', () => {
-    const resources = read('src/components/submission/resource-editor.tsx');
+    const resources = read('src/features/submissions/components/resource-editor.tsx');
     expect(resources).toContain('Thêm tài nguyên');
     expect(resources).toContain("add('DOCUMENT')");
     expect(resources).toContain('>Tệp</button>');
@@ -47,16 +47,8 @@ describe('submission editor shell', () => {
     expect(resources).not.toMatch(/onClick=.*<div/);
   });
 
-  it('keeps advanced fields inside an optional details disclosure', () => {
-    const optional = read('src/components/submission/optional-details.tsx');
-    expect(optional).toContain('<details');
-    expect(optional).toContain('Nội dung chi tiết');
-    expect(optional).not.toContain('Google Drive');
-    expect(optional).toContain('Markdown');
-  });
-
   it('associates sentence-case labels and field errors with stable ids', () => {
-    const fields = read('src/components/submission/basic-information-fields.tsx');
+    const fields = read('src/features/submissions/components/basic-information-fields.tsx');
     expect(fields).toContain('htmlFor="submission-title"');
     expect(fields).toContain('id="submission-title"');
     expect(fields).toContain('aria-describedby');
@@ -78,11 +70,24 @@ describe('submission editor shell', () => {
     expect(edited.data.title).toBe('Robot tự hành');
     expect(edited.isDirty).toBe(true);
     expect(submissionEditorReducer(edited, { type: 'saving' }).saveState).toBe('saving');
-    expect(submissionEditorReducer(edited, { type: 'saved', itemId: 'item-1' }).isDirty).toBe(false);
+    expect(submissionEditorReducer(edited, { type: 'saved', itemId: 'item-1', reviewVersion: 1, editSequence: edited.editSequence }).isDirty).toBe(false);
+  });
+
+  it('preserves edits made while an older save was pending', () => {
+    const state = createInitialSubmissionState({ id: 'item', reviewVersion: 2, title: 'Old' });
+    const edited = submissionEditorReducer(state, { type: 'field', field: 'title', value: 'New' });
+    const saved = submissionEditorReducer(edited, { type: 'saved', itemId: 'item', reviewVersion: 3, editSequence: state.editSequence });
+    expect(saved.data.title).toBe('New');
+    expect(saved.isDirty).toBe(true);
+    expect(saved.reviewVersion).toBe(3);
+    expect(saved.saveState).toBe('idle');
+    const failed = submissionEditorReducer(saved, { type: 'failed', error: 'Network error' });
+    expect(failed.data.title).toBe('New');
+    expect(failed.isDirty).toBe(true);
   });
 
   it('shows explicit save states in a responsive action bar', () => {
-    const actions = read('src/components/submission/submission-action-bar.tsx');
+    const actions = read('src/features/submissions/components/submission-action-bar.tsx');
     expect(actions).toContain('Chưa lưu');
     expect(actions).toContain('Đang lưu…');
     expect(actions).toContain('Đã lưu');

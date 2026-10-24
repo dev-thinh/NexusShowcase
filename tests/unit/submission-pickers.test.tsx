@@ -1,15 +1,16 @@
+vi.mock('@/features/identity/server/member-search-action', () => ({ searchContributors: vi.fn() }));
+import { BasicInformationFields } from '@/features/submissions/components/basic-information-fields';
+import { ContributorEditor } from '@/features/submissions/components/contributor-editor';
+import { ResourceEditor } from '@/features/submissions/components/resource-editor';
+import { SubmissionActionBar } from '@/features/submissions/components/submission-action-bar';
+import { ThumbnailPicker } from '@/features/submissions/components/thumbnail-picker';
+import { contributorInputSchema } from '@/features/submissions/model/input';
+import { CustomSelect } from '@/shared/ui/custom-select';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { ContributorEditor } from '@/components/submission/contributor-editor';
-import { ResourceEditor } from '@/components/submission/resource-editor';
-import { BasicInformationFields } from '@/components/submission/basic-information-fields';
-import { ThumbnailPicker } from '@/components/submission/thumbnail-picker';
-import { CustomSelect } from '@/components/ui/custom-select';
-import { contributorInputSchema } from '@/lib/action-schemas';
-import { SubmissionActionBar } from '@/components/submission/submission-action-bar';
 
-vi.mock('@/actions/upload-actions', () => ({ uploadFileAction: vi.fn() }));
+vi.mock('@/features/assets/server/actions', () => ({ uploadFileAction: vi.fn() }));
 vi.stubGlobal('React', React);
 
 describe('submission add controls', () => {

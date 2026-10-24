@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { parseVideoEmbedUrl } from '@/lib/video-parser';
+import { parseVideoEmbedUrl } from '@/shared/lib/video-parser';
+import { describe, expect, it } from 'vitest';
 
 describe('Video Embed Parser', () => {
   it('should parse standard YouTube watch URL', () => {

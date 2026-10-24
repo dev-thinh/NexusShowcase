@@ -1,6 +1,6 @@
+import type { SubmissionSnapshot } from '@/features/submissions/model/snapshot';
+import { buildSubmissionSnapshot, mergeEditorialOverrides } from '@/features/submissions/model/snapshot-mapper';
 import { describe, expect, it } from 'vitest';
-import { buildSubmissionSnapshot, mergeEditorialOverrides } from '@/lib/submission-snapshot';
-import type { SubmissionSnapshot } from '@/lib/submission-types';
 
 const snapshot: SubmissionSnapshot = {
   title: 'Bản gửi',
