@@ -1,22 +1,27 @@
+import { PageReveal } from '@/shared/ui/page-reveal';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-const hooks = vi.hoisted(() => ({ effect: undefined as (() => void | (() => void)) | undefined }));
-vi.mock('react', () => ({ useRef: (value: string) => ({ current: value }), useEffect: (effect: () => void | (() => void)) => { hooks.effect = effect; } }));
-vi.mock('next/navigation', () => ({ usePathname: () => '/' }));
-import { PageReveal } from '@/components/page-reveal';
+const hooks = vi.hoisted(() => ({ pathname: '/', ref: undefined as { current: string | null } | undefined, effect: undefined as (() => void | (() => void)) | undefined }));
+vi.mock('react', () => ({ useRef: (value: string) => hooks.ref ??= { current: value }, useEffect: (effect: () => void | (() => void)) => { hooks.effect = effect; } }));
+vi.mock('next/navigation', () => ({ usePathname: () => hooks.pathname }));
 
 class ElementStub {
   dataset: Record<string, string> = {};
   style = { setProperty: vi.fn(), removeProperty: vi.fn() };
   parentElement = null;
   animation = { playState: 'running', pause: vi.fn(() => { this.animation.playState = 'paused'; }), play: vi.fn(() => { this.animation.playState = 'running'; }), cancel: vi.fn(), onfinish: null };
-  animate() { return this.animation; }
+  animate = vi.fn(() => this.animation);
   constructor(public top: number) {}
   closest() { return null; }
+  matches() { return true; }
+  querySelectorAll() { return []; }
+  querySelector() { return null; }
   getBoundingClientRect() { return { top: this.top, bottom: this.top + 100 }; }
 }
 
 let intersect: (entries: { target: ElementStub; isIntersecting: boolean }[]) => void;
+let mutate: (records: Array<{ addedNodes: ElementStub[] }>) => void;
+const queryAll = vi.fn();
 let reduced = false;
 let elements: ElementStub[];
 const observe = vi.fn();
@@ -26,6 +31,8 @@ const disconnect = vi.fn();
 beforeEach(() => {
   vi.clearAllMocks();
   reduced = false;
+  hooks.pathname = '/';
+  hooks.ref = undefined;
   elements = [new ElementStub(40), new ElementStub(1200)];
   const media = { get matches() { return reduced; }, addEventListener: vi.fn(), removeEventListener: vi.fn() };
   const Observer = class {
@@ -36,13 +43,13 @@ beforeEach(() => {
   };
   vi.stubGlobal('HTMLElement', ElementStub);
   vi.stubGlobal('IntersectionObserver', Observer);
-  vi.stubGlobal('MutationObserver', class { observe() {} disconnect() {} });
+  vi.stubGlobal('MutationObserver', class { constructor(callback: typeof mutate) { mutate = callback; } observe() {} disconnect() {} });
   vi.stubGlobal('window', {
     innerHeight: 800, matchMedia: () => media, IntersectionObserver: Observer,
     location: { hash: '' }, addEventListener: vi.fn(), removeEventListener: vi.fn(),
   });
   vi.stubGlobal('document', {
-    body: {}, querySelectorAll: () => elements,
+    body: {}, querySelectorAll: queryAll.mockImplementation(() => elements),
     addEventListener: vi.fn(), removeEventListener: vi.fn(),
   });
 });
@@ -53,12 +60,24 @@ const mount = () => { PageReveal(); return hooks.effect?.(); };
 describe('page content reveal', () => {
   it('reveals visible content immediately and waits for scroll on offscreen content', () => {
     mount();
-    expect(elements[0].animation.play).toHaveBeenCalled();
-    expect(elements[1].animation.play).not.toHaveBeenCalled();
+    expect(elements[0].animate).toHaveBeenCalled();
+    expect(elements[1].animate).not.toHaveBeenCalled();
+    expect(elements[0].animation.pause).not.toHaveBeenCalled();
     expect(observe.mock.calls.some(([node]) => node === elements[1])).toBe(true);
     intersect([{ target: elements[1], isIntersecting: true }]);
-    expect(elements[1].animation.play).toHaveBeenCalled();
+    expect(elements[1].animate).toHaveBeenCalled();
     expect(unobserve.mock.calls.some(([node]) => node === elements[1])).toBe(true);
+  });
+
+  it('also reveals content after a route change, with a perceptible smooth duration', () => {
+    const cleanup = mount();
+    if (typeof cleanup === 'function') cleanup();
+    hooks.pathname = '/members';
+    elements = [new ElementStub(80)];
+    mount();
+    expect(elements[0].animate).toHaveBeenCalled();
+    const options = elements[0].animate.mock.calls[0] as unknown as [unknown, { duration: number }];
+    expect(options[1].duration).toBeGreaterThanOrEqual(300);
   });
 
   it('leaves all content untouched when reduced motion is enabled', () => {
@@ -72,7 +91,15 @@ describe('page content reveal', () => {
     const cleanup = mount();
     if (typeof cleanup === 'function') cleanup();
     expect(disconnect).toHaveBeenCalled();
-    expect(elements.every(element => element.animation.cancel.mock.calls.length > 0)).toBe(true);
+    expect(elements[0].animation.cancel).toHaveBeenCalled();
+    expect(elements[1].animate).not.toHaveBeenCalled();
     expect(elements.every(element => Object.keys(element.dataset).length === 0)).toBe(true);
+  });
+  it('registers streamed subtrees without rescanning the entire document on every mutation', () => {
+    mount();
+    const streamed = new ElementStub(80);
+    for (let index = 0; index < 20; index++) mutate([{ addedNodes: [streamed] }]);
+    expect(queryAll).toHaveBeenCalledTimes(1);
+    expect(streamed.animate).toHaveBeenCalledTimes(1);
   });
 });
