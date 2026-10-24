@@ -12,33 +12,39 @@ import type { PublicMemberRole } from '../model/directory';
 const labels: Record<PublicMemberRole, string> = { ADMIN: 'Ban chủ nhiệm', CORE_MEMBER: 'Core Member', MEMBER: 'Thành viên' };
 
 export function HomeMemberWall({ members, total }: HomeMembersPayload) {
-  const [active, setActive] = useState<{ member: HomeMember; x: number; y: number; below: boolean } | null>(null);
+  const [active, setActive] = useState<{ member: HomeMember; x: number; y: number; below: boolean; viewport: number[] } | null>(null);
   const tooltipId = useId();
   const remaining = Math.max(0, total - members.length);
 
   useEffect(() => {
     if (!active) return;
     const close = () => setActive(null);
+    const onViewportChange = () => {
+      // A scroll/resize event queued before the click can arrive after opening.
+      // Dismiss only if the viewport has moved since this tooltip was positioned.
+      const viewport = [window.scrollX, window.scrollY, window.innerWidth, window.innerHeight];
+      if (viewport.some((value, index) => value !== active.viewport[index])) close();
+    };
     const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') close(); };
     const onPointer = (event: PointerEvent) => {
       if (!(event.target instanceof Element) || !event.target.closest('[data-home-member-avatar]')) close();
     };
     document.addEventListener('pointerdown', onPointer);
     document.addEventListener('keydown', onKey);
-    window.addEventListener('scroll', close, true);
-    window.addEventListener('resize', close);
+    window.addEventListener('scroll', onViewportChange, true);
+    window.addEventListener('resize', onViewportChange);
     return () => {
       document.removeEventListener('pointerdown', onPointer);
       document.removeEventListener('keydown', onKey);
-      window.removeEventListener('scroll', close, true);
-      window.removeEventListener('resize', close);
+      window.removeEventListener('scroll', onViewportChange, true);
+      window.removeEventListener('resize', onViewportChange);
     };
   }, [active]);
 
   const show = (member: HomeMember, element: HTMLElement) => {
     const rect = element.getBoundingClientRect();
     const below = rect.top < 100;
-    setActive({ member, x: Math.max(116, Math.min(window.innerWidth - 116, rect.left + rect.width / 2)), y: below ? rect.bottom + 10 : rect.top - 10, below });
+    setActive({ member, x: Math.max(116, Math.min(window.innerWidth - 116, rect.left + rect.width / 2)), y: below ? rect.bottom + 10 : rect.top - 10, below, viewport: [window.scrollX, window.scrollY, window.innerWidth, window.innerHeight] });
   };
 
   if (!members.length) return <p className="home-members-empty">Thông tin thành viên đang được cập nhật.</p>;
