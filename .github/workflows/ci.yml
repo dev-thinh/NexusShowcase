@@ -1,0 +1,69 @@
+name: Repository checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  check:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    env:
+      AUTH_SECRET: ci-only-random-placeholder-not-for-deployment-2026
+      DATABASE_URL: postgresql://unused:unused@127.0.0.1:5432/unused_runtime
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run check
+      - run: npm run build
+  database-and-browser:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: nexus_test
+          POSTGRES_PASSWORD: ci_test_only
+          POSTGRES_DB: nexus_showcase_test
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U nexus_test -d nexus_showcase_test"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      AUTH_SECRET: ci-only-random-placeholder-not-for-deployment-2026
+      DATABASE_URL: postgresql://unused:unused@127.0.0.1:5432/unused_runtime
+      TEST_DATABASE_URL: postgresql://nexus_test:ci_test_only@127.0.0.1:5432/nexus_showcase_test?schema=public
+      HARNESS_BROWSER_CHANNEL: chromium
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx prisma generate
+      - run: npm run db:verify-upgrade
+      - name: Initialize the dedicated test template
+        run: npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://nexus_test:ci_test_only@127.0.0.1:5432/nexus_showcase_test?schema=public
+      - run: npm run test:integration
+      - run: npx playwright install --with-deps chromium
+        env:
+          PLAYWRIGHT_BROWSERS_PATH: .playwright
+      - run: npm run test:e2e
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verification-artifacts
+          path: |
+            docs/superpowers/reports/database-verification.json
+            docs/superpowers/reports/refactor-after/metrics.json
+            test-results/navigation-*/trace.zip
+            test-results/presentation-*/trace.zip
+          if-no-files-found: ignore
