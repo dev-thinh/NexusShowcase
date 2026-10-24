@@ -2,12 +2,19 @@ import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
 import { expect, login, test } from './fixtures';
 
+const createdItems: string[] = [];
+test.afterEach(async ({ database }) => {
+  await database.showcaseItem.deleteMany({ where: { id: { in: createdItems } } });
+  createdItems.length = 0;
+});
+
 test('admin directly approves a submission and preserves live content until update approval', async ({ page, fixture, database, browser, baseURL }) => {
   const author = fixture.users[1];
   const slug = `browser-approval-${randomUUID()}`;
   const category = await database.category.findUniqueOrThrow({ where: { slug: 'robotics-iot' } });
   const snapshot = { type: 'PROJECT', categoryId: category.id, title: 'Browser first publication', summary: 'Synthetic browser approval fixture.', content: '', publishedYear: 2026, suggestedField: '', customProjectType: '', contributors: [{ userId: author.id, displayName: 'Benchmark Member 001', role: 'CONTRIBUTOR', displayOrder: 0 }], resources: [] };
   const item = await database.showcaseItem.create({ data: { title: snapshot.title, slug, summary: snapshot.summary, creatorId: author.id, categoryId: category.id, status: 'PENDING_REVIEW', reviewVersion: 1, revisions: { create: { revisionNumber: 1, snapshot, submittedById: author.id } } } });
+  createdItems.push(item.id);
   await login(page, fixture.users[0], `/admin/reviews/${item.id}`);
   const diagnostic = { pageErrors: [] as string[], posts: [] as Array<{ status: number; redirect: string | null; contentType: string | null; bodyReadable: boolean; bytes: number | null }>, failedRequests: [] as Array<{ method: string; path: string; error: string | null }> };
   page.on('pageerror', error => { diagnostic.pageErrors.push(error.name); });
@@ -62,6 +69,7 @@ test('admin directly approves a submission and preserves live content until upda
 test('admin requests revision and rejects through form decisions', async ({ page, fixture, database }) => {
   const author = fixture.users[1];
   const item = await database.showcaseItem.create({ data: { title: 'Browser feedback fixture', slug: `browser-feedback-${randomUUID()}`, summary: 'Pending feedback', creatorId: author.id, status: 'PENDING_REVIEW', reviewVersion: 1 } });
+  createdItems.push(item.id);
   await login(page, fixture.users[0], `/admin/reviews/${item.id}`);
   await page.getByRole('button', { name: 'Yêu cầu chỉnh sửa', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Nội dung yêu cầu chỉnh sửa', { exact: false }).fill('Clarify the submitted results.');
