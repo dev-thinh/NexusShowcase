@@ -102,4 +102,20 @@ describe('page content reveal', () => {
     expect(queryAll).toHaveBeenCalledTimes(1);
     expect(streamed.animate).toHaveBeenCalledTimes(1);
   });
+  it('settles focused content without moving the target during a pointer click', () => {
+    mount();
+    const target = elements[1];
+    const focus = vi.mocked(document.addEventListener).mock.calls.find(([type]) => type === 'focusin')![1] as (event: unknown) => void;
+    focus({ target });
+    expect(target.animate).not.toHaveBeenCalled();
+    expect(unobserve.mock.calls.some(([node]) => node === target)).toBe(true);
+    intersect([{ target, isIntersecting: true }]);
+    expect(target.animate).not.toHaveBeenCalled();
+  });
+  it('cancels an active entry animation when its controls receive focus', () => {
+    mount();
+    const focus = vi.mocked(document.addEventListener).mock.calls.find(([type]) => type === 'focusin')![1] as (event: unknown) => void;
+    focus({ target: elements[0] });
+    expect(elements[0].animation.cancel).toHaveBeenCalledOnce();
+  });
 });

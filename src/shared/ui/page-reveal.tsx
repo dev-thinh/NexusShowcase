@@ -14,9 +14,10 @@ export function PageReveal() {
     if (motion.matches || !('IntersectionObserver' in window)) return;
 
     const tracked = new Map<HTMLElement, Animation>();
+    const settled = new WeakSet<HTMLElement>();
     const registered = new Set<HTMLElement>();
     const reveal = (element: HTMLElement) => {
-      if (tracked.has(element)) return;
+      if (tracked.has(element) || settled.has(element)) return;
       const animation = element.animate([
         { opacity: 0.55, translate: '0 14px' },
         { opacity: 1, translate: '0 0' },
@@ -63,16 +64,23 @@ export function PageReveal() {
     mutations.observe(document.body, { childList: true, subtree: true });
     register(document.querySelectorAll<HTMLElement>(targets));
 
-    const revealAncestors = (element: Element | null) => {
+    const settleAncestors = (element: Element | null) => {
       for (let current = element; current; current = current.parentElement) {
-        if (current instanceof HTMLElement && registered.has(current)) reveal(current);
+        if (current instanceof HTMLElement && registered.has(current)) {
+          // Focus can occur between pointerdown and pointerup. Moving a focused
+          // control here changes the click target and silently drops navigation.
+          settled.add(current);
+          tracked.get(current)?.cancel();
+          tracked.delete(current);
+          observer.unobserve(current);
+        }
       }
     };
-    const onFocus = (event: FocusEvent) => revealAncestors(event.target as Element);
+    const onFocus = (event: FocusEvent) => settleAncestors(event.target as Element);
     const onHash = () => {
       const id = window.location.hash.slice(1);
       if (id) {
-        try { revealAncestors(document.getElementById(decodeURIComponent(id))); } catch { /* Invalid URL fragment. */ }
+        try { settleAncestors(document.getElementById(decodeURIComponent(id))); } catch { /* Invalid URL fragment. */ }
       }
     };
     const onMotionChange = () => {
