@@ -5,11 +5,11 @@ const mocks = vi.hoisted(() => ({
   findUnique: vi.fn(),
 }));
 
-vi.mock('@/lib/auth', () => ({ auth: mocks.auth }));
-vi.mock('@/lib/prisma', () => ({ prisma: { user: { findUnique: mocks.findUnique } } }));
+vi.mock('@/features/identity/server/auth', () => ({ auth: mocks.auth }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { user: { findUnique: mocks.findUnique } } }));
 vi.mock('server-only', () => ({}));
 
-import { getCurrentUser, requireCurrentUser } from '@/lib/current-user';
+import { getActor } from '@/features/identity/server/actor';
 
 describe('current user', () => {
   beforeEach(() => {
@@ -19,7 +19,7 @@ describe('current user', () => {
   it('returns no actor when the request has no authenticated session', async () => {
     mocks.auth.mockResolvedValue(null);
 
-    await expect(getCurrentUser()).resolves.toBeNull();
+    await expect(getActor()).resolves.toBeNull();
     expect(mocks.findUnique).not.toHaveBeenCalled();
   });
 
@@ -27,17 +27,23 @@ describe('current user', () => {
     mocks.auth.mockResolvedValue({ user: { id: 'suspended-user' } });
     mocks.findUnique.mockResolvedValue({ id: 'suspended-user', role: 'ADMIN', status: 'SUSPENDED' });
 
-    await expect(requireCurrentUser(['ADMIN'])).rejects.toThrow('Unauthorized');
+    await expect(getActor(['ADMIN'])).resolves.toBeNull();
   });
 
   it('returns the active database user only when their role is allowed', async () => {
     mocks.auth.mockResolvedValue({ user: { id: 'active-admin' } });
     mocks.findUnique.mockResolvedValue({ id: 'active-admin', role: 'ADMIN', status: 'ACTIVE' });
 
-    await expect(requireCurrentUser(['ADMIN'])).resolves.toMatchObject({
+    await expect(getActor(['ADMIN'])).resolves.toMatchObject({
       id: 'active-admin',
       role: 'ADMIN',
       status: 'ACTIVE',
     });
+  });
+
+  it.each([{ status: 'ACTIVE', deletedAt: new Date() }, { status: 'ACTIVE', mustChangePassword: true }])('rejects an ineligible database actor %j', async flags => {
+    mocks.auth.mockResolvedValue({ user: { id: 'user' } });
+    mocks.findUnique.mockResolvedValue({ id: 'user', role: 'ADMIN', ...flags });
+    await expect(getActor()).resolves.toBeNull();
   });
 });

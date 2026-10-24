@@ -3,13 +3,13 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ params: new URLSearchParams() }));
-vi.mock('@/components/navbar', () => ({ Navbar: () => React.createElement('header', null, 'CLB Robotics & IoT') }));
+vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => React.createElement('header', null, 'CLB Robotics & IoT') }));
 vi.mock('next/navigation', () => ({ useSearchParams: () => mocks.params }));
-vi.mock('@/app/login/actions', () => ({ loginAction: vi.fn() }));
+vi.mock('@/features/identity/server/login-actions', () => ({ loginAction: vi.fn() }));
 vi.stubGlobal('React', React);
 
-import LoginPage from '@/app/login/page';
-import { LoginForm } from '@/app/login/login-form';
+import LoginPage from '@/app/(shell)/(auth)/login/page';
+import { LoginForm } from '@/features/identity/components/login-form';
 
 beforeEach(() => { mocks.params = new URLSearchParams(); });
 

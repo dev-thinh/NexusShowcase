@@ -1,12 +1,13 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { changePasswordAction } from '@/features/identity/server/account-actions';
 import bcrypt from 'bcryptjs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(), findUnique: vi.fn(), update: vi.fn(),
 }));
-vi.mock('@/lib/auth', () => ({ auth: mocks.auth }));
-vi.mock('@/lib/prisma', () => ({ prisma: { user: { findUnique: mocks.findUnique, update: mocks.update } } }));
-import { changePasswordAction } from '@/actions/account-actions';
+vi.mock('@/features/identity/server/auth', () => ({ auth: mocks.auth }));
+vi.mock('server-only', () => ({}));
+vi.mock('@/server/db/prisma', () => ({ prisma: { user: { findUnique: mocks.findUnique, update: mocks.update } } }));
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -16,7 +17,7 @@ beforeEach(() => {
 
 describe('password changes', () => {
   it('stores a hash that accepts the new password and invalidates old sessions', async () => {
-    mocks.findUnique.mockResolvedValue({ id: 'member-1', status: 'ACTIVE', passwordHash: await bcrypt.hash('old-password', 4) });
+    mocks.findUnique.mockResolvedValue({ id: 'member-1', status: 'ACTIVE', mustChangePassword: true, passwordHash: await bcrypt.hash('old-password', 4) });
     const result = await changePasswordAction({ currentPassword: 'old-password', newPassword: 'new-password' });
     expect(result.success).toBe(true);
     const { where, data } = mocks.update.mock.calls[0][0];
