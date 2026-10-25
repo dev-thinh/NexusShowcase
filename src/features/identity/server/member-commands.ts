@@ -63,27 +63,21 @@ async function createMemberInternal(actor: Actor, input: CreateMemberInput) {
     return { success: false as const, code: 'VALIDATION' as const, error: 'Vui lòng nhập email hoặc tên đăng nhập của thành viên.' };
   }
 
-  const emailTrimmed = input.email.trim();
-  const existing = await prisma.user.findFirst({
-    where: {
-      OR: [
-        { email: emailTrimmed },
-        { email: emailTrimmed.toLowerCase() },
-      ],
-    },
-  });
-
-  if (existing) {
-    return { success: false as const, code: 'VALIDATION' as const, error: `Tài khoản hoặc email "${emailTrimmed}" đã tồn tại trong hệ thống.` };
-  }
-
+  const emailTrimmed = input.email.trim().toLowerCase();
   const rawPassword = input.password?.trim() || crypto.randomBytes(12).toString('base64url');
   if (rawPassword.length < 6) {
     return { success: false as const, code: 'VALIDATION' as const, error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.' };
   }
 
   const passwordHash = await bcrypt.hash(rawPassword, 10);
-  const newUser = await prisma.user.create({
+  return prisma.$transaction(async tx => {
+    const current = await tx.user.findUnique({ where: { id: actor.id }, select: { role: true, status: true, deletedAt: true, mustChangePassword: true } });
+    if (!current || current.role !== 'ADMIN' || current.status !== 'ACTIVE' || current.deletedAt || current.mustChangePassword) return { success: false as const, code: 'FORBIDDEN' as const, error: 'Bạn không còn quyền quản trị.' };
+    const family = emailTrimmed.replace(/@(robotics|nexus)\.hcmus\.edu\.vn$/, '');
+    const matches = await tx.$queryRaw<Array<{ id: string }>>(Prisma.sql`
+      SELECT id FROM users WHERE regexp_replace(lower(btrim(email)), '@(robotics|nexus)[.]hcmus[.]edu[.]vn$', '') = ${family} LIMIT 1`);
+    if (matches.length) return { success: false as const, code: 'VALIDATION' as const, error: 'Tài khoản hoặc email đã tồn tại trong hệ thống.' };
+    const newUser = await tx.user.create({
     data: {
       fullName: input.fullName.trim(),
       email: emailTrimmed,
@@ -98,6 +92,7 @@ async function createMemberInternal(actor: Actor, input: CreateMemberInput) {
   });
 
   return { success: true as const, data: { user: toSafeMember(newUser), temporaryPassword: rawPassword } };
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
 }
 
 async function disableMemberInternal(actor: Actor, targetUserId: string) {
@@ -144,7 +139,10 @@ async function disableMemberInternal(actor: Actor, targetUserId: string) {
 }
 
 export async function createMember(actor: Actor, input: CreateMemberInput) {
-  try { return await createMemberInternal(actor, input); } catch (error) { return commandFailure('member.create', error, { actorId: actor.id }); }
+  try { return await createMemberInternal(actor, input); } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') return { success: false as const, code: 'CONFLICT' as const, error: 'Tài khoản hoặc email đã tồn tại trong hệ thống.' };
+    return commandFailure('member.create', error, { actorId: actor.id });
+  }
 }
 export async function disableMember(actor: Actor, targetUserId: string) {
   try { return await disableMemberInternal(actor, targetUserId); } catch (error) { return commandFailure('member.disable', error, { actorId: actor.id }); }
