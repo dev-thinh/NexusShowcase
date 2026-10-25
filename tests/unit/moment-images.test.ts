@@ -1,6 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ read: vi.fn() }));
 vi.mock('fs/promises', () => ({ readFile: mocks.read }));
+vi.mock('@/features/assets/server/access', () => ({ getAssetAccess: vi.fn(async () => ({ allowed: true, public: true })) }));
 import { GET } from '@/app/uploads/thumbnails/[filename]/route';
 const read = (filename: string) => GET(new Request('http://localhost/uploads/thumbnails/' + filename), { params: Promise.resolve({ filename }) });
 beforeEach(() => { vi.clearAllMocks(); mocks.read.mockResolvedValue(Buffer.from([1, 2, 3])); });

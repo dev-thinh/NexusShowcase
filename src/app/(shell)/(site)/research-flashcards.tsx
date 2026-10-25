@@ -8,6 +8,7 @@ import { MomentsEditor } from '@/features/publications/components/moments-editor
 import { defaultResearchImages, researchImagesSchema } from '@/features/publications/model/research-images';
 import type { MomentsGallery, MomentsPayload } from '@/features/publications/model/moments';
 import { ResearchSectionHeading } from './research-section-heading';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 const directions = [
   {
@@ -49,9 +50,9 @@ export function ResearchFlashcards({ initialGallery }: { initialGallery?: Moment
   }
 
   function finishEditing(saved?: MomentsGallery) {
-    if (saved) { setGallery({ ...saved, isAdmin: true }); setMessage('Đã lưu ảnh hướng nghiên cứu.'); }
+    if (saved) { setGallery({ ...saved, isAdmin: true }); void notifySuccess('Đã lưu ảnh hướng nghiên cứu.').then(() => editButton.current?.focus()); }
     setEditing(false);
-    requestAnimationFrame(() => editButton.current?.focus());
+    if (!saved) requestAnimationFrame(() => editButton.current?.focus());
   }
 
   return (
@@ -66,7 +67,7 @@ export function ResearchFlashcards({ initialGallery }: { initialGallery?: Moment
         <article className="research-direction" key={direction.title} aria-labelledby={`research-direction-${index}`}>
           <div className="research-direction__photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <MediaImage src={photo?.src} alt={photo?.title || direction.title} width={1000} height={667} loading="lazy" decoding="async" className="h-full w-full object-cover" style={{ objectPosition: direction.position }} />
+            <MediaImage optimized src={photo?.src} alt={photo?.title || direction.title} width={1000} height={667} sizes="(max-width: 767px) 120px, 400px" loading="eager" decoding="async" className="h-full w-full object-cover" style={{ objectPosition: direction.position }} />
           </div>
           <div className="research-direction__body">
             <div className="research-direction__heading">

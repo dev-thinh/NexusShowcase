@@ -7,7 +7,7 @@ it('pairs each research direction with an accessible local photograph and keeps 
   const html = renderToStaticMarkup(<ResearchFlashcards initialGallery={{ version: 0, isAdmin: false, photos: defaultResearchImages }} />);
   const images = [...html.matchAll(/<img[^>]+>/g)].map(match => match[0]);
   expect(images).toHaveLength(3);
-  expect(images.every(image => image.includes('alt=') && image.includes('loading="lazy"') && image.includes('width=') && image.includes('height='))).toBe(true);
+  expect(images.every(image => image.includes('alt=') && image.includes('loading="eager"') && image.includes('?w=') && image.includes('width=') && image.includes('height='))).toBe(true);
   expect(new Set(images.map(image => image.match(/src="([^"]+)"/)?.[1])).size).toBe(3);
   expect(html).not.toContain('data-media-placeholder');
   expect(html.match(/<h3/g)).toHaveLength(3);

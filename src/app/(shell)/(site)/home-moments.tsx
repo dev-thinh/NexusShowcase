@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { Modal } from '@/shared/ui/modal';
 import { defaultMoments, momentRows, momentsSaveSchema, type MomentsPayload, type MomentsGallery } from '@/features/publications/model/moments';
 import { MomentsEditor } from '@/features/publications/components/moments-editor';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 export function HomeMoments({ initialGallery = { photos: defaultMoments, version: 0, isAdmin: false } }: { initialGallery?: MomentsPayload }) {
   const [gallery, setGallery] = useState<MomentsGallery>(initialGallery);
@@ -20,10 +21,10 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
   const photos = rows.flat();
   const hasMotion = rows.some(row => row.length >= 3);
   function finishEditing(saved?: MomentsGallery) {
-    if (saved) { setGallery(saved); setNotice('Đã lưu thay đổi.'); }
+    if (saved) { setGallery(saved); void notifySuccess('Đã lưu ảnh khoảnh khắc.').then(() => editButton.current?.focus()); }
     setEditing(false);
     setKeyboardBrowsing(false);
-    requestAnimationFrame(() => editButton.current?.focus());
+    if (!saved) requestAnimationFrame(() => editButton.current?.focus());
   }
   async function startEditing() {
     setOpening(true);
@@ -116,7 +117,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
                     return (
                       <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': photo.tilt, '--photo-offset': index % 2 ? '0.75rem' : '-0.5rem' } as CSSProperties} tabIndex={copy ? -1 : undefined} aria-label={`Xem ảnh: ${photo.title}`} onClick={() => setSelected(photoIndex)}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <MediaImage src={photo.src} alt={copy ? '' : photo.alt} width={1000} height={750} loading="lazy" decoding="async" />
+                        <MediaImage optimized src={photo.src} alt={copy ? '' : photo.alt} width={1000} height={750} sizes="(max-width: 767px) 240px, 304px" loading="eager" decoding="async" />
                         <span className="moment-photo__caption"><span>{photo.title}</span><Expand size={16} aria-hidden="true" /></span>
                       </button>
                     );
