@@ -32,7 +32,7 @@ export async function searchBulkPostsAction(input: { query: string; page: number
     const totalPages = Math.max(1, Math.ceil(total / 10));
     const page = Math.min(parsed.data.page, totalPages);
     const items = await prisma.showcaseItem.findMany({ where, skip: (page - 1) * 10, take: 10,
-      select: { id: true, title: true, slug: true, isPinned: true, visibility: true, publishedYear: true },
+      select: { id: true, title: true, slug: true, type: true, isPinned: true, visibility: true, publishedYear: true },
       orderBy: [{ publishedAt: 'desc' }, { id: 'asc' }],
     });
     return { success: true, items, total, page, totalPages, counts };

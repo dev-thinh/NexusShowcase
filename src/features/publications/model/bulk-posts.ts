@@ -1,8 +1,11 @@
 import { z } from 'zod';
+import { cuidSchema } from '@/shared/lib/validation';
+export const pinReplacementSchema = z.object({ selected: cuidSchema.min(1, 'Vui lòng chọn công trình cần thay thế.') });
 export type BulkPostFilter = 'ALL' | 'PINNED' | 'UNPINNED' | 'PUBLIC' | 'PRIVATE';
 export type BulkPostCounts = Record<BulkPostFilter, number>;
 export type BulkPostEntry = {
   id: string; title: string; slug: string; isPinned: boolean;
+  type?: import('@prisma/client').ItemType;
   visibility: 'PUBLIC' | 'PRIVATE'; publishedYear: number | null;
 };
 
