@@ -1,6 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ actor: vi.fn(), upload: vi.fn(), updateMany: vi.fn(), revalidatePath: vi.fn() }));
 vi.mock('@/features/identity/server/actor', () => ({ getActor: mocks.actor }));
+vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: async () => ({ allowed: true, retryAfterSeconds: 0 }) }));
 vi.mock('@/features/assets/server/upload-command', () => ({ uploadAsset: mocks.upload }));
 vi.mock('@/server/db/prisma', () => ({ prisma: { user: { updateMany: mocks.updateMany } } }));
 vi.mock('next/cache', () => ({ revalidatePath: mocks.revalidatePath }));

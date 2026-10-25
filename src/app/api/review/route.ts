@@ -30,6 +30,6 @@ export async function POST(request: Request) {
     input = JSON.parse(body + decoder.decode());
   } catch { return failure(400, 'VALIDATION', 'Dữ liệu không hợp lệ.'); }
   const result = await decideSubmissionAction(input);
-  const status = result.success ? 200 : { VALIDATION: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, NOT_FOUND: 404, CONFLICT: 409, INTERNAL: 500 }[result.code];
+  const status = result.success ? 200 : { VALIDATION: 400, UNAUTHORIZED: 401, FORBIDDEN: 403, NOT_FOUND: 404, CONFLICT: 409, RATE_LIMITED: 429, INTERNAL: 500 }[result.code];
   return Response.json(result, { status, headers: { 'Cache-Control': 'no-store' } });
 }

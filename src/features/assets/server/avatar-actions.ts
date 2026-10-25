@@ -6,6 +6,7 @@ import type { UploadResult } from '../model/contracts';
 import { uploadAsset } from './upload-command';
 import { prisma } from '@/server/db/prisma';
 import { revalidatePath } from 'next/cache';
+import { consumeRateLimit } from '@/features/identity/server/rate-limit';
 
 function refreshAvatar(id: string) {
   revalidatePath(`/members/${id}`);
@@ -21,6 +22,8 @@ export async function uploadAvatarAction(formData: FormData): Promise<UploadResu
   const file = formData.get('file');
   if (!(file instanceof File)) return { success: false, code: 'VALIDATION', error: 'Vui lòng chọn ảnh đại diện.' };
   try {
+    const throttle = await consumeRateLimit({ scope: 'upload', key: actor.id, limit: 60, windowMs: 60_000 });
+    if (!throttle.allowed) return { success: false, code: 'RATE_LIMITED', error: 'Bạn tải tệp quá nhanh. Vui lòng thử lại sau.' };
     const uploaded = await uploadAsset(file, 'thumbnail', actor.id);
     if (!uploaded.success) return uploaded;
     const updated = await prisma.user.updateMany({ where: { id: actor.id, status: 'ACTIVE', deletedAt: null, mustChangePassword: false }, data: { avatarUrl: uploaded.data.url } });

@@ -82,7 +82,7 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
 
           <div>
             <label htmlFor={`${id}-new`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
-              Mật khẩu mới (tối thiểu 6 ký tự)
+              Mật khẩu mới (tối thiểu 15 ký tự)
             </label>
             <input
               id={`${id}-new`}

@@ -15,9 +15,10 @@ export function normalizeAssetReferenceText(value: string): { text: string; inco
 }
 
 /** Foreign origins never grant access to a local object with the same pathname. */
-export function inspectAssetReferences(value: unknown): { urls: Set<string>; incomplete: boolean } {
+export function inspectAssetReferences(value: unknown, options: { strictLocal?: boolean } = {}): { urls: Set<string>; incomplete: boolean } {
   const urls = new Set<string>();
   let incomplete = false;
+  let invalidLocal = false;
   function inspect(entry: unknown): void {
     if (Array.isArray(entry)) { entry.forEach(inspect); return; }
     if (entry && typeof entry === 'object') { Object.values(entry).forEach(inspect); return; }
@@ -40,10 +41,11 @@ export function inspectAssetReferences(value: unknown): { urls: Set<string>; inc
         continue;
       }
       const pathname = candidate.split(/[?#]/)[0];
-      try { assertAssetPath(pathname); urls.add(pathname); } catch { incomplete = true; }
+      try { assertAssetPath(pathname); urls.add(pathname); } catch { incomplete = true; invalidLocal = true; }
     }
   }
   inspect(value);
+  if (options.strictLocal && invalidLocal) throw new Error('Ambiguous local asset reference');
   return { urls, incomplete };
 }
 

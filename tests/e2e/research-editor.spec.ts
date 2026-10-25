@@ -93,7 +93,7 @@ test('both editors share uploaded photos without changing each other’s placeme
     expect(stale.photos[0].src).toBe(firstUpload);
     // The server also protects references if a client bypasses disabled controls.
     const removed = { version: afterResearch.version, photos: afterResearch.photos.filter((photo: { src: string }) => photo.src !== firstUpload) };
-    expect((await page.request.put('/api/home/moments', { data: removed })).status()).toBe(400);
+    expect((await page.request.put('/api/home/moments', { headers: { Origin: new URL(page.url()).origin }, data: removed })).status()).toBe(400);
     expect((await (await page.request.get('/api/home/moments')).json()).version).toBe(afterResearch.version);
 
     await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
@@ -104,7 +104,7 @@ test('both editors share uploaded photos without changing each other’s placeme
     await moments.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
     await acknowledgeSuccess(page, 'Đã lưu ảnh khoảnh khắc.');
     await expect(moments).toHaveCount(0);
-    expect((await page.request.put('/api/home/research', { data: stale })).status()).toBe(409);
+    expect((await page.request.put('/api/home/research', { headers: { Origin: new URL(page.url()).origin }, data: stale })).status()).toBe(409);
     expect((await (await page.request.get('/api/home/research')).json()).version).toBe(stale.version);
 
     await page.locator('[data-deferred-section="research"]').scrollIntoViewIfNeeded();

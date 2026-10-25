@@ -3,7 +3,7 @@ import type { NextAuthConfig } from 'next-auth';
 import type { CredentialsConfig } from 'next-auth/providers/credentials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({ config: null as NextAuthConfig | null, findUnique: vi.fn(), findMany: vi.fn(), throttle: vi.fn(async () => ({ allowed: true, retryAfterSeconds: 0 })) }));
+const mocks = vi.hoisted(() => ({ config: null as NextAuthConfig | null, findUnique: vi.fn(), findMany: vi.fn(), throttle: vi.fn(async (_input: { key: string }) => ({ allowed: true, retryAfterSeconds: 0 })) }));
 vi.mock('next-auth', () => ({ default: (config: NextAuthConfig) => { mocks.config = config; return {}; } }));
 vi.mock('@/server/db/prisma', () => ({ prisma: { $queryRaw: mocks.findMany, user: { findUnique: mocks.findUnique } } }));
 vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: mocks.throttle }));
@@ -62,4 +62,13 @@ it('rejects login before database identity lookup when shared throttle denies it
  mocks.findMany.mockClear();
  expect(await provider.options.authorize!({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).toBeNull();
  expect(mocks.findMany).not.toHaveBeenCalled();
+});
+
+it('shares a login throttle across institutional aliases without changing unrelated emails', async () => {
+ const provider = mocks.config!.providers[0] as CredentialsConfig & { options: Partial<CredentialsConfig> };
+ mocks.findMany.mockResolvedValue([]);
+ for (const email of ['Member', 'Member@robotics.hcmus.edu.vn', 'Member@nexus.hcmus.edu.vn', 'Member@example.test']) {
+   await provider.options.authorize!({ email, password: 'correct-password' }, new Request('http://localhost'));
+ }
+ expect(mocks.throttle.mock.calls.map(call => (call[0] as { key: string }).key)).toEqual(['member', 'member', 'member', 'member@example.test']);
 });

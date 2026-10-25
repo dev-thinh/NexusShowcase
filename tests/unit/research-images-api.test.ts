@@ -6,7 +6,7 @@ vi.mock('@/server/observability/errors', () => ({ reportServerError: vi.fn() }))
 import { GET, PUT } from '@/app/api/home/research/route';
 import { defaultResearchImages } from '../fixtures/moments';
 const input = { version: 0, photos: defaultResearchImages };
-const request = (body: unknown) => new Request('http://localhost/api/home/research', { method: 'PUT', headers: { Origin: 'http://localhost' }, body: JSON.stringify(body) });
+const request = (body: unknown) => new Request('http://localhost/api/home/research', { method: 'PUT', headers: { Origin: 'http://localhost', 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
 beforeEach(() => { vi.clearAllMocks(); mocks.actor.mockResolvedValue(null); mocks.read.mockResolvedValue({ home: input, research: input }); });
 
 it('returns the research gallery independently from moments', async () => {

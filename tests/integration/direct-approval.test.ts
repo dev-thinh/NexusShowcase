@@ -112,6 +112,8 @@ describe('author sections and direct admin approval', () => {
       { kind: 'DOCUMENT' as const, label: 'Mô hình đã huấn luyện', url: '/uploads/resources/model.onnx', fileName: 'Mô hình đã huấn luyện', fileSize: 200, mimeType: 'application/octet-stream' },
       { kind: 'DOCUMENT' as const, label: 'Báo cáo toàn văn', url: '/uploads/documents/report.pdf', fileName: 'Báo cáo toàn văn', fileSize: 100, mimeType: 'application/pdf' },
     ];
+    // Real uploads register ownership before their URLs can be used in a draft.
+    await prisma.asset.createMany({ data: resources.filter(resource => resource.kind === 'DOCUMENT').map(resource => ({ url: resource.url, provider: 'local', ownerId: author.id, private: true })) });
     const saved = await saveDraft(null, { ...payload(), resources });
     if (!saved.success) throw Error(saved.error);
     const id = saved.data.id; items.push(id);
