@@ -66,7 +66,7 @@ test('both editors share uploaded photos without changing each other’s placeme
     await expect(research.locator('.moments-editor__asset')).toHaveCount(6);
     const original = (await (await page.request.get('/api/home/moments')).json()).photos;
     await research.getByRole('button', { name: `Chọn ảnh: ${original[0].title}`, exact: true }).click();
-    await expect(research.locator('[data-moment-slot="0"] img')).toHaveAttribute('src', original[0].src);
+    await expect(research.locator('[data-moment-slot="0"] img')).toHaveAttribute('src', `${original[0].src}?w=256`);
     const buffer = fixtureImage;
     const upload = async (modal: typeof research, name: string) => {
       const pending = page.waitForResponse(response => response.url().endsWith('/api/upload') && response.request().method() === 'POST');
@@ -113,6 +113,6 @@ test('both editors share uploaded photos without changing each other’s placeme
     expect(result.photos[0].src).toBe(secondUpload);
   } finally {
     await database.homeMomentsGallery.deleteMany();
-    for (const src of uploads) await unlink(path.join(process.cwd(), 'public', src)).catch(() => {});
+    for (const src of uploads) await unlink(path.join(process.cwd(), 'storage/thumbnails', path.basename(src))).catch(() => {});
   }
 });

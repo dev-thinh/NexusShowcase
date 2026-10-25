@@ -116,7 +116,7 @@ test('admin uses modal slots and a reusable library without repeating photos bet
     await expect(modal).toHaveCount(0);
   } finally {
     await database.homeMomentsGallery.deleteMany();
-    if (uploaded && /^\/uploads\/thumbnails\/[a-zA-Z0-9_-]+\.(?:jpg|jpeg|png|webp)$/.test(uploaded)) await unlink(path.join(process.cwd(), 'public', 'uploads', 'thumbnails', path.basename(uploaded))).catch(() => {});
+    if (uploaded && /^\/uploads\/thumbnails\/[a-zA-Z0-9_-]+\.(?:jpg|jpeg|png|webp)$/.test(uploaded)) await unlink(path.join(process.cwd(), 'storage/thumbnails', path.basename(uploaded))).catch(() => {});
   }
 });
 
