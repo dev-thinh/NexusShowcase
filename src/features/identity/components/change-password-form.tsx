@@ -1,51 +1,46 @@
 'use client';
 
 import { changePasswordAction } from '@/features/identity/server/account-actions';
-import { AlertCircle, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
+import { AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { notifySuccess } from '@/shared/dialogs/success';
 import { signOut } from 'next-auth/react';
-import { useState, useTransition } from 'react';
+import { useEffect, useId, useState, useTransition } from 'react';
+import { changePasswordFormSchema } from '../model/password-input';
+import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
-export function ChangePasswordForm() {
+export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedded?: boolean; onBusyChange?: (busy: boolean) => void } = {}) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const id = useId();
+  useEffect(() => { onBusyChange?.(isPending || success); }, [isPending, success, onBusyChange]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentPassword) {
-      setError('Vui lòng nhập mật khẩu hiện tại hoặc mật khẩu tạm thời.');
-      return;
-    }
-    if (newPassword.length < 6) {
-      setError('Mật khẩu mới phải có ít nhất 6 ký tự.');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError('Mật khẩu xác nhận không khớp.');
-      return;
-    }
-
     setError(null);
     setSuccess(false);
 
     startTransition(async () => {
+      try {
       const res = await changePasswordAction({ currentPassword, newPassword });
       if (!res.success) {
         setError(res.error || 'Đổi mật khẩu thất bại.');
       } else {
         setSuccess(true);
-        await signOut({ callbackUrl: '/login?passwordChanged=1' });
+        await notifySuccess('Đã đổi mật khẩu. Vui lòng đăng nhập lại bằng mật khẩu mới.');
+        await signOut({ callbackUrl: '/login' });
       }
+      } catch { setSuccess(false); setError('Không đổi được mật khẩu. Vui lòng thử lại.'); }
     });
   };
 
   return (
-    <div className="max-w-md mx-auto w-full">
-      <div className="panel-detail sm:p-7">
-        <div className="pb-4 border-b border-slate-200">
+    <div className="max-w-md mx-auto w-full text-left">
+      <div className={embedded ? '' : 'panel-detail sm:p-7'}>
+        {!embedded && <div className="pb-4 border-b border-slate-200">
           <div className="min-w-0">
             <h2 className="text-xl font-semibold text-[#1F2937] tracking-tight leading-tight">
               Đổi Mật Khẩu
@@ -54,7 +49,7 @@ export function ChangePasswordForm() {
               Cập nhật mật khẩu bảo mật cho tài khoản của bạn
             </p>
           </div>
-        </div>
+        </div>}
 
         {error && (
           <div
@@ -66,22 +61,15 @@ export function ChangePasswordForm() {
           </div>
         )}
 
-        {success && (
-          <div
-            role="status"
-            className="mt-4 p-3 rounded-md bg-[#FFFFFF] border border-slate-200 text-[#1F2937] text-sm flex items-center gap-2.5"
-          >
-            <CheckCircle2 className="w-4 h-4 text-[#1F2937] shrink-0" />
-            <div className="font-semibold">Đổi mật khẩu thành công! Vui lòng đăng nhập lại bằng mật khẩu mới.</div>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="mt-5 space-y-3.5">
+        <ValidatedForm schema={changePasswordFormSchema} values={{ currentPassword, newPassword, confirmPassword }} inlineErrors onSubmit={handleSubmit} className="mt-5 space-y-3.5">
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1.5">
+            <label htmlFor={`${id}-current`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
               Mật khẩu hiện tại / Mật khẩu tạm thời
             </label>
             <input
+              id={`${id}-current`}
+              name="currentPassword"
+              required
               type="password"
               autoComplete="current-password"
               value={currentPassword}
@@ -89,14 +77,17 @@ export function ChangePasswordForm() {
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[#1F2937] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#153D67]/20 focus:border-slate-200"
               placeholder="••••••••"
               disabled={isPending || success}
-            />
+            /><FieldError name="currentPassword" />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1.5">
+            <label htmlFor={`${id}-new`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
               Mật khẩu mới (tối thiểu 6 ký tự)
             </label>
             <input
+              id={`${id}-new`}
+              name="newPassword"
+              required
               type="password"
               autoComplete="new-password"
               value={newPassword}
@@ -104,14 +95,17 @@ export function ChangePasswordForm() {
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[#1F2937] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#153D67]/20 focus:border-slate-200"
               placeholder="••••••••"
               disabled={isPending || success}
-            />
+            /><FieldError name="newPassword" />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1.5">
+            <label htmlFor={`${id}-confirm`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
               Xác nhận mật khẩu mới
             </label>
             <input
+              id={`${id}-confirm`}
+              name="confirmPassword"
+              required
               type="password"
               autoComplete="new-password"
               value={confirmPassword}
@@ -119,7 +113,7 @@ export function ChangePasswordForm() {
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 text-[#1F2937] text-sm focus:outline-hidden focus:ring-2 focus:ring-[#153D67]/20 focus:border-slate-200"
               placeholder="••••••••"
               disabled={isPending || success}
-            />
+            /><FieldError name="confirmPassword" />
           </div>
 
           <button
@@ -139,7 +133,7 @@ export function ChangePasswordForm() {
               </>
             )}
           </button>
-        </form>
+        </ValidatedForm>
       </div>
     </div>
   );
