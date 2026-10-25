@@ -65,8 +65,8 @@ async function createMemberInternal(actor: Actor, input: CreateMemberInput) {
 
   const emailTrimmed = input.email.trim().toLowerCase();
   const rawPassword = input.password?.trim() || crypto.randomBytes(12).toString('base64url');
-  if (rawPassword.length < 6) {
-    return { success: false as const, code: 'VALIDATION' as const, error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.' };
+  if (rawPassword.length < 15) {
+    return { success: false as const, code: 'VALIDATION' as const, error: 'Mật khẩu phải có độ dài tối thiểu 15 ký tự.' };
   }
 
   const passwordHash = await bcrypt.hash(rawPassword, 10);

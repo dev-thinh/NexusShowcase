@@ -1,4 +1,4 @@
-export type ActionErrorCode = 'VALIDATION' | 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'CONFLICT' | 'INTERNAL';
+export type ActionErrorCode = 'VALIDATION' | 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'CONFLICT' | 'INTERNAL' | 'RATE_LIMITED';
 
 export type ActionResult<T, Detail = never> =
   | { success: true; data: T }

@@ -63,7 +63,7 @@ test('admin uses modal slots and a reusable library without repeating photos bet
       expect(publicGallery.photos.some((photo: { src: string }) => photo.src === uploaded)).toBe(false);
       expect(publicGallery.photos.filter((photo: { slot: number }) => photo.slot >= 6)).toHaveLength(1);
     } finally { await guest.close(); }
-    expect((await page.request.put('/api/home/moments', { data: { version: 0, photos: [] } })).status()).toBe(409);
+    expect((await page.request.put('/api/home/moments', { headers: { Origin: new URL(page.url()).origin }, data: { version: 0, photos: [] } })).status()).toBe(409);
 
     await page.reload();
     await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();

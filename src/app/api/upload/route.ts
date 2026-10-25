@@ -2,6 +2,7 @@ import { uploadFileAction } from '@/features/assets/server/actions';
 import { getActor } from '@/features/identity/server/actor';
 import { consumeRateLimit } from '@/features/identity/server/rate-limit';
 import { NextRequest, NextResponse } from 'next/server';
+import { isSameOriginMutation } from '@/server/http/mutation-request';
 
 // Allow the largest supported file (25 MiB) plus multipart headers/fields.
 const maxBodyBytes = 26 * 1024 * 1024;
@@ -13,8 +14,9 @@ export async function POST(req: NextRequest) {
     if (!actor) {
       return NextResponse.json({ error: 'Chỉ thành viên nòng cốt và Admin được tải tệp.', code: 'UNAUTHORIZED' }, { status: 403 });
     }
-    const throttle = await consumeRateLimit({ scope: 'upload', key: actor.id, limit: 60, windowMs: 60_000 });
+    const throttle = await consumeRateLimit({ scope: 'upload-request', key: actor.id, limit: 60, windowMs: 60_000 });
     if (!throttle.allowed) return NextResponse.json({ error: 'Bạn tải tệp quá nhanh. Vui lòng thử lại sau.', code: 'RATE_LIMITED' }, { status: 429, headers: { 'Retry-After': String(throttle.retryAfterSeconds) } });
+    if (!isSameOriginMutation(req)) return NextResponse.json({ error: 'Nguồn yêu cầu không hợp lệ.', code: 'FORBIDDEN' }, { status: 403 });
     if (Number(req.headers.get('content-length')) > maxBodyBytes) return tooLarge();
     if (!req.body) return NextResponse.json({ error: 'Dữ liệu tải lên không hợp lệ.', code: 'VALIDATION' }, { status: 400 });
     let bytes = 0;
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
 
     if (!result.success) {
       const status =
-        result.code === 'UNAUTHORIZED' || result.code === 'FORBIDDEN'
+        result.code === 'RATE_LIMITED' ? 429 : result.code === 'UNAUTHORIZED' || result.code === 'FORBIDDEN'
           ? 403
           : result.code === 'INTERNAL'
           ? 500

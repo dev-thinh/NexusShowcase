@@ -2,6 +2,7 @@ import { prisma } from '@/server/db/prisma';
 import bcrypt from 'bcryptjs';
 import { changePasswordSchema, type ChangePasswordInput } from '../model/password-input';
 import type { Actor } from '../model/session';
+import { consumeRateLimit } from './rate-limit';
 export async function changePassword(actor: Actor, input: ChangePasswordInput) {
   const userId = actor?.id;
   if (!userId) {
@@ -12,6 +13,9 @@ export async function changePassword(actor: Actor, input: ChangePasswordInput) {
   if (!parsed.success) {
     return { success: false as const, code: 'VALIDATION' as const, error: parsed.error.issues[0]?.message || 'Dữ liệu không hợp lệ.' };
   }
+
+  const throttle = await consumeRateLimit({ scope: 'password-change', key: userId, limit: 10, windowMs: 15 * 60_000 });
+  if (!throttle.allowed) return { success: false as const, code: 'FORBIDDEN' as const, error: 'Bạn đã thử đổi mật khẩu quá nhiều lần. Vui lòng thử lại sau.' };
 
   const user = await prisma.user.findUnique({
     where: { id: userId },

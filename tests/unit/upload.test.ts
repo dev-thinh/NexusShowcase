@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('@/features/identity/server/auth', () => ({ auth: vi.fn() }));
 vi.mock('server-only', () => ({}));
+vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: async () => ({ allowed: true, retryAfterSeconds: 0 }) }));
 vi.mock('@/features/assets/server/registry', () => ({ registerUploadedAsset: vi.fn() }));
 vi.mock('@/server/db/prisma', () => ({ prisma: { user: { findUnique: async () => {
   const session = await vi.mocked(auth).mock.results.at(-1)?.value as { user?: { id: string; role: string; mustChangePassword?: boolean } } | null;

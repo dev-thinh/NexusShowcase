@@ -26,6 +26,7 @@ describe('Browser Hardening & Security Headers', () => {
     expect(csp).toContain('https://www.loom.com');
     expect(csp).toContain('https://drive.google.com');
     expect(csp).toContain('https://fonts.googleapis.com');
+    expect(csp).not.toContain("'unsafe-eval'");
   });
 
   it('ensures login form contains no hardcoded default credentials in source code', () => {

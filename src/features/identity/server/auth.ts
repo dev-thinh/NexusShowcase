@@ -35,7 +35,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (!parsed.success) return null;
 
         const identifier = parsed.data.email.trim().toLowerCase();
-        const throttle = await consumeRateLimit({ scope: 'login', key: identifier, limit: 10, windowMs: 15 * 60_000 });
+        const throttleKey = identifier.replace(/@(robotics|nexus)\.hcmus\.edu\.vn$/, '');
+        const throttle = await consumeRateLimit({ scope: 'login', key: throttleKey, limit: 10, windowMs: 15 * 60_000 });
         if (!throttle.allowed) return null;
         const aliases = [...new Set([identifier, `${identifier}@robotics.hcmus.edu.vn`, `${identifier}@nexus.hcmus.edu.vn`])];
         // Read every matching identity (including inactive rows): never pick an

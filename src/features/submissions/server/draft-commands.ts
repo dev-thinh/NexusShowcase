@@ -14,6 +14,7 @@ import type { ActionResult } from '@/shared/lib/action-result';
 import { slugify } from '@/shared/lib/slugify';
 import { cuidSchema, showcaseItemIdSchema } from '@/shared/lib/validation';
 import { Prisma } from '@prisma/client';
+import { canReferenceAssets } from '@/features/assets/server/reference-access';
 
 
 async function saveDraftInternal(
@@ -28,6 +29,7 @@ async function saveDraftInternal(
   const parsed = showcaseDraftInputSchema.safeParse(normalized);
   if (!parsed.success) return validationFailure(parsed.error);
   const values = parsed.data;
+  if (!(await canReferenceAssets(user, values))) return { success: false, code: 'FORBIDDEN', error: 'Bạn không có quyền sử dụng một tệp trong bản nháp.' };
   if (values.categoryId) {
     const category = await prisma.category.findUnique({ where: { id: values.categoryId }, select: { slug: true } });
     if (!category || category.slug !== (values.type === 'RESEARCH_PAPER' ? 'bai-bao-khoa-hoc' : 'robotics-iot')) return { success: false, code: 'VALIDATION', error: 'Chuyên mục không khớp với loại công trình.' };

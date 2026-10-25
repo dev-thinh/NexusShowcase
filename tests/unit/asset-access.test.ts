@@ -39,3 +39,15 @@ it('allows gallery photos only when publicly placed', async () => {
   mocks.galleries.mockResolvedValue([{ photos: [{ src: photo, visible: true, slot: 0 }] }]);
   expect(await getAssetAccess(photo)).toEqual({ allowed: true, public: true });
 });
+it.each(['victim', null])('denies preexisting self-granting draft references to a registered asset owned by %s', async ownerId => {
+  mocks.registry.mockResolvedValue({ ownerId, private: true });
+  mocks.actor.mockResolvedValue({ id: 'attacker', role: 'CORE_MEMBER' });
+  mocks.rows.mockResolvedValue([{ creatorId: 'attacker', status: 'DRAFT', visibility: 'PRIVATE', live: [url], drafts: [url] }]);
+  expect((await getAssetAccess(url)).allowed).toBe(false);
+});
+it('preserves the explicit editor privilege to review registered draft media', async () => {
+  mocks.registry.mockResolvedValue({ ownerId: 'author', private: true });
+  mocks.actor.mockResolvedValue({ id: 'reviewer', role: 'EDITOR' });
+  mocks.rows.mockResolvedValue([{ creatorId: 'author', status: 'PENDING_REVIEW', visibility: 'PRIVATE', live: [url], drafts: [] }]);
+  expect(await getAssetAccess(url)).toEqual({ allowed: true, public: false });
+});

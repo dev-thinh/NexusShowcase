@@ -4,13 +4,14 @@ import { getActor } from '@/features/identity/server/actor';
 import { assertAssetPath } from './asset-path';
 import { findRegisteredAsset } from './registry';
 import { inspectAssetReferences } from './references';
+import type { Actor } from '@/features/identity/model/session';
 
 type ItemReference = { creatorId: string; status: string; visibility: string; live: unknown; drafts: unknown };
 const denied = { allowed: false, public: false } as const;
 const hasReference = (value: unknown, url: string) => inspectAssetReferences(value).urls.has(url);
 
 /** Public placement grants public reads; drafts and history never grant anonymous reads. */
-export async function getAssetAccess(url: string): Promise<{ allowed: boolean; public: boolean }> {
+export async function getAssetAccess(url: string, authenticatedActor?: Actor): Promise<{ allowed: boolean; public: boolean }> {
   assertAssetPath(url);
   const registered = await findRegisteredAsset(url);
   if (registered?.deletedAt || registered?.deletionToken) return denied;
@@ -34,9 +35,13 @@ export async function getAssetAccess(url: string): Promise<{ allowed: boolean; p
     ]);
     if (avatar || galleries.some(gallery => Array.isArray(gallery.photos) && gallery.photos.some(photo => photo && typeof photo === 'object' && !Array.isArray(photo) && photo.src === url && photo.visible === true && photo.slot !== null))) return { allowed: true, public: true };
   }
-  const actor = await getActor();
+  const actor = authenticatedActor ?? await getActor();
   if (!actor) return denied;
   if (registered?.ownerId === actor.id || actor.role === 'ADMIN') return { allowed: true, public: false };
-  if (references.some(item => (item.liveAsset && item.status === 'PUBLISHED') || ((item.liveAsset || item.draftAsset) && (item.creatorId === actor.id || actor.role === 'EDITOR')))) return { allowed: true, public: false };
+  if (references.some(item => item.liveAsset && item.status === 'PUBLISHED')) return { allowed: true, public: false };
+  // A user-controlled draft cannot override the registry's owner, including
+  // references persisted before write-time authorization was introduced.
+  if (registered && actor.role !== 'EDITOR') return denied;
+  if (references.some(item => (item.liveAsset || item.draftAsset) && (item.creatorId === actor.id || actor.role === 'EDITOR'))) return { allowed: true, public: false };
   return denied;
 }

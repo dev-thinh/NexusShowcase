@@ -17,6 +17,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 vi.mock('@/features/identity/server/auth', () => ({ auth: mocks.auth }));
+vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: vi.fn(async () => ({ allowed: true, retryAfterSeconds: 0 })) }));
 vi.mock('@/server/db/prisma', () => ({ prisma: mocks.prisma }));
 vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }));
 vi.mock('server-only', () => ({}));

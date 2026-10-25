@@ -3,6 +3,7 @@ import { getActor } from '@/features/identity/server/actor';
 import { commandFailure } from '@/server/db/command-error';
 import type { UploadResult } from '../model/contracts';
 import { uploadAsset } from './upload-command';
+import { consumeRateLimit } from '@/features/identity/server/rate-limit';
 export type { UploadResult } from '../model/contracts';
 export async function uploadFileAction(formData: FormData): Promise<UploadResult> {
   const actor = await getActor(['CORE_MEMBER', 'ADMIN']);
@@ -11,5 +12,9 @@ export async function uploadFileAction(formData: FormData): Promise<UploadResult
   const file = formData.get('file');
   const kind = formData.get('type');
   if (!file || typeof file === 'string' || !['thumbnail', 'pdf', 'resource'].includes(String(kind))) return { success: false, code: 'VALIDATION', error: 'Vui lòng chọn tệp và loại tệp hợp lệ.' };
-  try { return await uploadAsset(file, kind as 'thumbnail' | 'pdf' | 'resource', actor.id); } catch (error) { return commandFailure('asset.upload', error, { actorId: actor.id }); }
+  try {
+    const throttle = await consumeRateLimit({ scope: 'upload', key: actor.id, limit: 60, windowMs: 60_000 });
+    if (!throttle.allowed) return { success: false, code: 'RATE_LIMITED', error: 'Bạn tải tệp quá nhanh. Vui lòng thử lại sau.' };
+    return await uploadAsset(file, kind as 'thumbnail' | 'pdf' | 'resource', actor.id);
+  } catch (error) { return commandFailure('asset.upload', error, { actorId: actor.id }); }
 }
