@@ -1,8 +1,10 @@
 'use client';
 
 import { MediaImage } from '@/shared/ui/media-image';
+import { FilePicker } from '@/shared/ui/file-picker';
+import { notifySuccess } from '@/shared/dialogs/success';
 
-import { Check, ChevronLeft, ChevronRight, ImageMinus, ImagePlus, Loader2, Save, Trash2, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, ImageMinus, Loader2, Save, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Modal } from '@/shared/ui/modal';
@@ -67,21 +69,34 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
     setSelectedSlot(target);
   }
 
-  async function upload(file: File | undefined) {
-    if (!file || locked || photos.length >= 40) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024 || !file.size) {
-      setError('Chọn ảnh JPG, PNG hoặc WebP, tối đa 5 MB.'); return;
+  async function upload(files: File[]) {
+    if (!files.length || locked) return;
+    if (files.length > 40 - photos.length) {
+      setError(`Thư viện tối đa 40 ảnh. Bạn chỉ có thể thêm ${40 - photos.length} ảnh nữa.`); return;
     }
     setError(''); setBusy('upload');
+    const errors: string[] = [];
+    let uploadedCount = 0;
     try {
-      const form = new FormData(); form.set('file', file); form.set('type', 'thumbnail');
-      const response = await fetch('/api/upload', { method: 'POST', body: form });
-      const result = await response.json();
-      if (!response.ok || typeof result.url !== 'string') throw new Error(result.error || 'Không tải được ảnh.');
-      const name = file.name.replace(/\.[^.]+$/, '').slice(0, 160).trim() || 'Khoảnh khắc mới';
-      setPhotos(current => [...current, { id: crypto.randomUUID(), src: result.url, title: name, alt: name, shape: 'wide', tilt: '-2deg', visible: false, slot: null }]);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Không tải được ảnh. Vui lòng thử lại.'); }
-    finally { setBusy(null); }
+      for (const file of files) {
+        if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size > 5 * 1024 * 1024 || !file.size) {
+          errors.push(`${file.name}: Chọn ảnh JPG, PNG hoặc WebP, tối đa 5 MB.`);
+          continue;
+        }
+        try {
+          const form = new FormData(); form.set('file', file); form.set('type', 'thumbnail');
+          const response = await fetch('/api/upload', { method: 'POST', body: form });
+          const result = await response.json();
+          if (!response.ok || typeof result.url !== 'string') throw new Error(result.error || 'Không tải được ảnh.');
+          const name = file.name.replace(/\.[^.]+$/, '').slice(0, 160).trim() || 'Khoảnh khắc mới';
+          setPhotos(current => [...current, { id: crypto.randomUUID(), src: result.url, title: name, alt: name, shape: 'wide', tilt: '-2deg', visible: false, slot: null }]);
+          uploadedCount += 1;
+        } catch (cause) {
+          errors.push(`${file.name}: ${cause instanceof Error ? cause.message : 'Không tải được ảnh. Vui lòng thử lại.'}`);
+        }
+      }
+      if (uploadedCount && !errors.length) await notifySuccess(`Đã tải ${uploadedCount} ảnh vào thư viện chỉnh sửa. Bấm Lưu thay đổi để lưu thư viện.`);
+    } finally { setError(errors.join('\n')); setBusy(null); }
   }
 
   async function save() {
@@ -113,7 +128,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
           <button type="button" className={mobilePanel === 'details' ? 'action-primary-detail' : 'action-secondary-detail'} disabled={locked} aria-pressed={mobilePanel === 'details'} onClick={() => setMobilePanel('details')}>Sửa ảnh</button>
         </div>
         <div ref={contentRef} className="moments-editor__scroll">
-          {error && <p role="alert" className="mb-4 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
+          {error && <p role="alert" className="mb-4 whitespace-pre-line rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
           <fieldset disabled={locked} className="moments-editor__workspace" data-panel={mobilePanel}>
             <legend className="sr-only">Ảnh đang hiển thị và thư viện ảnh</legend>
             <section className="moments-editor__stage" aria-label="Bố trí ảnh trang chủ">
@@ -128,7 +143,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                     return <button key={slot} type="button" className={`moments-editor__slot${photo ? '' : ' moments-editor__slot--empty'}`} data-moment-slot={slot} data-moment-drag={photo?.id} data-drag-source={drag?.photoId === photo?.id && !!photo ? 'true' : undefined} data-drop-target={drag?.over === slot ? 'true' : undefined} aria-label={`${slotLabel(slot)}: ${photo?.title ?? 'Trống'}`} aria-pressed={selectedSlot === slot} onDragStart={event => event.preventDefault()} onClick={() => { setSelectedSlot(slot); setMobilePanel(photo ? 'details' : 'arrange'); }}>
                       {photo ? <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <MediaImage src={photo.src} alt={photo.alt} width={180} height={110} draggable={false} />
+                        <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={110} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} draggable={false} />
                         <span className="moments-editor__slot-title">{photo.title}</span>
                       </> : <MediaImage className="h-full w-full" alt="Vị trí ảnh trống" />}
                       <span className="moments-editor__slot-number">{column + 1}</span>
@@ -144,7 +159,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                 <div className="moments-editor__preview-stage">
                   <figure className={`moments-editor__preview-card moment-photo moment-photo--${research ? 'wide' : selected.shape}`} aria-label="Xem trước ảnh" data-preview-shape={research ? 'wide' : selected.shape}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <MediaImage src={selected.src} alt={selected.title} width={320} height={180} draggable={false} />
+                    <MediaImage optimized src={selected.src} alt={selected.title} width={320} height={180} sizes="320px" draggable={false} />
                     <figcaption className="moment-photo__caption">{selected.title}</figcaption>
                   </figure>
                 </div>
@@ -165,14 +180,14 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                 <h4 className="font-semibold">Thư viện ảnh <span className="text-sm font-normal text-slate-500">{photos.length}/40</span></h4>
                 <div className="moments-editor__library-actions">
                   <CustomSelect className="moments-editor__filter" ariaLabel="Lọc thư viện ảnh" disabled={locked} value={unusedOnly ? 'unused' : 'all'} onChange={value => setUnusedOnly(value === 'unused')} options={[{ value: 'all', label: 'Tất cả' }, { value: 'unused', label: 'Chưa sử dụng' }]} />
-                  <label className="action-secondary-detail moments-editor__button moments-editor__upload"><ImagePlus size={16} aria-hidden="true" />{busy === 'upload' ? 'Đang tải…' : 'Tải ảnh mới'}<input type="file" className="sr-only" disabled={photos.length >= 40} accept="image/jpeg,image/png,image/webp" aria-label="Tải ảnh mới vào thư viện" onChange={event => { void upload(event.target.files?.[0]); event.target.value = ''; }} /></label>
+                  <FilePicker label="Tải ảnh mới" multiple busy={busy === 'upload'} showFileName={false} disabled={locked || photos.length >= 40} accept="image/jpeg,image/png,image/webp" aria-label="Tải ảnh mới vào thư viện" onChange={event => { const files = Array.from(event.target.files ?? []); void upload(files); }} />
                 </div>
               </div>
               {library.length === 0 ? <p className="py-6 text-center text-sm text-slate-500">{unusedOnly ? 'Không có ảnh chưa sử dụng.' : 'Thư viện chưa có ảnh.'}</p> : <div className="moments-editor__library-grid">
                 {library.map(photo => <div key={photo.id} className="moments-editor__asset">
                   <button type="button" className="moments-editor__asset-select" data-moment-drag={photo.id} data-drag-source={drag?.photoId === photo.id ? 'true' : undefined} aria-label={`Chọn ảnh: ${photo.title}`} onDragStart={event => event.preventDefault()} onClick={() => choose(photo)}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <MediaImage src={photo.src} alt={photo.alt} width={180} height={110} loading="lazy" draggable={false} />
+                    <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={120} sizes="(max-width: 767px) 30vw, 200px" loading="lazy" draggable={false} />
                     {photo.slot !== null && <span className="moments-editor__used"><Check size={12} aria-hidden="true" />{research ? 'Ảnh' : photo.slot < 6 ? 'Trên' : 'Dưới'} {photo.slot % 6 + 1}</span>}
                     <span className="moments-editor__asset-title">{photo.title}</span>
                   </button>
@@ -188,7 +203,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
         </div></div>
         {drag && draggedPhoto && createPortal(<div className="moments-drag-preview" style={{ left: drag.x - drag.offsetX, top: drag.y - drag.offsetY, width: drag.width, height: drag.height }} aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <MediaImage src={draggedPhoto.src} alt="" width={112} height={76} draggable={false} />
+          <MediaImage optimized src={draggedPhoto.src} alt="" width={180} height={120} sizes="(max-width: 767px) 30vw, 200px" draggable={false} />
         </div>, document.body)}
       </div>
     </Modal>

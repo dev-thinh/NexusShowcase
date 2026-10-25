@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { prisma } from '../fixtures/database';
 const session = vi.hoisted(() => ({ authenticated: false }));
+vi.mock('next/navigation', async original => ({ ...await original<typeof import('next/navigation')>(), useRouter: () => ({ refresh: vi.fn(), replace: vi.fn() }), usePathname: () => '/members/author' }));
 vi.mock('@/features/identity/server/session', () => ({ getSession: async () => session.authenticated ? { user: { id: 'viewer', role: 'MEMBER' } } : null }));
 vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => null }));
 vi.mock('@/shared/ui/academic-footer', () => ({ AcademicFooter: () => null }));

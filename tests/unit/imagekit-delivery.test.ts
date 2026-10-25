@@ -2,6 +2,7 @@ import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const filesystem = vi.hoisted(() => ({ readFile: vi.fn(), mkdir: vi.fn(), writeFile: vi.fn() }));
 vi.mock('fs/promises', () => filesystem);
 import { readStoredAsset } from '@/features/assets/server/delivery';
+vi.mock('@/features/assets/server/registry', () => ({ registerUploadedAsset: vi.fn() }));
 import { writeStoredAsset } from '@/features/assets/server/storage';
 
 beforeEach(() => {
@@ -15,7 +16,11 @@ it('reads cloud bytes without reading disk', async () => {
   const request = vi.fn().mockResolvedValue(new Response('cloud bytes'));
   vi.stubGlobal('fetch', request);
   expect(Buffer.from(await readStoredAsset('/uploads/resources/file.zip')).toString()).toBe('cloud bytes');
-  expect(request.mock.calls[0][0]).toBe('https://ik.imagekit.io/test/nexus-showcase/uploads/resources/file.zip?tr=orig-true');
+  const delivered = new URL(request.mock.calls[0][0]);
+  expect(delivered.pathname).toBe('/test/nexus-showcase/uploads/resources/file.zip');
+  expect(delivered.searchParams.get('tr')).toBe('orig-true');
+  expect(delivered.searchParams.get('ik-s')).toMatch(/^[a-f0-9]{40}$/);
+  expect(Number(delivered.searchParams.get('ik-t'))).toBeGreaterThan(Date.now() / 1000);
   expect(filesystem.readFile).not.toHaveBeenCalled();
 });
 it('keeps old local assets available before migration', async () => {

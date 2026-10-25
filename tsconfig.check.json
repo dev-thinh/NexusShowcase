@@ -1,0 +1,15 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "types/typecheck-env.d.ts",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "tests/**/*.ts",
+    "tests/**/*.tsx",
+    "scripts/**/*.ts",
+    "prisma/**/*.ts",
+    "*.config.ts",
+    "*.config.mts"
+  ],
+  "exclude": ["node_modules", ".next", ".next-preview", ".next-harness"]
+}

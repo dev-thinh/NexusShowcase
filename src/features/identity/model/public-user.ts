@@ -9,6 +9,7 @@ export const publicUserSelect = {
   linkedinUrl: true,
   googleScholarUrl: true,
   portfolioUrl: true,
+  profileLinks: true,
   role: true,
 } satisfies Prisma.UserSelect;
 
@@ -28,5 +29,6 @@ export type PublicUser = {
   linkedinUrl: string | null;
   googleScholarUrl: string | null;
   portfolioUrl: string | null;
+  profileLinks?: unknown;
   role: Role;
 };

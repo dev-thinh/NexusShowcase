@@ -7,7 +7,7 @@ vi.mock('@/features/identity/server/session', () => ({ getSession: mocks.session
 vi.mock('@/features/publications/server/queries', () => ({ getHomePublications: mocks.publications, listPublications: vi.fn() }));
 vi.mock('@/features/members/server/queries', () => ({ getHomeMembers: mocks.members }));
 import HomePage from '@/app/(shell)/(site)/page';
-it('does not start home section queries before the visitor approaches them', async () => {
+it('renders the home shell without waiting for client section requests', async () => {
   await HomePage({ searchParams: Promise.resolve({}) });
   await Promise.resolve();
   expect(mocks.publications).not.toHaveBeenCalled();

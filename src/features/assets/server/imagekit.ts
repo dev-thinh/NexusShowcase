@@ -1,4 +1,5 @@
 import { assertAssetPath, getAssetStorageProvider } from './asset-path';
+import { createHmac } from 'node:crypto';
 
 export type ImageKitConfig = { privateKey: string; endpoint: string; folder: string };
 export function getImageKitConfig(force = false): ImageKitConfig | null {
@@ -16,6 +17,14 @@ export function imageKitObject(localUrl: string, config: ImageKitConfig) {
   return { filePath, folder: filePath.slice(0, filePath.lastIndexOf('/')), fileName: filePath.split('/').at(-1)!, url: `${config.endpoint}${filePath}?tr=orig-true` };
 }
 
+/** Origin signatures stay server-side; clients receive bytes from the permission gateway. */
+export function signedImageKitUrl(localUrl: string, config: ImageKitConfig, expiresAt = Math.floor(Date.now() / 1000) + 120) {
+  const object = imageKitObject(localUrl, config);
+  const unsigned = object.url.slice(`${config.endpoint}/`.length);
+  const signature = createHmac('sha1', config.privateKey).update(`${unsigned}${expiresAt}`).digest('hex');
+  return `${object.url}&ik-t=${expiresAt}&ik-s=${signature}`;
+}
+
 export async function uploadImageKitAsset(localUrl: string, bytes: Uint8Array, config: ImageKitConfig) {
   const object = imageKitObject(localUrl, config);
   const form = new FormData();
@@ -24,6 +33,7 @@ export async function uploadImageKitAsset(localUrl: string, bytes: Uint8Array, c
   form.set('folder', object.folder);
   form.set('useUniqueFileName', 'false');
   form.set('overwriteFile', 'false');
+  form.set('isPrivateFile', 'true');
   const response = await fetch('https://upload.imagekit.io/api/v1/files/upload', {
     method: 'POST', headers: { Authorization: `Basic ${Buffer.from(`${config.privateKey}:`).toString('base64')}` },
     body: form, signal: AbortSignal.timeout(90_000),
@@ -36,10 +46,14 @@ export async function uploadImageKitAsset(localUrl: string, bytes: Uint8Array, c
 }
 
 /** Only used to remove our newly-created connectivity probe, never existing media. */
-export async function deleteImageKitProbe(fileId: string, config: ImageKitConfig) {
+export async function deleteRegisteredImageKitAsset(fileId: string, config: ImageKitConfig) {
   if (!/^[a-zA-Z0-9_-]+$/.test(fileId)) throw new Error('Invalid ImageKit file ID');
   const response = await fetch(`https://api.imagekit.io/v1/files/${encodeURIComponent(fileId)}`, {
     method: 'DELETE', headers: { Authorization: `Basic ${Buffer.from(`${config.privateKey}:`).toString('base64')}` }, signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) throw new Error(`ImageKit probe cleanup failed (${response.status})`);
+}
+
+export async function deleteImageKitProbe(fileId: string, config: ImageKitConfig) {
+  return deleteRegisteredImageKitAsset(fileId, config);
 }

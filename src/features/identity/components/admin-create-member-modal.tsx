@@ -2,303 +2,86 @@
 
 import { createMemberAction } from '@/features/identity/server/member-actions';
 import { Modal } from '@/shared/ui/modal';
-import {
-AlertCircle,
-Check,
-CheckCircle2,
-Copy,
-GraduationCap,
-KeyRound,
-Loader2,
-Mail,
-Shield,
-User,
-UserCheck,
-UserPlus,
-} from 'lucide-react';
+import { CustomSelect } from '@/shared/ui/custom-select';
+import { SuccessNotice } from '@/shared/dialogs/success-notice';
+import { notifySuccess } from '@/shared/dialogs/success';
+import { Copy, Eye, EyeOff, Loader2, UserPlus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useId, useRef, useState } from 'react';
+import { createMemberInputSchema } from '../model/member-input';
+import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
+
+const inputClass = 'min-h-11 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]/30';
+const labelClass = 'mb-1.5 block text-sm font-semibold text-slate-800';
 
 export function AdminCreateMemberModal() {
   const router = useRouter();
+  const id = useId();
+  const submitting = useRef(false);
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [copying, setCopying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [temporaryPassword, setTemporaryPassword] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
-
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [studentId, setStudentId] = useState('');
   const [role, setRole] = useState<'MEMBER' | 'CORE_MEMBER'>('MEMBER');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleOpen = () => {
-    setError(null);
-    setTemporaryPassword(null);
-    setCopied(false);
-    setFullName('');
-    setEmail('');
-    setStudentId('');
-    setRole('MEMBER');
-    setPassword('');
-    setIsOpen(true);
+    setError(null); setTemporaryPassword(null); setFullName(''); setEmail('');
+    setStudentId(''); setRole('MEMBER'); setPassword(''); setShowPassword(false); setIsOpen(true);
   };
-
-  const handleCopy = () => {
-    if (temporaryPassword) {
-      navigator.clipboard.writeText(temporaryPassword);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
+  const handleCopy = async () => {
+    if (!temporaryPassword || copying) return;
+    setCopying(true); setError(null);
+    try { await navigator.clipboard.writeText(temporaryPassword); await notifySuccess('Đã sao chép mật khẩu tạm thời.'); }
+    catch { setError('Không sao chép được mật khẩu. Vui lòng thử lại.'); }
+    finally { setCopying(false); }
   };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fullName.trim() || !email.trim()) {
-      setError('Vui lòng nhập họ tên và tên đăng nhập/email.');
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    const res = await createMemberAction({
-      fullName: fullName.trim(),
-      email: email.trim(),
-      studentId: studentId.trim() || undefined,
-      role,
-      password: password.trim() || undefined,
-    });
-
-    setLoading(false);
-
-    if (!res.success) {
-      setError(res.error || 'Tạo tài khoản thất bại');
-    } else {
-      setTemporaryPassword(res.data.temporaryPassword);
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    if (submitting.current) return;
+    submitting.current = true; setLoading(true); setError(null);
+    try {
+      const result = await createMemberAction({ fullName: fullName.trim(), email: email.trim(), studentId: studentId.trim() || undefined, role, password: password.trim() || undefined });
+      if (!result.success) { setError(result.error || 'Không tạo được tài khoản. Vui lòng thử lại.'); return; }
+      setTemporaryPassword(result.data.temporaryPassword);
       router.refresh();
-    }
+    } catch { setError('Không kết nối được. Vui lòng thử lại.'); }
+    finally { submitting.current = false; setLoading(false); }
   };
 
-  return (
-    <>
-      <button
-        onClick={handleOpen}
-        className="action-primary-detail"
-      >
-        <UserPlus className="w-4 h-4 text-white/80" />
-        <span>Thêm thành viên</span>
-      </button>
-
-      <Modal
-        isOpen={isOpen}
-        onClose={() => !loading && setIsOpen(false)}
-        title="Thêm thành viên"
-        description="Cấp quyền truy cập hệ thống nghiên cứu cho sinh viên hoặc nghiên cứu viên."
-      >
-        {temporaryPassword ? (
-          <div className="space-y-4 py-2">
-            <div className="p-4 bg-[#FFFFFF] border border-slate-200 rounded-md text-xs space-y-2">
-              <div className="flex items-center gap-2 text-[#1F2937] font-semibold text-sm">
-                <CheckCircle2 className="w-5 h-5 text-[#1F2937]" />
-                <span>Tài khoản đã được tạo thành công!</span>
-              </div>
-              <p className="text-[#1F2937] leading-relaxed">
-                Tài khoản <strong>{email}</strong> đã sẵn sàng. Hãy sao chép mật khẩu tạm thời dưới đây và gửi cho thành viên. Thành viên sẽ được yêu cầu đổi mật khẩu ở lần đăng nhập đầu tiên.
-              </p>
-            </div>
-
-            <div className="p-3.5 bg-[#FFFFFF] border border-slate-200 rounded-md flex items-center justify-between">
-              <div>
-                <span className="block text-[11px] font-semibold text-[#1F2937] uppercase tracking-wider">Mật khẩu tạm thời</span>
-                <span className="text-sm font-mono font-semibold text-[#1F2937]">{temporaryPassword}</span>
-              </div>
-              <button
-                type="button"
-                onClick={handleCopy}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-xs font-semibold text-[#1F2937] hover:bg-[#FFFFFF] transition-colors shadow-2xs"
-              >
-                {copied ? <Check className="w-3.5 h-3.5 text-[#1F2937]" /> : <Copy className="w-3.5 h-3.5 text-[#1F2937]" />}
-                <span>{copied ? 'Đã sao chép' : 'Sao chép'}</span>
-              </button>
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                onClick={() => setIsOpen(false)}
-                className="action-primary-detail"
-              >
-                Hoàn tất
-              </button>
-            </div>
+  return <>
+    <button type="button" onClick={handleOpen} className="action-primary-detail"><UserPlus className="h-4 w-4" aria-hidden="true" />Thêm thành viên</button>
+    <Modal isOpen={isOpen} onClose={() => setIsOpen(false)} closeDisabled={loading || copying} title={temporaryPassword ? 'Thành công' : 'Thêm thành viên'} description={temporaryPassword ? undefined : 'Tạo tài khoản và chọn quyền truy cập.'} className={temporaryPassword ? '!rounded-2xl' : '!max-w-2xl !rounded-2xl'}>
+      {temporaryPassword ? <div className="space-y-4">
+        <SuccessNotice message={`Đã tạo tài khoản ${email.trim()}. Hãy sao chép mật khẩu tạm thời để gửi cho thành viên.`} />
+        {error && <p role="alert" className="text-sm text-rose-800">{error}</p>}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50 p-4 text-left">
+          <div className="min-w-0 flex-1"><p className="mb-1 text-sm text-slate-500">Mật khẩu tạm thời</p><p className="break-all font-mono text-base font-semibold text-slate-900">{temporaryPassword}</p></div>
+          <button type="button" disabled={copying} onClick={() => void handleCopy()} className="action-secondary-detail disabled:opacity-50">{copying ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <Copy className="h-4 w-4" aria-hidden="true" />}Sao chép</button>
+        </div>
+        <p className="text-sm leading-6 text-slate-500">Thành viên cần đổi mật khẩu khi đăng nhập lần đầu.</p>
+        <div className="modal-footer"><button type="button" disabled={copying} onClick={() => setIsOpen(false)} className="action-primary-detail">Đã hiểu</button></div>
+      </div> : <ValidatedForm schema={createMemberInputSchema} values={{ fullName, email, studentId, role, password }} inlineErrors onSubmit={handleSubmit} className="space-y-4 text-left">
+        {error && <p id={`${id}-error`} role="alert" className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2.5 text-sm text-rose-800">{error}</p>}
+        <fieldset disabled={loading} className="space-y-4 disabled:opacity-60">
+          <div><label htmlFor={`${id}-name`} className={labelClass}>Họ và tên <span aria-hidden="true" className="text-rose-700">*</span></label><input id={`${id}-name`} name="fullName" autoComplete="name" required maxLength={200} value={fullName} onChange={event => setFullName(event.target.value)} placeholder="Nguyễn Văn A" className={inputClass} /><FieldError name="fullName" /></div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><label htmlFor={`${id}-email`} className={labelClass}>Tên đăng nhập / Email <span aria-hidden="true" className="text-rose-700">*</span></label><input id={`${id}-email`} name="email" type="text" autoComplete="off" autoCapitalize="none" spellCheck={false} required maxLength={254} value={email} onChange={event => setEmail(event.target.value)} placeholder="22120001 hoặc email" className={inputClass} /><FieldError name="email" /></div>
+            <div><label htmlFor={`${id}-student`} className={labelClass}>Mã số sinh viên <span className="font-normal text-slate-400">(tùy chọn)</span></label><input id={`${id}-student`} name="studentId" maxLength={64} value={studentId} onChange={event => setStudentId(event.target.value)} placeholder="22120001" className={inputClass} /><FieldError name="studentId" /></div>
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div
-                role="alert"
-                className="p-3 bg-[#FFFFFF] border border-slate-200 text-[#1F2937] rounded-md text-xs flex items-center gap-2"
-              >
-                <AlertCircle className="w-4 h-4 shrink-0 text-[#1F2937]" />
-                <span>{error}</span>
-              </div>
-            )}
-
-            <div>
-              <label className="block text-xs font-semibold text-[#1F2937] mb-1">
-                Họ và tên thành viên *
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 text-[#1F2937] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="VD: Nguyễn Văn A"
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 transition-colors"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-semibold text-[#1F2937] mb-1">
-                  Tên đăng nhập / Email *
-                </label>
-                <div className="relative">
-                  <Mail className="w-4 h-4 text-[#1F2937] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="VD: 22120001 hoặc email..."
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 transition-colors"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-[#1F2937] mb-1">
-                  Mã số sinh viên (MSSV)
-                </label>
-                <div className="relative">
-                  <GraduationCap className="w-4 h-4 text-[#1F2937] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                  <input
-                    type="text"
-                    value={studentId}
-                    onChange={(e) => setStudentId(e.target.value)}
-                    placeholder="VD: 22120001"
-                    className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 transition-colors"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-[#1F2937] mb-1.5">
-                Phân quyền ban đầu *
-              </label>
-              <div className="grid grid-cols-2 gap-2.5">
-                <label
-                  className={`flex items-start gap-2.5 p-3 rounded-md border text-xs cursor-pointer transition-all ${
-                    role === 'MEMBER'
-                      ? 'bg-[#FFFFFF] border-slate-200 text-[#1F2937] font-semibold'
-                      : 'bg-white border-slate-200 text-[#1F2937] hover:bg-[#FFFFFF]'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="MEMBER"
-                    checked={role === 'MEMBER'}
-                    onChange={() => setRole('MEMBER')}
-                    className="mt-0.5 accent-[#153D67]"
-                  />
-                  <div>
-                    <div className="flex items-center gap-1 font-semibold text-[#1F2937]">
-                      <UserCheck className="w-3.5 h-3.5 text-[#1F2937]" />
-                      <span>MEMBER</span>
-                    </div>
-                    <p className="text-[11px] text-[#1F2937] font-normal mt-0.5">
-                      Thành viên thông thường, sở hữu portfolio
-                    </p>
-                  </div>
-                </label>
-
-                <label
-                  className={`flex items-start gap-2.5 p-3 rounded-md border text-xs cursor-pointer transition-all ${
-                    role === 'CORE_MEMBER'
-                      ? 'bg-[#FFFFFF] border-slate-200 text-[#1F2937] font-semibold'
-                      : 'bg-white border-slate-200 text-[#1F2937] hover:bg-[#FFFFFF]'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="role"
-                    value="CORE_MEMBER"
-                    checked={role === 'CORE_MEMBER'}
-                    onChange={() => setRole('CORE_MEMBER')}
-                    className="mt-0.5 accent-[#153D67]"
-                  />
-                  <div>
-                    <div className="flex items-center gap-1 font-semibold text-[#1F2937]">
-                      <Shield className="w-3.5 h-3.5 text-[#1F2937]" />
-                      <span>CORE MEMBER</span>
-                    </div>
-                    <p className="text-[11px] text-[#1F2937] font-normal mt-0.5">
-                      Được quyền đại diện nhóm nộp bài báo/dự án
-                    </p>
-                  </div>
-                </label>
-
-
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-[#1F2937] mb-1">
-                Mật khẩu khởi tạo
-              </label>
-              <div className="relative">
-                <KeyRound className="w-4 h-4 text-[#1F2937] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
-                  type="text"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Để trống để tự động tạo mật khẩu ngẫu nhiên"
-                  className="w-full pl-9 pr-3 py-2 text-xs bg-white border border-slate-200 rounded-md focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 font-mono transition-colors"
-                />
-              </div>
-              <p className="text-[11px] text-[#1F2937] mt-1">
-                Để trống để hệ thống tự tạo mật khẩu an toàn. Thành viên sẽ phải đổi mật khẩu khi đăng nhập lần đầu.
-              </p>
-            </div>
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => setIsOpen(false)}
-                className="action-secondary-detail disabled:opacity-50"
-              >
-                Hủy
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="action-primary-detail disabled:opacity-50"
-              >
-                {loading && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                <span>{loading ? 'Đang tạo...' : 'Xác nhận tạo'}</span>
-              </button>
-            </div>
-          </form>
-        )}
-      </Modal>
-    </>
-  );
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div><label htmlFor={`${id}-role`} className={labelClass}>Vai trò</label><CustomSelect id={`${id}-role`} name="role" value={role} disabled={loading} className="[&>button]:rounded-lg" describedBy={`${id}-role-hint`} options={[{ value: 'MEMBER', label: 'Thành viên' }, { value: 'CORE_MEMBER', label: 'Thành viên chủ chốt' }]} onChange={value => setRole(value as 'MEMBER' | 'CORE_MEMBER')} /><FieldError name="role" /><p id={`${id}-role-hint`} className="mt-1.5 text-sm leading-6 text-slate-500">{role === 'CORE_MEMBER' ? 'Được đăng công trình và gửi xét duyệt.' : 'Xem nội dung và theo dõi công trình.'}</p></div>
+            <div><label htmlFor={`${id}-password`} className={labelClass}>Mật khẩu ban đầu <span className="font-normal text-slate-400">(tùy chọn)</span></label><div className="relative"><input id={`${id}-password`} name="password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" minLength={6} maxLength={128} value={password} onChange={event => setPassword(event.target.value)} aria-describedby={`${id}-password-hint`} placeholder="Để trống để tự tạo" className={`${inputClass} pr-11`} /><button type="button" aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'} aria-pressed={showPassword} onClick={() => setShowPassword(!showPassword)} className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-lg text-slate-500 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30">{showPassword ? <EyeOff className="h-4 w-4" aria-hidden="true" /> : <Eye className="h-4 w-4" aria-hidden="true" />}</button></div><FieldError name="password" /><p id={`${id}-password-hint`} className="mt-1.5 text-sm leading-6 text-slate-500">Hệ thống tự tạo nếu bỏ trống. Mật khẩu tự nhập cần ít nhất 6 ký tự.</p></div>
+          </div>
+          <p className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-500">Thành viên cần đổi mật khẩu khi đăng nhập lần đầu.</p>
+          <div className="modal-footer !justify-end"><button type="button" onClick={() => setIsOpen(false)} className="action-secondary-detail">Hủy</button><button type="submit" className="action-primary-detail">{loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> : <UserPlus className="h-4 w-4" aria-hidden="true" />}{loading ? 'Đang tạo…' : 'Tạo tài khoản'}</button></div>
+        </fieldset>
+      </ValidatedForm>}
+    </Modal>
+  </>;
 }

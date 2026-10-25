@@ -1,4 +1,4 @@
-import { MediaImage } from '@/shared/ui/media-image';
+import { MemberAvatar } from '@/shared/ui/member-avatar';
 import {
 MEMBER_GROUP_LABELS,
 type MemberDirectoryEntry,
@@ -34,13 +34,13 @@ export function MemberCard({
   return (
     <article className="panel-public group flex h-full min-w-0 flex-col p-4 transition-[border-color,box-shadow] duration-200 hover:border-border-strong hover:shadow-md focus-within:border-border-strong motion-reduce:transition-none sm:p-5">
       <header className="flex items-start gap-4">
-        <MediaImage
+        <MemberAvatar fullName={member.fullName}
             src={member.avatarUrl}
             alt=""
             width={56}
             height={56}
             loading="lazy"
-            className="h-14 w-14 shrink-0 rounded-full border border-border object-cover"
+            className="h-14 w-14 shrink-0 rounded-full border border-border object-cover text-xl"
           />
 
         <div className="min-w-0 flex-1">

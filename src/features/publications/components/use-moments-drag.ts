@@ -68,7 +68,8 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       suppressClickUntil = 0;
       const bounds = source.getBoundingClientRect();
       gesture = { photoId: source.dataset.momentDrag!, x, y, startX: x, startY: y, offsetX: x - bounds.left, offsetY: y - bounds.top, width: bounds.width, height: bounds.height, active: false, touch, pointerId };
-      timer = setTimeout(activate, touch ? 350 : 220);
+      // Mouse placement starts only after movement; a stationary press is not a drag.
+      if (touch) timer = setTimeout(activate, 350);
     };
     const move = (x: number, y: number) => {
       if (!gesture) return false;
@@ -88,6 +89,8 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
     };
     const pointerMove = (event: PointerEvent) => {
       if (gesture?.touch || gesture?.pointerId !== event.pointerId) return;
+      // Native scrollbar interactions can consume pointerup outside the photo.
+      if (!(event.buttons & 1)) { finish(false); return; }
       if (move(event.clientX, event.clientY)) event.preventDefault();
     };
     const pointerUp = (event: PointerEvent) => {
@@ -117,7 +120,7 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       if (gesture.active && event.cancelable) event.preventDefault();
       finish(true);
     };
-    const cancel = () => finish(false);
+    const cancel = () => { if (gesture) finish(false); };
     const click = (event: MouseEvent) => {
       if (event.detail > 0 && Date.now() < suppressClickUntil) { event.preventDefault(); event.stopImmediatePropagation(); suppressClickUntil = 0; }
     };
@@ -130,6 +133,7 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
     element.addEventListener('touchstart', touchStart, { passive: true });
     element.addEventListener('click', click, true);
     element.addEventListener('contextmenu', context);
+    element.addEventListener('wheel', cancel, { passive: true });
     window.addEventListener('pointermove', pointerMove, { passive: false });
     window.addEventListener('pointerup', pointerUp);
     window.addEventListener('pointercancel', pointerCancel);
@@ -144,6 +148,7 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       element.removeEventListener('touchstart', touchStart);
       element.removeEventListener('click', click, true);
       element.removeEventListener('contextmenu', context);
+      element.removeEventListener('wheel', cancel);
       window.removeEventListener('pointermove', pointerMove);
       window.removeEventListener('pointerup', pointerUp);
       window.removeEventListener('pointercancel', pointerCancel);

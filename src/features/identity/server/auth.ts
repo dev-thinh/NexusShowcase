@@ -4,12 +4,9 @@ import { reportServerError } from '@/server/observability/errors';
 import bcrypt from 'bcryptjs';
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { z } from 'zod';
-
-const loginSchema = z.object({
-  email: z.string().min(3),
-  password: z.string().min(6),
-});
+import { loginSchema } from '../model/login-input';
+import { Prisma, type User } from '@prisma/client';
+import { consumeRateLimit } from './rate-limit';
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
@@ -37,17 +34,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
-        const identifier = parsed.data.email.trim();
-        const user = await prisma.user.findFirst({
-          where: {
-            OR: [
-              { email: identifier },
-              { email: identifier.toLowerCase() },
-              { email: `${identifier.toLowerCase()}@robotics.hcmus.edu.vn` },
-              { email: `${identifier.toLowerCase()}@nexus.hcmus.edu.vn` },
-            ],
-          },
-        });
+        const identifier = parsed.data.email.trim().toLowerCase();
+        const throttle = await consumeRateLimit({ scope: 'login', key: identifier, limit: 10, windowMs: 15 * 60_000 });
+        if (!throttle.allowed) return null;
+        const aliases = [...new Set([identifier, `${identifier}@robotics.hcmus.edu.vn`, `${identifier}@nexus.hcmus.edu.vn`])];
+        // Read every matching identity (including inactive rows): never pick an
+        // arbitrary account when legacy aliases or casing overlap.
+        const users = await prisma.$queryRaw<User[]>(Prisma.sql`
+          SELECT * FROM users WHERE lower(btrim(email)) IN (${Prisma.join(aliases)}) LIMIT 2`);
+        if (users.length !== 1) return null;
+        const user = users[0];
 
         if (!user || !user.passwordHash) return null;
         if (user.status !== 'ACTIVE' || user.deletedAt) return null;

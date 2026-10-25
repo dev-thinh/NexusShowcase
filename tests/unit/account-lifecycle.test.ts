@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   prisma: {
+    $queryRaw: vi.fn(async () => []),
     $transaction: vi.fn(),
     user: {
       findUnique: vi.fn(),
@@ -34,7 +35,7 @@ const VALID_MEMBER_CUID = 'cjr012345678901234567891';
 describe('Account Lifecycle & Session State', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.prisma.$transaction.mockImplementation(callback => callback({ user: mocks.prisma.user }));
+    mocks.prisma.$transaction.mockImplementation(callback => callback({ user: mocks.prisma.user, $queryRaw: mocks.prisma.$queryRaw }));
   });
 
   describe('createMemberAction', () => {
@@ -146,7 +147,7 @@ describe('Account Lifecycle & Session State', () => {
         status: 'ACTIVE',
       });
 
-      mocks.prisma.user.update.mockResolvedValue({ id: VALID_MEMBER_CUID });
+      mocks.prisma.user.updateMany.mockResolvedValue({ count: 1 });
 
       const result = await changePasswordAction({
         currentPassword: 'tempSecret123',
@@ -155,9 +156,9 @@ describe('Account Lifecycle & Session State', () => {
 
       expect(result.success).toBe(true);
     if (!result.success) throw Error(result.error);
-      expect(mocks.prisma.user.update).toHaveBeenCalledWith(
+      expect(mocks.prisma.user.updateMany).toHaveBeenCalledWith(
         expect.objectContaining({
-          where: { id: VALID_MEMBER_CUID },
+          where: expect.objectContaining({ id: VALID_MEMBER_CUID, passwordHash: oldHash, status: 'ACTIVE', deletedAt: null }),
           data: expect.objectContaining({
             mustChangePassword: false,
             sessionVersion: { increment: 1 },
@@ -183,7 +184,7 @@ describe('Account Lifecycle & Session State', () => {
       expect(result.success).toBe(false);
     if (result.success) throw Error('Expected failure');
       expect(result.error).toContain('Mật khẩu hiện tại không chính xác');
-      expect(mocks.prisma.user.update).not.toHaveBeenCalled();
+      expect(mocks.prisma.user.updateMany).not.toHaveBeenCalled();
     });
   });
 });

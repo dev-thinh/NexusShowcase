@@ -11,7 +11,7 @@ describe('homepage photo wall', () => {
     expect(admin).toContain('aria-label="Chỉnh sửa ảnh khoảnh khắc"');
     expect(guest).not.toContain('aria-label="Chỉnh sửa ảnh khoảnh khắc"');
     expect(admin).not.toContain(defaultMoments[0].src);
-    expect(admin).toContain(defaultMoments[1].src);
+    expect(decodeURIComponent(admin)).toContain(defaultMoments[1].src);
   });
   it('handles empty galleries without animation lanes or broken images', () => {
     const html = renderToStaticMarkup(<HomeMoments initialGallery={{ photos: [], version: 1, isAdmin: true }} />);
@@ -33,7 +33,7 @@ describe('homepage photo wall', () => {
     expect(html).not.toContain('role="dialog"');
     const images = [...html.matchAll(/<img[^>]+>/g)].map(match => match[0]);
     expect(images).toHaveLength(12);
-    expect(images.every(img => img.includes('loading="lazy"') && img.includes('width=') && img.includes('height='))).toBe(true);
+    expect(images.every(img => img.includes('loading="eager"') && img.includes('?w=') && img.includes('width=') && img.includes('height='))).toBe(true);
   });
   it.each([0, 1, 2, 3, 6])('applies the per-row animation threshold with %i photos', count => {
     const html = renderToStaticMarkup(<HomeMoments initialGallery={{ version: 0, isAdmin: false, photos: defaultMoments.slice(0, count) }} />);
@@ -46,7 +46,8 @@ describe('homepage photo wall', () => {
     const html = renderToStaticMarkup(<HomeMoments initialGallery={{ version: 0, isAdmin: false, photos: defaultMoments.map((photo, index) => ({ ...photo, slot: index < 2 ? index : index + 4 })) }} />);
     expect(html).toContain('data-row="0" data-motion="false"');
     expect(html).toContain('data-row="1" data-motion="true"');
-    const [top, bottom] = html.split('data-row="1"');
+    const top = decodeURIComponent(html.slice(html.indexOf('data-row="0"'), html.indexOf('data-row="1"')));
+    const bottom = decodeURIComponent(html.slice(html.indexOf('data-row="1"')));
     expect(top).toContain(defaultMoments[0].src);
     expect(top).not.toContain(defaultMoments[2].src);
     expect(bottom).not.toContain(defaultMoments[0].src);

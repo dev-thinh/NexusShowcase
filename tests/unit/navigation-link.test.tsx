@@ -28,11 +28,8 @@ describe('tab navigation feedback', () => {
     const markup = renderToStaticMarkup(<NavigationLink href="/contact" className="h-9">Liên hệ</NavigationLink>);
     expect(markup).toContain('role="status"');
     expect(markup).toContain('Đang chuyển trang…');
-    expect(markup).toContain('absolute inset-0');
-    const overlay = markup.match(/<span[^>]*aria-hidden="true"[^>]*>/)?.[0];
-    expect(overlay).toBeDefined();
-    expect(overlay).toContain('ring-2');
-    expect(overlay).not.toMatch(/\bbg-/);
+    expect(markup).not.toContain('ring-2');
+    expect(markup).not.toContain('absolute inset-0');
     state.pending = false;
     expect(renderToStaticMarkup(<NavigationLink href="/contact">Liên hệ</NavigationLink>)).not.toContain('role="status"');
   });

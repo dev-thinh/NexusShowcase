@@ -66,7 +66,7 @@ interface TypeBadgeProps {
 
 export function TypeBadge({ type, size = 'sm', variant = 'subtle' }: TypeBadgeProps) {
   const isRobotics = type === 'PROJECT';
-  const label = isRobotics ? 'Robotics & IoT' : 'Nghiên cứu khoa học';
+  const label = type === 'ACHIEVEMENT' ? 'Thành tích' : isRobotics ? 'Robotics & IoT' : 'Nghiên cứu khoa học';
   const classes = variant === 'outline'
     ? 'bg-transparent text-[#1F2937] border-slate-200'
     : isRobotics

@@ -10,6 +10,28 @@ test('preserves navbar across route transitions', async ({ page }) => {
   await expect(page.locator('header[data-test-shell="kept"]')).toBeVisible();
 });
 
+test('switching public tabs changes page before smoothly returning to the top', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  const initialScroll = await page.evaluate(() => {
+    const samples: Array<{ pathname: string; top: number }> = [];
+    Object.assign(window, { navigationScrollSamples: samples });
+    window.addEventListener('scroll', () => samples.push({ pathname: location.pathname, top: window.scrollY }), { passive: true });
+    return window.scrollY;
+  });
+  expect(initialScroll).toBeGreaterThan(0);
+  await page.locator('nav a[href="/members"]').first().click();
+  await expect(page).toHaveURL(/\/members$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  const samples = await page.evaluate(() => (window as unknown as { navigationScrollSamples: Array<{ pathname: string; top: number }> }).navigationScrollSamples);
+  expect(samples.some(sample => sample.pathname === '/members' && sample.top > 0 && sample.top < initialScroll)).toBe(true);
+  expect(samples.some(sample => sample.pathname === '/' && sample.top < initialScroll - 1)).toBe(false);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.locator('nav a[href="/"]').first().click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+});
+
 test('shows feedback before delayed RSC and keeps the committed tab active', async ({ page }) => {
   let release!: () => void;
   const clicked = new Promise<void>(resolve => { release = resolve; });
@@ -61,7 +83,7 @@ test('latest rapid destination wins and history and modified clicks stay native'
   await network.send('Network.emulateNetworkConditions', { offline: false, latency: 700, downloadThroughput: -1, uploadThroughput: -1 });
   for (const href of ['/', '/category/robotics-iot', '/members']) await page.locator(`nav a[href="${href}"]`).first().click();
   await expect(page).toHaveURL(/\/members$/);
-  await expect(page.getByRole('heading', { name: 'Benchmark Member 000', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Benchmark Member 000 · Ban chủ nhiệm', exact: true })).toBeVisible();
   await network.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
   await network.detach();
   await page.locator('nav a[href="/contact"]').first().click();
@@ -87,7 +109,7 @@ test('home navigation displays route content', async ({ page }) => {
   ]) {
     await page.locator(`nav a[href="${href}"]`).first().click();
     await expect(page).toHaveURL(new RegExp(`${href}$`));
-    await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
+    await expect(page.getByRole(href === '/members' ? 'link' : 'heading', { name: href === '/members' ? `${title} · Ban chủ nhiệm` : title, exact: true })).toBeVisible();
   }
   await page.locator('nav a[href="/"]').first().click();
   await expect(page.locator('#home-content')).toBeVisible();

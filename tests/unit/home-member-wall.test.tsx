@@ -8,6 +8,8 @@ describe('homepage member wall', () => {
   it('shows a compact avatar list without biographies or contribution cards', () => {
     const html = renderToStaticMarkup(<HomeMemberWall members={[member(1), member(2)]} total={2} />);
     expect(html.match(/data-home-member-avatar="true"/g)).toHaveLength(2);
+    expect(html).toContain('href="/members/m1"');
+    expect(html).toContain('href="/members/m2"');
     expect(html).toContain('2 thành viên');
     expect(html).not.toContain('home-member-more');
     expect(html).not.toContain('panel-public');

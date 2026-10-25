@@ -11,7 +11,10 @@ it('uses the shared modal editor with three fixed research slots', () => {
   expect(html).toContain('aria-label="Chỉnh sửa ảnh hướng nghiên cứu"');
   expect(html.match(/data-moment-slot=/g)).toHaveLength(3);
   expect(html).toContain('Tải ảnh mới vào thư viện');
-  expect(html).toContain(defaultMoments[0].src);
+  const images = [...html.matchAll(/<img[^>]+>/g)].map(match => match[0]);
+  expect(images.length).toBeGreaterThan(0);
+  expect(images.every(img => img.includes('?w='))).toBe(true);
+  expect(decodeURIComponent(html)).toContain(defaultMoments[0].src);
   expect(html.match(/class="moments-editor__asset"/g)).toHaveLength(6);
   expect(html).toContain('Lưu thay đổi');
   expect(html).toContain('Gỡ ảnh');

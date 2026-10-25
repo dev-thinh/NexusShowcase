@@ -27,7 +27,6 @@ function PendingNavigation({ requestId }: { requestId: { current: number | null 
   }, [pending, navigation, requestId]);
   if (!pending) return null;
   return <>
-    <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[inherit] ring-2 ring-inset ring-[#153D67]" />
     <span role="status" className="sr-only">Đang chuyển trang…</span>
   </>;
 }
@@ -55,7 +54,11 @@ export function NavigationLink({ children, className = '', onNavigate, href, pre
     onNavigate?.({ preventDefault: () => { cancelled = true; event.preventDefault(); } });
     if (!cancelled) {
       const target = navigationHref(href);
-      requestId.current = navigation?.begin(target) ?? null;
+      if (navigation?.navigate?.(target, { replace: props.replace, scroll: props.scroll })) {
+        event.preventDefault();
+        return;
+      }
+      requestId.current = (props.scroll === false ? navigation?.begin(target, false) : navigation?.begin(target)) ?? null;
     }
   }}>
     {children}

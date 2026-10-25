@@ -42,6 +42,8 @@ beforeEach(() => {
     disconnect = disconnect;
   };
   vi.stubGlobal('HTMLElement', ElementStub);
+  vi.stubGlobal('requestAnimationFrame', vi.fn(() => 1));
+  vi.stubGlobal('cancelAnimationFrame', vi.fn());
   vi.stubGlobal('IntersectionObserver', Observer);
   vi.stubGlobal('MutationObserver', class { constructor(callback: typeof mutate) { mutate = callback; } observe() {} disconnect() {} });
   vi.stubGlobal('window', {
@@ -58,6 +60,36 @@ afterEach(() => vi.unstubAllGlobals());
 const mount = () => { PageReveal(); return hooks.effect?.(); };
 
 describe('page content reveal', () => {
+  it('freezes a moving click target through pointer focus and resumes after pointerup', () => {
+    mount();
+    const listener = (type: string) => vi.mocked(document.addEventListener).mock.calls.find(([name]) => name === type)![1] as (event: unknown) => void;
+    listener('pointerdown')({ target: elements[0] });
+    listener('focusin')({ target: elements[0] });
+    expect(elements[0].animation.pause).toHaveBeenCalledOnce();
+    expect(elements[0].animation.cancel).not.toHaveBeenCalled();
+    listener('pointerup')({});
+    expect(elements[0].animation.play).not.toHaveBeenCalled();
+    (vi.mocked(requestAnimationFrame).mock.calls[0][0] as () => void)();
+    expect(elements[0].animation.play).toHaveBeenCalledOnce();
+  });
+  it('releases completed animations without replaying them on later observer callbacks', () => {
+    const cleanup = mount();
+    const target = elements[0];
+    (target.animation.onfinish as unknown as () => void)();
+    intersect([{ target, isIntersecting: true }]);
+    expect(target.animate).toHaveBeenCalledOnce();
+    if (typeof cleanup === 'function') cleanup();
+    expect(target.animation.cancel).toHaveBeenCalledOnce();
+  });
+  it('waits until content is clearly inside the viewport rather than revealing at its bottom edge', () => {
+    elements = [new ElementStub(750)];
+    mount();
+    expect(elements[0].animate).not.toHaveBeenCalled();
+    expect(observe.mock.calls.some(([node]) => node === elements[0])).toBe(true);
+    intersect([{ target: elements[0], isIntersecting: true }]);
+    const options = elements[0].animate.mock.calls[0] as unknown as [unknown, { delay: number; duration: number; fill: string }];
+    expect(options[1]).toMatchObject({ delay: 100, duration: 600, fill: 'backwards' });
+  });
   it('reveals visible content immediately and waits for scroll on offscreen content', () => {
     mount();
     expect(elements[0].animate).toHaveBeenCalled();

@@ -1,12 +1,8 @@
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getSession } from '@/features/identity/server/session';
-import { MemberCard } from '@/features/members/components/member-card';
+import { HomeMemberWall } from '@/features/members/components/home-member-wall';
 import { MemberSectionHeading } from '@/features/members/components/member-section-heading';
-import {
-MEMBER_GROUP_LABELS
-} from '@/features/members/model/directory';
 import { listDirectory } from '@/features/members/server/queries';
-import { LoadingCards } from '@/shared/ui/loading-content';
 import { MemberPagination } from '@/shared/ui/member-pagination';
 import { ArrowRight } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
@@ -24,7 +20,7 @@ export default async function MembersDirectoryPage({
     const [advisoryPage, experiencedPage, regularPage] = await Promise.all([
       listDirectory({ authenticated, role: 'ADMIN', page: params.adminPage, pageSize: 12 }),
       listDirectory({ authenticated, role: 'CORE_MEMBER', page: params.corePage, pageSize: 12 }),
-      listDirectory({ authenticated, role: 'MEMBER', page: params.page, pageSize: 6 }),
+      listDirectory({ authenticated, role: 'MEMBER', page: params.page, pageSize: 12 }),
     ]);
     const advisors = advisoryPage.items, experienced = experiencedPage.items;
     const totalMembers = advisoryPage.total + experiencedPage.total + regularPage.total;
@@ -34,63 +30,47 @@ export default async function MembersDirectoryPage({
 
     return <>
         <p className="mb-5 text-sm font-semibold text-[#1F2937]">{totalMembers} thành viên</p>
-        {advisors.length > 0 && (
           <section className="mb-10" aria-labelledby="leadership-heading">
             <div id="leadership-heading">
               <MemberSectionHeading
-                title={MEMBER_GROUP_LABELS.ADMIN}
+                title="Quản trị viên"
                 count={advisoryPage.total}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {advisors.map((member) => (
-                <MemberCard key={member.id} member={member} group="ADMIN" />
-              ))}
-            </div>
+            {advisors.length > 0 ? (
+              <HomeMemberWall members={advisors.map(({ id, fullName, avatarUrl, role }) => ({ id, fullName, avatarUrl, role }))} total={advisors.length} showMeta={false} />
+            ) : (
+              <p className="text-sm text-slate-600">Chưa có thành viên nào</p>
+            )}
           <div className="mt-6"><MemberPagination page={advisoryPage.page} totalPages={advisoryPage.totalPages} basePath={basePath} pageParam="adminPage" /></div>
 </section>
-        )}
 
-        {experienced.length > 0 && (
           <section className="mb-10" aria-labelledby="experienced-heading">
             <div id="experienced-heading">
               <MemberSectionHeading
-                title={MEMBER_GROUP_LABELS.CORE_MEMBER}
+                title="Thành viên chủ chốt"
                 count={experiencedPage.total}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {experienced.map((member) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  group="CORE_MEMBER"
-                />
-              ))}
-            </div>
+            {experienced.length > 0 ? (
+              <HomeMemberWall members={experienced.map(({ id, fullName, avatarUrl, role }) => ({ id, fullName, avatarUrl, role }))} total={experienced.length} showMeta={false} />
+            ) : (
+              <p className="text-sm text-slate-600">Chưa có thành viên nào</p>
+            )}
           <div className="mt-6"><MemberPagination page={experiencedPage.page} totalPages={experiencedPage.totalPages} basePath={basePath} pageParam="corePage" /></div>
 </section>
-        )}
 
         <section className="mb-8" aria-labelledby="members-heading">
           <div id="members-heading">
             <MemberSectionHeading
-              title={MEMBER_GROUP_LABELS.MEMBER}
+              title="Thành viên"
               count={regularPage.total}
             />
           </div>
 
           {regularPage.total > 0 ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {regularPage.items.map((member) => (
-                  <MemberCard
-                    key={member.id}
-                    member={member}
-                    group="MEMBER"
-                  />
-                ))}
-              </div>
+              <HomeMemberWall members={regularPage.items.map(({ id, fullName, avatarUrl, role }) => ({ id, fullName, avatarUrl, role }))} total={regularPage.items.length} showMeta={false} />
 
               <div className="mt-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <MemberPagination
@@ -108,9 +88,7 @@ export default async function MembersDirectoryPage({
               </div>
             </>
           ) : (
-            <div className="panel-public p-6 text-sm text-[#1F2937]">
-              Chưa có thành viên được công bố.
-            </div>
+            <p className="text-sm text-slate-600">Chưa có thành viên nào</p>
           )}
         </section>
     </>;
@@ -133,7 +111,7 @@ export default async function MembersDirectoryPage({
           </div>
         </header>
 
-        <Suspense fallback={<LoadingCards members />}><MemberResults /></Suspense>
+        <Suspense fallback={<div className="home-member-grid" role="status" aria-label="Đang tải thành viên">{Array.from({ length: 12 }, (_, index) => <span key={index} className="home-member-avatar home-member-avatar--loading" aria-hidden="true" />)}</div>}><MemberResults /></Suspense>
       </main>
 
 

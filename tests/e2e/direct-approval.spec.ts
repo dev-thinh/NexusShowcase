@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { randomUUID } from 'node:crypto';
-import { expect, login, test } from './fixtures';
+import { acknowledgeSuccess, expect, login, test } from './fixtures';
 
 const createdItems: string[] = [];
 test.afterEach(async ({ database }) => {
@@ -33,6 +33,7 @@ test('admin directly approves a submission and preserves live content until upda
     await page.getByRole('dialog').getByRole('button', { name: 'Xuất bản', exact: true }).click();
     try {
       await expect.poll(async () => database.showcaseItem.findUniqueOrThrow({ where: { id: item.id }, select: { status: true, reviewStatus: true, title: true } }), { message: 'approval persists the published snapshot' }).toEqual({ status: 'PUBLISHED', reviewStatus: null, title: expectedTitle });
+      await acknowledgeSuccess(page, 'Đã duyệt và xuất bản công trình.');
       await expect(page).toHaveURL(/\/admin\/reviews$/);
     } catch (error) {
       const state = await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id }, select: { status: true, reviewStatus: true, reviewVersion: true } });
@@ -74,6 +75,7 @@ test('admin requests revision and rejects through form decisions', async ({ page
   await page.getByRole('button', { name: 'Yêu cầu chỉnh sửa', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Nội dung yêu cầu chỉnh sửa', { exact: false }).fill('Clarify the submitted results.');
   await page.getByRole('dialog').getByRole('button', { name: 'Gửi yêu cầu chỉnh sửa', exact: true }).click();
+  await acknowledgeSuccess(page, 'Đã gửi yêu cầu chỉnh sửa cho tác giả.');
   await expect(page).toHaveURL(/\/admin\/reviews$/);
   await expect.poll(async () => database.showcaseItem.findUniqueOrThrow({ where: { id: item.id }, select: { status: true, rejectionReason: true } })).toEqual({ status: 'REVISION_REQUESTED', rejectionReason: 'Clarify the submitted results.' });
   await database.showcaseItem.update({ where: { id: item.id }, data: { status: 'PENDING_REVIEW' } });
@@ -81,6 +83,7 @@ test('admin requests revision and rejects through form decisions', async ({ page
   await page.getByRole('button', { name: 'Từ chối', exact: true }).click();
   await page.getByRole('dialog').getByLabel('Lý do từ chối', { exact: false }).fill('Outside the publication scope.');
   await page.getByRole('dialog').getByRole('button', { name: 'Xác nhận từ chối', exact: true }).click();
+  await acknowledgeSuccess(page, 'Đã từ chối bài đăng.');
   await expect(page).toHaveURL(/\/admin\/reviews$/);
   await expect.poll(async () => database.showcaseItem.findUniqueOrThrow({ where: { id: item.id }, select: { status: true, rejectionReason: true } })).toEqual({ status: 'REJECTED', rejectionReason: 'Outside the publication scope.' });
 });

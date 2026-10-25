@@ -29,17 +29,34 @@ it('recognizes named exports consumed by deferred module imports', () => {
   });
   expect(auditUnused(root).unusedExports).toEqual([]);
 });
-it('retains files referenced only by revision history, drafts, overrides or avatars', async () => {
-  const root = fixture(Object.fromEntries(['history.png', 'draft.png', 'editor.png', 'avatar.png', 'orphan.png'].map(name => [`public/uploads/thumbnails/${name}`, 'asset'])));
+it('retains files referenced only by revision history, drafts, overrides, avatars or galleries', async () => {
+  const root = fixture(Object.fromEntries(['history.png', 'draft.png', 'editor.png', 'avatar.png', 'home.png', 'research.png', 'orphan.png'].map(name => [`public/uploads/thumbnails/${name}`, 'asset'])));
   const db = {
     user: { findMany: async () => [{ avatarUrl: '/uploads/thumbnails/avatar.png?v=1' }] },
     showcaseItem: { findMany: async () => [{ authorDraft: { content: 'nexus-sections:v1\n' + JSON.stringify({ url: '/uploads/thumbnails/draft.png#figure' }) } }] },
     itemLink: { findMany: async () => [] }, itemAttachment: { findMany: async () => [] },
     submissionRevision: { findMany: async () => [{ snapshot: { url: '/uploads/thumbnails/history.png' } }] },
     editorialDraft: { findMany: async () => [{ overrides: { thumbnailUrl: '/uploads/thumbnails/editor.png' } }] },
+    homeMomentsGallery: { findMany: async () => [
+      { photos: [{ src: '/uploads/thumbnails/home.png' }] },
+      { photos: [{ src: '/uploads/thumbnails/research.png' }] },
+    ] },
   };
   const audit = await auditAssetReferences({ prisma: db as never, root });
   expect(audit.incompleteSources).toEqual([]);
-  for (const name of ['history', 'draft', 'editor', 'avatar']) expect(audit.referenced).toContain(`/uploads/thumbnails/${name}.png`);
+  for (const name of ['history', 'draft', 'editor', 'avatar', 'home', 'research']) expect(audit.referenced).toContain(`/uploads/thumbnails/${name}.png`);
   expect(audit.unreferenced).toEqual(['/uploads/thumbnails/orphan.png']);
+});
+it('marks the asset inventory incomplete when galleries cannot be read', async () => {
+  const root = fixture({ 'public/uploads/thumbnails/gallery.png': 'asset' });
+  const empty = { findMany: async () => [] };
+  const db = {
+    user: empty, showcaseItem: empty, itemLink: empty, itemAttachment: empty,
+    submissionRevision: empty, editorialDraft: empty,
+    homeMomentsGallery: { findMany: async () => { throw new Error('Gallery unavailable'); } },
+  };
+  const audit = await auditAssetReferences({ prisma: db as never, root });
+  expect(audit.incompleteSources).toEqual(['gallery.photos']);
+  expect(audit.unreferenced).toEqual(['/uploads/thumbnails/gallery.png']);
+  expect(fs.readFileSync(path.join(root, 'public/uploads/thumbnails/gallery.png'), 'utf8')).toBe('asset');
 });

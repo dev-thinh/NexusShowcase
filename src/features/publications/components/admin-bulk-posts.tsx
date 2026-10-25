@@ -1,5 +1,6 @@
 'use client';
 
+import { SearchForm } from '@/shared/ui/validated-form';
 import { type BulkPostCounts, type BulkPostEntry, type BulkPostFilter } from '@/features/publications/model/bulk-posts';
 import { saveBulkPostStatesAction, searchBulkPostsAction } from '@/features/publications/server/bulk-actions';
 import { Modal } from '@/shared/ui/modal';
@@ -8,6 +9,7 @@ import { Globe, Pin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
   const isPinMode = mode === 'pin';
@@ -29,7 +31,6 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
   const [loading, setLoading] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [reload, setReload] = useState(0);
   const [replacement, setReplacement] = useState<{ required: number; items: Array<{ id: string; title: string }> } | null>(null);
   const [replaceIds, setReplaceIds] = useState<string[]>([]);
@@ -72,14 +73,14 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
     return next;
   };
   const toggle = (item: BulkPostEntry) => {
-    clearReplacement(); setSuccess('');
+    clearReplacement();
     setChanges(current => setDesiredState(current, item, !(current[item.id]?.enabled ?? initialState(item))));
   };
   const apply = async () => {
     if (busyRef.current || !ids.length) return;
     busyRef.current = true;
     try {
-      setBusy(true); setError(''); setSuccess('');
+      setBusy(true); setError('');
       const result = await saveBulkPostStatesAction({ mode,
         changes: ids.map(itemId => ({ itemId, enabled: changes[itemId].enabled })),
         replaceItemIds: replaceIds,
@@ -95,13 +96,13 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
       }
       setChanges({}); clearReplacement(); setLoading(true); setReload(value => value + 1);
       router.refresh();
-      setSuccess(`Đã lưu thay đổi cho ${result.data.count} bài.`);
+      await notifySuccess(`Đã lưu thay đổi cho ${result.data.count} bài.`);
     } catch { setError('Không kết nối được. Vui lòng thử lại.'); }
     finally { busyRef.current = false; setBusy(false); }
   };
 
   return <>
-    <button type="button" className="action-secondary-detail" onClick={() => { setOpen(true); setLoading(true); setFilter(isPinMode ? 'PINNED' : 'PUBLIC'); setCounts(null); setSuccess(''); setSearch(''); setQuery(''); setPage(1); setReload(value => value + 1); }}>
+    <button type="button" className="action-secondary-detail" onClick={() => { setOpen(true); setLoading(true); setFilter(isPinMode ? 'PINNED' : 'PUBLIC'); setCounts(null); setSearch(''); setQuery(''); setPage(1); setReload(value => value + 1); }}>
       {isPinMode ? <Pin aria-hidden="true" className="h-4 w-4" /> : <Globe aria-hidden="true" className="h-4 w-4" />}{title}
     </button>
     {open && createPortal(<Modal isOpen onClose={close} title={title} description={isPinMode ? 'Tick là ghim trang chủ, bỏ tick là không ghim. Chỉnh các bài rồi bấm Áp dụng thay đổi. Tối đa 3 bài ghim.' : 'Tick là công khai, bỏ tick là nội bộ. Chỉnh các bài rồi bấm Áp dụng thay đổi.'} className="!max-w-3xl">
@@ -114,10 +115,10 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
             {option.label}<span className="rounded bg-black/5 px-1.5 text-xs tabular-nums">{counts?.[option.value] ?? '…'}</span>
           </button>)}
         </div>
-        <form onSubmit={event => { event.preventDefault(); setLoading(true); clearReplacement(); setQuery(search.trim()); setPage(1); setReload(value => value + 1); }} className="flex flex-wrap gap-2">
-          <input type="search" value={search} maxLength={200} onChange={event => setSearch(event.target.value)} aria-label="Tìm bài đăng để quản lý" placeholder="Tìm theo tiêu đề…" className="min-h-11 min-w-0 flex-1 rounded-md border border-slate-200 px-3 text-sm text-left" />
+        <SearchForm onSubmit={event => { event.preventDefault(); setLoading(true); clearReplacement(); setQuery(search.trim()); setPage(1); setReload(value => value + 1); }} className="flex flex-wrap gap-2">
+          <input type="search" name="q" value={search} maxLength={200} onChange={event => setSearch(event.target.value)} aria-label="Tìm bài đăng để quản lý" placeholder="Tìm theo tiêu đề…" className="min-h-11 min-w-0 flex-1 rounded-md border border-slate-200 px-3 text-sm text-left" />
           <button type="submit" disabled={loading} className="action-secondary-detail min-h-11">Tìm kiếm</button>
-        </form>
+        </SearchForm>
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
           <label className="inline-flex min-h-10 cursor-pointer items-center gap-2"><input ref={allCheckbox} type="checkbox" checked={allChecked} disabled={loading || !items.length} onChange={() => {
@@ -155,7 +156,6 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
           {replacement.items.map(item => <label key={item.id} className="flex min-h-10 cursor-pointer items-start gap-2 py-2 text-sm"><input type="checkbox" checked={replaceIds.includes(item.id)} onChange={() => setReplaceIds(current => current.includes(item.id) ? current.filter(id => id !== item.id) : [...current, item.id])} className="mt-1 h-4 w-4 shrink-0 accent-[#153D67]" /><span className="break-words">{item.title}</span></label>)}
         </div>}
         {tooManyPins && <p role="alert" className="text-sm text-[#1F2937]">Chọn tối đa 3 bài để ghim.</p>}
-        {success && <p role="status" className="text-sm text-[#1F2937]">{success}</p>}
         {error && <p role="alert" className="text-sm text-[#1F2937]">{error}</p>}
         <div className="modal-footer"><button type="button" disabled={busy} onClick={close} className="action-secondary-detail min-h-11">Đóng</button><button type="button" disabled={busy || loading || !ids.length || tooManyPins || !!replacement && replaceIds.length < replacement.required} onClick={() => void apply()} className="action-primary-detail min-h-11 disabled:opacity-50">{busy ? 'Đang lưu…' : `Áp dụng thay đổi (${ids.length})`}</button></div>
       </fieldset>

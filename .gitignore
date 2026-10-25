@@ -49,6 +49,8 @@ next-env.d.ts
 
 # uploaded resource files
 /storage/resources/
+/storage/thumbnails/
+/storage/documents/
 
 # isolated production browser harness build
 /.next-harness/

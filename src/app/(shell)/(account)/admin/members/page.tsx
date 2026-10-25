@@ -1,5 +1,3 @@
-import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
-import { ManagementHeader, ManagementNav } from '@/app/(shell)/_components/management-layout';
 import { AdminCreateMemberModal } from '@/features/identity/components/admin-create-member-modal';
 import { AdminMemberTable } from '@/features/identity/components/admin-member-table';
 import { listAdminMembers } from '@/features/identity/server/member-queries';
@@ -31,16 +29,14 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
     <>
 
 
-      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
-      <Breadcrumbs items={[{ label: "Quản trị", href: "/admin" }, { label: "Quản lý thành viên" }]} />
-        <ManagementHeader title="Quản lý thành viên" description="Quản lý tài khoản và quyền đăng bài của thành viên.">
-          <AdminCreateMemberModal />
-        </ManagementHeader>
-        <ManagementNav active="members" userId={session.user.id} isAdmin />
+      <section aria-labelledby="admin-members-title">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <div><h2 id="admin-members-title" className="text-lg font-semibold text-slate-900">Thành viên</h2><p className="mt-1 text-sm text-slate-500">Quản lý tài khoản và quyền đăng bài.</p></div>
+        </div>
 
         {/* Member Table with Search and Filters */}
-        <AdminMemberTable members={result.items} query={query} roleFilter={role} counts={result.counts} total={result.total} /><MemberPagination page={result.page} totalPages={result.totalPages} basePath={basePath} />
-      </main>
+        <AdminMemberTable members={result.items} query={query} roleFilter={role} counts={result.counts} total={result.total} actions={<AdminCreateMemberModal />} /><MemberPagination page={result.page} totalPages={result.totalPages} basePath={basePath} />
+      </section>
 
 
     </>

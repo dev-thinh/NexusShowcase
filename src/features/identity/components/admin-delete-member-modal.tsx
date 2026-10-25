@@ -6,6 +6,7 @@ import { Loader2, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Modal } from '@/shared/ui/modal';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 interface AdminDeleteMemberModalProps {
   member: {
@@ -41,6 +42,7 @@ export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) 
     setLoading(false);
     setIsOpen(false);
     router.refresh();
+    await notifySuccess(`Đã xóa tài khoản của ${member.fullName}.`);
   };
 
   return (

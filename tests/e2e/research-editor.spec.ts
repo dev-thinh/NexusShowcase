@@ -1,5 +1,5 @@
 import { fixtureImage, defaultResearchImages } from '../fixtures/moments';
-import { expect, login, seedPhotoGalleries, test } from './fixtures';
+import { acknowledgeSuccess, expect, login, seedPhotoGalleries, test } from './fixtures';
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
 
@@ -24,6 +24,7 @@ test('research photos use the shared modal with cancel, save and mobile editing'
     await modal.getByLabel('Tiêu đề', { exact: true }).fill('Ảnh nghiên cứu đã lưu');
     await modal.getByRole('button', { name: 'Đưa ảnh sang phải' }).click();
     await modal.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh hướng nghiên cứu.');
     await expect(modal).toHaveCount(0);
     await expect(section.locator('.research-direction img').nth(1)).toHaveAttribute('alt', 'Ảnh nghiên cứu đã lưu');
     expect((await (await page.request.get('/api/home/research')).json()).photos).toHaveLength(3);
@@ -41,6 +42,7 @@ test('research photos use the shared modal with cancel, save and mobile editing'
     await modal.getByRole('button', { name: 'Gỡ ảnh', exact: true }).click();
     await expect(modal.locator('[data-moment-slot="0"] img')).toHaveCount(0);
     await modal.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh hướng nghiên cứu.');
     await expect(modal).toHaveCount(0);
     await expect(section.locator('.research-direction').nth(0).locator('[data-media-placeholder]')).toHaveCount(1);
     const afterRemoval = await (await page.request.get('/api/home/research')).json();
@@ -66,7 +68,7 @@ test('both editors share uploaded photos without changing each other’s placeme
     await expect(research.locator('.moments-editor__asset')).toHaveCount(6);
     const original = (await (await page.request.get('/api/home/moments')).json()).photos;
     await research.getByRole('button', { name: `Chọn ảnh: ${original[0].title}`, exact: true }).click();
-    await expect(research.locator('[data-moment-slot="0"] img')).toHaveAttribute('src', original[0].src);
+    await expect(research.locator('[data-moment-slot="0"] img')).toHaveAttribute('src', `${original[0].src}?w=256`);
     const buffer = fixtureImage;
     const upload = async (modal: typeof research, name: string) => {
       const pending = page.waitForResponse(response => response.url().endsWith('/api/upload') && response.request().method() === 'POST');
@@ -75,12 +77,14 @@ test('both editors share uploaded photos without changing each other’s placeme
       expect(result.ok()).toBe(true);
       const src = (await result.json()).url as string;
       uploads.push(src);
+      await acknowledgeSuccess(page, 'Đã tải 1 ảnh vào thư viện chỉnh sửa.');
       await expect(modal.getByRole('button', { name: `Chọn ảnh: ${name}`, exact: true })).toBeVisible();
       return src;
     };
     const firstUpload = await upload(research, 'shared-research-upload');
     await research.getByRole('button', { name: 'Chọn ảnh: shared-research-upload', exact: true }).click();
     await research.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh hướng nghiên cứu.');
     await expect(research).toHaveCount(0);
     const afterResearch = await (await page.request.get('/api/home/moments')).json();
     expect(afterResearch.photos.filter((photo: { slot: number | null }) => photo.slot !== null)).toEqual(original.filter((photo: { slot: number | null }) => photo.slot !== null));
@@ -98,6 +102,7 @@ test('both editors share uploaded photos without changing each other’s placeme
     await expect(moments.getByRole('button', { name: 'Xóa khỏi thư viện: shared-research-upload', exact: true })).toBeDisabled();
     const secondUpload = await upload(moments, 'shared-moments-upload');
     await moments.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh khoảnh khắc.');
     await expect(moments).toHaveCount(0);
     expect((await page.request.put('/api/home/research', { data: stale })).status()).toBe(409);
     expect((await (await page.request.get('/api/home/research')).json()).version).toBe(stale.version);
@@ -107,12 +112,13 @@ test('both editors share uploaded photos without changing each other’s placeme
     await expect(research.getByRole('button', { name: 'Chọn ảnh: shared-moments-upload', exact: true })).toBeVisible();
     await research.getByRole('button', { name: 'Chọn ảnh: shared-moments-upload', exact: true }).click();
     await research.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh hướng nghiên cứu.');
     await expect(research).toHaveCount(0);
     const result = await (await page.request.get('/api/home/research')).json();
     expect(result.photos).toHaveLength(3);
     expect(result.photos[0].src).toBe(secondUpload);
   } finally {
     await database.homeMomentsGallery.deleteMany();
-    for (const src of uploads) await unlink(path.join(process.cwd(), 'public', src)).catch(() => {});
+    for (const src of uploads) await unlink(path.join(process.cwd(), 'storage/thumbnails', path.basename(src))).catch(() => {});
   }
 });

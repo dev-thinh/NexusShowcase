@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures';
 
-test('empty galleries, cards and members share the same missing-image component', async ({ page, database }) => {
+test('empty galleries and cards show placeholders while members show letter avatars', async ({ page, database }) => {
   await database.homeMomentsGallery.deleteMany();
   await page.goto('/');
   await page.locator('[data-deferred-section="research"]').scrollIntoViewIfNeeded();
@@ -10,7 +10,9 @@ test('empty galleries, cards and members share the same missing-image component'
   await page.goto('/explore');
   await expect(page.locator('[data-media-placeholder]').first()).toBeVisible();
   await page.goto('/members');
-  await expect(page.locator('[data-media-placeholder]').first()).toBeVisible();
+  await expect(page.locator('[data-member-avatar-fallback]').first()).toBeVisible();
+  // Numeric fixture surnames have no letter, so the avatar uses its unknown initial.
+  await expect(page.getByRole('img', { name: 'Benchmark Member 000', exact: true })).toHaveText('?');
 });
 
 test('a broken post image recovers into the shared placeholder', async ({ page, database }) => {

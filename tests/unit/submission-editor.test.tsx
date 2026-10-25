@@ -41,7 +41,7 @@ describe('submission editor shell', () => {
     expect(resources).toContain('>Tệp</button>');
     expect(resources).not.toContain('Tài liệu PDF');
     expect(resources).toContain("add('LINK')");
-    expect(resources).toContain('type="file"');
+    expect(resources).toContain('<FilePicker');
     expect(resources).toContain('aria-label={`Xóa tài nguyên');
     expect(resources).toContain('panel-nested');
     expect(resources).not.toMatch(/onClick=.*<div/);
@@ -90,7 +90,7 @@ describe('submission editor shell', () => {
     const actions = read('src/features/submissions/components/submission-action-bar.tsx');
     expect(actions).toContain('Chưa lưu');
     expect(actions).toContain('Đang lưu…');
-    expect(actions).toContain('Đã lưu');
+    expect(actions).toContain("saved: ''");
     expect(actions).toContain('Lưu thất bại');
     expect(actions).toContain('sticky bottom-0');
     expect(actions).not.toContain('fixed');

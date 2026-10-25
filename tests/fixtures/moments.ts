@@ -23,10 +23,10 @@ export const fixtureImage = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD
 export const fixtureUpload = { name: 'collaboration.png', mimeType: 'image/png', buffer: fixtureImage };
 
 export async function writeFixtureImages(root = process.cwd()) {
-  const directory = path.join(root, 'public/uploads/thumbnails');
+  const directory = path.join(root, 'storage/thumbnails');
   await mkdir(directory, { recursive: true });
   await Promise.all(defaultMoments.map(photo => writeFile(path.join(directory, path.basename(photo.src)), fixtureImage)));
 }
 export async function removeFixtureImages(root = process.cwd()) {
-  await Promise.all(defaultMoments.map(photo => rm(path.join(root, 'public', photo.src), { force: true })));
+  await Promise.all(defaultMoments.map(photo => rm(path.join(root, 'storage/thumbnails', path.basename(photo.src)), { force: true })));
 }

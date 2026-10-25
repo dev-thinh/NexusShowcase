@@ -5,6 +5,7 @@ import { setShowcaseVisibilityAction } from '@/features/publications/server/acti
 import { Loader2, Pin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 interface CardAdminControlsProps {
   itemId: string;
@@ -37,6 +38,7 @@ export function CardAdminControls({ itemId, itemTitle, initialIsPinned, initialV
         const result = await setShowcaseVisibilityAction({ itemId, visibility: visibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC' });
         if (!result.success) { setError(result.error); return; }
         setVisibility(result.data.visibility);
+        await notifySuccess(result.data.visibility === 'PUBLIC' ? 'Đã chuyển công trình sang công khai.' : 'Đã chuyển công trình sang phạm vi nội bộ.');
       }
       router.refresh();
     } catch {

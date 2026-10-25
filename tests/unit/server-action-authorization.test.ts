@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({
   auth: vi.fn(),
   prisma: {
+    $transaction: vi.fn(),
+    $queryRaw: vi.fn(async () => []),
     user: {
       findUnique: vi.fn(),
       findFirst: vi.fn(),
@@ -34,6 +36,7 @@ import { setShowcasePinAction } from '@/features/publications/server/actions';
 describe('Server action authorization', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mocks.prisma.$transaction.mockImplementation(callback => callback(mocks.prisma));
     mocks.auth.mockResolvedValue(null);
     mocks.prisma.user.findUnique.mockResolvedValue({
       id: 'admin-id',

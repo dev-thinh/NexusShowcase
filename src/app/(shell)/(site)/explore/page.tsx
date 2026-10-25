@@ -1,3 +1,4 @@
+import { SearchForm } from '@/shared/ui/validated-form';
 import { MediaImage } from '@/shared/ui/media-image';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import type { Metadata } from 'next';
@@ -58,7 +59,7 @@ export default async function ExplorePage({ searchParams }: {
           </div>
         </section>
         <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl flex-1">
-            <form method="GET" action="/explore" role="search" aria-label="Tìm kiếm và lọc công trình" className="mb-6 grid items-end gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_8rem_11rem_auto]">
+            <SearchForm action="/explore" role="search" aria-label="Tìm kiếm và lọc công trình" className="mb-6 grid items-end gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_8rem_11rem_auto]">
               <div className="min-w-0">
                 <label htmlFor="library-search" className="text-xs font-semibold text-[#1F2937]">Tìm kiếm toàn bộ kho</label>
                 <div className="relative mt-2">
@@ -68,7 +69,7 @@ export default async function ExplorePage({ searchParams }: {
               </div>
               <div>
                 <label htmlFor="library-year" className="text-xs font-semibold text-[#1F2937]">Năm thực hiện</label>
-                <input id="library-year" type="number" name="year" min={1900} max={2100} defaultValue={year ?? ''} placeholder="Tất cả" className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-[#FFFFFF] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]" />
+                <input id="library-year" type="text" inputMode="numeric" name="year" min={1900} max={2100} defaultValue={year ?? ''} placeholder="Tất cả" className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-[#FFFFFF] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]" />
               </div>
               <div>
                 <label htmlFor="library-sort" className="text-xs font-semibold text-[#1F2937]">Sắp xếp</label>
@@ -84,7 +85,7 @@ export default async function ExplorePage({ searchParams }: {
                 <p className="break-words text-xs text-[#1F2937]">Kết quả lọc công trình{searchQuery ? ` với “${searchQuery}”` : ''}{year ? ` · Năm ${year}` : ''}</p>
                 <Link href="/explore" className="inline-flex min-h-9 items-center text-xs font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link>
               </div>}
-            </form>
+            </SearchForm>
           <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
             <div className="min-w-0">
               <h2 className="break-words text-lg font-semibold text-[#1F2937]">{searchQuery ? `${totalItems} công trình cho “${searchQuery}”` : hasFilters ? `${totalItems} công trình phù hợp` : `Tất cả công trình · ${totalItems} công trình`}</h2>

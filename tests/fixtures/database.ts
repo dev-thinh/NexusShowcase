@@ -1,5 +1,7 @@
 import { Prisma, PrismaClient } from '@prisma/client';
 import { randomUUID } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import { assertTestDatabaseUrl, verifyTestDatabase } from '../setup/database-guard';
 
 export type DatabaseFixture = { prisma: PrismaClient; prefix: string };
@@ -80,6 +82,11 @@ export async function createTestFixtures(): Promise<DatabaseFixture & { cleanup(
     scopedUrl.searchParams.set('schema', prefix);
     scoped = new PrismaClient({ datasources: { db: { url: scopedUrl.toString() } }, log: [] });
     await verifyTestDatabase(scoped, scopedUrl.toString());
+    // LIKE copies indexes but not functions/triggers. Install the same asset
+    // write guards in this verified, fixture-owned schema as in production.
+    const guards = readFileSync(path.resolve('prisma/migrations/20261025_asset_registry_guards/migration.sql'), 'utf8').match(/CREATE FUNCTION[\s\S]*?\$\$;|CREATE TRIGGER[^;]+;/g);
+    if (!guards || guards.length !== 9) throw new Error('Unexpected asset guard migration structure');
+    for (const statement of guards) await scoped.$executeRawUnsafe(statement);
     return { prisma: scoped, prefix, cleanup };
   } catch (error) {
     await cleanup();

@@ -7,6 +7,8 @@ import type { SubmissionResource } from '@/features/submissions/model/snapshot';
 import { useDialog } from '@/shared/dialogs/dialog-provider';
 import { ArrowDown, ArrowUp, Bold, ChevronDown, FileText, Heading3, ImagePlus, Italic, Link2, List, Plus, Trash2, Type, Video } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { FilePicker } from '@/shared/ui/file-picker';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 const control = 'w-full rounded-md border border-slate-200 bg-white px-3 py-2.5 text-sm text-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#153D67]/20';
 const iconButton = 'inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-[#1F2937] hover:bg-[#FFFFFF] hover:text-[#1F2937] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] disabled:opacity-30';
@@ -49,12 +51,13 @@ function BlockEditor({ block, onChange, onBusy }: { block: ArticleBlock; onChang
       const result = await uploadFileAction(data);
       if (!result.success) { setMessage(result.error || 'Không tải được tệp.'); return; }
       onChange({ ...block, url: result.data.url, fileName: result.data.fileName || file.name, fileSize: result.data.fileSize, mimeType: result.data.mimeType, alt: block.alt || (block.kind === 'IMAGE' ? file.name : '') });
-      setMessage('Đã tải lên.');
+      setMessage('');
+      await notifySuccess('Đã tải tệp vào nội dung bài. Lưu bản nháp để giữ thay đổi.');
     } catch { setMessage('Tải lên thất bại. Vui lòng thử lại.'); }
     finally { setUploading(false); onBusy(false); }
   };
   return <div className="space-y-3">
-    {(block.kind === 'IMAGE' || block.kind === 'DOCUMENT') && <label className="block text-sm font-semibold text-[#1F2937]">{block.kind === 'IMAGE' ? 'Tải ảnh JPEG, PNG, WebP (tối đa 5 MB)' : 'Tải PDF (tối đa 25 MB)'}<input type="file" disabled={uploading} accept={block.kind === 'IMAGE' ? 'image/jpeg,image/png,image/webp' : 'application/pdf'} onChange={e => void upload(e.target.files?.[0])} className="mt-2 block w-full text-sm file:mr-3 file:rounded-md file:border-0 file:bg-[#FFFFFF] file:px-3 file:py-2 file:text-sm" /></label>}
+    {(block.kind === 'IMAGE' || block.kind === 'DOCUMENT') && <div className="space-y-2"><p className="text-sm font-semibold text-[#1F2937]">{block.kind === 'IMAGE' ? 'Ảnh JPEG, PNG, WebP (tối đa 5 MB)' : 'PDF (tối đa 25 MB)'}</p><FilePicker label={block.kind === 'IMAGE' ? 'Chọn ảnh' : 'Chọn PDF'} aria-label={block.kind === 'IMAGE' ? 'Chọn ảnh cho nội dung' : 'Chọn PDF cho nội dung'} busy={uploading} accept={block.kind === 'IMAGE' ? 'image/jpeg,image/png,image/webp' : 'application/pdf'} onChange={e => void upload(e.target.files?.[0])} /></div>}
     <label className="block text-sm font-semibold text-[#1F2937]">{block.kind === 'VIDEO' ? 'Liên kết YouTube, Loom hoặc Google Drive' : 'Liên kết'}<input type="url" value={block.url} onChange={e => onChange({ ...block, url: e.target.value })} placeholder="https://…" className={`mt-2 ${control}`} /></label>
     <label className="block text-sm font-semibold text-[#1F2937]">{block.kind === 'LINK' || block.kind === 'DOCUMENT' ? 'Tên hiển thị' : 'Chú thích'}<input value={block.caption} maxLength={160} onChange={e => onChange({ ...block, caption: e.target.value })} placeholder={block.kind === 'LINK' ? 'Ví dụ: Mã nguồn GitHub' : 'Mô tả ngắn nội dung minh họa…'} className={`mt-2 ${control}`} /></label>
     {block.kind === 'IMAGE' && <label className="block text-sm font-semibold text-[#1F2937]">Mô tả ảnh <span className="text-[#1F2937]">*</span><input value={block.alt} maxLength={500} onChange={e => onChange({ ...block, alt: e.target.value })} className={`mt-2 ${control}`} placeholder="Mô tả sơ đồ, biểu đồ hoặc hình ảnh cho người đọc" /></label>}

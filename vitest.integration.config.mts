@@ -12,7 +12,7 @@ for (const key of ['DATABASE_URL', 'TEST_DATABASE_URL', 'AUTH_SECRET', 'NEXTAUTH
 assertTestDatabaseUrl(process.env.DATABASE_URL, process.env.TEST_DATABASE_URL, {});
 
 export default defineConfig({
-  esbuild: { jsx: 'automatic' },
+  oxc: { jsx: { runtime: 'automatic' } },
   test: {
     env: { ASSET_STORAGE: 'local' },
     environment: 'node',

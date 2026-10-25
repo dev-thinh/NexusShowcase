@@ -5,3 +5,7 @@ export const changePasswordSchema = z.object({
 });
 
 export type ChangePasswordInput = z.infer<typeof changePasswordSchema>;
+
+export const changePasswordFormSchema = changePasswordSchema.extend({
+  confirmPassword: z.string().min(1, 'Vui lòng xác nhận mật khẩu mới.'),
+}).refine(value => value.newPassword === value.confirmPassword, { path: ['confirmPassword'], message: 'Mật khẩu xác nhận không khớp.' });

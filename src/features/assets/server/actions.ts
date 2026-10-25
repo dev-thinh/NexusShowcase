@@ -11,5 +11,5 @@ export async function uploadFileAction(formData: FormData): Promise<UploadResult
   const file = formData.get('file');
   const kind = formData.get('type');
   if (!file || typeof file === 'string' || !['thumbnail', 'pdf', 'resource'].includes(String(kind))) return { success: false, code: 'VALIDATION', error: 'Vui lòng chọn tệp và loại tệp hợp lệ.' };
-  try { return await uploadAsset(file, kind as 'thumbnail' | 'pdf' | 'resource'); } catch (error) { return commandFailure('asset.upload', error, { actorId: actor.id }); }
+  try { return await uploadAsset(file, kind as 'thumbnail' | 'pdf' | 'resource', actor.id); } catch (error) { return commandFailure('asset.upload', error, { actorId: actor.id }); }
 }

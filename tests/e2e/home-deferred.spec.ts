@@ -1,24 +1,23 @@
 import { expect, seedPhotoGalleries, test } from './fixtures';
 
-test('gallery code and images wait until its section approaches the viewport', async ({ page, database }) => {
+test('gallery images start loading before the visitor scrolls down', async ({ page, database }) => {
   await seedPhotoGalleries(database);
   await page.setViewportSize({ width: 1440, height: 600 });
   const photoRequests: string[] = [];
-  page.on('request', request => { if (request.url().includes('/uploads/thumbnails/fixture-')) photoRequests.push(request.url()); });
+  page.on('request', request => {
+    const url = new URL(request.url());
+    if ((url.searchParams.get('url') ?? url.pathname).includes('/uploads/thumbnails/fixture-')) photoRequests.push(request.url());
+  });
   await page.goto('/');
   const section = page.locator('[data-deferred-section="moments"]');
-  await expect(section).toHaveAttribute('data-state', 'idle');
-  await expect(page.locator('.moments-wall')).toHaveCount(0);
-  expect(photoRequests).toHaveLength(0);
-  await section.scrollIntoViewIfNeeded();
   await expect(section).toHaveAttribute('data-state', 'ready');
-  await expect(section.locator('.moments-wall')).toBeVisible();
   await expect.poll(() => photoRequests.length).toBeGreaterThan(0);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
+  expect(await section.evaluate(element => element.getBoundingClientRect().top)).toBeGreaterThan(600);
   await database.homeMomentsGallery.deleteMany();
 });
 
-test('home queries run only when their sections approach the viewport', async ({ page }) => {
-  // Keep the first section outside the observer's 200px preload margin.
+test('home sections load independently on entry without needing a scroll', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 400 });
   let actions = 0;
   page.on('request', request => { if (new URL(request.url()).pathname === '/api/home') actions++; });
@@ -26,14 +25,10 @@ test('home queries run only when their sections approach the viewport', async ({
   const featured = page.locator('[data-deferred-section="featured"]');
   const members = page.locator('[data-deferred-section="members"]');
   await expect(page.locator('#home-hero-title')).toBeVisible();
-  await expect(featured).toHaveAttribute('data-state', 'idle');
-  await expect(members).toHaveAttribute('data-state', 'idle');
-  expect(actions).toBe(0);
-  await featured.scrollIntoViewIfNeeded();
   await expect(featured).toHaveAttribute('data-state', 'ready');
+  await expect(members).toHaveAttribute('data-state', 'ready');
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
   await expect(featured.getByRole('heading', { name: 'Benchmark Research 0000', exact: true })).toBeVisible();
-  await expect(members).toHaveAttribute('data-state', 'idle');
-  expect(actions).toBe(1);
   await members.scrollIntoViewIfNeeded();
   await expect(members).toHaveAttribute('data-state', 'ready');
   expect(actions).toBe(2);
@@ -58,7 +53,7 @@ test('leaving home does not wait for an in-flight deferred section', async ({ pa
   try {
     await page.locator('nav a[href="/members"]').first().click();
     await expect(page).toHaveURL(/\/members$/);
-    await expect(page.getByRole('heading', { name: 'Benchmark Member 000', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Benchmark Member 000 · Ban chủ nhiệm', exact: true })).toBeVisible();
   } finally { release(); }
 });
 

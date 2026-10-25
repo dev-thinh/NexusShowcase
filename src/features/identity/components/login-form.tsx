@@ -4,7 +4,6 @@ import { loginAction } from '@/features/identity/server/login-actions';
 import {
 AlertCircle,
 ArrowRight,
-CheckCircle2,
 Eye,
 EyeOff,
 Loader2,
@@ -14,7 +13,10 @@ User,
 } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { useSearchParams } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
+import { notifySuccess } from '@/shared/dialogs/success';
+import { loginSchema } from '../model/login-input';
+import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
@@ -27,18 +29,17 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const passwordChangeNotified = useRef(false);
+  const passwordChanged = searchParams.get('passwordChanged') === '1';
+  useEffect(() => {
+    if (passwordChanged && !passwordChangeNotified.current) {
+      passwordChangeNotified.current = true;
+      void notifySuccess('Đã đổi mật khẩu. Vui lòng đăng nhập bằng mật khẩu mới.');
+    }
+  }, [passwordChanged]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!identifier.trim()) {
-      setError('Vui lòng nhập tài khoản hoặc email.');
-      return;
-    }
-    if (!password) {
-      setError('Vui lòng nhập mật khẩu.');
-      return;
-    }
-
     setError(null);
     setSuccess(false);
 
@@ -73,12 +74,6 @@ export function LoginForm() {
           <h1 className="text-2xl font-semibold text-[#1F2937] leading-tight">Đăng nhập</h1>
         </div>
 
-        {searchParams.get('passwordChanged') === '1' && (
-          <p role="status" className="mt-4 rounded-lg border border-slate-200 bg-[#FFFFFF] p-3 text-sm text-[#1F2937]">
-            Đã đổi mật khẩu thành công. Vui lòng đăng nhập bằng mật khẩu mới.
-          </p>
-        )}
-
         {error && (
           <div
             id="login-error"
@@ -95,14 +90,13 @@ export function LoginForm() {
             role="status"
             className="mt-4 p-3.5 rounded-lg bg-[#FFFFFF] border border-slate-200 text-[#1F2937] text-sm flex items-center gap-2.5 animate-in fade-in"
           >
-            <CheckCircle2 className="w-4 h-4 text-[#1F2937] shrink-0" />
             <div className="font-semibold">
-              Đăng nhập thành công! Đang chuyển hướng...
+              Đang chuyển trang…
             </div>
           </div>
         )}
 
-        <form noValidate onSubmit={handleSubmit} className="mt-5 space-y-4">
+        <ValidatedForm schema={loginSchema} values={{ email: identifier, password }} inlineErrors onSubmit={handleSubmit} className="mt-5 space-y-4">
           <div>
             <label
               htmlFor="identifier"
@@ -114,7 +108,7 @@ export function LoginForm() {
               <User aria-hidden="true" className="w-4 h-4 text-[#1F2937] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 id="identifier"
-                name="identifier"
+                name="email"
                 type="text"
                 autoComplete="username"
                 autoCapitalize="none"
@@ -127,7 +121,7 @@ export function LoginForm() {
                 disabled={isPending}
                 className="w-full pl-10 pr-4 py-3 text-sm sm:text-base bg-white hover:border-slate-200 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 text-[#1F2937] transition-all font-semibold disabled:opacity-50"
               />
-            </div>
+            </div><FieldError name="email" />
           </div>
 
           <div>
@@ -162,7 +156,7 @@ export function LoginForm() {
               >
                 {showPassword ? <EyeOff aria-hidden="true" className="w-4 h-4" /> : <Eye aria-hidden="true" className="w-4 h-4" />}
               </button>
-            </div>
+            </div><FieldError name="password" />
           </div>
 
           <button
@@ -182,7 +176,7 @@ export function LoginForm() {
               </>
             )}
           </button>
-        </form>
+        </ValidatedForm>
 
         <div className="mt-6 pt-4 border-t border-slate-200 text-center text-xs sm:text-sm text-[#1F2937]">
           <span>Chưa có tài khoản? </span>

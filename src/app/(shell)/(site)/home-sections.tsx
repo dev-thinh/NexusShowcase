@@ -33,7 +33,7 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
                 <article key={item.id} className="clickable-card home-featured-card panel-public grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white !p-0 md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
                   <CardLink slug={item.slug} returnTo={returnTo} />
                   <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:aspect-auto md:min-h-56 md:border-b-0 md:border-r">
-                    <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-contain p-4" />
+                    <MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="absolute inset-0 h-full w-full object-contain p-4" />
                   </Link>
                   <div className="flex min-w-0 flex-col px-5 pt-4 sm:px-6 sm:pt-5">
                     <header>

@@ -45,11 +45,10 @@ describe('footer content alignment', () => {
   const gutters = ['container', 'mx-auto', 'max-w-7xl', 'px-4', 'sm:px-6', 'lg:px-8'];
   const files = [
     'src/app/(shell)/(site)/page.tsx', 'src/app/(shell)/(site)/category/[slug]/page.tsx', 'src/app/(shell)/(site)/contact/page.tsx',
-    'src/app/(shell)/(account)/admin/page.tsx', 'src/app/(shell)/(account)/admin/members/page.tsx', 'src/app/(shell)/(account)/admin/reviews/page.tsx',
-    'src/app/(shell)/(account)/admin/reviews/[id]/page.tsx', 'src/app/(shell)/(account)/dashboard/page.tsx',
+    'src/app/(shell)/(account)/admin/layout.tsx', 'src/app/(shell)/(account)/dashboard/page.tsx',
     'src/app/(shell)/(account)/dashboard/items/new/page.tsx', 'src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx',
     'src/app/(shell)/(site)/members/page.tsx', 'src/app/(shell)/(site)/members/all/page.tsx', 'src/app/(shell)/(site)/members/[id]/page.tsx',
-    'src/app/(shell)/(auth)/login/page.tsx', 'src/app/(shell)/(account)/account/change-password/page.tsx', 'src/app/(shell)/(site)/showcase/[slug]/page.tsx',
+    'src/app/(shell)/(auth)/login/page.tsx', 'src/app/(shell)/(site)/showcase/[slug]/page.tsx',
   ];
   it.each(files)('%s matches the footer width and responsive gutters', file => {
     const source = readFileSync(resolve(process.cwd(), file), 'utf8');

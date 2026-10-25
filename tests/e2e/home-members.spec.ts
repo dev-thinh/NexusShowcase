@@ -53,8 +53,11 @@ for (const count of [2, 13, 30]) test(`centers every row for ${count} members on
   await section.scrollIntoViewIfNeeded();
   await assertCenteredRows(section.locator('.home-member-grid'));
   const avatar = section.locator('[data-home-member-avatar]').first();
-  await avatar.click();
+  await avatar.focus();
   await expect(page.getByRole('tooltip')).toContainText('Thành viên 0');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   if (count === 13) await section.screenshot({ path: 'test-results/home-members-mobile.png' });
+  await expect(avatar).toHaveAttribute('href', '/members/m0');
+  await avatar.click();
+  await expect(page).toHaveURL(/\/members\/m0$/);
 });

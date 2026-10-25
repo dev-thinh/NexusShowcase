@@ -1,14 +1,18 @@
-import { MediaImage } from '@/shared/ui/media-image';
+import { ProfileAvatar } from '@/features/identity/components/profile-avatar';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
-import { ManagementHeader, ManagementNav } from '@/app/(shell)/_components/management-layout';
 import { publicUserSelect } from '@/features/identity/model/public-user';
+import { ProfileEditor } from '@/features/identity/components/profile-editor';
+import { ProfileBio } from '@/features/identity/components/profile-bio';
+import { ChangePasswordModal } from '@/features/identity/components/change-password-modal';
+import { getProfileLinks } from '@/features/identity/model/profile-input';
+import { TypeBadge } from '@/features/publications/components/badges';
+import { uploadAvatarAction, removeAvatarAction } from '@/features/assets/server/avatar-actions';
 import { getSession as auth } from '@/features/identity/server/session';
-import { ShowcaseCard } from '@/features/publications/components/showcase-card';
+import { MediaImage } from '@/shared/ui/media-image';
 import { listMemberPublications } from '@/features/publications/server/queries';
 import { prisma } from '@/server/db/prisma';
-import { EmptyState } from '@/shared/ui/empty-state';
 import { MemberPagination } from '@/shared/ui/member-pagination';
-import { ArrowRight, Code2, FileText, Github, Globe, GraduationCap, KeyRound, Linkedin, ShieldCheck, UserCheck } from 'lucide-react';
+import { ArrowUpRight, ShieldCheck, UserCheck } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { notFound } from 'next/navigation';
 
@@ -18,7 +22,7 @@ export default async function MemberProfilePage({
   params, searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams?: Promise<{ researchPage?: string; projectPage?: string }>;
+  searchParams?: Promise<{ page?: string; password?: string; researchPage?: string; projectPage?: string }>;
 }) {
   const { id } = await params;
   const session = await auth();
@@ -26,19 +30,12 @@ export default async function MemberProfilePage({
   const user = await prisma.user.findUnique({ where: { id, status: 'ACTIVE', deletedAt: null }, select: publicUserSelect });
   if (!user) notFound();
   const query = await searchParams ?? {};
-  const [research, robotics] = await Promise.all([
-    listMemberPublications({ memberId: id, authenticated: !!session?.user, type: 'RESEARCH_PAPER', page: query.researchPage }),
-    listMemberPublications({ memberId: id, authenticated: !!session?.user, type: 'PROJECT', page: query.projectPage }),
-  ]);
-  const papers = research.items, projects = robotics.items;
-  const preserved = new URLSearchParams();
-  if (query.researchPage) preserved.set('researchPage', query.researchPage);
-  if (query.projectPage) preserved.set('projectPage', query.projectPage);
-  const basePath = '/members/' + id + (preserved.size ? '?' + preserved : '');
+  const publications = await listMemberPublications({ memberId: id, authenticated: !!session?.user, page: query.page ?? query.researchPage ?? query.projectPage, pageSize: 6 });
+  const basePath = '/members/' + id;
 
   const roleBadgeConfig = {
     ADMIN: { label: 'Quản trị viên', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: ShieldCheck },
-    CORE_MEMBER: { label: 'Thành viên nòng cốt', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
+    CORE_MEMBER: { label: 'Thành viên chủ chốt', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
     EDITOR: { label: 'Thành viên', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
     MEMBER: { label: 'Thành viên', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
     GUEST: { label: 'Khách', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
@@ -47,43 +44,49 @@ export default async function MemberProfilePage({
   const currentRole = roleBadgeConfig[user.role] || roleBadgeConfig.MEMBER;
   const RoleIcon = currentRole.icon;
 
-  const socialLinks = [
-    { href: user.googleScholarUrl, label: 'Google Scholar', icon: GraduationCap },
-    { href: user.githubUrl, label: 'GitHub', icon: Github },
-    { href: user.linkedinUrl, label: 'LinkedIn', icon: Linkedin },
-    { href: user.portfolioUrl, label: 'Trang cá nhân', icon: Globe },
-  ].filter(link => !!link.href);
+  const socialLinks = getProfileLinks(user);
+  const profile = { fullName: user.fullName, bio: user.bio ?? '', links: socialLinks };
 
-  return <>
-    <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <Breadcrumbs items={[{ label: "Thành viên", href: "/members" }, { label: user.fullName }]} />
-      <ManagementHeader title={isOwnProfile ? 'Hồ sơ của tôi' : 'Hồ sơ thành viên'} description={isOwnProfile ? 'Thông tin cá nhân và các công trình bạn đã tham gia.' : 'Giới thiệu và các công trình đã công bố của thành viên.'}>
-        {isOwnProfile ? <Link href="/account/change-password" className="action-secondary-detail"><KeyRound aria-hidden="true" className="h-4 w-4" />Đổi mật khẩu</Link> : <Link href="/members" className="action-secondary-detail">Danh sách thành viên</Link>}
-      </ManagementHeader>
-      {isOwnProfile && <ManagementNav active="profile" userId={user.id} isAdmin={(session?.user as { role?: string } | undefined)?.role === 'ADMIN'} />}
-      <div className="grid items-start gap-6 lg:grid-cols-[18rem_minmax(0,1fr)]">
-        <aside className="space-y-4 lg:sticky lg:top-32" aria-label="Thông tin thành viên">
-          <section className="panel-detail !p-5 !shadow-none">
-            <div className="mb-4 flex items-center gap-3">
-              <MediaImage src={user.avatarUrl} alt={`Ảnh của ${user.fullName}`} className="h-14 w-14 shrink-0 rounded-lg border border-slate-200 object-cover" />
-              <div className="min-w-0"><h2 className="break-words text-lg font-semibold leading-6 text-[#1F2937]">{user.fullName}</h2><span className={`mt-2 inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-xs font-semibold ${currentRole.color}`}><RoleIcon aria-hidden="true" className="h-3.5 w-3.5" />{currentRole.label}</span></div>
+  return (
+    <main className="container mx-auto max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+      <Breadcrumbs items={[{ label: 'Thành viên', href: '/members' }, { label: isOwnProfile ? 'Hồ sơ của tôi' : user.fullName }]} />
+
+      <section aria-label="Thông tin thành viên" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-7">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
+          <ProfileAvatar fullName={user.fullName} avatarUrl={user.avatarUrl} uploadAction={isOwnProfile ? uploadAvatarAction : undefined} removeAction={isOwnProfile ? removeAvatarAction : undefined} />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+              <h1 className="break-words font-serif text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{user.fullName}</h1>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-xs font-semibold text-slate-600"><RoleIcon aria-hidden="true" className="h-3.5 w-3.5" />{currentRole.label}</span>
             </div>
-            <p className="whitespace-pre-line break-words text-sm leading-7 text-[#1F2937]">{user.bio || 'Chưa cập nhật giới thiệu.'}</p>
-            <div className="panel-nested mt-5 grid grid-cols-2 gap-3 !border-0 !p-3 text-center">
-              <div><p className="text-xl font-semibold tabular-nums text-[#1F2937]">{research.total}</p><p className="mt-1 text-xs text-[#1F2937]">Nghiên cứu</p></div>
-              <div className="border-l border-slate-200"><p className="text-xl font-semibold tabular-nums text-[#1F2937]">{robotics.total}</p><p className="mt-1 text-xs text-[#1F2937]">Dự án</p></div>
-            </div>
-          </section>
-          {socialLinks.length > 0 && <section className="rounded-lg border border-slate-200 bg-white p-4"><h2 className="mb-2 text-sm font-semibold text-[#1F2937]">Liên kết cá nhân</h2><div className="divide-y divide-[#153D67]">{socialLinks.map(({ href, label, icon: Icon }) => <a key={label} href={href!} target="_blank" rel="noopener noreferrer" className="flex min-h-11 items-center gap-2 text-sm text-[#1F2937] hover:text-[#1F2937]"><Icon aria-hidden="true" className="h-4 w-4" />{label}<ArrowRight aria-hidden="true" className="ml-auto h-3.5 w-3.5" /></a>)}</div></section>}
-          {isOwnProfile && <Link href="/dashboard" className="action-secondary-detail w-full">Quản lý bài đăng<ArrowRight aria-hidden="true" className="h-4 w-4" /></Link>}
-        </aside>
-        <div className="min-w-0 space-y-8">
-          {[{ id: 'research', label: 'Nghiên cứu khoa học', items: papers, total: research.total, pagination: research, pageParam: 'researchPage', icon: FileText }, { id: 'projects', label: 'Robotics & IoT', items: projects, total: robotics.total, pagination: robotics, pageParam: 'projectPage', icon: Code2 }].map(({ id: sectionId, label, items, total, pagination, pageParam, icon }) => <section key={sectionId} id={sectionId} aria-labelledby={`${sectionId}-title`} className="scroll-mt-32">
-            <div className="mb-4 flex items-center justify-between gap-3 border-b border-slate-200 pb-3"><h2 id={`${sectionId}-title`} className="text-lg font-semibold text-[#1F2937]">{label}</h2><span className="text-xs text-[#1F2937]">{total} công trình</span></div>
-            {items.length ? <div className="grid grid-cols-1 gap-4 md:grid-cols-2">{items.map(item => <ShowcaseCard key={item.id} item={item} />)}</div> : <EmptyState icon={icon} title="Chưa có công trình" description={isOwnProfile ? 'Các công trình đã xuất bản có bạn tham gia sẽ hiển thị tại đây.' : 'Thành viên chưa có công trình trong chuyên mục này.'} />}
-            <div className="mt-6"><MemberPagination page={pagination.page} totalPages={pagination.totalPages} basePath={basePath} pageParam={pageParam} ariaLabel={`Phân trang ${label}`} /></div>
-          </section>)}
+            {user.bio ? <ProfileBio text={user.bio} /> : <p className="mt-2 text-sm text-slate-500">Chưa cập nhật giới thiệu.</p>}
+            {socialLinks.length > 0 && <div className="mt-4 flex flex-wrap gap-2" aria-label="Liên kết cá nhân">
+              {socialLinks.map(({ url, title }, index) => <a key={index} href={url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-9 max-w-full items-center rounded-lg border border-slate-200 px-3 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30"><span className="truncate">{title}</span></a>)}
+            </div>}
+          </div>
+          {isOwnProfile && <div className="flex shrink-0 flex-wrap items-center gap-2 sm:flex-col sm:items-stretch">
+            <ProfileEditor profile={profile} />
+            <ChangePasswordModal autoOpen={query.password === 'change'} required={!!session?.user?.mustChangePassword} />
+          </div>}
         </div>
-      </div>
-    </main></>;
+      </section>
+
+      <section className="mt-7" aria-label="Công trình của thành viên">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">Công trình<span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-sm tabular-nums text-slate-600">{publications.total}</span></h2>{publications.total > 0 && <p className="text-sm text-slate-500">Hiển thị {(publications.page - 1) * 6 + 1}–{Math.min(publications.page * 6, publications.total)} / {publications.total}</p>}</div>
+        {publications.items.length ? <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+          {publications.items.map(item => <Link key={item.id} href={`/showcase/${item.slug}`} className="group flex items-center gap-3 p-4 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#153D67]/30 sm:gap-4 sm:px-5">
+            {item.thumbnailUrl && <MediaImage src={item.thumbnailUrl} alt="" width={64} height={64} loading="lazy" className="hidden h-16 w-16 shrink-0 rounded-lg border border-slate-100 object-cover sm:block" />}
+            <div className="min-w-0 flex-1">
+              <div className="mb-1"><TypeBadge type={item.type} size="sm" /></div>
+              <h3 className="line-clamp-2 break-words text-sm font-semibold leading-6 text-slate-900 group-hover:text-[#153D67] sm:text-base">{item.title}</h3>
+              {item.summary && <p className="mt-1 line-clamp-1 break-words text-sm text-slate-500">{item.summary}</p>}
+            </div>
+            {item.publishedYear && <span className="shrink-0 text-xs tabular-nums text-slate-500 sm:text-sm">{item.publishedYear}</span>}
+            <ArrowUpRight aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400 group-hover:text-[#153D67]" />
+          </Link>)}
+        </div> : <div className="rounded-xl border border-dashed border-slate-300 bg-white/60 px-5 py-8 text-center"><p className="text-sm text-slate-500">Chưa có công trình nào.</p></div>}
+        {publications.totalPages > 1 && <div className="mt-5"><MemberPagination page={publications.page} totalPages={publications.totalPages} basePath={basePath} ariaLabel="Phân trang công trình" /></div>}
+      </section>
+    </main>
+  );
 }
