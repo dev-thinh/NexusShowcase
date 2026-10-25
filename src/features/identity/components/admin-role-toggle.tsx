@@ -6,6 +6,7 @@ import { Role } from '@prisma/client';
 import { ArrowDownCircle, ArrowUpCircle, Loader2, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 export function AdminRoleToggle({
   userId,
@@ -16,13 +17,19 @@ export function AdminRoleToggle({
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const toggleCoreMember = async () => {
     const nextRole = currentRole === 'CORE_MEMBER' ? 'MEMBER' : 'CORE_MEMBER';
     setLoading(true);
-    await updateUserRoleAction(userId, nextRole);
-    setLoading(false);
-    router.refresh();
+    setError('');
+    try {
+      const result = await updateUserRoleAction(userId, nextRole);
+      if (!result.success) { setError(result.error); return; }
+      router.refresh();
+      await notifySuccess(nextRole === 'CORE_MEMBER' ? 'Đã cấp quyền đăng bài cho thành viên.' : 'Đã thu quyền đăng bài của thành viên.');
+    } catch { setError('Không cập nhật được quyền. Vui lòng thử lại.'); }
+    finally { setLoading(false); }
   };
 
 
@@ -40,6 +47,7 @@ export function AdminRoleToggle({
 
   return (
     <div className="inline-flex items-center gap-2">
+      {error && <p role="alert" className="text-xs text-rose-800">{error}</p>}
       <button
         disabled={loading}
         onClick={toggleCoreMember}
