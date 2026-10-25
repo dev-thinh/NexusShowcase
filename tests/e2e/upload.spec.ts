@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { readFile, unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { expect, login, test } from './fixtures';
+import { acknowledgeSuccess, expect, login, test } from './fixtures';
 
 test('uploads an author resource through the editor and downloads the exact PDF', async ({ page, fixture }) => {
   const bytes = Buffer.from(`%PDF-1.4\n% Nexus browser fixture ${randomUUID()}\n%%EOF\n`);
@@ -11,7 +11,7 @@ test('uploads an author resource through the editor and downloads the exact PDF'
     await page.getByRole('button', { name: 'Thêm tài nguyên', exact: true }).click();
     await page.getByRole('button', { name: 'Tệp', exact: true }).click();
     await page.getByLabel('Chọn tệp cho tài nguyên 1').setInputFiles({ name: 'browser-resource.pdf', mimeType: 'application/pdf', buffer: bytes });
-    await expect(page.getByText('Đã tải lên.', { exact: true })).toBeVisible();
+    await acknowledgeSuccess(page, 'Đã tải tệp lên. Lưu bản nháp để giữ thay đổi.');
     const link = page.getByRole('link', { name: 'browser-resource.pdf', exact: true });
     const url = await link.getAttribute('href');
     expect(url).toMatch(/^\/uploads\/resources\/[a-zA-Z0-9_-]+\.pdf$/);
