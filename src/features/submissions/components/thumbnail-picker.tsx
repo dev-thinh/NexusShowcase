@@ -1,10 +1,12 @@
 'use client';
 
 import { MediaImage } from '@/shared/ui/media-image';
+import { FilePicker } from '@/shared/ui/file-picker';
 
 import { uploadFileAction } from '@/features/assets/server/actions';
-import { ImagePlus, X } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { X } from 'lucide-react';
+import { useState } from 'react';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 export interface ThumbnailOption { id: string; url: string; alt: string; caption: string }
 
@@ -15,7 +17,6 @@ export function ThumbnailPicker({ value, images = [], errors = [], onChange, onB
   onChange: (url: string | null) => void;
   onBusy?: (busy: boolean) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const upload = async (file?: File) => {
@@ -30,11 +31,11 @@ export function ThumbnailPicker({ value, images = [], errors = [], onChange, onB
       const result = await uploadFileAction(data);
       if (!result.success) { setError(result.error || 'Không tải được ảnh.'); return; }
       onChange(result.data.url);
+      await notifySuccess('Đã tải ảnh lên. Lưu bản nháp để giữ thay đổi.');
     } catch { setError('Tải ảnh thất bại. Vui lòng thử lại.'); }
     finally {
       setUploading(false);
       onBusy(false);
-      if (inputRef.current) inputRef.current.value = '';
     }
   };
   const message = error || errors[0];
@@ -47,8 +48,7 @@ export function ThumbnailPicker({ value, images = [], errors = [], onChange, onB
         {value && <button type="button" disabled={uploading} onClick={() => { setError(''); onChange(null); }} aria-label="Bỏ ảnh đại diện" className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1F2937] shadow-sm hover:bg-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]"><X aria-hidden="true" className="h-4 w-4" /></button>}
       </div>}
       <div className="space-y-1.5">
-        <input ref={inputRef} id="submission-thumbnail" type="file" accept="image/jpeg,image/png,image/webp" disabled={uploading} onChange={event => void upload(event.target.files?.[0])} aria-invalid={!!message} aria-describedby={message ? 'submission-thumbnail-error' : 'submission-thumbnail-hint'} className="sr-only" />
-        <button type="button" disabled={uploading} onClick={() => inputRef.current?.click()} className="action-secondary-detail min-h-10 text-xs"><ImagePlus aria-hidden="true" className="h-4 w-4" />{uploading ? 'Đang tải ảnh…' : value ? 'Đổi ảnh' : 'Chọn ảnh'}</button>
+        <FilePicker id="submission-thumbnail" label={value ? 'Đổi ảnh' : 'Chọn ảnh'} accept="image/jpeg,image/png,image/webp" busy={uploading} onChange={event => void upload(event.target.files?.[0])} aria-invalid={!!message} aria-describedby={message ? 'submission-thumbnail-error' : 'submission-thumbnail-hint'} />
         <p id="submission-thumbnail-hint" className="text-xs text-[#1F2937]">JPG, PNG, WebP · Tối đa 5 MB</p>
       </div>
     </div>
