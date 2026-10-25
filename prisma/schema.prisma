@@ -25,6 +25,23 @@ model RateLimitBucket {
   @@map("rate_limit_buckets")
 }
 
+model Asset {
+  id                String    @id @default(cuid())
+  url               String    @unique
+  provider          String
+  fileId            String?
+  ownerId           String?
+  private           Boolean   @default(false)
+  createdAt         DateTime  @default(now())
+  deletionToken     String?
+  deletionStartedAt DateTime?
+  deletedAt         DateTime?
+
+  @@unique([provider, fileId])
+  @@index([createdAt, deletedAt])
+  @@map("assets")
+}
+
 enum Role {
   GUEST
   MEMBER
