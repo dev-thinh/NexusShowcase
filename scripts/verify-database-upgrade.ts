@@ -82,16 +82,18 @@ export async function verifyDatabaseUpgrade(input: { freshUrl: string; legacyFix
     await legacy.$executeRaw`INSERT INTO showcase_items (id, slug, title, summary, content, type, status, visibility, "creatorId", "updatedAt", tags)
       VALUES ('upgrade-live', 'upgrade-live', 'Original live title', 'Live summary', 'Original live content', 'PROJECT', 'PUBLISHED', 'PUBLIC', 'upgrade-author', CURRENT_TIMESTAMP, ARRAY['legacy'])`;
     await executeMigration(migrations[1], input.legacyFixtureUrl);
-    await legacy.user.update({ where: { id: 'upgrade-author' }, data: { role: 'EDITOR', sessionVersion: 3 } });
+    // The generated client describes the final schema, but these fixtures are
+    // written between migrations. Return only columns present at this stage.
+    await legacy.user.update({ where: { id: 'upgrade-author' }, data: { role: 'EDITOR', sessionVersion: 3 }, select: { id: true } });
     await legacy.$executeRaw`INSERT INTO showcase_items (id, slug, title, summary, type, status, "creatorId", "updatedAt") VALUES ('upgrade-draft', 'upgrade-draft', 'Pending draft', 'Draft summary', 'PROJECT', 'READY_FOR_APPROVAL', 'upgrade-author', CURRENT_TIMESTAMP)`;
     const snapshot = { title: 'Immutable submitted title', summary: 'Submitted summary', content: 'Immutable history', tags: ['historical'] };
-    const revision = await legacy.submissionRevision.create({ data: { itemId: 'upgrade-live', revisionNumber: 1, submittedById: 'upgrade-author', snapshot } });
-    await legacy.editorialDraft.create({ data: { itemId: 'upgrade-live', assignedEditorId: 'upgrade-author', overrides: { title: 'Legacy editorial title', tags: ['removed'] } } });
-    await legacy.auditEvent.create({ data: { itemId: 'upgrade-live', actorId: 'upgrade-author', action: 'LEGACY_FIXTURE', metadata: { preserve: true } } });
-    await legacy.reviewComment.create({ data: { itemId: 'upgrade-live', revisionId: revision.id, authorId: 'upgrade-author', audience: 'AUTHOR', severity: 'REQUIRED', fieldKey: 'title', body: 'Retain history' } });
+    const revision = await legacy.submissionRevision.create({ data: { itemId: 'upgrade-live', revisionNumber: 1, submittedById: 'upgrade-author', snapshot }, select: { id: true } });
+    await legacy.editorialDraft.create({ data: { itemId: 'upgrade-live', assignedEditorId: 'upgrade-author', overrides: { title: 'Legacy editorial title', tags: ['removed'] } }, select: { id: true } });
+    await legacy.auditEvent.create({ data: { itemId: 'upgrade-live', actorId: 'upgrade-author', action: 'LEGACY_FIXTURE', metadata: { preserve: true } }, select: { id: true } });
+    await legacy.reviewComment.create({ data: { itemId: 'upgrade-live', revisionId: revision.id, authorId: 'upgrade-author', audience: 'AUTHOR', severity: 'REQUIRED', fieldKey: 'title', body: 'Retain history' }, select: { id: true } });
     await executeMigration(migrations[2], input.legacyFixtureUrl);
     const authorDraft = { title: 'Unpublished update', summary: 'Still private', content: 'Draft content', tags: ['removed'] };
-    await legacy.showcaseItem.update({ where: { id: 'upgrade-live' }, data: { authorDraft } });
+    await legacy.showcaseItem.update({ where: { id: 'upgrade-live' }, data: { authorDraft }, select: { id: true } });
     await cli(['migrate', 'deploy'], input.legacyFixtureUrl, 'legacy-deploy');
     await cli(['migrate', 'diff', '--from-schema-datasource', 'prisma/schema.prisma', '--to-schema-datamodel', 'prisma/schema.prisma', '--exit-code'], input.legacyFixtureUrl, 'legacy-schema-diff');
     const [user, live, draft, history, editorial, auditCount, commentCount] = await Promise.all([
