@@ -13,5 +13,5 @@ export default async function ReviewPreviewPage({ params }: { params: Promise<{ 
     revisions: { orderBy: { revisionNumber: 'desc' }, take: 1 }, editorialDraft: true,
   } });
   if (!item) notFound();
-  return <main className="min-h-screen bg-[#FFFFFF] px-4 py-8"><div className="mx-auto max-w-4xl"><Breadcrumbs items={[{ label: 'Quản trị', href: '/admin' }, { label: 'Phê duyệt bài đăng', href: '/admin/reviews' }, { label: item.title, href: `/admin/reviews/${item.id}` }, { label: 'Xem trước' }]} /><p className="mb-4 text-sm font-semibold text-[#1F2937]">Bản xem trước · Chưa xuất bản</p><SubmissionPreview snapshot={getReviewSnapshot(item)} /></div></main>;
+  return <section className="bg-white p-4 sm:p-6"><div className="mx-auto max-w-4xl"><Breadcrumbs items={[{ label: 'Phê duyệt', href: '/admin/reviews' }, { label: item.title, href: `/admin/reviews/${item.id}` }, { label: 'Xem trước' }]} /><p className="mb-4 text-sm font-semibold text-[#1F2937]">Bản xem trước · Chưa xuất bản</p><SubmissionPreview snapshot={getReviewSnapshot(item)} /></div></section>;
 }
