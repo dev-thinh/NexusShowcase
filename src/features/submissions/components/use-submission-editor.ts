@@ -2,11 +2,21 @@
 
 import { articleFromLegacy, serializeArticle, standaloneResources } from '@/features/submissions/model/article';
 import type { ShowcaseDraftInput } from '@/features/submissions/model/input';
+import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
+import { formErrors } from '@/shared/lib/form-validation';
+import type { z } from 'zod';
 import { saveShowcaseDraftAction, submitShowcaseForReviewAction } from '@/features/submissions/server/actions';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+
+function clientFieldErrors(error: z.ZodError) {
+  const fields: Record<string, string[]> = {};
+  for (const [path, message] of Object.entries(formErrors(error))) (fields[path.split('.')[0]] ??= []).push(message);
+  return fields;
+}
 
 export interface SubmissionEditorState {
   itemId: string | null;
@@ -102,6 +112,11 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
 
   const saveDraft = useCallback(async () => {
     if (savingRef.current) return null;
+    const parsed = showcaseDraftInputSchema.safeParse(state.data);
+    if (!parsed.success) {
+      dispatch({ type: 'errors', error: 'Vui lòng kiểm tra các thông tin được đánh dấu.', fieldErrors: clientFieldErrors(parsed.error) });
+      return null;
+    }
     savingRef.current = true;
     const editSequence = state.editSequence;
     dispatch({ type: 'saving' });
@@ -122,6 +137,11 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
 
   const submitForReview = useCallback(async () => {
     if (busyRef.current) return false;
+    const parsed = showcaseSubmissionInputSchema.safeParse(state.data);
+    if (!parsed.success) {
+      dispatch({ type: 'errors', error: 'Vui lòng kiểm tra các thông tin được đánh dấu.', fieldErrors: clientFieldErrors(parsed.error) });
+      return false;
+    }
     busyRef.current = true;
     try {
       const saved = await saveDraft();
@@ -136,13 +156,14 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
         dispatch({ type: 'failed', error: result.error, fieldErrors: result.fieldErrors });
         return false;
       }
-      router.replace('/dashboard?submitted=1');
+      await notifySuccess('Đã gửi công trình để xét duyệt.');
+      router.replace('/dashboard');
       return true;
     } catch {
       dispatch({ type: 'failed', error: 'Không gửi được bài. Bản nháp đã lưu vẫn được giữ lại.' });
       return false;
     } finally { busyRef.current = false; }
-  }, [saveDraft, router]);
+  }, [saveDraft, router, state.data]);
 
   return { state, updateField, saveDraft, submitForReview };
 }

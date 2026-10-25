@@ -16,6 +16,7 @@ import { ReviewComments, type AuthorReviewComment } from './review-comments';
 import { SectionEditor } from './section-editor';
 import { SubmissionActionBar } from './submission-action-bar';
 import { useSubmissionEditor } from './use-submission-editor';
+import { notifySuccess } from '@/shared/dialogs/success';
 
 export interface SubmissionEditorProps {
   initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number };
@@ -65,7 +66,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
 
           </section>
           <div className="min-w-0 border-t border-slate-200 bg-[#FFFFFF] p-6 sm:p-8 lg:border-t-0">
-            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">Tác giả và người đóng góp</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm người tham gia và xác nhận vai trò của từng người.</p><ReviewComments comments={reviewComments} fieldKey="contributors" /><ContributorEditor value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
+            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">Tác giả và người đóng góp</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm người tham gia và xác nhận vai trò của từng người.</p><ReviewComments comments={reviewComments} fieldKey="contributors" />{!!state.fieldErrors.contributors?.length && <p role="alert" tabIndex={-1} className="mt-2 text-sm text-rose-800">{state.fieldErrors.contributors[0]}</p>}<ContributorEditor value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
             <section className="mt-7 border-t border-slate-200 pt-6" aria-labelledby="submission-resources-title">
               <h2 id="submission-resources-title" className="text-lg font-semibold text-[#1F2937]">Tài nguyên đính kèm</h2>
               <p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm tệp hoặc liên kết bổ sung cho bài viết.</p>
@@ -83,7 +84,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
         </div>
 
       </fieldset>}
-      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={uploads > 0} onSave={() => void saveDraft()} onSubmit={async () => { if (await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
+      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={uploads > 0} onSave={async () => { if (await saveDraft()) await notifySuccess('Đã lưu bản nháp công trình.'); }} onSubmit={async () => { if (await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
     </form>
   );
 }
