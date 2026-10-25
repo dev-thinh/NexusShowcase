@@ -46,11 +46,13 @@ describe('Navbar Nav Component Structure', () => {
     expect(navContent).toContain('slug: \'robotics-iot\'');
   });
 
-  it('exposes review queue to EDITOR while hiding member administration', () => {
+  it('keeps one admin workspace entry and personal actions in the account menu', () => {
     const navbarNavPath = path.resolve(process.cwd(), 'src/app/(shell)/_components/navbar-nav.tsx');
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
 
-    expect(navContent).toContain("canUserReview(user)");
-    expect(navContent).toContain('/admin/reviews');
+    expect(navContent).toContain("href: '/admin', label: 'Quản trị'");
+    expect(navContent).not.toContain("href: '/admin/reviews'");
+    expect(navContent).not.toContain("href: '/admin/members'");
+    expect(navContent).toContain("href: '/dashboard'");
   });
 });

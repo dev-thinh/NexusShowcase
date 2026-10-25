@@ -3,14 +3,9 @@
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { useEffect, useRef } from 'react';
 
-export function ManagementNav({ active, userId, isAdmin = false }: { active: 'overview' | 'members' | 'posts' | 'profile'; userId: string; isAdmin?: boolean }) {
+export function ManagementNav({ active, userId }: { active: 'posts' | 'profile'; userId: string }) {
   const isActive = (id: string, _href: string) => active === id;
   const links = [
-    ...(isAdmin ? [
-      { id: 'overview', href: '/admin', label: 'Tổng quan' },
-      { id: 'reviews', href: '/admin/reviews', label: 'Phê duyệt' },
-      { id: 'members', href: '/admin/members', label: 'Thành viên' },
-    ] : []),
     { id: 'posts', href: '/dashboard', label: 'Bài đăng của tôi' },
     { id: 'profile', href: `/members/${userId}`, label: 'Hồ sơ của tôi' },
   ];

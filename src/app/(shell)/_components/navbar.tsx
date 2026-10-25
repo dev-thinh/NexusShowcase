@@ -2,6 +2,7 @@ import { NavbarNav, PublicNavigation } from '@/app/(shell)/_components/navbar-na
 import { getSession as auth } from '@/features/identity/server/session';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { Suspense } from 'react';
+import { prisma } from '@/server/db/prisma';
 
 export function SiteNavbar() {
 
@@ -53,5 +54,6 @@ export function SiteNavbar() {
 export async function AccountNavigation() {
   const session = await auth();
   const user = session?.user;
-  return <NavbarNav user={user ? { id: user.id, name: user.name, role: user.role ?? 'GUEST' } : null} />;
+  const member = user ? await prisma.user.findUnique({ where: { id: user.id }, select: { fullName: true, avatarUrl: true } }) : null;
+  return <NavbarNav user={user ? { id: user.id, name: member?.fullName ?? user.name, avatarUrl: member?.avatarUrl, role: user.role ?? 'GUEST' } : null} />;
 }

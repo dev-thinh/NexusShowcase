@@ -1,17 +1,16 @@
 'use client';
 
 import { SignOutButton } from '@/features/identity/components/sign-out-button';
+import { MemberAvatar } from '@/shared/ui/member-avatar';
 import { canUserReview, canUserUpload } from '@/features/identity/model/permissions';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { useNavigationPathname as usePathname, useNavigationVisualPathname } from '@/shared/navigation/navigation-transition';
 import {
-CheckSquare,
 ChevronDown,
 LayoutDashboard,
 Plus,
 ShieldCheck,
 User,
-Users,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -19,6 +18,7 @@ interface NavbarNavProps {
   user?: {
     id: string;
     name?: string | null;
+    avatarUrl?: string | null;
     role: string;
   } | null;
 }
@@ -91,9 +91,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
                   : 'bg-white hover:bg-[#FFFFFF] text-[#1F2937] border-slate-200'
               }`}
             >
-              <span aria-hidden="true" className="w-6 h-6 rounded-full bg-[#FFFFFF] text-[#1F2937] flex items-center justify-center text-xs font-semibold shrink-0">
-                {user.name?.charAt(0) || 'U'}
-              </span>
+              <MemberAvatar fullName={user.name || 'Thành viên'} src={user.avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
               <span className="truncate max-w-[65px] sm:max-w-[110px] font-semibold">
                 {user.name || 'Thành viên'}
               </span>
@@ -115,9 +113,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
                 className="absolute top-full right-0 mt-2 w-64 max-w-[calc(100vw-2rem)] max-h-[calc(100dvh-5rem)] overflow-y-auto bg-white rounded-xl border border-slate-200 shadow-xl p-1.5 z-50"
               >
                 {[
-                  ...(user.role === 'ADMIN' ? [{ href: '/admin', label: 'Admin Dashboard', icon: ShieldCheck }] : []),
-                  ...(canUserReview(user) ? [{ href: '/admin/reviews', label: 'Phê duyệt', icon: CheckSquare }] : []),
-                  ...(user.role === 'ADMIN' ? [{ href: '/admin/members', label: 'Quản lý thành viên', icon: Users }] : []),
+                  ...(canUserReview(user) ? [{ href: '/admin', label: 'Quản trị', icon: ShieldCheck }] : []),
                   { href: '/dashboard', label: 'Bài đăng của tôi', icon: LayoutDashboard },
                   ...(canUserUpload(user) ? [{ href: '/dashboard/items/new', label: 'Đăng bài mới', icon: Plus }] : []),
                   { href: `/members/${user.id}`, label: 'Hồ sơ của tôi', icon: User },

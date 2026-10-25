@@ -33,7 +33,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <ManagementHeader title="Bài đăng của tôi" description="Theo dõi bản nháp, phản hồi và các công trình đã xuất bản.">
         {isUploader && <Link href="/dashboard/items/new" className="action-primary-detail"><Plus aria-hidden="true" className="h-4 w-4" />Đăng bài mới</Link>}
       </ManagementHeader>
-      <ManagementNav active="posts" userId={user.id} isAdmin={user.role === 'ADMIN'} />
+      <ManagementNav active="posts" userId={user.id} />
       <div className="mb-6 grid grid-cols-3 gap-3">
         <ManagementStat label="Tổng bài đăng" value={counts.ALL} icon={FileText} />
         <ManagementStat label="Đang chờ duyệt" value={counts.PENDING_REVIEW} icon={Clock} />

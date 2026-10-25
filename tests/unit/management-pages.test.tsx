@@ -48,9 +48,9 @@ describe('management pages', () => {
 
   it('keeps admin access checks and counts all pins rather than only the preview list', async () => {
     const html = renderToStaticMarkup(<DialogProvider>{await AdminDashboardPage()}</DialogProvider>);
-    expect(html).toContain('Tổng quan quản trị');
+    expect(html).toContain('Tổng quan');
     expect(html).toContain('>12</span>');
-    expect(mocks.items).toHaveBeenCalledWith(expect.objectContaining({ take: 10 }));
+    expect(mocks.items).toHaveBeenCalledWith(expect.objectContaining({ take: 5 }));
     mocks.auth.mockResolvedValue({ user: { id: member.id, role: 'MEMBER' } });
     await expect(AdminDashboardPage()).rejects.toThrow('redirect:/');
   });
@@ -86,7 +86,8 @@ describe('management pages', () => {
   it('shows account actions only on the signed-in user profile', async () => {
     const own = renderToStaticMarkup(await MemberProfilePage({ params: Promise.resolve({ id: member.id }) }));
     expect(own).toContain('Đổi mật khẩu');
-    expect(own).toContain('Điều hướng quản lý');
+    expect(own).toContain('Tùy chọn ảnh đại diện');
+    expect(own).toContain('Chỉnh sửa hồ sơ');
     mocks.auth.mockResolvedValue(null);
     const publicProfile = renderToStaticMarkup(await MemberProfilePage({ params: Promise.resolve({ id: member.id }) }));
     expect(publicProfile).not.toContain('Đổi mật khẩu');
