@@ -42,6 +42,7 @@ export async function auditAssetReferences(input: { prisma: PrismaClient; root: 
     ['item.attachments', () => database.itemAttachment.findMany({ select: { fileUrl: true } })],
     ['revision.history', () => database.submissionRevision.findMany({ select: { snapshot: true } })],
     ['editorial.overrides', () => database.editorialDraft.findMany({ select: { overrides: true } })],
+    ['gallery.photos', () => database.homeMomentsGallery.findMany({ select: { photos: true } })],
   ] as const;
   for (const [name, read] of readers) {
     try { inspect(await read()); } catch { incompleteSources.push(name); }
