@@ -21,6 +21,7 @@ it('uploads without overwriting or renaming the stored file', async () => {
   expect(options.headers.Authorization).toBe(`Basic ${Buffer.from('private_test:').toString('base64')}`);
   expect(options.body.get('useUniqueFileName')).toBe('false');
   expect(options.body.get('overwriteFile')).toBe('false');
+  expect(options.body.get('isPrivateFile')).toBe('true');
 });
 it('rejects an unexpected response path and sanitizes provider errors', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValueOnce(new Response(JSON.stringify({ fileId: 'id', filePath: '/other/test.zip', url: 'https://ik.imagekit.io/test/other/test.zip' }))).mockResolvedValueOnce(new Response('private_test', { status: 401 })));
