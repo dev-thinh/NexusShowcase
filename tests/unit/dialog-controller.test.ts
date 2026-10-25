@@ -4,6 +4,12 @@ import { describe, expect, it, vi } from 'vitest';
 const request = (title: string) => ({ mode: 'confirm' as const, title, message: 'Xác nhận thao tác.' });
 
 describe('application dialogs', () => {
+  it('queues success notifications and resolves them on dismissal', async () => {
+    const change = vi.fn(); const dialog = createDialogController(change);
+    const success = dialog.open({ mode: 'success', title: 'Thành công', message: 'Đã lưu thay đổi.', confirmLabel: 'Đã hiểu' });
+    expect(change).toHaveBeenLastCalledWith(expect.objectContaining({ mode: 'success', confirmLabel: 'Đã hiểu' }));
+    dialog.settle(true); await expect(success).resolves.toBe(true);
+  });
   it('waits for a decision before allowing an action', async () => {
     const change = vi.fn();
     const action = vi.fn();

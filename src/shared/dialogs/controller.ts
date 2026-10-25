@@ -6,7 +6,7 @@ export interface DialogOptions {
   destructive?: boolean;
 }
 export interface DialogRequest extends DialogOptions {
-  mode: 'confirm' | 'alert';
+  mode: 'confirm' | 'alert' | 'success';
 }
 
 /** Resolve every request exactly once, including cancellation during navigation. */
