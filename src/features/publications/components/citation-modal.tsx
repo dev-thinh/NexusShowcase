@@ -7,8 +7,8 @@ generateBibTeX,
 generateIEEE,
 } from '@/features/publications/model/citation';
 import { Modal } from '@/shared/ui/modal';
+import { notifySuccess } from '@/shared/dialogs/success';
 import {
-Check,
 Copy,
 Download,
 } from 'lucide-react';
@@ -23,7 +23,7 @@ interface CitationModalProps {
 export function CitationModal({ item, triggerVariant = 'button', className }: CitationModalProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'bibtex' | 'apa' | 'ieee'>('bibtex');
-  const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState('');
 
   const bibtex = generateBibTeX(item);
   const apa = generateAPA(item);
@@ -34,10 +34,10 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(currentContent);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopyError('');
+      await notifySuccess(`Đã sao chép trích dẫn ${activeTab.toUpperCase()}.`);
     } catch {
-      // Fallback
+      setCopyError('Không sao chép được trích dẫn. Vui lòng thử lại.');
     }
   };
 
@@ -85,7 +85,7 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
             <button
               onClick={() => {
                 setActiveTab('bibtex');
-                setCopied(false);
+                setCopyError('');
               }}
               className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'bibtex'
@@ -98,7 +98,7 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
             <button
               onClick={() => {
                 setActiveTab('apa');
-                setCopied(false);
+                setCopyError('');
               }}
               className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'apa'
@@ -111,7 +111,7 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
             <button
               onClick={() => {
                 setActiveTab('ieee');
-                setCopied(false);
+                setCopyError('');
               }}
               className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === 'ieee'
@@ -142,6 +142,7 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
               </button>
             )}
 
+            {copyError && <p role="alert" className="text-sm text-rose-800">{copyError}</p>}
             <div className="flex items-center justify-center gap-2">
               <button
                 onClick={() => setIsOpen(false)}
@@ -153,17 +154,8 @@ export function CitationModal({ item, triggerVariant = 'button', className }: Ci
                 onClick={handleCopy}
                 className="action-primary-detail"
               >
-                {copied ? (
-                  <>
-                    <Check aria-hidden="true" className="w-3.5 h-3.5 text-[#1F2937]" />
-                    <span>Đã sao chép!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy aria-hidden="true" className="w-3.5 h-3.5 text-white/80" />
-                    <span>Sao chép {activeTab.toUpperCase()}</span>
-                  </>
-                )}
+                <Copy aria-hidden="true" className="w-3.5 h-3.5 text-white/80" />
+                <span>Sao chép {activeTab.toUpperCase()}</span>
               </button>
             </div>
           </div>
