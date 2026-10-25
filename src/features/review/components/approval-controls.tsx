@@ -6,9 +6,14 @@ import { Modal } from '@/shared/ui/modal';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { notifySuccess } from '@/shared/dialogs/success';
+import { useRouter } from 'next/navigation';
+import { reviewFeedbackSchema } from '../model/decision';
+import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
-export function ApprovalControls({ itemId, reviewVersion }: { itemId: string; reviewVersion: number }) {
+export function ApprovalControls({ itemId, reviewVersion, returnTo = '/admin/reviews' }: { itemId: string; reviewVersion: number; returnTo?: string }) {
   const dialog = useDialog();
+  const router = useRouter();
   const [feedbackAction, setFeedbackAction] = useState<'REQUEST_REVISION' | 'REJECT' | null>(null);
   const [reason, setReason] = useState('');
   const [visibility, setVisibility] = useState<'PRIVATE' | 'PUBLIC'>('PRIVATE');
@@ -31,8 +36,10 @@ export function ApprovalControls({ itemId, reviewVersion }: { itemId: string; re
       const result = await response.json() as ActionResult<unknown>;
       if (!mounted.current) return;
       if (!result.success) { setError(result.error); return; }
+      setFeedbackAction(null);
+      await notifySuccess(action === 'PUBLISH' ? 'Đã duyệt và xuất bản công trình.' : action === 'REQUEST_REVISION' ? 'Đã gửi yêu cầu chỉnh sửa cho tác giả.' : 'Đã từ chối bài đăng.');
       // The mutation response finishes independently of the RSC action queue.
-      window.location.assign('/admin/reviews');
+      router.replace(returnTo, { scroll: false });
       navigating = true;
     } catch { if (mounted.current) setError('Không kết nối được. Vui lòng thử lại.'); }
     finally { if (!navigating) { deciding.current = false; if (mounted.current) setPending(false); } }
@@ -65,15 +72,16 @@ export function ApprovalControls({ itemId, reviewVersion }: { itemId: string; re
       title={feedbackAction === 'REQUEST_REVISION' ? 'Yêu cầu chỉnh sửa' : 'Từ chối bài đăng'}
       description={feedbackAction === 'REQUEST_REVISION' ? 'Nhập nội dung cần chỉnh sửa để gửi lại cho tác giả.' : 'Nhập lý do từ chối để thông báo cho tác giả.'}
     >
-      <form className="space-y-4" onSubmit={event => { event.preventDefault(); decide(feedbackAction); }}>
+      <ValidatedForm schema={reviewFeedbackSchema} values={{ reason }} inlineErrors className="space-y-4" onSubmit={event => { event.preventDefault(); decide(feedbackAction); }}>
         <label htmlFor="approval-feedback" className="block text-sm font-semibold text-[#1F2937]">{feedbackAction === 'REQUEST_REVISION' ? 'Nội dung yêu cầu chỉnh sửa' : 'Lý do từ chối'} <span className="text-[#1F2937]">*</span></label>
-        <textarea id="approval-feedback" value={reason} disabled={pending} required maxLength={2000} rows={5} onChange={e => setReason(e.target.value)} aria-invalid={!!error} aria-describedby={error ? 'approval-feedback-error' : undefined} placeholder={feedbackAction === 'REQUEST_REVISION' ? 'Mô tả cụ thể những nội dung tác giả cần bổ sung hoặc sửa…' : 'Nhập lý do từ chối bài đăng…'} className="w-full rounded-md border border-slate-200 p-3 text-sm font-normal" />
+        <textarea id="approval-feedback" name="reason" value={reason} disabled={pending} required maxLength={2000} rows={5} onChange={e => setReason(e.target.value)} aria-invalid={!!error} aria-describedby={error ? 'approval-feedback-error' : undefined} placeholder={feedbackAction === 'REQUEST_REVISION' ? 'Mô tả cụ thể những nội dung tác giả cần bổ sung hoặc sửa…' : 'Nhập lý do từ chối bài đăng…'} className="w-full rounded-md border border-slate-200 p-3 text-sm font-normal" />
+        <FieldError name="reason" />
         {error && <p id="approval-feedback-error" role="alert" className="text-sm text-[#1F2937]">{error}</p>}
         <div className="flex flex-wrap justify-center gap-2">
           <button type="button" disabled={pending} className="action-secondary-detail min-h-11 disabled:opacity-50" onClick={() => { setFeedbackAction(null); setError(''); }}>Hủy</button>
           <button type="submit" disabled={pending || !reason.trim()} className="action-primary-detail min-h-11 disabled:opacity-50">{pending ? 'Đang gửi…' : feedbackAction === 'REQUEST_REVISION' ? 'Gửi yêu cầu chỉnh sửa' : 'Xác nhận từ chối'}</button>
         </div>
-      </form>
+      </ValidatedForm>
     </Modal>, document.body)}
   </section>;
 }
