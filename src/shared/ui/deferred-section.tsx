@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
-/** Do not invoke the server loader until this section approaches the viewport. */
+/** Fetch each section independently after mount, without blocking route navigation. */
 export function DeferredSection({ name, load, fallback }: { name: string; load: (signal: AbortSignal) => Promise<ReactNode>; fallback: ReactNode }) {
-  const root = useRef<HTMLDivElement>(null);
   const active = useRef(false);
   const inFlight = useRef(false);
   const request = useRef<AbortController | null>(null);
@@ -30,17 +29,10 @@ export function DeferredSection({ name, load, fallback }: { name: string; load: 
       request.current = null;
       inFlight.current = false;
     };
-    if (!('IntersectionObserver' in window)) void start();
-    else {
-      const observer = new IntersectionObserver(entries => {
-        if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); void start(); }
-      }, { rootMargin: '200px 0px' });
-      if (root.current) observer.observe(root.current);
-      return () => { cleanup(); observer.disconnect(); };
-    }
+    void start();
     return cleanup;
   }, [start]);
-  return <div ref={root} data-deferred-section={name} data-state={state}>
+  return <div data-deferred-section={name} data-state={state}>
     {state === 'ready' ? <div data-deferred-content>{content}</div> : state === 'error' ? <div role="alert" className="panel-public space-y-3">
       <p>Không tải được nội dung.</p>
       <button type="button" onClick={() => void start()} className="action-secondary-detail">Thử lại</button>
