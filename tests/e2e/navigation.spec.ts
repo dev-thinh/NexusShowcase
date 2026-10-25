@@ -10,6 +10,28 @@ test('preserves navbar across route transitions', async ({ page }) => {
   await expect(page.locator('header[data-test-shell="kept"]')).toBeVisible();
 });
 
+test('switching public tabs changes page before smoothly returning to the top', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  const initialScroll = await page.evaluate(() => {
+    const samples: Array<{ pathname: string; top: number }> = [];
+    Object.assign(window, { navigationScrollSamples: samples });
+    window.addEventListener('scroll', () => samples.push({ pathname: location.pathname, top: window.scrollY }), { passive: true });
+    return window.scrollY;
+  });
+  expect(initialScroll).toBeGreaterThan(0);
+  await page.locator('nav a[href="/members"]').first().click();
+  await expect(page).toHaveURL(/\/members$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  const samples = await page.evaluate(() => (window as unknown as { navigationScrollSamples: Array<{ pathname: string; top: number }> }).navigationScrollSamples);
+  expect(samples.some(sample => sample.pathname === '/members' && sample.top > 0 && sample.top < initialScroll)).toBe(true);
+  expect(samples.some(sample => sample.pathname === '/' && sample.top < initialScroll - 1)).toBe(false);
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.locator('nav a[href="/"]').first().click();
+  await expect(page).toHaveURL(/\/$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+});
+
 test('shows feedback before delayed RSC and keeps the committed tab active', async ({ page }) => {
   let release!: () => void;
   const clicked = new Promise<void>(resolve => { release = resolve; });

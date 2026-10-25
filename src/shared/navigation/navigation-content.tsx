@@ -10,8 +10,12 @@ export function NavigationContent({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const contentRef = useRef<HTMLDivElement>(null);
   const initial = useRef(true);
+  const previousPathname = useRef(pathname);
   useLayoutEffect(() => {
+    const previous = previousPathname.current;
+    previousPathname.current = pathname;
     if (initial.current) { initial.current = false; return; }
+    if ((previous === '/admin' || previous?.startsWith('/admin/')) && (pathname === '/admin' || pathname?.startsWith('/admin/'))) return;
     const element = contentRef.current;
     if (destination || !element || window.matchMedia('(prefers-reduced-motion: reduce)').matches || typeof element.animate !== 'function') return;
     const animation = element.animate([
