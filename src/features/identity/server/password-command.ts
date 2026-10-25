@@ -15,7 +15,7 @@ export async function changePassword(actor: Actor, input: ChangePasswordInput) {
 
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, passwordHash: true, status: true, deletedAt: true },
+    select: { id: true, passwordHash: true, status: true, deletedAt: true, sessionVersion: true },
   });
 
   if (!user || user.status !== 'ACTIVE' || user.deletedAt || !user.passwordHash) {
@@ -28,14 +28,16 @@ export async function changePassword(actor: Actor, input: ChangePasswordInput) {
   }
 
   const newHash = await bcrypt.hash(parsed.data.newPassword, 10);
-  await prisma.user.update({
-    where: { id: userId },
+  const updated = await prisma.user.updateMany({
+    where: { id: userId, passwordHash: user.passwordHash, sessionVersion: user.sessionVersion, status: 'ACTIVE', deletedAt: null },
     data: {
       passwordHash: newHash,
       mustChangePassword: false,
       sessionVersion: { increment: 1 },
     },
   });
+
+  if (updated.count !== 1) return { success: false as const, code: 'CONFLICT' as const, error: 'Mật khẩu vừa thay đổi. Vui lòng đăng nhập và thử lại.' };
 
   return { success: true as const, data: { message: 'Đổi mật khẩu thành công.' } };
 }
