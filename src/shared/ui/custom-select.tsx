@@ -97,7 +97,7 @@ export function CustomSelect({ id, name, value, defaultValue = '', options, plac
         aria-invalid={invalid} aria-required={required} aria-describedby={describedBy}
         onClick={() => { setActive(Math.max(selected, 0)); setOpen(current => !current); }}
         onKeyDown={event => {
-          if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); setOpen(false); }
+          if (event.key === 'Escape' && open) { event.preventDefault(); event.stopPropagation(); setOpen(false); }
           else if (event.key === 'Tab') setOpen(false);
           else if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
             event.preventDefault();
