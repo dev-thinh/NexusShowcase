@@ -1,4 +1,4 @@
-import { expect, login, seedPhotoGalleries, test } from './fixtures';
+import { acknowledgeSuccess, expect, login, seedPhotoGalleries, test } from './fixtures';
 import { defaultMoments } from '../fixtures/moments';
 import type { Locator, Page } from '@playwright/test';
 
@@ -66,6 +66,7 @@ test('mouse drags swap, move across rows and place library images, then persist 
     const unchanged = await database.homeMomentsGallery.findUniqueOrThrow({ where: { id: 'home' } });
     expect((unchanged.photos as Array<{ id: string; slot: number | null }>).find(photo => photo.id === extra.id)?.slot).toBeNull();
     await modal.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh khoảnh khắc.');
     await expect(modal).toHaveCount(0);
     await pencil.click();
     await expect(slot(0)).toHaveAttribute('data-moment-drag', extra.id);

@@ -53,7 +53,7 @@ test('leaving home does not wait for an in-flight deferred section', async ({ pa
   try {
     await page.locator('nav a[href="/members"]').first().click();
     await expect(page).toHaveURL(/\/members$/);
-    await expect(page.getByRole('heading', { name: 'Benchmark Member 000', exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Benchmark Member 000 · Ban chủ nhiệm', exact: true })).toBeVisible();
   } finally { release(); }
 });
 

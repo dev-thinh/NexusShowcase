@@ -20,6 +20,13 @@ export const test = base.extend<{ fixture: Manifest; database: PrismaClient }>({
   },
 });
 export { expect };
+export async function acknowledgeSuccess(page: Page, message?: string) {
+  const dialog = page.getByRole('dialog', { name: 'Thành công', exact: true });
+  await expect(dialog).toBeVisible();
+  if (message) await expect(dialog).toContainText(message);
+  await dialog.getByRole('button', { name: 'Đã hiểu', exact: true }).click();
+  await expect(dialog).toHaveCount(0);
+}
 export async function login(page: Page, user: TestUser, callbackUrl = '/dashboard') {
   // Fixture logins repeat across browser scenarios. Reset only this seeded
   // identity's budget; direct form submissions still exercise real throttling.

@@ -1,6 +1,6 @@
 import { unlink } from 'node:fs/promises';
 import path from 'node:path';
-import { expect, login, seedPhotoGalleries, test } from './fixtures';
+import { acknowledgeSuccess, expect, login, seedPhotoGalleries, test } from './fixtures';
 import { defaultMoments, fixtureUpload } from '../fixtures/moments';
 
 test('admin uses modal slots and a reusable library without repeating photos between rows', async ({ page, fixture, database, browser }) => {
@@ -43,12 +43,14 @@ test('admin uses modal slots and a reusable library without repeating photos bet
     ]);
     expect(upload.ok()).toBe(true);
     uploaded = (await upload.json()).url;
+    await acknowledgeSuccess(page, 'Đã tải 1 ảnh vào thư viện chỉnh sửa.');
     expect((await page.request.get(uploaded!)).ok()).toBe(true);
     await expect(modal.locator('.moments-editor__asset')).toHaveCount(7);
     await modal.getByRole('combobox', { name: 'Lọc thư viện ảnh' }).click();
     await page.getByRole('option', { name: 'Chưa sử dụng', exact: true }).click();
     await expect(modal.locator('.moments-editor__asset')).toHaveCount(1);
     await modal.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh khoảnh khắc.');
     await expect(modal).toHaveCount(0);
     await expect(page.locator('.moments-lane[data-row="0"]')).toHaveAttribute('data-motion', 'true');
     await expect(page.locator('.moments-lane[data-row="1"] .moments-track')).toHaveCSS('animation-name', 'none');
@@ -89,6 +91,7 @@ test('admin uses modal slots and a reusable library without repeating photos bet
     expect(await modal.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     await modal.screenshot({ path: '.tmp/moments-modal-mobile.png' });
     await modal.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
+    await acknowledgeSuccess(page, 'Đã lưu ảnh khoảnh khắc.');
     await expect(modal).toHaveCount(0);
     await pencil.click();
     await expect(modal.locator('.moments-editor__asset')).toHaveCount(7);
@@ -152,8 +155,9 @@ test('editor keeps placement and details visible while only the library scrolls'
     await modal.screenshot({ path: '.tmp/moments-workspace-mobile.png' });
     await page.setViewportSize({ width: 667, height: 375 });
     await modal.getByRole('button', { name: 'Sắp xếp ảnh', exact: true }).click();
-    await modal.locator('.moments-editor__upload').scrollIntoViewIfNeeded();
-    await expect(modal.locator('.moments-editor__upload')).toBeInViewport();
+    const uploadButton = modal.getByRole('button', { name: 'Tải ảnh mới', exact: true });
+    await uploadButton.scrollIntoViewIfNeeded();
+    await expect(uploadButton).toBeInViewport();
     await modal.getByRole('button', { name: 'Chọn ảnh: Ảnh thư viện 40', exact: true }).click();
     await expect(modal.getByRole('button', { name: 'Sửa ảnh', exact: true })).toHaveAttribute('aria-pressed', 'true');
     await modal.getByLabel('Tiêu đề', { exact: true }).fill('Sửa ảnh trên màn hình thấp');

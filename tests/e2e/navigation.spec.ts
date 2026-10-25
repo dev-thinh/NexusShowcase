@@ -83,7 +83,7 @@ test('latest rapid destination wins and history and modified clicks stay native'
   await network.send('Network.emulateNetworkConditions', { offline: false, latency: 700, downloadThroughput: -1, uploadThroughput: -1 });
   for (const href of ['/', '/category/robotics-iot', '/members']) await page.locator(`nav a[href="${href}"]`).first().click();
   await expect(page).toHaveURL(/\/members$/);
-  await expect(page.getByRole('heading', { name: 'Benchmark Member 000', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Benchmark Member 000 · Ban chủ nhiệm', exact: true })).toBeVisible();
   await network.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
   await network.detach();
   await page.locator('nav a[href="/contact"]').first().click();
@@ -109,7 +109,7 @@ test('home navigation displays route content', async ({ page }) => {
   ]) {
     await page.locator(`nav a[href="${href}"]`).first().click();
     await expect(page).toHaveURL(new RegExp(`${href}$`));
-    await expect(page.getByRole('heading', { name: title, exact: true })).toBeVisible();
+    await expect(page.getByRole(href === '/members' ? 'link' : 'heading', { name: href === '/members' ? `${title} · Ban chủ nhiệm` : title, exact: true })).toBeVisible();
   }
   await page.locator('nav a[href="/"]').first().click();
   await expect(page.locator('#home-content')).toBeVisible();
