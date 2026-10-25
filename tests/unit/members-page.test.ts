@@ -3,7 +3,7 @@ import path from 'path';
 import { describe, expect, it } from 'vitest';
 
 describe('Members Directory Page', () => {
-  it('renders the approved header, hierarchy, and six-member preview', () => {
+  it('renders the approved header, role groups, and compact avatar wall', () => {
     const pagePath = path.resolve(process.cwd(), 'src/app/(shell)/(site)/members/page.tsx');
     expect(fs.existsSync(pagePath)).toBe(true);
 
@@ -15,19 +15,20 @@ describe('Members Directory Page', () => {
     expect(content).not.toContain('Danh bạ');
     expect(content).not.toContain('heading-gutter-icon');
     expect(content).toContain('max-w-7xl');
-    expect(content).toContain('MEMBER_GROUP_LABELS.ADMIN');
-    expect(content).toContain('MEMBER_GROUP_LABELS.CORE_MEMBER');
-    expect(content).toContain('MEMBER_GROUP_LABELS.MEMBER');
+    expect(content).toContain('title="Quản trị viên"');
+    expect(content).toContain('title="Thành viên chủ chốt"');
+    expect(content).toContain('title="Thành viên"');
+    expect(content).toContain('<HomeMemberWall');
     expect(content).toContain(
-      'pageSize: 6',
+      'pageSize: 12',
     );
     expect(content).toContain('href="/members/all"');
   });
 
   it('keeps the profile visible until the destination is ready', () => {
     const detail = fs.readFileSync(path.resolve(process.cwd(), 'src/app/(shell)/(site)/members/[id]/page.tsx'), 'utf-8');
-    expect(detail).toContain('panel-detail');
-    expect(detail).toContain('panel-nested');
+    expect(detail).toContain('aria-label="Thông tin thành viên"');
+    expect(detail).toContain('aria-label="Công trình của thành viên"');
     expect(fs.existsSync(path.resolve(process.cwd(), 'src/app/members/[id]/loading.tsx'))).toBe(false);
   });
 
