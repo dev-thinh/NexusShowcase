@@ -3,6 +3,7 @@ import { submissionResourceSchema } from '@/features/submissions/model/input';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const filesystem = vi.hoisted(() => ({ readFile: vi.fn() }));
 vi.mock('fs/promises', () => filesystem);
+vi.mock('@/features/assets/server/access', () => ({ getAssetAccess: vi.fn(async () => ({ allowed: true, public: true })) }));
 
 beforeEach(() => {
   vi.clearAllMocks();
