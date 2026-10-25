@@ -1,3 +1,4 @@
+import { SearchForm } from '@/shared/ui/validated-form';
 import { MediaImage } from '@/shared/ui/media-image';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getSession as auth } from '@/features/identity/server/session';
@@ -243,7 +244,7 @@ export default async function CategoryPage({
           <PublicationNavigation currentHref={`/category/${slug}`} />
         </header>
 
-        <form method="GET" action={`/category/${slug}`} aria-label="Tìm kiếm và lọc công trình" className="mb-6 grid items-end gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_8rem_11rem_auto]">
+        <SearchForm action={`/category/${slug}`} aria-label="Tìm kiếm và lọc công trình" className="mb-6 grid items-end gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_8rem_11rem_auto]">
           <div className="min-w-0">
             <label htmlFor="category-search" className="text-xs font-semibold text-[#1F2937]">Tìm kiếm trong chuyên mục</label>
             <div className="relative mt-2">
@@ -253,7 +254,7 @@ export default async function CategoryPage({
           </div>
           <div>
             <label htmlFor="category-year" className="text-xs font-semibold text-[#1F2937]">Năm thực hiện</label>
-            <input id="category-year" type="number" name="year" min={1900} max={2100} defaultValue={year ?? ''} placeholder="Tất cả" className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-[#FFFFFF] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]" />
+            <input id="category-year" type="text" inputMode="numeric" name="year" min={1900} max={2100} defaultValue={year ?? ''} placeholder="Tất cả" className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-[#FFFFFF] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]" />
           </div>
           <div>
             <label htmlFor="category-sort" className="text-xs font-semibold text-[#1F2937]">Sắp xếp</label>
@@ -269,7 +270,7 @@ export default async function CategoryPage({
             <p className="break-words text-xs text-[#1F2937]">Kết quả lọc công trình{searchQuery ? ` với “${searchQuery}”` : ''}{year ? ` · Năm ${year}` : ''}</p>
             <Link href={`/category/${slug}`} className="inline-flex min-h-9 items-center text-xs font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link>
           </div>}
-        </form>
+        </SearchForm>
 
         <Suspense key={returnToKey} fallback={<LoadingCards />}><CategoryResults /></Suspense>
       </main>
