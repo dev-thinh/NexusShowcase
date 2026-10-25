@@ -15,14 +15,22 @@ export function PageReveal() {
 
     const tracked = new Map<HTMLElement, Animation>();
     const settled = new WeakSet<HTMLElement>();
-    const registered = new Set<HTMLElement>();
+    const registered = new WeakSet<HTMLElement>();
+    const pressed = new Set<Animation>();
+    let pointerActive = false;
+    let resumeFrame = 0;
+    const entryInset = Math.min(120, Math.round(window.innerHeight * 0.15));
     const reveal = (element: HTMLElement) => {
       if (tracked.has(element) || settled.has(element)) return;
       const animation = element.animate([
-        { opacity: 0.55, translate: '0 14px' },
+        { opacity: 0.35, translate: '0 24px' },
         { opacity: 1, translate: '0 0' },
-      ], { duration: 400, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
-      animation.onfinish = () => animation.cancel();
+      ], { delay: 100, duration: 600, fill: 'backwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+      animation.onfinish = () => {
+        settled.add(element);
+        tracked.delete(element);
+        animation.cancel();
+      };
       tracked.set(element, animation);
       observer.unobserve(element);
     };
@@ -30,7 +38,7 @@ export function PageReveal() {
       for (const entry of entries) {
         if (entry.isIntersecting) reveal(entry.target as HTMLElement);
       }
-    }, { threshold: 0, rootMargin: '0px 0px -24px 0px' });
+    }, { threshold: 0, rootMargin: `0px 0px -${entryInset}px 0px` });
 
     const register = (elements: Iterable<HTMLElement>) => {
       for (const element of elements) {
@@ -42,7 +50,7 @@ export function PageReveal() {
         // Offscreen and streamed content stays visible even if an observer is delayed.
         registered.add(element);
         const bounds = element.getBoundingClientRect();
-        if (bounds.top < window.innerHeight && bounds.bottom > 0) {
+        if (bounds.top < window.innerHeight - entryInset && bounds.bottom > 0) {
           reveal(element);
         } else if (bounds.bottom <= 0) {
           // Scroll restoration should never leave already-passed content hidden.
@@ -67,6 +75,7 @@ export function PageReveal() {
     const settleAncestors = (element: Element | null) => {
       for (let current = element; current; current = current.parentElement) {
         if (current instanceof HTMLElement && registered.has(current)) {
+          if (pointerActive && tracked.has(current)) continue;
           // Focus can occur between pointerdown and pointerup. Moving a focused
           // control here changes the click target and silently drops navigation.
           settled.add(current);
@@ -75,6 +84,25 @@ export function PageReveal() {
           observer.unobserve(current);
         }
       }
+    };
+    // Keep the hit target stationary between pointerdown, focus and click.
+    // Cancelling a translated ancestor during focus moves the control away
+    // before pointerup, so the browser never dispatches its click handler.
+    const onPointerDown = (event: PointerEvent) => {
+      pointerActive = true;
+      for (let current = event.target as Element | null; current; current = current.parentElement) {
+        const animation = current instanceof HTMLElement ? tracked.get(current) : undefined;
+        if (animation?.playState === 'running') { animation.pause(); pressed.add(animation); }
+      }
+      settleAncestors(event.target as Element);
+    };
+    const onPointerEnd = () => {
+      pointerActive = false;
+      cancelAnimationFrame(resumeFrame);
+      resumeFrame = requestAnimationFrame(() => {
+        pressed.forEach(animation => { if (animation.playState === 'paused') animation.play(); });
+        pressed.clear();
+      });
     };
     const onFocus = (event: FocusEvent) => settleAncestors(event.target as Element);
     const onHash = () => {
@@ -91,6 +119,9 @@ export function PageReveal() {
       }
     };
     document.addEventListener('focusin', onFocus);
+    document.addEventListener('pointerdown', onPointerDown, true);
+    document.addEventListener('pointerup', onPointerEnd, true);
+    document.addEventListener('pointercancel', onPointerEnd, true);
     window.addEventListener('hashchange', onHash);
     motion.addEventListener('change', onMotionChange);
     onHash();
@@ -99,6 +130,10 @@ export function PageReveal() {
       observer.disconnect();
       mutations.disconnect();
       document.removeEventListener('focusin', onFocus);
+      document.removeEventListener('pointerdown', onPointerDown, true);
+      document.removeEventListener('pointerup', onPointerEnd, true);
+      document.removeEventListener('pointercancel', onPointerEnd, true);
+      cancelAnimationFrame(resumeFrame);
       window.removeEventListener('hashchange', onHash);
       motion.removeEventListener('change', onMotionChange);
       tracked.forEach(animation => animation.cancel());

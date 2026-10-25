@@ -16,7 +16,7 @@ test('page navigation and scroll entries animate, and modal close waits for its 
     await page.locator('nav a[href="/members"]').first().click();
     await expect(page).toHaveURL(/\/members$/);
     await expect.poll(() => page.evaluate(() => (window as unknown as { motionDurations: number[] }).motionDurations)).toContain(260);
-    await expect.poll(() => page.evaluate(() => (window as unknown as { motionDurations: number[] }).motionDurations)).toContain(400);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { motionDurations: number[] }).motionDurations)).toContain(600);
     await page.goto('/');
     await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
     // Use the accessible photo buttons regardless of presentation class names.
