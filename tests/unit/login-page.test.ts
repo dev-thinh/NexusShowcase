@@ -50,10 +50,10 @@ describe('login page', () => {
     expect(html).toContain('uppercase');
   });
 
-  it('shows the password-change confirmation', () => {
+  it('keeps password-change confirmation out of the inline login form', () => {
     mocks.params = new URLSearchParams('passwordChanged=1');
     const html = renderToStaticMarkup(React.createElement(LoginForm));
-    expect(html).toContain('role="status"');
-    expect(html).toContain('Đã đổi mật khẩu thành công');
+    expect(html).not.toContain('role="status"');
+    expect(html).not.toContain('Đã đổi mật khẩu thành công');
   });
 });
