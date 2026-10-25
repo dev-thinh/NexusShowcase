@@ -38,7 +38,9 @@
     "assets:cleanup:local-images": "tsx scripts/cleanup-local-images.ts",
     "db:normalize-types": "tsx prisma/normalize-content-types.ts",
     "db:seed:categories": "tsx prisma/seed-categories.ts",
-    "db:cleanup-rate-limits": "tsx scripts/cleanup-rate-limits.ts"
+    "db:cleanup-rate-limits": "tsx scripts/cleanup-rate-limits.ts",
+    "assets:inventory": "tsx scripts/inventory-asset-registry.ts",
+    "assets:cleanup:orphans": "tsx scripts/cleanup-orphan-assets.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
