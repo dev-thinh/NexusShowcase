@@ -16,7 +16,9 @@ describe('data loading boundaries', () => {
     const category = fs.readFileSync('src/app/(shell)/(site)/category/[slug]/page.tsx', 'utf8');
     const members = fs.readFileSync('src/app/(shell)/(site)/members/page.tsx', 'utf8');
     expect(category).toContain('fallback={<LoadingCards />}><CategoryResults />');
-    expect(members).toContain('fallback={<LoadingCards members />}><MemberResults />');
+    expect(members).toContain('<Suspense fallback=');
+    expect(members).toContain('home-member-avatar--loading');
+    expect(members).toContain('<MemberResults />');
   });
   it('renders the destination title as text outside the busy data region', () => {
     const title = renderToStaticMarkup(<LoadingTitle fallback="Danh sách" />);
