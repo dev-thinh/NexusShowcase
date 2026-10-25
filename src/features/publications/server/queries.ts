@@ -31,10 +31,10 @@ export function getHomePublications(authenticated: boolean): Promise<Publication
   return prisma.showcaseItem.findMany({ where: publishedWhere(authenticated), select: publicationCardSelect, take: 3, orderBy: [{ isPinned: 'desc' }, { publishedAt: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }] });
 }
 
-export async function listMemberPublications(input: { memberId: string; authenticated: boolean; type: 'PROJECT' | 'RESEARCH_PAPER'; page: unknown }): Promise<Page<PublicationCardDto>> {
+export async function listMemberPublications(input: { memberId: string; authenticated: boolean; type?: 'PROJECT' | 'RESEARCH_PAPER'; page: unknown; pageSize?: 6 | 20 }): Promise<Page<PublicationCardDto>> {
   const where: Prisma.ShowcaseItemWhereInput = { contributors: { some: { userId: input.memberId } }, type: input.type, ...publishedWhere(input.authenticated) };
   const total = await prisma.showcaseItem.count({ where });
-  const { page, skip, take, totalPages } = pageBounds(input.page, total, 20);
+  const { page, skip, take, totalPages } = pageBounds(input.page, total, input.pageSize ?? 20);
   const items = await prisma.showcaseItem.findMany({ where, select: publicationCardSelect, skip, take, orderBy: [{ publishedYear: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }] });
   return { items, total, page, pageSize: take, totalPages };
 }

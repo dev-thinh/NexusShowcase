@@ -27,3 +27,8 @@ it('limits home and member portfolio queries before hydration', async () => {
   await listMemberPublications({ memberId: 'member', authenticated: true, type: 'PROJECT', page: 1 });
   expect(db.findMany.mock.calls[1][0]).toMatchObject({ take: 20, skip: 0, where: { status: 'PUBLISHED', type: 'PROJECT', contributors: { some: { userId: 'member' } } } });
 });
+it('combines all publication types and paginates the profile with the same visibility filter', async () => {
+  await listMemberPublications({ memberId: 'member', authenticated: false, page: '2', pageSize: 6 });
+  expect(db.findMany).toHaveBeenCalledWith(expect.objectContaining({ take: 6, skip: 6, where: { contributors: { some: { userId: 'member' } }, type: undefined, status: 'PUBLISHED', visibility: 'PUBLIC' } }));
+  expect(db.count.mock.calls[0][0].where).toEqual(db.findMany.mock.calls[0][0].where);
+});
