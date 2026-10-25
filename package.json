@@ -40,7 +40,8 @@
     "db:seed:categories": "tsx prisma/seed-categories.ts",
     "db:cleanup-rate-limits": "tsx scripts/cleanup-rate-limits.ts",
     "assets:inventory": "tsx scripts/inventory-asset-registry.ts",
-    "assets:cleanup:orphans": "tsx scripts/cleanup-orphan-assets.ts"
+    "assets:cleanup:orphans": "tsx scripts/cleanup-orphan-assets.ts",
+    "assets:reconcile:imagekit": "tsx scripts/reconcile-imagekit-assets.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
