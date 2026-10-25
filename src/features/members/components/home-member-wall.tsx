@@ -1,6 +1,6 @@
 'use client';
 
-import { MediaImage } from '@/shared/ui/media-image';
+import { MemberAvatar } from '@/shared/ui/member-avatar';
 
 import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -11,7 +11,7 @@ import type { PublicMemberRole } from '../model/directory';
 
 const labels: Record<PublicMemberRole, string> = { ADMIN: 'Ban chủ nhiệm', CORE_MEMBER: 'Core Member', MEMBER: 'Thành viên' };
 
-export function HomeMemberWall({ members, total }: HomeMembersPayload) {
+export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersPayload & { showMeta?: boolean }) {
   const [active, setActive] = useState<{ member: HomeMember; x: number; y: number; below: boolean; viewport: number[] } | null>(null);
   const tooltipId = useId();
   const remaining = Math.max(0, total - members.length);
@@ -51,18 +51,18 @@ export function HomeMemberWall({ members, total }: HomeMembersPayload) {
 
   return (
     <div className="home-members-wall">
-      <div className="home-members-meta">
+      {showMeta && <div className="home-members-meta">
         <p>{total} thành viên</p>
         <div className="home-members-legend" aria-label="Vai trò thành viên">
           {(['ADMIN', 'CORE_MEMBER', 'MEMBER'] as const).map(role => <span key={role}><i className={`home-member-dot home-member-dot--${role.toLowerCase()}`} aria-hidden="true" />{labels[role]}</span>)}
         </div>
-      </div>
+      </div>}
       <div className="home-member-grid">
         {members.map(member => {
           return (
             <div className="home-member-slot" key={member.id}>
-              <button
-                type="button"
+              <Link
+                href={`/members/${member.id}`}
                 data-home-member-avatar="true"
                 data-member-id={member.id}
                 data-role={member.role}
@@ -73,10 +73,10 @@ export function HomeMemberWall({ members, total }: HomeMembersPayload) {
                 onPointerLeave={event => { if (event.pointerType === 'mouse') setActive(null); }}
                 onFocus={event => show(member, event.currentTarget)}
                 onBlur={() => setActive(null)}
-                onClick={event => show(member, event.currentTarget)}
+                onClick={() => setActive(null)}
               >
-                <MediaImage src={member.avatarUrl} alt="" width={76} height={76} className="h-full w-full rounded-full object-cover" loading="lazy" decoding="async" />
-              </button>
+                <MemberAvatar fullName={member.fullName} optimized={member.avatarUrl?.startsWith('/')} src={member.avatarUrl} alt="" width={76} height={76} sizes="76px" className="h-full w-full rounded-full object-cover" loading="eager" decoding="async" />
+              </Link>
             </div>
           );
         })}

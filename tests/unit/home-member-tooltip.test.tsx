@@ -27,11 +27,12 @@ afterEach(() => vi.unstubAllGlobals());
 function openTooltip() {
   const findButton = (node: ReactNode): React.ReactElement<Record<string, unknown>> | undefined => {
     if (!React.isValidElement<Record<string, unknown>>(node)) return;
-    if (node.type === 'button') return node;
+    if (node.props['data-home-member-avatar']) return node;
     return React.Children.toArray(node.props.children as ReactNode).map(findButton).find(Boolean);
   };
   const button = findButton(HomeMemberWall({ members: [member], total: 1 }))!;
-  (button.props.onClick as (event: unknown) => void)({ currentTarget: { getBoundingClientRect: () => ({ top: 200, bottom: 268, left: 80, width: 68 }) } });
+  expect(button.props.href).toBe('/members/m0');
+  (button.props.onFocus as (event: unknown) => void)({ currentTarget: { getBoundingClientRect: () => ({ top: 200, bottom: 268, left: 80, width: 68 }) } });
   HomeMemberWall({ members: [member], total: 1 });
   hooks.effect?.();
 }
@@ -46,5 +47,18 @@ it('dismisses the tooltip when the visitor actually scrolls away', () => {
   openTooltip();
   viewport.scrollY += 30;
   listeners.get('scroll')?.();
+  expect(hooks.active).toBeNull();
+});
+
+it('closes the tooltip on navigation without blocking the profile link', () => {
+  openTooltip();
+  function findAvatar(node: ReactNode): React.ReactElement<Record<string, unknown>> | undefined {
+    if (!React.isValidElement<Record<string, unknown>>(node)) return;
+    if (node.props['data-home-member-avatar']) return node;
+    return React.Children.toArray(node.props.children as ReactNode).map(findAvatar).find(Boolean);
+  }
+  const avatar = findAvatar(HomeMemberWall({ members: [member], total: 1 }))!;
+  expect(avatar.props.href).toBe('/members/m0');
+  (avatar.props.onClick as () => void)();
   expect(hooks.active).toBeNull();
 });
