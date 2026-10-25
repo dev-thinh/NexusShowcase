@@ -26,7 +26,7 @@ export async function rankedMembers(input: { authenticated: boolean; role?: Publ
   type Row = Omit<MemberDirectoryEntry, '_count'> & { contributionCount: number };
   const role = input.role ? Prisma.sql`AND u.role::text = ${input.role}` : Prisma.empty;
   const rows = await prisma.$queryRaw<Row[]>(Prisma.sql`
-    SELECT u.id, u."fullName", u."avatarUrl", u.bio, u."githubUrl", u."linkedinUrl", u."googleScholarUrl", u."portfolioUrl", u.role,
+    SELECT u.id, u."fullName", u."avatarUrl", u.bio, u."githubUrl", u."linkedinUrl", u."googleScholarUrl", u."portfolioUrl", u."profileLinks", u.role,
       count(i.id)::integer AS "contributionCount"
     FROM users u
     LEFT JOIN item_contributors c ON c."userId" = u.id

@@ -155,6 +155,7 @@ model User {
   linkedinUrl        String?
   googleScholarUrl   String?
   portfolioUrl       String?
+  profileLinks       Json?
   role               Role       @default(GUEST)
   status             UserStatus @default(PENDING)
   mustChangePassword Boolean    @default(false)
