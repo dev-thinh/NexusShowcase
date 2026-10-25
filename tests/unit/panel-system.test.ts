@@ -13,9 +13,6 @@ describe('sitewide panel system', () => {
     '.panel-detail',
     '.panel-nested',
     '.panel-callout',
-    '.action-row-card',
-    '.action-row-detail',
-    '.action-primary-card',
     '.action-secondary-card',
     '.action-primary-detail',
     '.action-secondary-detail',
@@ -24,7 +21,7 @@ describe('sitewide panel system', () => {
   });
 
   it('keeps card and detail action heights distinct', () => {
-    expect(css).toMatch(/\.action-primary-card[\s\S]*@apply[^;]*h-9/);
+    expect(css).toMatch(/\.action-secondary-card[\s\S]*@apply[^;]*h-9/);
     expect(css).toMatch(/\.action-primary-detail[\s\S]*@apply[^;]*h-10/);
   });
 

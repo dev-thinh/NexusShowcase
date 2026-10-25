@@ -66,15 +66,6 @@ const config: Config = {
           border: '#E2E8F0',
         },
       },
-      keyframes: {
-        'filmstrip-roll': {
-          '0%': { transform: 'translateX(0)' },
-          '100%': { transform: 'translateX(-100%)' },
-        },
-      },
-      animation: {
-        'filmstrip-roll': 'filmstrip-roll 40s linear infinite',
-      },
     },
   },
   plugins: [],

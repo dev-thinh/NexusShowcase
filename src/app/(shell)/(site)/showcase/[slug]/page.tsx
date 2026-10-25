@@ -1,4 +1,5 @@
 import { MediaImage } from '@/shared/ui/media-image';
+import { MemberAvatar } from '@/shared/ui/member-avatar';
 import { getSession as auth } from '@/features/identity/server/session';
 import { StatusBadge, TypeBadge } from '@/features/publications/components/badges';
 import { CardAdminControls } from '@/features/publications/components/card-admin-controls';
@@ -237,7 +238,7 @@ export default async function ShowcaseDetailPage({
                     const name = contributor.user?.fullName || contributor.externalName || 'Thành viên';
                     return (
                       <li key={contributor.id} className="flex items-start gap-3">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#153D67] text-xs font-semibold text-[#FFFFFF]" aria-hidden="true">{name.charAt(0)}</span>
+                        <MemberAvatar fullName={name} className="h-9 w-9 shrink-0 rounded-full text-xs" />
                         <div className="min-w-0">
                           {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="text-sm font-semibold text-[#1F2937] hover:text-[#1F2937]">{name}</Link> : <span className="text-sm font-semibold text-[#1F2937]">{name}</span>}
                           <p className="mt-1 text-xs leading-5 text-[#1F2937]">{contributor.customRoleTitle || contributorRoles[contributor.role]}</p>
