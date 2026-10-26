@@ -3,6 +3,12 @@ import { defaultMoments } from '../fixtures/moments';
 import type { Locator, Page } from '@playwright/test';
 
 async function dragPhoto(page: Page, source: Locator, target: Locator) {
+  // Measure the grab point after the dialog's entrance transform settles,
+  // as the touch scenario already does before dispatching its first gesture.
+  await source.evaluate(async element => {
+    const dialog = element.closest('[role="dialog"]');
+    await Promise.all((dialog?.getAnimations() ?? []).map(animation => animation.finished));
+  });
   await source.scrollIntoViewIfNeeded();
   const from = (await source.boundingBox())!;
   const to = (await target.boundingBox())!;

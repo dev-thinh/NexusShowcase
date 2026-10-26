@@ -152,7 +152,7 @@ describe('Account Lifecycle & Session State', () => {
 
       const result = await changePasswordAction({
         currentPassword: 'tempSecret123',
-        newPassword: 'newStrongPassword2026',
+        newPassword: 'newStrongPassword2026!',
       });
 
       expect(result.success).toBe(true);
@@ -179,7 +179,7 @@ describe('Account Lifecycle & Session State', () => {
 
       const result = await changePasswordAction({
         currentPassword: 'wrongPassword',
-        newPassword: 'newStrongPassword2026',
+        newPassword: 'newStrongPassword2026!',
       });
 
       expect(result.success).toBe(false);

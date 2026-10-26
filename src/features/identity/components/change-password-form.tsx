@@ -7,6 +7,7 @@ import { signOut } from 'next-auth/react';
 import { useEffect, useId, useState, useTransition } from 'react';
 import { changePasswordFormSchema } from '../model/password-input';
 import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
+import { PasswordInput } from '@/shared/ui/password-input';
 
 export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedded?: boolean; onBusyChange?: (busy: boolean) => void } = {}) {
   const [currentPassword, setCurrentPassword] = useState('');
@@ -61,16 +62,16 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
           </div>
         )}
 
-        <ValidatedForm schema={changePasswordFormSchema} values={{ currentPassword, newPassword, confirmPassword }} inlineErrors onSubmit={handleSubmit} className="mt-5 space-y-3.5">
+        <ValidatedForm schema={changePasswordFormSchema} values={{ currentPassword, newPassword, confirmPassword }} inlineErrors onSubmit={handleSubmit} className="space-y-3.5">
           <div>
             <label htmlFor={`${id}-current`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
-              Mật khẩu hiện tại / Mật khẩu tạm thời
+              Mật khẩu hiện tại
             </label>
-            <input
+            <PasswordInput
               id={`${id}-current`}
               name="currentPassword"
+              visibilityLabel="mật khẩu hiện tại"
               required
-              type="password"
               autoComplete="current-password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
@@ -82,13 +83,13 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
 
           <div>
             <label htmlFor={`${id}-new`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
-              Mật khẩu mới (tối thiểu 15 ký tự)
+              Mật khẩu mới
             </label>
-            <input
+            <PasswordInput
               id={`${id}-new`}
               name="newPassword"
+              visibilityLabel="mật khẩu mới"
               required
-              type="password"
               autoComplete="new-password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
@@ -102,11 +103,11 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
             <label htmlFor={`${id}-confirm`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
               Xác nhận mật khẩu mới
             </label>
-            <input
+            <PasswordInput
               id={`${id}-confirm`}
               name="confirmPassword"
+              visibilityLabel="xác nhận mật khẩu mới"
               required
-              type="password"
               autoComplete="new-password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
