@@ -4,7 +4,7 @@ import type { CredentialsConfig } from 'next-auth/providers/credentials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ config: null as NextAuthConfig | null, findUnique: vi.fn(), findMany: vi.fn(), throttle: vi.fn(async (_input: { key: string }) => ({ allowed: true, retryAfterSeconds: 0 })) }));
-vi.mock('next-auth', () => ({ default: (config: NextAuthConfig) => { mocks.config = config; return {}; } }));
+vi.mock('next-auth', () => ({ CredentialsSignin: class extends Error { code = 'credentials'; }, default: (config: NextAuthConfig) => { mocks.config = config; return {}; } }));
 vi.mock('@/server/db/prisma', () => ({ prisma: { $queryRaw: mocks.findMany, user: { findUnique: mocks.findUnique } } }));
 vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: mocks.throttle }));
 vi.stubEnv('AUTH_SECRET', 'unit-test-config-only');
@@ -60,7 +60,7 @@ it('rejects login before database identity lookup when shared throttle denies it
  const provider = mocks.config!.providers[0] as CredentialsConfig & { options: Partial<CredentialsConfig> };
  mocks.throttle.mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 1 });
  mocks.findMany.mockClear();
- expect(await provider.options.authorize!({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).toBeNull();
+ await expect(provider.options.authorize!({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).rejects.toMatchObject({ code: 'rate_limited' });
  expect(mocks.findMany).not.toHaveBeenCalled();
 });
 
@@ -70,5 +70,26 @@ it('shares a login throttle across institutional aliases without changing unrela
  for (const email of ['Member', 'Member@robotics.hcmus.edu.vn', 'Member@nexus.hcmus.edu.vn', 'Member@example.test']) {
    await provider.options.authorize!({ email, password: 'correct-password' }, new Request('http://localhost'));
  }
- expect(mocks.throttle.mock.calls.map(call => (call[0] as { key: string }).key)).toEqual(['member', 'member', 'member', 'member@example.test']);
+ expect(mocks.throttle.mock.calls.filter(call => (call[0] as { scope?: string }).scope === 'login').map(call => (call[0] as { key: string }).key)).toEqual(['member', 'member', 'member', 'member@example.test']);
+});
+
+
+it('uses a single global budget before account buckets for random identifiers and spoofed headers', async () => {
+ const provider = mocks.config!.providers[0] as CredentialsConfig & { options: Partial<CredentialsConfig> };
+ const compare = vi.spyOn(bcrypt, 'compare');
+ mocks.throttle.mockResolvedValue({ allowed: false, retryAfterSeconds: 60 });
+ for (const email of ['random-one', 'random-two', 'random-three']) {
+   await expect(provider.options.authorize!({ email, password: 'correct-password' }, new Request('http://localhost', { headers: { 'x-forwarded-for': email } }))).rejects.toMatchObject({ code: 'rate_limited' });
+ }
+ expect(mocks.throttle.mock.calls.map(call => call[0])).toEqual(Array(3).fill({ scope: 'login-global', key: 'all', limit: 300, windowMs: 60_000 }));
+ expect(mocks.findMany).not.toHaveBeenCalled();
+ expect(compare).not.toHaveBeenCalled();
+ compare.mockRestore();
+});
+
+it('reports account throttling distinctly from incorrect credentials', async () => {
+ const provider = mocks.config!.providers[0] as CredentialsConfig & { options: Partial<CredentialsConfig> };
+ mocks.throttle.mockResolvedValueOnce({ allowed: true, retryAfterSeconds: 0 }).mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 300 });
+ await expect(provider.options.authorize!({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).rejects.toMatchObject({ code: 'rate_limited' });
+ expect(mocks.findMany).not.toHaveBeenCalled();
 });

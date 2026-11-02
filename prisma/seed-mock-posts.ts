@@ -1,8 +1,10 @@
+import { loadEnvConfig } from '@next/env';
 import { CategoryLayout, ItemType, PrismaClient } from '@prisma/client';
+import { randomInt } from 'node:crypto';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-const prisma = new PrismaClient();
-
-// Fictional demo content. Existing posts are never overwritten.
+// Fictional demo content. Only seeded post authors are refreshed on reruns.
 const categories: { slug: string; name: string; layoutType: CategoryLayout }[] = [
   { slug: 'robotics-iot', name: 'Robotics & IoT', layoutType: 'SHOWCASE_GRID' },
   { slug: 'bai-bao-khoa-hoc', name: 'Nghiên cứu khoa học', layoutType: 'BIBLIOGRAPHY' },
@@ -37,9 +39,18 @@ const additionalPosts: { slug: string; title: string; type: ItemType; category: 
 ];
 posts.push(...additionalPosts);
 
-async function main() {
-  const admin = await prisma.user.findFirst({ where: { role: 'ADMIN', status: 'ACTIVE', deletedAt: null } });
-  if (!admin) throw new Error('Chưa có admin hoạt động. Hãy chạy npm run db:seed trước.');
+export async function seedMockPosts(prisma: PrismaClient, authorIds?: string[]) {
+  const authors = authorIds ?? (await prisma.user.findMany({
+    where: { role: 'ADMIN', status: 'ACTIVE', deletedAt: null },
+    orderBy: { email: 'asc' },
+    select: { id: true },
+  })).map(user => user.id);
+  if (!authors.length) throw new Error('Cần quản trị viên hoạt động; chạy npm run db:seed để khởi tạo nếu chưa có.');
+  const assignments = posts.map((_, index) => authors[index % authors.length]);
+  for (let index = assignments.length - 1; index > 0; index--) {
+    const other = randomInt(index + 1);
+    [assignments[index], assignments[other]] = [assignments[other], assignments[index]];
+  }
 
   await prisma.$transaction(async (tx) => {
     const categoryIds = new Map<string, string>();
@@ -51,20 +62,22 @@ async function main() {
     }
     for (const [index, post] of posts.entries()) {
       const { category, detail, ...fields } = post;
+      const creatorId = assignments[index];
+      const role = post.type === 'RESEARCH_PAPER' ? 'FIRST_AUTHOR' as const : 'PROJECT_LEAD' as const;
       await tx.showcaseItem.upsert({
         where: { slug: post.slug },
-        update: {},
+        update: { creatorId, status: 'PUBLISHED', visibility: 'PUBLIC', publishedAt: new Date(Date.UTC(2026, 9, 16 - index, 2)), contributors: { deleteMany: {}, create: { userId: creatorId, role } } },
         create: {
           ...fields,
           content: `DỮ LIỆU MẪU — Bài đăng giả lập phục vụ trải nghiệm NexusShowcase.\n\n${post.summary}\n\n${detail}`,
-          creatorId: admin.id,
+          creatorId,
           categoryId: categoryIds.get(category),
           status: 'PUBLISHED',
           visibility: 'PUBLIC',
           scope: post.slug === 'mock-open-data-toolkit' ? 'OPEN_SOURCE' : 'INTERNAL',
           publishedYear: 2026,
           publishedAt: new Date(Date.UTC(2026, 9, 16 - index, 2)),
-          contributors: { create: { userId: admin.id, role: post.type === 'RESEARCH_PAPER' ? 'FIRST_AUTHOR' : 'PROJECT_LEAD' } },
+          contributors: { create: { userId: creatorId, role } },
         },
       });
     }
@@ -74,7 +87,11 @@ async function main() {
   console.log(`Đã xác nhận ${count}/${posts.length} bài mẫu công khai (10 nghiên cứu khoa học, 10 Robotics & IoT).`);
 }
 
-main().catch(() => {
-  console.error('Seed mẫu thất bại. Cần DB đã khởi tạo và admin hoạt động; chi tiết kết nối không được ghi log.');
-  process.exitCode = 1;
-}).finally(() => prisma.$disconnect());
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  loadEnvConfig(process.cwd());
+  const prisma = new PrismaClient();
+  seedMockPosts(prisma).catch(() => {
+    console.error('Seed mẫu thất bại. Cần DB đã khởi tạo và quản trị viên hoạt động; chi tiết kết nối không được ghi log.');
+    process.exitCode = 1;
+  }).finally(() => prisma.$disconnect());
+}

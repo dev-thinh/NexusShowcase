@@ -16,7 +16,6 @@ export async function getAssetAccess(url: string, authenticatedActor?: Actor): P
   const registered = await findRegisteredAsset(url);
   if (registered?.deletedAt || registered?.deletionToken) return denied;
   const items = await prisma.$queryRaw<ItemReference[]>`
-    SELECT * FROM (
       SELECT i."creatorId", i.status::text, i.visibility::text,
         jsonb_build_array(i."thumbnailUrl", i.content, i."mediaDriveUrl",
           (SELECT jsonb_agg(l.url) FROM item_links l WHERE l."itemId" = i.id),
@@ -24,7 +23,7 @@ export async function getAssetAccess(url: string, authenticatedActor?: Actor): P
         jsonb_build_array(i."authorDraft", e.overrides,
           (SELECT jsonb_agg(r.snapshot) FROM submission_revisions r WHERE r."itemId" = i.id)) AS drafts
       FROM showcase_items i LEFT JOIN editorial_drafts e ON e."itemId" = i.id
-    ) refs WHERE position(${url} in normalize_asset_reference_text(concat(refs.live::text, refs.drafts::text))) > 0
+      WHERE i.id IN (SELECT "itemId" FROM asset_item_references WHERE url = ${url})
   `;
   const references = items.map(item => ({ ...item, liveAsset: hasReference(item.live, url), draftAsset: hasReference(item.drafts, url) }));
   if (references.some(item => item.liveAsset && item.status === 'PUBLISHED' && item.visibility === 'PUBLIC')) return { allowed: true, public: true };

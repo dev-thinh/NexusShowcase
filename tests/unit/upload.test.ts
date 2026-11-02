@@ -1,3 +1,4 @@
+vi.mock('@/features/assets/server/upload-quota', () => ({reserveUpload: async () => 'reservation', releaseUpload: async () => undefined, UploadQuotaError: class extends Error {}}));
 import { uploadFileAction } from '@/features/assets/server/actions';
 import path from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

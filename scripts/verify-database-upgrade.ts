@@ -2,7 +2,7 @@ import { loadEnvConfig } from '@next/env';
 import { PrismaClient } from '@prisma/client';
 import { spawn } from 'node:child_process';
 import { createHash, randomUUID } from 'node:crypto';
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { isDeepStrictEqual } from 'node:util';
@@ -46,6 +46,7 @@ export async function inventoryIdentifierCollisions(client: PrismaClient): Promi
 
 async function inventoryRuntime() {
   loadEnvConfig(process.cwd());
+  if (existsSync('.env.test.local')) process.loadEnvFile('.env.test.local');
   const client = new PrismaClient({ log: [] });
   try {
     const collisions = await inventoryIdentifierCollisions(client);
@@ -125,6 +126,7 @@ export async function verifyDatabaseUpgrade(input: { freshUrl: string; legacyFix
 
 async function main() {
   loadEnvConfig(process.cwd());
+  if (existsSync('.env.test.local')) process.loadEnvFile('.env.test.local');
   const url = assertTestDatabaseUrl(process.env.DATABASE_URL, process.env.TEST_DATABASE_URL, {});
   const catalog = new PrismaClient({ datasources: { db: { url } }, log: [] });
   const prefix = `nexus_upgrade_${randomUUID().replaceAll('-', '')}`;

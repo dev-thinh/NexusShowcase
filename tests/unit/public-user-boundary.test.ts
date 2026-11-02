@@ -26,6 +26,7 @@ describe('public user data boundary', () => {
   it('selects only safe fields for admin member client rows', () => {
     expect(adminMemberClientSelect).toEqual({
       id: true,
+      publicSlug: true,
       fullName: true,
       role: true,
       createdAt: true,

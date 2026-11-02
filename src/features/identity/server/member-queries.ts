@@ -15,15 +15,15 @@ export async function listAdminMembers(input: { q: string; role: Role | 'ALL'; p
     const predicate = Prisma.sql`${role} AND regexp_replace(translate(normalize(lower("fullName"), NFD), 'đ', 'd'), ${'[\u0300-\u036f]'}, '', 'g') LIKE ${literalSearchPattern(input.q.trim())}`;
     const [count] = await prisma.$queryRaw<Array<{ total: bigint }>>(Prisma.sql`SELECT count(*) AS total FROM users WHERE ${predicate}`);
     total = Number(count.total);
-    bounds = pageBounds(input.page, total, 20);
+    bounds = pageBounds(input.page, total, 10);
     ids = (await prisma.$queryRaw<Array<{ id: string }>>(Prisma.sql`SELECT id FROM users WHERE ${predicate} ORDER BY role, "fullName", id LIMIT ${bounds.take} OFFSET ${bounds.skip}`)).map(row => row.id);
   } else {
     total = await prisma.user.count({ where });
-    bounds = pageBounds(input.page, total, 20);
+    bounds = pageBounds(input.page, total, 10);
   }
   const items = await prisma.user.findMany({ where: { ...where, ...(ids ? { id: { in: ids } } : {}) }, select: adminMemberClientSelect, orderBy: [{ role: 'asc' }, { fullName: 'asc' }, { id: 'asc' }], take: bounds.take, ...(ids ? {} : { skip: bounds.skip }) });
   const groups = await prisma.user.groupBy({ by: ['role'], _count: { _all: true } });
   const counts = { ALL: groups.reduce((sum, row) => sum + row._count._all, 0), ADMIN: 0, CORE_MEMBER: 0, MEMBER: 0, EDITOR: 0, GUEST: 0 };
   for (const row of groups) counts[row.role] = row._count._all;
-  return { items, total, page: bounds.page, totalPages: bounds.totalPages, pageSize: 20, counts };
+  return { items, total, page: bounds.page, totalPages: bounds.totalPages, pageSize: 10, counts };
 }

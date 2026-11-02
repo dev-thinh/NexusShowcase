@@ -1,3 +1,4 @@
+vi.mock('@/features/assets/server/upload-quota', () => ({reserveUpload: async () => 'reservation', releaseUpload: async () => undefined, UploadQuotaError: class extends Error {}}));
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const filesystem = vi.hoisted(() => ({ readFile: vi.fn(), mkdir: vi.fn(), writeFile: vi.fn() }));
 vi.mock('fs/promises', () => filesystem);
@@ -30,12 +31,12 @@ it('keeps old local assets available before migration', async () => {
 });
 it('does not silently write to disk when cloud upload fails', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('secret', { status: 503 })));
-  await expect(writeStoredAsset('resource', 'file.zip', new Uint8Array([1]))).rejects.toThrow('ImageKit upload failed (503)');
+  await expect(writeStoredAsset('resource', 'file.zip', new Uint8Array([1]), 'owner')).rejects.toThrow('ImageKit upload failed (503)');
   expect(filesystem.writeFile).not.toHaveBeenCalled();
 });
 it('preserves stable app URLs for new cloud uploads', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({ fileId: 'test-id', filePath: '/nexus-showcase/uploads/resources/file.zip', url: 'https://ik.imagekit.io/test/nexus-showcase/uploads/resources/file.zip' }))));
-  expect(await writeStoredAsset('resource', 'file.zip', new Uint8Array([1]))).toBe('/uploads/resources/file.zip');
+  expect(await writeStoredAsset('resource', 'file.zip', new Uint8Array([1]), 'owner')).toBe('/uploads/resources/file.zip');
   expect(filesystem.mkdir).not.toHaveBeenCalled();
 });
 it('rejects oversized cloud bodies before consuming them', async () => {

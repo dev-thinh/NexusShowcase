@@ -10,6 +10,7 @@
     "postcss-selector-parser": "7.1.7"
   },
   "scripts": {
+    "predev": "prisma generate",
     "dev": "next dev --webpack",
     "build": "next build --webpack",
     "start": "next start",
@@ -25,7 +26,7 @@
     "test:e2e": "tsx scripts/run-browser-harness.ts e2e",
     "bench:navigation": "tsx scripts/run-browser-harness.ts benchmark",
     "db:push": "prisma db push",
-    "db:migrate": "prisma migrate deploy",
+    "db:migrate": "node scripts/migrate-database.mjs",
     "db:verify-upgrade": "tsx scripts/verify-database-upgrade.ts",
     "db:inventory": "tsx scripts/verify-database-upgrade.ts --inventory",
     "db:cleanup-rate-limits": "tsx scripts/cleanup-rate-limits.ts",
@@ -41,7 +42,8 @@
     "assets:cleanup:orphans": "tsx scripts/cleanup-orphan-assets.ts",
     "assets:reconcile:imagekit": "tsx scripts/reconcile-imagekit-assets.ts",
     "db:normalize-types": "tsx prisma/normalize-content-types.ts",
-    "db:seed:categories": "tsx prisma/seed-categories.ts"
+    "db:seed:categories": "tsx prisma/seed-categories.ts",
+    "db:up": "docker compose --env-file .env.database.local up -d"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
@@ -67,5 +69,8 @@
     "tsx": "^4.19.2",
     "typescript": "^5.7.2",
     "vitest": "4.1.12"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

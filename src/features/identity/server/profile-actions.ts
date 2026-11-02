@@ -27,7 +27,7 @@ export async function updateProfileAction(input: ProfileInput) {
       data,
     });
     if (updated.count !== 1) return { success: false as const, code: 'FORBIDDEN' as const, error: 'Tài khoản đã thay đổi. Vui lòng đăng nhập lại.' };
-    revalidatePath(`/members/${actor.id}`);
+    revalidatePath('/members/[id]', 'page');
     revalidatePath('/members');
     revalidatePath('/members/all');
     revalidatePath('/', 'layout');

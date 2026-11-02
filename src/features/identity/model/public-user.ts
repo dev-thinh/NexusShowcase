@@ -2,6 +2,7 @@ import { Prisma, Role } from '@prisma/client';
 
 export const publicUserSelect = {
   id: true,
+  publicSlug: true,
   fullName: true,
   avatarUrl: true,
   bio: true,
@@ -15,6 +16,7 @@ export const publicUserSelect = {
 
 export const adminMemberClientSelect = {
   id: true,
+  publicSlug: true,
   fullName: true,
   role: true,
   createdAt: true,
@@ -22,6 +24,7 @@ export const adminMemberClientSelect = {
 
 export type PublicUser = {
   id: string;
+  publicSlug: string;
   fullName: string;
   avatarUrl: string | null;
   bio: string | null;

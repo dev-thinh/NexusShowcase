@@ -1,62 +1,16 @@
+import { loadEnvConfig } from '@next/env';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { bootstrapAdmin } from './seed-bootstrap';
 
-const prisma = new PrismaClient();
-
-async function main() {
-  console.log('🔄 Đang kiểm tra và khởi tạo dữ liệu bootstrap cho NexusShowcase...');
-
-  if (process.env.RESET_DATABASE === 'true') {
-    console.log('⚠️ Cờ RESET_DATABASE được bật: Đang làm sạch dữ liệu cũ...');
-    await prisma.itemAttachment.deleteMany();
-    await prisma.itemLink.deleteMany();
-    await prisma.itemContributor.deleteMany();
-    await prisma.showcaseItem.deleteMany();
-    await prisma.user.deleteMany();
-  }
-
-  const existingAdmin = await prisma.user.findFirst({
-    where: { role: 'ADMIN' },
-    select: { id: true },
-  });
-
-  if (existingAdmin) {
-    console.log('Tài khoản quản trị đã tồn tại. Giữ nguyên dữ liệu hiện có.');
-    return;
-  }
-
-  const email = process.env.BOOTSTRAP_ADMIN_EMAIL?.trim() || 'admin01';
-  const rawPassword = process.env.BOOTSTRAP_ADMIN_PASSWORD?.trim();
-
-  if (!rawPassword) {
-    throw new Error(
-      'Vui lòng cấu hình biến môi trường BOOTSTRAP_ADMIN_PASSWORD để tạo tài khoản admin đầu tiên.'
-    );
-  }
-
-  const adminPasswordHash = await bcrypt.hash(rawPassword, 10);
-
-  await prisma.user.create({
-    data: {
-      email,
-      fullName: 'Quản Trị Viên Học Thuật (Admin)',
-      passwordHash: adminPasswordHash,
-      role: 'ADMIN',
-      status: 'ACTIVE',
-      mustChangePassword: false,
-      sessionVersion: 1,
-      bio: 'Tài khoản Quản trị viên CLB Nexus, Khoa CNTT - ĐH KHTN ĐHQG-HCM.',
-    },
-  });
-
-  console.log('Khởi tạo thành công tài khoản quản trị.');
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  loadEnvConfig(process.cwd());
+  const prisma = new PrismaClient();
+  bootstrapAdmin(prisma, process.env).then(result => {
+    console.log(result === 'created' ? 'Bootstrap administrator created; password change required.' : 'Administrator already exists; no accounts changed.');
+  }).catch(() => {
+    console.error('Bootstrap failed. Configure BOOTSTRAP_ADMIN_EMAIL and a private BOOTSTRAP_ADMIN_PASSWORD (15+ characters, at most 72 UTF-8 bytes); verify database migrations.');
+    process.exitCode = 1;
+  }).finally(() => prisma.$disconnect());
 }
-
-main()
-  .catch(() => {
-    console.error('Bootstrap thất bại. Kiểm tra kết nối DB và BOOTSTRAP_ADMIN_PASSWORD; chi tiết kết nối không được ghi log.');
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });

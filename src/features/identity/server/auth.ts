@@ -2,16 +2,29 @@ import { readAuthSecret } from '@/server/config/auth';
 import { prisma } from '@/server/db/prisma';
 import { reportServerError } from '@/server/observability/errors';
 import bcrypt from 'bcryptjs';
-import NextAuth from 'next-auth';
+import NextAuth, { CredentialsSignin } from 'next-auth';
+
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { loginSchema } from '../model/login-input';
 import { Prisma, type User } from '@prisma/client';
 import { consumeRateLimit } from './rate-limit';
 
+class LoginRateLimitError extends CredentialsSignin {
+  code = 'rate_limited';
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   trustHost: true,
   secret: readAuthSecret({ AUTH_SECRET: process.env.AUTH_SECRET, NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET }),
   session: { strategy: 'jwt' },
+  // Ports do not isolate browser cookies. Keep the disposable demo session
+  // separate even when it and the current app share the same loopback host.
+  cookies: process.env.NEXUS_DEMO_BUILD === '1' ? {
+    sessionToken: { name: 'nexus-demo.session-token', options: { httpOnly: true, sameSite: 'lax', path: '/', secure: (process.env.AUTH_URL || '').startsWith('https://') } },
+    csrfToken: { name: 'nexus-demo.csrf-token', options: { httpOnly: true, sameSite: 'lax', path: '/', secure: (process.env.AUTH_URL || '').startsWith('https://') } },
+    callbackUrl: { name: 'nexus-demo.callback-url', options: { httpOnly: true, sameSite: 'lax', path: '/', secure: (process.env.AUTH_URL || '').startsWith('https://') } },
+  } : undefined,
+
   logger: {
     error(error: Error) {
       if (error?.name === 'JWTSessionError') {
@@ -31,13 +44,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: 'Mật khẩu', type: 'password' },
       },
       async authorize(credentials) {
+        // A fixed shared key bounds account-bucket creation even when submitted
+        // identifiers or forwarding headers vary. Never trust proxy headers here.
+        const budget = await consumeRateLimit({ scope: 'login-global', key: 'all', limit: 300, windowMs: 60_000 });
+        if (!budget.allowed) throw new LoginRateLimitError();
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 
         const identifier = parsed.data.email.trim().toLowerCase();
         const throttleKey = identifier.replace(/@(robotics|nexus)\.hcmus\.edu\.vn$/, '');
         const throttle = await consumeRateLimit({ scope: 'login', key: throttleKey, limit: 10, windowMs: 15 * 60_000 });
-        if (!throttle.allowed) return null;
+        if (!throttle.allowed) throw new LoginRateLimitError();
         const aliases = [...new Set([identifier, `${identifier}@robotics.hcmus.edu.vn`, `${identifier}@nexus.hcmus.edu.vn`])];
         // Read every matching identity (including inactive rows): never pick an
         // arbitrary account when legacy aliases or casing overlap.
