@@ -4,7 +4,7 @@ for (const width of [390, 1024, 1440]) test(`home account menu opens administrat
   await page.setViewportSize({ width, height: 900 });
   await login(page, fixture.users[0], '/');
   for (const [label, route, title] of [
-    ['Bài đăng của tôi', '/dashboard', 'Bài đăng của tôi'],
+    ['Công trình của tôi', '/dashboard', 'Công trình của tôi'],
     ['Quản trị', '/admin', 'Tổng quan'],
   ]) {
     if (new URL(page.url()).pathname !== '/') {

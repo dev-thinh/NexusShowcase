@@ -20,7 +20,7 @@ it('lets a regular member upload only an image owned by their session identity',
   expect(await uploadAvatarAction(data)).toMatchObject({ success: true });
   expect(mocks.upload).toHaveBeenCalledWith(file, 'thumbnail', 'member');
   expect(mocks.updateMany).toHaveBeenCalledWith({ where: { id: 'member', status: 'ACTIVE', deletedAt: null, mustChangePassword: false }, data: { avatarUrl: '/uploads/thumbnails/avatar.png' } });
-  expect(mocks.revalidatePath).toHaveBeenCalledWith('/members/member');
+  expect(mocks.revalidatePath).toHaveBeenCalledWith('/members/[id]', 'page');
 });
 it('does not change the avatar if uploading fails', async () => {
   const data = new FormData(); data.set('file', new File(['invalid'], 'bad.png', { type: 'image/png' }));
@@ -42,7 +42,7 @@ it('rejects missing or non-file data', async () => {
 it('clears only the authenticated user avatar to restore the initial-letter fallback', async () => {
   expect(await removeAvatarAction()).toMatchObject({ success: true });
   expect(mocks.updateMany).toHaveBeenCalledWith({ where: { id: 'member', status: 'ACTIVE', deletedAt: null, mustChangePassword: false }, data: { avatarUrl: null } });
-  expect(mocks.revalidatePath).toHaveBeenCalledWith('/members/member');
+  expect(mocks.revalidatePath).toHaveBeenCalledWith('/members/[id]', 'page');
   expect(mocks.upload).not.toHaveBeenCalled();
 });
 it('does not allow anonymous avatar removal', async () => {

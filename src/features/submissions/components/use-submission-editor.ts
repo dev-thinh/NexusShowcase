@@ -1,22 +1,16 @@
 'use client';
 
+import { submissionValidationMessage, submissionFieldErrors } from '@/features/submissions/model/validation-result';
+
 import { articleFromLegacy, serializeArticle, standaloneResources } from '@/features/submissions/model/article';
 import type { ShowcaseDraftInput } from '@/features/submissions/model/input';
 import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
-import { formErrors } from '@/shared/lib/form-validation';
-import type { z } from 'zod';
 import { saveShowcaseDraftAction, submitShowcaseForReviewAction } from '@/features/submissions/server/actions';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { notifySuccess } from '@/shared/dialogs/success';
 
 export type SaveState = 'idle' | 'saving' | 'saved' | 'error';
-
-function clientFieldErrors(error: z.ZodError) {
-  const fields: Record<string, string[]> = {};
-  for (const [path, message] of Object.entries(formErrors(error))) (fields[path.split('.')[0]] ??= []).push(message);
-  return fields;
-}
 
 export interface SubmissionEditorState {
   itemId: string | null;
@@ -44,6 +38,7 @@ export function createInitialSubmissionState(
     reviewVersion: initialData.reviewVersion,
     editSequence: 0,
     data: {
+      citationEnabled: initialData.citationEnabled ?? Boolean(initialData.id),
       title: initialData.title ?? '',
       summary: initialData.summary ?? '',
       content: serializeArticle(articleFromLegacy(initialData.content ?? '')),
@@ -72,7 +67,7 @@ export function submissionEditorReducer(
       return {
         ...state,
         data: { ...state.data, [action.field]: action.value },
-        fieldErrors: { ...state.fieldErrors, [action.field]: [] },
+        fieldErrors: Object.fromEntries(Object.entries(state.fieldErrors).filter(([key]) => key !== action.field && !key.startsWith(`${action.field}.`))),
         saveState: 'idle',
         isDirty: true,
         editSequence: state.editSequence + 1,
@@ -114,7 +109,7 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
     if (savingRef.current) return null;
     const parsed = showcaseDraftInputSchema.safeParse(state.data);
     if (!parsed.success) {
-      dispatch({ type: 'errors', error: 'Vui lòng kiểm tra các thông tin được đánh dấu.', fieldErrors: clientFieldErrors(parsed.error) });
+      dispatch({ type: 'errors', error: submissionValidationMessage(parsed.error), fieldErrors: submissionFieldErrors(parsed.error) });
       return null;
     }
     savingRef.current = true;
@@ -139,7 +134,7 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
     if (busyRef.current) return false;
     const parsed = showcaseSubmissionInputSchema.safeParse(state.data);
     if (!parsed.success) {
-      dispatch({ type: 'errors', error: 'Vui lòng kiểm tra các thông tin được đánh dấu.', fieldErrors: clientFieldErrors(parsed.error) });
+      dispatch({ type: 'errors', error: submissionValidationMessage(parsed.error), fieldErrors: submissionFieldErrors(parsed.error) });
       return false;
     }
     busyRef.current = true;

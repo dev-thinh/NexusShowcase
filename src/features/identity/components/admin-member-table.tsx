@@ -10,7 +10,7 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import type { ReactNode } from 'react';
 
 
-interface MemberItem { id: string; fullName: string; avatarUrl?: string | null; role: Role; createdAt: Date | string }
+interface MemberItem { id: string; publicSlug: string; fullName: string; avatarUrl?: string | null; role: Role; createdAt: Date | string }
 const roleNames: Record<Role, string> = { ADMIN: 'Quản trị viên', CORE_MEMBER: 'Thành viên nòng cốt', MEMBER: 'Thành viên', EDITOR: 'Thành viên', GUEST: 'Khách' };
 
 export function AdminMemberTable({ members, query: searchQuery, roleFilter, counts, total, actions }: { members: MemberItem[]; query: string; roleFilter: 'ALL' | Role; counts: Record<'ALL' | Role, number>; total: number; actions?: ReactNode }) {
@@ -39,7 +39,7 @@ export function AdminMemberTable({ members, query: searchQuery, roleFilter, coun
       <span className={`inline-flex w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-semibold ${member.role === 'ADMIN' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : member.role === 'CORE_MEMBER' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : 'border-slate-200 bg-white text-[#1F2937]'}`}>{member.role === 'ADMIN' ? <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" /> : member.role === 'CORE_MEMBER' ? <UserCheck aria-hidden="true" className="h-3.5 w-3.5" /> : <User aria-hidden="true" className="h-3.5 w-3.5" />}{roleNames[member.role]}</span>
       <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 lg:justify-end lg:border-0 lg:pt-0"><AdminRoleToggle userId={member.id} currentRole={member.role} /><AdminDeleteMemberModal member={member} /></div>
     </li>)}</ul>}
-    <p aria-live="polite" className="border-t border-slate-200 px-4 py-3 text-xs text-[#1F2937] sm:px-5">Hiển thị {filteredMembers.length} / {total} thành viên</p>
     </section>
+    <p aria-live="polite" className="mt-3 text-right text-xs text-[#1F2937]">Hiển thị {filteredMembers.length} / {total} thành viên</p>
   </div>;
 }

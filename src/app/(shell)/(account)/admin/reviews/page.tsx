@@ -1,7 +1,7 @@
 import { getActor } from '@/features/identity/server/actor';
 import { SearchForm as Form } from '@/shared/ui/validated-form';
 import { listReviewQueue } from '@/features/review/server/queries';
-import { MemberPagination } from '@/shared/ui/member-pagination';
+import { PaginationFooter } from '@/shared/ui/member-pagination';
 
 
 import { EmptyState } from '@/shared/ui/empty-state';
@@ -24,6 +24,6 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
       const snapshot = item;
       return <div key={item.id} className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center sm:p-6"><div className="min-w-0"><p className="mb-2 text-xs font-semibold text-[#1F2937]">{item.status === 'PUBLISHED' ? 'Bản cập nhật · Bài hiện tại vẫn đang hiển thị' : 'Chờ duyệt'}</p><Link href={`/admin/reviews/${item.id}?${new URLSearchParams({ returnTo })}`} scroll={false} className="break-words text-lg font-semibold text-[#1F2937] hover:underline">{snapshot.title}</Link><p className="mt-2 line-clamp-2 text-sm leading-6 text-[#1F2937]">{snapshot.summary}</p><p className="mt-2 text-xs text-[#1F2937]">Người nộp: {item.creatorName} · {snapshot.publishedYear}</p></div><Link href={`/admin/reviews/${item.id}?${new URLSearchParams({ returnTo })}`} scroll={false} className="action-primary-detail min-h-11 shrink-0">Xem và duyệt<ArrowRight aria-hidden="true" className="h-4 w-4" /></Link></div>;
     })}</div>}
-    <MemberPagination page={result.page} totalPages={result.totalPages} basePath={basePath} ariaLabel="Phân trang bản nộp" />
+    <PaginationFooter itemLabel="bản nộp" page={result.page} totalPages={result.totalPages} pageSize={20} basePath={basePath} ariaLabel="Phân trang bản nộp" />
   </section>;
 }

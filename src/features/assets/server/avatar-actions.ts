@@ -8,8 +8,8 @@ import { prisma } from '@/server/db/prisma';
 import { revalidatePath } from 'next/cache';
 import { consumeRateLimit } from '@/features/identity/server/rate-limit';
 
-function refreshAvatar(id: string) {
-  revalidatePath(`/members/${id}`);
+function refreshAvatar() {
+  revalidatePath('/members/[id]', 'page');
   revalidatePath('/members');
   revalidatePath('/members/all');
   revalidatePath('/', 'layout');
@@ -28,7 +28,7 @@ export async function uploadAvatarAction(formData: FormData): Promise<UploadResu
     if (!uploaded.success) return uploaded;
     const updated = await prisma.user.updateMany({ where: { id: actor.id, status: 'ACTIVE', deletedAt: null, mustChangePassword: false }, data: { avatarUrl: uploaded.data.url } });
     if (updated.count !== 1) return { success: false, code: 'FORBIDDEN', error: 'Tài khoản đã thay đổi. Vui lòng đăng nhập lại.' };
-    refreshAvatar(actor.id);
+    refreshAvatar();
     return uploaded;
   }
   catch (error) { return commandFailure('member.avatar', error, { actorId: actor.id }); }
@@ -40,7 +40,7 @@ export async function removeAvatarAction() {
   try {
     const updated = await prisma.user.updateMany({ where: { id: actor.id, status: 'ACTIVE', deletedAt: null, mustChangePassword: false }, data: { avatarUrl: null } });
     if (updated.count !== 1) return { success: false as const, code: 'FORBIDDEN' as const, error: 'Tài khoản đã thay đổi. Vui lòng đăng nhập lại.' };
-    refreshAvatar(actor.id);
+    refreshAvatar();
     return { success: true as const };
   } catch (error) { return commandFailure('member.avatar.remove', error, { actorId: actor.id }); }
 }

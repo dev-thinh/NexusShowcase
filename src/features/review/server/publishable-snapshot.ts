@@ -5,6 +5,7 @@ import { z } from 'zod';
 /** Persisted historical metadata is distinct from strict external mutation input. */
 export function parsePublishableSnapshot(snapshot: EffectivePublication) {
   const parsed = showcaseSubmissionInputSchema.safeParse({
+    citationEnabled: snapshot.citationEnabled ?? true,
     title: snapshot.title, summary: snapshot.summary, content: snapshot.content,
     type: snapshot.type, categoryId: snapshot.categoryId, thumbnailUrl: snapshot.thumbnailUrl,
     publishedYear: snapshot.publishedYear, suggestedField: snapshot.suggestedField,

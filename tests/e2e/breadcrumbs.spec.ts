@@ -4,7 +4,7 @@ for (const width of [390, 1440]) {
   test(`public pages use the same breadcrumb at ${width}px`, async ({ page, fixture }) => {
     await page.setViewportSize({ width, height: 900 });
     let reference: unknown;
-    for (const route of ['/explore', '/category/bai-bao-khoa-hoc', '/category/robotics-iot', '/members', '/members/all', `/members/${fixture.users[1].id}`, '/showcase/benchmark-0', '/contact', '/login']) {
+    for (const route of ['/explore', '/category/bai-bao-khoa-hoc', '/category/robotics-iot', '/members', '/members/all', `/members/${fixture.users[1].id}`, '/showcase/benchmark-0', '/contact']) {
       await page.goto(route);
       const breadcrumb = page.getByRole('navigation', { name: 'Đường dẫn', exact: true });
       await expect(breadcrumb).toHaveCount(1);
@@ -42,3 +42,16 @@ test('detail breadcrumb preserves library filters and pagination', async ({ page
   await parent.click();
   await expect(page).toHaveURL(/\/explore\?q=Benchmark&page=2$/);
 });
+
+for (const width of [390, 1440]) {
+  test(`login uses direct home navigation without a breadcrumb at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto('/login');
+    await expect(page.getByRole('navigation', { name: 'Đường dẫn', exact: true })).toHaveCount(0);
+    const home = page.getByRole('main').getByRole('link', { name: 'Trang chủ', exact: true });
+    await expect(home).toBeVisible();
+    await expect(home).toHaveAttribute('href', '/');
+    await home.click();
+    await expect(page).toHaveURL(/\/$/);
+  });
+}

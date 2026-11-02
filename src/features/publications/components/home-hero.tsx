@@ -69,12 +69,11 @@ export function HomeHero() {
         <div className="home-hero__intro relative z-10 max-w-3xl py-12 sm:py-16 lg:py-20">
           <p className="home-hero__eyebrow">CLB Robotics &amp; IoT · HCMUS</p>
           <h1 id="home-hero-title" className="home-hero__title">
-            <span className="home-hero__title-line">Nơi ý tưởng chuyển động</span>
-            <span className="home-hero__title-line home-hero__title-accent">thành công nghệ.</span>
+            <span className="home-hero__title-line">Cùng nghiên cứu.</span>
+            <span className="home-hero__title-line home-hero__title-accent">Cùng sáng tạo.</span>
           </h1>
           <p className="home-hero__copy">
-            Không gian nghiên cứu Robotics, IoT và hệ thống nhúng, nơi ý tưởng được kiểm chứng
-            bằng nguyên mẫu và công nghệ thực tế.
+            Khám phá Robotics, IoT và hệ thống nhúng qua những dự án thực tế.
           </p>
           <div className="home-hero__actions mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link href="/explore" className="home-hero__primary-action">

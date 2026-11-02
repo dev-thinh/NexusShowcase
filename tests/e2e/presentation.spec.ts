@@ -28,7 +28,7 @@ for (const width of [390, 768, 1440]) test(`keeps content readable with reduced 
   await page.goto('/category/bai-bao-khoa-hoc');
   await expect(page.getByRole('heading', { name: 'Benchmark Research 0000', exact: true })).toBeVisible();
   await capture('card', 'article');
-  await page.getByRole('button', { name: /Trích dẫn khoa học/ }).first().click();
+  await page.getByRole('button', { name: 'Trích dẫn công trình (Cite)', exact: true }).first().click();
   await capture('dialog', '[role="dialog"]');
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);

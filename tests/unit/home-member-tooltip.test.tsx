@@ -13,7 +13,7 @@ vi.mock('react-dom', () => ({ createPortal: (node: ReactNode) => node }));
 
 const listeners = new Map<string, () => void>();
 const viewport = { innerWidth: 390, innerHeight: 844, scrollX: 0, scrollY: 100, addEventListener: (type: string, listener: () => void) => listeners.set(type, listener), removeEventListener: vi.fn() };
-const member = { id: 'm0', fullName: 'Member 0', avatarUrl: null, role: 'ADMIN' as const };
+const member = { id: 'm0', publicSlug: 'member-zero', fullName: 'Member 0', avatarUrl: null, role: 'ADMIN' as const };
 
 beforeEach(() => {
   hooks.active = null;

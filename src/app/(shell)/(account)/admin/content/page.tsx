@@ -5,7 +5,7 @@ import { TypeBadge } from '@/features/publications/components/badges';
 import { CardAdminControls } from '@/features/publications/components/card-admin-controls';
 import type { BulkPostFilter } from '@/features/publications/model/bulk-posts';
 import { searchBulkPostsAction } from '@/features/publications/server/bulk-actions';
-import { MemberPagination } from '@/shared/ui/member-pagination';
+import { PaginationFooter } from '@/shared/ui/member-pagination';
 import { ArrowUpRight, Search } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -48,6 +48,6 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
         <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />
       </article>)}
     </div>
-    {result.totalPages > 1 && <div className="mt-5"><MemberPagination page={result.page} totalPages={result.totalPages} basePath={`/admin/content?${baseParams}`} ariaLabel="Phân trang nội dung" /></div>}
+    {result.total > 0 && <PaginationFooter page={result.page} totalPages={result.totalPages} pageSize={10} basePath={`/admin/content?${baseParams}`} ariaLabel="Phân trang nội dung" />}
   </section>;
 }

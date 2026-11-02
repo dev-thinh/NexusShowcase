@@ -41,7 +41,7 @@ test('homepage samples thirty positions and preserves the selection while intera
 for (const count of [2, 13, 30]) test(`centers every row for ${count} members on desktop and mobile`, async ({ page }) => {
   await page.route('**/api/home?section=members', route => route.fulfill({ json: {
     total: count,
-    members: Array.from({ length: count }, (_, index) => ({ id: `m${index}`, fullName: `Thành viên ${index}`, avatarUrl: null, role: index === 0 ? 'ADMIN' : index < 4 ? 'CORE_MEMBER' : 'MEMBER' })),
+    members: Array.from({ length: count }, (_, index) => ({ id: `m${index}`, publicSlug: `thanh-vien-${index}`, fullName: `Thành viên ${index}`, avatarUrl: null, role: index === 0 ? 'ADMIN' : index < 4 ? 'CORE_MEMBER' : 'MEMBER' })),
   } }));
   await page.goto('/');
   const section = page.locator('[data-deferred-section="members"]');

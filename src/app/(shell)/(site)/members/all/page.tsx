@@ -1,7 +1,6 @@
 import { getSession } from '@/features/identity/server/session';
 import { MemberCard } from '@/features/members/components/member-card';
 import { listDirectory } from '@/features/members/server/queries';
-import { MemberPagination } from '@/shared/ui/member-pagination';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 
 
@@ -10,14 +9,9 @@ export const metadata = {
   description: 'Danh sách thành viên CLB Robotics & IoT.',
 };
 
-export default async function AllMembersPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ page?: string }>;
-}) {
-  const params = await searchParams;
+export default async function AllMembersPage() {
   const session = await getSession();
-  const memberPage = await listDirectory({ authenticated: !!session?.user, role: 'MEMBER', page: params.page, pageSize: 12 });
+  const memberPage = await listDirectory({ authenticated: !!session?.user, role: 'MEMBER', page: 1, pageSize: 'all' });
   const members = memberPage.items;
 
   return (
@@ -48,14 +42,6 @@ export default async function AllMembersPage({
                   group="MEMBER"
                 />
               ))}
-            </div>
-
-            <div className="mt-7">
-              <MemberPagination
-                page={memberPage.page}
-                totalPages={memberPage.totalPages}
-                basePath="/members/all"
-              />
             </div>
           </>
         ) : (

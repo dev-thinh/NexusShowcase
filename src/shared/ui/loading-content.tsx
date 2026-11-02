@@ -16,10 +16,10 @@ export function LoadingTitle({ fallback, pathname: destination }: { fallback: st
     : pathname === '/admin' ? 'Tổng quan quản trị'
     : pathname.includes('/items/new') ? 'Đăng công trình mới'
     : pathname.includes('/edit') ? 'Chỉnh sửa bài đăng'
-    : pathname.startsWith('/dashboard') ? 'Bài đăng của tôi'
+    : pathname.startsWith('/dashboard') ? 'Công trình của tôi'
     : pathname.startsWith('/members/all') ? 'Tất cả thành viên'
     : pathname.startsWith('/category/bai-bao-khoa-hoc') ? 'Nghiên cứu khoa học'
-    : pathname.startsWith('/category/robotics-iot') ? 'Robotics & IoT'
+    : pathname.startsWith('/category/robotics-iot') ? 'Dự án & Sản phẩm'
     : fallback;
   return <h1 className="text-2xl font-semibold tracking-tight text-[#1F2937] sm:text-3xl">{title}</h1>;
 }

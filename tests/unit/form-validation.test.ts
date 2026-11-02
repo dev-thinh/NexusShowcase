@@ -17,7 +17,7 @@ it('rejects oversized queries and invalid filters', () => {
   expect(searchFormSchema.safeParse({ filter: 'unknown' }).success).toBe(false);
 });
 it('puts password mismatch errors on the confirmation field', () => {
-  const parsed = changePasswordFormSchema.safeParse({ currentPassword: 'old', newPassword: 'new-password-2026', confirmPassword: 'different' });
+  const parsed = changePasswordFormSchema.safeParse({ currentPassword: 'old', newPassword: 'New-password-2026!', confirmPassword: 'different' });
   expect(parsed.success).toBe(false);
   if (!parsed.success) expect(Object.keys(formErrors(parsed.error))).toEqual(['confirmPassword']);
 });

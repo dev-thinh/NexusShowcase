@@ -41,12 +41,14 @@ test('author and admin filters preserve bounded server pages', async ({ page, fi
   await login(page, fixture.users[1]);
   await page.getByRole('link', { name: /^Đã xuất bản/ }).click();
   await expect(page).toHaveURL(/filter=PUBLISHED/);
-  await page.getByLabel('Tìm bài đăng', { exact: true }).fill('Research 0000');
-  await page.getByLabel('Tìm bài đăng', { exact: true }).press('Enter');
+  await page.getByLabel('Tìm công trình', { exact: true }).fill('Research 0000');
+  await page.getByLabel('Tìm công trình', { exact: true }).press('Enter');
   await expect(page).toHaveURL(/q=Research/);
   await expect(page.getByRole('link', { name: 'Benchmark Research 0000', exact: true })).toBeVisible();
   await login(page, fixture.users[0], '/admin/members?page=2');
-  await expect(page.getByRole('link', { name: 'Benchmark Member 022', exact: true })).toBeVisible();
+  await expect(page.getByRole('main').getByRole('link', { name: /^Benchmark Member \d+$/ })).toHaveCount(10);
+  await expect(page.getByRole('link', { name: 'Benchmark Member 012', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Benchmark Member 022', exact: true })).toHaveCount(0);
   await page.getByLabel('Tìm thành viên theo họ tên').fill('Member 099');
   await page.getByLabel('Tìm thành viên theo họ tên').press('Enter');
   await expect(page.getByRole('link', { name: 'Benchmark Member 099', exact: true })).toBeVisible();

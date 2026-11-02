@@ -34,6 +34,7 @@ export function buildSubmissionSnapshot(source: SubmissionSnapshotSource): Submi
     type: source.type === 'RESEARCH_PAPER' ? 'RESEARCH_PAPER' : 'PROJECT',
     categoryId: source.categoryId,
     thumbnailUrl: source.thumbnailUrl,
+    citationEnabled: source.citationEnabled ?? true,
     title: source.title,
     summary: source.summary,
     content: source.content ?? '',

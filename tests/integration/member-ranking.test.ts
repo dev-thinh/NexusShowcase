@@ -35,3 +35,11 @@ it('searches accent-insensitively and returns only bounded name/id options', asy
   session.allowed = false;
   expect(await searchContributors({ q: '', page: 1 })).toMatchObject({ success: false, code: 'UNAUTHORIZED' });
 });
+
+it('returns the complete public role directory without honoring stale page parameters', async () => {
+  const result = await listDirectory({ authenticated: false, role: 'MEMBER', page: 999, pageSize: 'all' });
+  expect(result.items.map(member => member.id)).toEqual(expected);
+  expect(result.page).toBe(1);
+  expect(result.totalPages).toBe(1);
+  expect(JSON.stringify(result.items)).not.toContain('secret-');
+});

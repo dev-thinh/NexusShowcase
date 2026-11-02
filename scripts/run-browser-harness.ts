@@ -1,7 +1,7 @@
 import { loadEnvConfig } from '@next/env';
 import { spawn, type ChildProcess } from 'node:child_process';
 import { randomUUID } from 'node:crypto';
-import { appendFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import path from 'node:path';
 import { createBenchmarkFixtures } from '../tests/fixtures/benchmark';
@@ -10,6 +10,7 @@ import { writeFixtureImages, removeFixtureImages } from '../tests/fixtures/momen
 import { runNavigationBenchmark } from './benchmark-navigation';
 
 loadEnvConfig(process.cwd());
+if (existsSync('.env.test.local')) process.loadEnvFile('.env.test.local');
 const harnessRoot = path.resolve('.harness');
 const directory = path.join(harnessRoot, randomUUID());
 mkdirSync(directory, { recursive: true });

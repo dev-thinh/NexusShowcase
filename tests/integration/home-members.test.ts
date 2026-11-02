@@ -25,7 +25,7 @@ it('shows all eligible people below the cap without exposing profile or private 
   expect(result.total).toBe(19);
   expect(result.members).toHaveLength(19);
   expect(result.members.slice(0, 2).every(member => member.role === 'ADMIN')).toBe(true);
-  for (const member of result.members) expect(Object.keys(member).sort()).toEqual(['avatarUrl', 'fullName', 'id', 'role']);
+  for (const member of result.members) expect(Object.keys(member).sort()).toEqual(['avatarUrl', 'fullName', 'id', 'publicSlug', 'role']);
 });
 
 it('samples within roles per request, keeps admins and limits returned avatars to twenty-nine', async () => {

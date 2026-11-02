@@ -35,7 +35,7 @@ export function MemberPagination({
   return (
     <nav
       aria-label={ariaLabel}
-      className="flex items-center gap-1.5 flex-wrap"
+      className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-1.5"
     >
       {page === 1 ? (
         <span aria-disabled="true" className={disabledClass}>
@@ -73,4 +73,20 @@ export function MemberPagination({
       )}
     </nav>
   );
+}
+
+
+export function PaginationFooter({ page, totalPages, pageSize, basePath, ariaLabel, itemLabel = 'công trình', children }: {
+  page: number;
+  totalPages: number;
+  pageSize: number;
+  basePath: string;
+  ariaLabel?: string;
+  children?: import('react').ReactNode;
+  itemLabel?: string;
+}) {
+  return <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6" data-pagination-footer>
+    <p aria-live="polite" className="text-xs leading-6 text-[#1F2937]">Trang {page} / {totalPages} · {pageSize} {itemLabel} mỗi trang{children && <span className="ml-2">· {children}</span>}</p>
+    <MemberPagination page={page} totalPages={totalPages} basePath={basePath} ariaLabel={ariaLabel} />
+  </div>;
 }

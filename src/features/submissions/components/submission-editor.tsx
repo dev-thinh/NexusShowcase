@@ -1,5 +1,6 @@
 'use client';
 
+import { focusFirstSubmissionError } from './submission-field';
 import { MediaImage } from '@/shared/ui/media-image';
 
 import { ArticleContent, ArticleTableOfContents } from '@/features/submissions/components/article-content';
@@ -42,20 +43,28 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
     if (!state.formError) return;
     setPreview(false);
     requestAnimationFrame(() => {
-      const target = formRef.current?.querySelector<HTMLElement>('[aria-invalid="true"]') || formRef.current?.querySelector<HTMLElement>('[role="alert"]');
-      target?.focus(); target?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      focusFirstSubmissionError(formRef.current);
+      if (!Object.values(state.fieldErrors).some(messages => messages.length)) {
+        const error = formRef.current?.querySelector<HTMLElement>('[data-submit-error]');
+        error?.focus({ preventScroll: true });
+        error?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     });
-  }, [state.formError]);
+  }, [state.formError, state.fieldErrors]);
   const content = state.data.content ?? '';
   const images = articleFromLegacy(content, state.data.resources ?? []).sections.flatMap(section => section.blocks).filter((block): block is Extract<ArticleBlock, { kind: 'IMAGE' }> => block.kind === 'IMAGE' && !!block.url);
   return (
-    <form ref={formRef} className="panel-detail w-full !p-0" onSubmit={event => event.preventDefault()} noValidate>
-      {state.formError && <div role="alert" tabIndex={-1} className="border-b border-slate-200 bg-[#FFFFFF] px-6 py-3 text-sm font-semibold text-[#1F2937] sm:px-8">{state.formError}</div>}
+    <form ref={formRef} className="submission-form panel-detail w-full !p-0" onSubmit={event => event.preventDefault()} noValidate>
       {reviewComments.length > 0 && <aside aria-label="Yêu cầu chỉnh sửa" className="border-b border-slate-200 bg-[#FFFFFF] px-6 py-4 text-sm text-[#1F2937] sm:px-8"><h2 className="font-semibold">Phản hồi cần xử lý</h2><ul className="mt-2 list-disc space-y-1 pl-5">{reviewComments.filter(comment => comment.audience === 'AUTHOR').map(comment => <li key={comment.id}>{comment.body}</li>)}</ul></aside>}
       <div className="flex items-center justify-between gap-3 border-b border-slate-200 px-6 py-4 sm:px-8"><p className="text-sm font-semibold text-[#1F2937]">{preview ? 'Bản xem trước · Chưa xuất bản' : 'Workspace soạn thảo'}</p><button type="button" className="action-secondary-detail min-h-10" onClick={() => setPreview(value => !value)}>{preview ? 'Quay lại soạn thảo' : 'Xem trước'}</button></div>
       {preview ? <div className="space-y-8 p-6 sm:p-8">
-        <h1 className="break-words text-3xl font-semibold text-[#1F2937]">{state.data.title || 'Tiêu đề công trình'}</h1>
-        {<MediaImage src={state.data.thumbnailUrl} alt="Ảnh đại diện" className="mx-auto flex min-h-40 w-full max-h-[24rem] max-w-full rounded-md object-contain" />}
+        <header className={state.data.thumbnailUrl ? 'grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-8' : ''}>
+          <div className="min-w-0">
+            <h1 className="break-words text-3xl font-semibold text-[#1F2937]">{state.data.title || 'Tiêu đề công trình'}</h1>
+            <p className="mt-3 text-sm leading-7 text-[#1F2937]">{state.data.contributors?.map(c => clubMembers.find(member => member.id === c.userId)?.fullName || (c.userId === currentUser.id ? currentUser.fullName : c.externalName) || 'Thành viên').join(', ')}</p>
+          </div>
+          {state.data.thumbnailUrl && <MediaImage src={state.data.thumbnailUrl} alt={`Hình minh họa: ${state.data.title || 'Công trình'}`} className="article-header-thumbnail" />}
+        </header>
         <ArticleTableOfContents content={content} />
         <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{state.data.summary || 'Chưa có tóm tắt.'}</p></section>
         <ArticleContent content={content} />
@@ -66,24 +75,22 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
 
           </section>
           <div className="min-w-0 border-t border-slate-200 bg-[#FFFFFF] p-6 sm:p-8 lg:border-t-0">
-            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">Tác giả và người đóng góp</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm người tham gia và xác nhận vai trò của từng người.</p><ReviewComments comments={reviewComments} fieldKey="contributors" />{!!state.fieldErrors.contributors?.length && <p role="alert" tabIndex={-1} className="mt-2 text-sm text-rose-800">{state.fieldErrors.contributors[0]}</p>}<ContributorEditor value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
+            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">Tác giả và người đóng góp</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm người tham gia và xác nhận vai trò của từng người.</p><ReviewComments comments={reviewComments} fieldKey="contributors" /><ContributorEditor errors={state.fieldErrors} value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
             <section className="mt-7 border-t border-slate-200 pt-6" aria-labelledby="submission-resources-title">
               <h2 id="submission-resources-title" className="text-lg font-semibold text-[#1F2937]">Tài nguyên đính kèm</h2>
-              <p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm tệp hoặc liên kết bổ sung cho bài viết.</p>
               <ReviewComments comments={reviewComments} fieldKey="resources" />
-              {!!state.fieldErrors.resources?.length && <p role="alert" className="mt-2 text-sm text-[#1F2937]">{state.fieldErrors.resources[0]}</p>}
-              <ResourceEditor value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} />
+              <ResourceEditor errors={state.fieldErrors} citationEnabled={state.data.citationEnabled} onCitationChange={enabled => updateField('citationEnabled', enabled)} value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} />
             </section>
           </div>
         </div>
         <div className="space-y-5 border-t border-slate-200 p-6 sm:p-8">
           <ReviewComments comments={reviewComments} fieldKey="content" />
-          {!!state.fieldErrors.content?.length && <p role="alert" tabIndex={-1} className="text-sm text-[#1F2937]">{state.fieldErrors.content[0]}</p>}
-          <SectionEditor content={content} resources={[]} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} onChange={value => updateField('content', value)} />
+          <SectionEditor errors={state.fieldErrors} content={content} resources={[]} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} onChange={value => updateField('content', value)} />
 
         </div>
 
       </fieldset>}
+      {state.formError && !Object.values(state.fieldErrors).some(messages => messages.length) && <p role="alert" tabIndex={-1} data-submit-error className="mx-6 my-3 rounded-md border border-red-500 p-3 text-sm text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">{state.formError}</p>}
       <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={uploads > 0} onSave={async () => { if (await saveDraft()) await notifySuccess('Đã lưu bản nháp công trình.'); }} onSubmit={async () => { if (await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
     </form>
   );

@@ -14,7 +14,7 @@ vi.mock('@/features/identity/server/account-actions', () => ({ changePasswordAct
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.session.mockResolvedValue(null);
-  mocks.user.mockResolvedValue({ id: 'member', fullName: 'Nguyễn An', role: 'MEMBER', bio: 'Nghiên cứu robot', githubUrl: 'https://github.com/member' });
+  mocks.user.mockResolvedValue({ id: 'member', publicSlug: 'nguyen-an', fullName: 'Nguyễn An', role: 'MEMBER', bio: 'Nghiên cứu robot', githubUrl: 'https://github.com/member' });
   mocks.publications.mockResolvedValue({ items: [{ id: 'paper', title: 'Bài nghiên cứu mẫu', type: 'RESEARCH_PAPER' }, { id: 'robot', title: 'Robot mẫu', type: 'PROJECT' }], total: 30, page: 1, totalPages: 5 });
 });
 
@@ -25,7 +25,7 @@ it('combines publication types with labels and a total for visitors', async () =
   expect(html).toContain('Bài nghiên cứu mẫu');
   expect(html).toContain('Robot mẫu');
   expect(html).toContain('Nghiên cứu khoa học');
-  expect(html).toContain('Robotics &amp; IoT');
+  expect(html).toContain('Dự án &amp; Sản phẩm');
   expect(html).toContain('/ 30');
   expect(html).not.toContain('Loại công trình');
   expect(html).not.toContain('Tùy chọn ảnh đại diện');
@@ -52,6 +52,9 @@ it('offers editing and password actions only on the owner profile without an inl
   expect(html).not.toContain('href="/account/change-password"');
   expect(html).not.toContain('<form');
   expect(html).not.toContain('Điều hướng quản lý');
+  const breadcrumb = html.split('data-breadcrumbs="true"')[1].split('</nav>')[0];
+  expect(breadcrumb).toContain('Hồ sơ của tôi');
+  expect(breadcrumb).not.toContain('href="/members"');
 });
 
 it('accepts older project pagination links on the combined list', async () => {
@@ -67,4 +70,25 @@ it('renders a single compact empty state', async () => {
   expect(html).toContain('Chưa có công trình nào.');
   expect(html).not.toContain('Chưa có dự án nào.');
   expect(html).not.toContain('Phân trang công trình');
+});
+
+it('uses the profile ID for routing and verifies ownership with the authenticated ID', async () => {
+  mocks.session.mockResolvedValue({ user: { id: 'member', role: 'MEMBER' } });
+  await MemberProfilePage({ params: Promise.resolve({ id: 'member' }) });
+  expect(mocks.user).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'member', status: 'ACTIVE', deletedAt: null } }));
+  expect(mocks.publications).toHaveBeenCalledWith(expect.objectContaining({ memberId: 'member' }));
+});
+
+it('redirects previously shared slugs to canonical profile IDs and preserves password and pagination parameters', async () => {
+  mocks.user.mockResolvedValueOnce(null).mockResolvedValueOnce({ id: 'member' });
+  await expect(MemberProfilePage({ params: Promise.resolve({ id: 'nguyen-an' }), searchParams: Promise.resolve({ password: 'change', page: '2' }) })).rejects.toMatchObject({ digest: 'NEXT_REDIRECT;replace;/members/member?password=change&page=2;308;' });
+  expect(mocks.publications).not.toHaveBeenCalled();
+});
+
+it('renders a centered missing-image placeholder for every publication without a thumbnail', async () => {
+  const html = renderToStaticMarkup(await MemberProfilePage({ params: Promise.resolve({ id: 'member' }), searchParams: Promise.resolve({}) }));
+  expect(html.match(/data-media-placeholder="true"/g)).toHaveLength(2);
+  expect(html).toContain('aria-label="Chưa có ảnh"');
+  expect(html).not.toContain('>Chưa có ảnh</span>');
+  expect(html).toContain('items-center justify-center');
 });

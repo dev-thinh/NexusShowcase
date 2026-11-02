@@ -44,7 +44,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
     <>
 
       <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <Breadcrumbs items={[{ label: "Quản lý công trình", href: "/dashboard" }, { label: "Chỉnh sửa công trình" }]} />
+      <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/dashboard" }, { label: "Chỉnh sửa công trình" }]} />
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
             <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">{item.status === 'PUBLISHED' ? 'Soạn bản cập nhật' : item.status === 'REVISION_REQUESTED' ? 'Chỉnh sửa theo phản hồi' : 'Chỉnh sửa bản nháp'}</h1>

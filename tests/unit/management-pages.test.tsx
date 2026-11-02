@@ -24,8 +24,8 @@ import AdminDashboardPage from '@/app/(shell)/(account)/admin/page';
 import DashboardPage from '@/app/(shell)/(account)/dashboard/page';
 import MemberProfilePage from '@/app/(shell)/(site)/members/[id]/page';
 
-const post: MyPost = { id: 'post-1', slug: 'robot-tu-hanh', title: 'Robot tự hành', summary: 'Hệ thống điều hướng trong nhà', type: 'PROJECT', status: 'DRAFT', reviewStatus: null, reviewVersion: 0, rejectionReason: null, publishedYear: 2026, updatedAt: new Date('2026-10-17T00:00:00Z'), thumbnailUrl: null };
-const member = { id: 'member-1', fullName: 'Nguyễn An', role: 'CORE_MEMBER', mustChangePassword: false, avatarUrl: null, bio: 'Nghiên cứu robot và hệ thống nhúng.', githubUrl: 'https://github.com/example', linkedinUrl: null, googleScholarUrl: null, portfolioUrl: null, createdAt: new Date('2026-01-01'), createdItems: [post], contributions: [] };
+const post: MyPost = { canManage: true, id: 'post-1', slug: 'robot-tu-hanh', title: 'Robot tự hành', summary: 'Hệ thống điều hướng trong nhà', type: 'PROJECT', status: 'DRAFT', reviewStatus: null, reviewVersion: 0, rejectionReason: null, publishedYear: 2026, updatedAt: new Date('2026-10-17T00:00:00Z'), thumbnailUrl: null };
+const member = { id: 'member-1', publicSlug: 'nguyen-an', fullName: 'Nguyễn An', role: 'CORE_MEMBER', mustChangePassword: false, avatarUrl: null, bio: 'Nghiên cứu robot và hệ thống nhúng.', githubUrl: 'https://github.com/example', linkedinUrl: null, googleScholarUrl: null, portfolioUrl: null, createdAt: new Date('2026-01-01'), createdItems: [post], contributions: [] };
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -44,6 +44,8 @@ describe('management pages', () => {
     expect(html).toContain(`/members/${member.id}`);
     expect(html).not.toContain('/admin');
     expect(html).toContain('aria-current="page"');
+    expect(html).toContain('border-b-2');
+    expect(html).toContain('border-[#153D67]');
   });
 
   it('keeps admin access checks and counts all pins rather than only the preview list', async () => {
@@ -65,7 +67,7 @@ describe('management pages', () => {
 
   it('loads only the fields required for the author list and shows the create action', async () => {
     const html = renderToStaticMarkup(await DashboardPage({ searchParams: Promise.resolve({}) }));
-    expect(html).toContain('Bài đăng của tôi');
+    expect(html).toContain('Công trình của tôi');
     expect(html).toContain('Đăng bài mới');
     const query = mocks.items.mock.calls[0][0];
     expect(query.select).not.toHaveProperty('authorDraft');
@@ -81,6 +83,15 @@ describe('management pages', () => {
     const readOnly = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader={false} />);
     expect(readOnly).toContain('Chỉ đọc');
     expect(readOnly).not.toContain(`/dashboard/items/${post.id}/edit`);
+  });
+
+  it('shows contributor draft status without management actions or an inaccessible preview', () => {
+    const html = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, canManage: false }]} isUploader />);
+    expect(html).toContain(post.title);
+    expect(html).toContain('Chỉ theo dõi');
+    expect(html).not.toContain(`/dashboard/items/${post.id}/edit`);
+    expect(html).not.toContain(`/showcase/${post.slug}`);
+    expect(html).not.toContain('Rút bài để sửa');
   });
 
   it('shows account actions only on the signed-in user profile', async () => {
@@ -111,4 +122,22 @@ describe('author list filters', () => {
     expect(matchesPostFilter({ ...post, status: 'PUBLISHED', reviewStatus: 'REVISION_REQUESTED' }, 'REVISION_REQUESTED')).toBe(true);
     expect(matchesPostFilter({ ...post, status: 'REJECTED' }, 'REJECTED')).toBe(true);
   });
+});
+
+it('renders visible selected post filters like the admin role filters and preserves search', () => {
+  const html = renderToStaticMarkup(<MyPosts query="robot" filter="DRAFT" counts={{ ALL: 2, DRAFT: 1, PENDING_REVIEW: 1, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader />);
+  const group = html.split('aria-label="Lọc trạng thái bài đăng"')[1].split('</div>')[0];
+  expect(group).toContain('flex-wrap');
+  expect(group).toContain('bg-[#153D67]');
+  expect(group).toContain('text-white');
+  expect(group).toContain('aria-current="page"');
+  expect(group).toContain('q=robot');
+});
+
+it('does not offer editing or withdrawal for a contributed work owned by someone else', () => {
+  const html = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 0, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 1, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PUBLISHED', canManage: false }]} isUploader />);
+  expect(html).toContain('Xem bài');
+  expect(html).not.toContain('Soạn bản cập nhật');
+  expect(html).not.toContain(`/dashboard/items/${post.id}/edit`);
+  expect(html).not.toContain('Rút');
 });

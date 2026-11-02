@@ -1,3 +1,4 @@
+import { ContributorNames, ContributorName } from '@/features/publications/components/contributor-names';
 import { MediaImage } from '@/shared/ui/media-image';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
 import { getSession as auth } from '@/features/identity/server/session';
@@ -58,14 +59,14 @@ export default async function ShowcaseDetailPage({
   const sidebarResources = standaloneResources(item.content ?? '', buildSubmissionSnapshot(item).resources);
 
   const categorySlug = item.type === 'PROJECT' ? 'robotics-iot' : 'bai-bao-khoa-hoc';
-  const categoryName = item.type === 'PROJECT' ? 'Robotics & IoT' : 'Nghiên cứu khoa học';
+  const categoryName = item.type === 'PROJECT' ? 'Dự án & Sản phẩm' : 'Nghiên cứu khoa học';
   const source = await searchParams;
   const backHref = showcaseReturnTarget(source?.returnTo, `/category/${categorySlug}`);
   const breadcrumbParents = currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW'
     ? [{ label: 'Quản trị', href: '/admin' }, { label: 'Phê duyệt bài đăng', href: '/admin/reviews' }]
     : backHref === '/' ? [] : [{
       label: backHref.startsWith('/explore') || backHref.startsWith('/?') ? 'Khám phá công trình'
-        : backHref.startsWith('/category/robotics-iot') ? 'Robotics & IoT'
+        : backHref.startsWith('/category/robotics-iot') ? 'Dự án & Sản phẩm'
         : backHref.startsWith('/category/bai-bao-khoa-hoc') ? 'Nghiên cứu khoa học' : categoryName,
       href: backHref,
     }];
@@ -134,24 +135,28 @@ export default async function ShowcaseDetailPage({
         )}
 
 
-            <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-semibold text-[#1F2937]">
-              <TypeBadge type={item.type} variant="outline" />
-              {item.publishedYear && <span>{item.publishedYear}</span>}
-              {item.isPinned && <span className="font-semibold text-[#1F2937]">Công trình tiêu biểu</span>}
+            <div className={item.thumbnailUrl ? 'grid items-start gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-8' : ''}>
+              <div className="min-w-0">
+                <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-semibold text-[#1F2937]">
+                  <TypeBadge type={item.type} variant="outline" />
+                  {item.publishedYear && <span>{item.publishedYear}</span>}
+                  {item.isPinned && <span className="font-semibold text-[#1F2937]">Công trình tiêu biểu</span>}
+                </div>
+                <h1 className="page-title max-w-5xl break-words">{item.title}</h1>
+                {item.contributors.length > 0 && (
+                  <p className="mt-3 max-w-4xl text-sm leading-7 text-[#1F2937] sm:text-base">
+                    <ContributorNames contributors={item.contributors} />
+                  </p>
+                )}
+              </div>
+              {item.thumbnailUrl && (
+                <MediaImage
+                  src={item.thumbnailUrl}
+                  alt={`Hình minh họa: ${item.title}`}
+                  className="article-header-thumbnail"
+                />
+              )}
             </div>
-            <h1 className="page-title max-w-5xl break-words">{item.title}</h1>
-            {item.contributors.length > 0 && (
-              <p className="mt-3 max-w-4xl text-sm leading-7 text-[#1F2937] sm:text-base">
-                {item.contributors.map((contributor, index) => (
-                  <span key={contributor.id}>
-                    {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="hover:text-[#1F2937]">{contributor.user.fullName}</Link> : contributor.externalName || 'Thành viên'}
-                    {contributor.role === 'ADVISOR' && <sup className="ml-0.5 text-xs" title="Người hướng dẫn">†</sup>}
-                    {index < item.contributors.length - 1 ? ', ' : ''}
-                  </span>
-                ))}
-              </p>
-            )}
-            {item.issuer && <p className="mt-3 text-sm italic leading-relaxed text-[#1F2937]">{item.issuer}</p>}
 
           </div>
         </header>
@@ -162,14 +167,6 @@ export default async function ShowcaseDetailPage({
               <h2 id="abstract-title" className="mb-3 text-base font-semibold text-[#1F2937]">Tóm tắt</h2>
               <p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{item.summary}</p>
             </section>
-
-            {(
-              <figure className="space-y-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} className="mx-auto flex min-h-48 w-full max-h-[32rem] max-w-full rounded-md object-contain" />
-                <figcaption className="text-center text-xs leading-6 text-[#1F2937]">Hình tổng quan công trình</figcaption>
-              </figure>
-            )}
 
             {item.content && <ArticleContent content={item.content} />}
 
@@ -221,11 +218,11 @@ export default async function ShowcaseDetailPage({
 
           <aside className="min-w-0 space-y-7 border-t border-slate-200 pt-6 lg:sticky lg:top-24 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0" aria-label="Tài nguyên và nhóm thực hiện">
             <ArticleTableOfContents content={item.content ?? ''} />
-            <section aria-labelledby="resources-title">
+            <section id="resources" className="scroll-mt-28" aria-labelledby="resources-title">
               <h2 id="resources-title" className="mb-4 text-base font-semibold text-[#1F2937]">Tài nguyên</h2>
               <div className="flex flex-col items-stretch gap-2">
-                <ResourceLinks resources={sidebarResources} />
                 <CitationModal item={toCitationDto(item)} className="action-secondary-detail" />
+                <ResourceLinks resources={sidebarResources} />
               </div>
             </section>
 
@@ -240,7 +237,7 @@ export default async function ShowcaseDetailPage({
                       <li key={contributor.id} className="flex items-start gap-3">
                         <MemberAvatar fullName={name} className="h-9 w-9 shrink-0 rounded-full text-xs" />
                         <div className="min-w-0">
-                          {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="text-sm font-semibold text-[#1F2937] hover:text-[#1F2937]">{name}</Link> : <span className="text-sm font-semibold text-[#1F2937]">{name}</span>}
+                          <span className="text-sm text-[#1F2937]"><ContributorName contributor={contributor} /></span>
                           <p className="mt-1 text-xs leading-5 text-[#1F2937]">{contributor.customRoleTitle || contributorRoles[contributor.role]}</p>
                           {contributor.externalAffiliation && <p className="mt-1 text-xs leading-5 text-[#1F2937]">{contributor.externalAffiliation}</p>}
                         </div>

@@ -16,6 +16,7 @@ export type SnapshotContributor = ContributorInput & {
 };
 
 export interface SubmissionSnapshot {
+  citationEnabled?: boolean;
   type?: 'RESEARCH_PAPER' | 'PROJECT';
   categoryId?: string | null;
   thumbnailUrl?: string | null;
@@ -48,6 +49,7 @@ export interface EffectivePublication extends SubmissionSnapshot {
 }
 
 export interface SubmissionSnapshotSource {
+  citationEnabled?: boolean;
   type?: ItemType;
   categoryId?: string | null;
   thumbnailUrl?: string | null;
@@ -69,6 +71,7 @@ export interface SubmissionSnapshotSource {
 }
 
 export function mapShowcaseItemToSubmission(item: {
+  citationEnabled?: boolean;
   id: string;
   title: string;
   summary: string;
@@ -94,6 +97,7 @@ export function mapShowcaseItemToSubmission(item: {
 }): SubmissionSnapshot & { id: string } {
   return {
     id: item.id,
+    citationEnabled: item.citationEnabled ?? true,
     type: item.type === 'RESEARCH_PAPER' ? 'RESEARCH_PAPER' : 'PROJECT',
     categoryId: item.categoryId,
     thumbnailUrl: item.thumbnailUrl,

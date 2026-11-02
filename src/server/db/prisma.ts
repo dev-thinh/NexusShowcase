@@ -1,7 +1,8 @@
 import { recordQueryDuration } from '@/server/observability/timing';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma?: PrismaClient; prismaSchema?: string };
+const schemaSignature = JSON.stringify(Prisma.dmmf.datamodel.models);
 
 function createPrisma() {
   const client = new PrismaClient({
@@ -13,6 +14,12 @@ function createPrisma() {
   return client;
 }
 
-export const prisma = globalForPrisma.prisma || createPrisma();
+// Fast Refresh must not reuse an instance generated for a previous schema.
+const cached = globalForPrisma.prisma;
+export const prisma = cached && globalForPrisma.prismaSchema === schemaSignature ? cached : createPrisma();
+if (cached && cached !== prisma) void cached.$disconnect().catch(() => undefined);
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma;
+  globalForPrisma.prismaSchema = schemaSignature;
+}

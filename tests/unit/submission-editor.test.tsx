@@ -36,11 +36,11 @@ describe('submission editor shell', () => {
 
   it('adds one typed resource at a time with accessible file controls', () => {
     const resources = read('src/features/submissions/components/resource-editor.tsx');
-    expect(resources).toContain('Thêm tài nguyên');
-    expect(resources).toContain("add('DOCUMENT')");
-    expect(resources).toContain('>Tệp</button>');
+    expect(resources).toContain('<span>GitHub</span>');
+    expect(resources).toContain("linkType: 'GITHUB'");
+    expect(resources).not.toContain('>Tệp</button>');
     expect(resources).not.toContain('Tài liệu PDF');
-    expect(resources).toContain("add('LINK')");
+
     expect(resources).toContain('<FilePicker');
     expect(resources).toContain('aria-label={`Xóa tài nguyên');
     expect(resources).toContain('panel-nested');
@@ -97,4 +97,15 @@ describe('submission editor shell', () => {
     expect(actions).toContain('action-secondary-detail');
     expect(actions).toContain('action-primary-detail');
   });
+});
+
+it('keeps citation optional for new posts and preserves the saved toggle', () => {
+  expect(createInitialSubmissionState({}).data.citationEnabled).toBe(false);
+  expect(createInitialSubmissionState({ id: 'old' }).data.citationEnabled).toBe(true);
+  const initial = createInitialSubmissionState({ id: 'post', citationEnabled: false });
+  expect(initial.data.citationEnabled).toBe(false);
+  const enabled = submissionEditorReducer(initial, { type: 'field', field: 'citationEnabled', value: true });
+  expect(enabled.data.citationEnabled).toBe(true);
+  expect(enabled.isDirty).toBe(true);
+  expect(submissionEditorReducer(enabled, { type: 'field', field: 'citationEnabled', value: false }).data.citationEnabled).toBe(false);
 });

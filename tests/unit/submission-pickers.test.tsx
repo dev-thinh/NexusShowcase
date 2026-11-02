@@ -107,7 +107,12 @@ describe('submission add controls', () => {
   it('starts with a resource action and keeps its custom menu collapsed', () => {
     const html = renderToStaticMarkup(<ResourceEditor value={[]} onChange={() => undefined} />);
 
-    expect(html).toContain('>Thêm tài nguyên</button>');
+    expect(html).toContain('<span>Cite</span>');
+    expect(html.match(/type="checkbox"/g)).toHaveLength(2);
+    expect(html).not.toContain('checked=""');
+    expect(html).toContain('<span>GitHub</span>');
+    expect(html).not.toContain('github.com/owner/repository');
+    expect(html).not.toContain('Cite luôn có trên danh sách');
     expect(html).not.toContain('<select');
     expect(html).not.toContain('role="menu"');
   });
@@ -121,4 +126,12 @@ describe('submission add controls', () => {
     expect(html).toContain('>Gửi duyệt</button>');
     expect(html.match(/sm:w-40/g)).toHaveLength(2);
   });
+});
+
+it('shows saved resource selections with neutral cards and checked boxes', () => {
+  const html = renderToStaticMarkup(<ResourceEditor citationEnabled value={[{ kind: 'LINK', linkType: 'GITHUB', label: 'Mã nguồn GitHub', url: 'https://github.com/lab/repo' }]} onChange={() => undefined} />);
+  expect(html.match(/checked=""/g)).toHaveLength(2);
+  expect(html).toContain('https://github.com/lab/repo');
+  expect(html).toContain('accent-[#153D67]');
+  expect(html).not.toContain('!bg-[#153D67]');
 });

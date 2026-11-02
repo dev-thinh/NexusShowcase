@@ -6,9 +6,9 @@ import { rankedMembers } from './ranking';
 import { Prisma } from '@prisma/client';
 import { homeMemberSlots, type HomeMember, type HomeMembersPayload } from '../model/home';
 
-export async function listDirectory(input: { authenticated: boolean; role: PublicMemberRole; page: unknown; pageSize: 6 | 12 }): Promise<Page<MemberDirectoryEntry>> {
+export async function listDirectory(input: { authenticated: boolean; role: PublicMemberRole; page: unknown; pageSize: 6 | 12 | 'all' }): Promise<Page<MemberDirectoryEntry>> {
   const total = await prisma.user.count({ where: { status: 'ACTIVE', deletedAt: null, role: input.role } });
-  const { page, skip, take, totalPages } = pageBounds(input.page, total, input.pageSize);
+  const { page, skip, take, totalPages } = pageBounds(input.pageSize === 'all' ? 1 : input.page, total, input.pageSize === 'all' ? Math.max(1, total) : input.pageSize);
   const items = await rankedMembers({ ...input, skip, take });
   return { items, total, page, pageSize: take, totalPages };
 }
@@ -28,7 +28,7 @@ export function getHomeMembers(): Promise<HomeMembersPayload> {
       if (!slots[role]) continue;
       const order = role === 'ADMIN' ? Prisma.sql`"fullName", id` : Prisma.sql`random(), id`;
       const sample = await tx.$queryRaw<HomeMember[]>(Prisma.sql`
-        SELECT id, "fullName", "avatarUrl", role
+        SELECT id, "publicSlug", "fullName", "avatarUrl", role
         FROM users
         WHERE status = 'ACTIVE' AND "deletedAt" IS NULL AND role::text = ${role}
         ORDER BY ${order}

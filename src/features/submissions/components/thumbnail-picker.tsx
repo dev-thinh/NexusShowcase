@@ -6,7 +6,6 @@ import { FilePicker } from '@/shared/ui/file-picker';
 import { uploadFileAction } from '@/features/assets/server/actions';
 import { X } from 'lucide-react';
 import { useState } from 'react';
-import { notifySuccess } from '@/shared/dialogs/success';
 
 export interface ThumbnailOption { id: string; url: string; alt: string; caption: string }
 
@@ -31,7 +30,6 @@ export function ThumbnailPicker({ value, images = [], errors = [], onChange, onB
       const result = await uploadFileAction(data);
       if (!result.success) { setError(result.error || 'Không tải được ảnh.'); return; }
       onChange(result.data.url);
-      await notifySuccess('Đã tải ảnh lên. Lưu bản nháp để giữ thay đổi.');
     } catch { setError('Tải ảnh thất bại. Vui lòng thử lại.'); }
     finally {
       setUploading(false);
@@ -61,6 +59,6 @@ export function ThumbnailPicker({ value, images = [], errors = [], onChange, onB
         </button>)}
       </div>
     </details>}
-    {message && <p id="submission-thumbnail-error" role="alert" className="text-sm text-[#1F2937]">{message}</p>}
+    {message && <p id="submission-thumbnail-error" role="alert" className="text-sm text-red-700">{message}</p>}
   </div>;
 }

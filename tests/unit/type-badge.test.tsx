@@ -8,7 +8,7 @@ describe('TypeBadge shape', () => {
     const research = renderToStaticMarkup(<TypeBadge type={ItemType.RESEARCH_PAPER} />);
     const robotics = renderToStaticMarkup(<TypeBadge type={ItemType.PROJECT} />);
     expect(research).toContain('Nghiên cứu khoa học');
-    expect(robotics).toContain('Robotics &amp; IoT');
+    expect(robotics).toContain('Dự án &amp; Sản phẩm');
     expect(research).not.toContain('<svg');
     expect(robotics).not.toContain('<svg');
   });

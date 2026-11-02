@@ -2,7 +2,6 @@ import { MediaImage } from '@/shared/ui/media-image';
 import type { ArticleBlock } from '@/features/submissions/model/article';
 import { isGithubUrl, parseArticleContent } from '@/features/submissions/model/article';
 import { VideoPlayer } from '@/shared/ui/video-player';
-import { ExternalLink, FileText, Github } from 'lucide-react';
 import React from 'react';
 
 function inline(text: string): React.ReactNode[] {
@@ -28,16 +27,13 @@ export function ArticleBlockView({ block }: { block: ArticleBlock }) {
   if (!block.url) return null;
   if (block.kind === 'IMAGE') return <figure className="min-w-0 space-y-2">
     {/* eslint-disable-next-line @next/next/no-img-element */}
-    <MediaImage src={block.url} alt={block.alt || block.caption} loading="lazy" className="mx-auto block h-auto max-h-[40rem] max-w-full rounded-md object-contain" />
+    <MediaImage src={block.url} alt={block.caption || block.alt} loading="lazy" className="mx-auto block h-auto max-h-[40rem] max-w-full rounded-md object-contain" />
     {block.caption && <figcaption className="text-center text-sm leading-6 text-[#1F2937]">{block.caption}</figcaption>}
   </figure>;
   if (block.kind === 'VIDEO') return <figure className="space-y-3"><VideoPlayer url={block.url} title={block.caption || 'Video minh họa'} />{block.caption && <figcaption className="text-center text-sm text-[#1F2937]">{block.caption}</figcaption>}</figure>;
   const github = isGithubUrl(block.url);
-  const Icon = block.kind === 'DOCUMENT' ? FileText : github ? Github : ExternalLink;
-  return <a href={block.url} target="_blank" rel="noopener noreferrer" className="flex min-w-0 items-center gap-4 rounded-lg border border-slate-200 bg-[#FFFFFF] p-4 transition-colors hover:border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]">
-    <Icon aria-hidden="true" className="h-5 w-5 shrink-0 text-[#1F2937]" />
+  return <a href={block.url} target="_blank" rel="noopener noreferrer" className="flex min-w-0 items-center justify-center text-center gap-4 rounded-lg border border-slate-200 bg-[#FFFFFF] p-4 transition-colors hover:border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]">
     <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-[#1F2937]">{block.caption || block.fileName || (github ? 'Xem mã nguồn GitHub' : 'Mở liên kết')}</span><span className="mt-1 block truncate text-xs text-[#1F2937]">{block.kind === 'DOCUMENT' ? 'PDF · Xem / tải tài liệu' : block.url}</span></span>
-    <ExternalLink aria-hidden="true" className="h-4 w-4 shrink-0 text-[#1F2937]" />
   </a>;
 }
 export function ArticleContent({ content }: { content: string }) {

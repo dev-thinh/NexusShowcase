@@ -46,12 +46,12 @@ test('library pagination repeatedly completes without leaving the loading screen
   }
 });
 
-test('section tabs connect all publications, research and robotics', async ({ page }) => {
+test('section tabs connect all publications, research and projects', async ({ page }) => {
   await page.goto('/explore');
   const tabs = page.getByRole('navigation', { name: 'Chuyên mục công trình', exact: true });
   for (const [label, href] of [
     ['Nghiên cứu khoa học', '/category/bai-bao-khoa-hoc'],
-    ['Robotics & IoT', '/category/robotics-iot'],
+    ['Dự án & Sản phẩm', '/category/robotics-iot'],
     ['Tất cả công trình', '/explore'],
   ]) {
     await tabs.getByRole('link', { name: label, exact: true }).click();

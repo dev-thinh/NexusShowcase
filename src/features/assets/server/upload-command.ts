@@ -1,9 +1,10 @@
+import { UploadQuotaError } from './upload-quota';
 import crypto from 'node:crypto';
 import path from 'node:path';
 import type { UploadKind, UploadResult } from '../model/contracts';
 import { detectFileType, verifiedFileTypes } from '../model/file-signatures';
 import { writeStoredAsset } from './storage';
-export async function uploadAsset(file: File, type: UploadKind, ownerId?: string): Promise<UploadResult> {
+export async function uploadAsset(file: File, type: UploadKind, ownerId: string): Promise<UploadResult> {
 
   if (!file || typeof file === 'string' || file.size === 0) {
     return { success: false, code: 'VALIDATION', error: 'Vui lòng chọn một tệp hợp lệ.' };
@@ -37,7 +38,8 @@ export async function uploadAsset(file: File, type: UploadKind, ownerId?: string
     try {
       const url = await writeStoredAsset('resource', storedFileName, Buffer.from(await file.arrayBuffer()), ownerId);
       return { success: true, data: { url, fileName: path.basename(file.name).replace(/[\r\n]/g, '').slice(0, 160) || `resource.${storedExtension}`, fileSize: file.size, mimeType: 'application/octet-stream' } };
-    } catch {
+    } catch (error) {
+      if (error instanceof UploadQuotaError) return { success: false, code: 'RATE_LIMITED', error: error.message };
       return { success: false, code: 'INTERNAL', error: 'Không lưu được tài nguyên. Vui lòng thử lại.' };
     }
   }
@@ -101,7 +103,8 @@ export async function uploadAsset(file: File, type: UploadKind, ownerId?: string
     const fileUrl = await writeStoredAsset(isThumbnail ? 'thumbnail' : 'pdf', safeStoredFileName, Buffer.from(arrayBuffer), ownerId);
 
     return { success: true, data: { url: fileUrl, fileName: clientFileName, fileSize: file.size, mimeType: verified.mimeType } };
-  } catch {
+  } catch (error) {
+    if (error instanceof UploadQuotaError) return { success: false, code: 'RATE_LIMITED', error: error.message };
     return {
       success: false,
       code: 'INTERNAL',

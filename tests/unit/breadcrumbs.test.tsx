@@ -13,9 +13,13 @@ it('links ancestors and marks only the current page without linking it', () => {
 });
 
 it('keeps top level destinations beside one another under home', () => {
-  for (const label of ['Khám phá công trình', 'Nghiên cứu khoa học', 'Robotics & IoT']) {
+  for (const label of ['Khám phá công trình', 'Nghiên cứu khoa học', 'Dự án & Sản phẩm']) {
     const html = renderToStaticMarkup(<Breadcrumbs items={[{ label }]} />);
     expect(html.match(/<li\b/g)).toHaveLength(2);
     expect(html.match(/<a\b/g)).toHaveLength(1);
   }
+});
+
+it('omits a standalone home breadcrumb', () => {
+  expect(renderToStaticMarkup(<Breadcrumbs items={[]} />)).toBe('');
 });

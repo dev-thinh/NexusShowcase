@@ -25,7 +25,7 @@ describe('personal profile update', () => {
       where: { id: 'self', status: 'ACTIVE', deletedAt: null, mustChangePassword: false },
       data: { fullName: 'Nguyễn Văn A', bio: input.bio, profileLinks: input.links, githubUrl: null, linkedinUrl: null, googleScholarUrl: null, portfolioUrl: null },
     });
-    expect(mocks.revalidatePath).toHaveBeenCalledWith('/members/self');
+    expect(mocks.revalidatePath).toHaveBeenCalledWith('/members/[id]', 'page');
   });
   it.each([{ fullName: '   ' }, { links: [{ title: 'Bad link', url: 'javascript:alert(1)' }] }, { links: [{ title: '', url: 'https://example.com' }] }, { links: Array.from({ length: 13 }, () => ({ title: 'Website', url: 'https://example.com' })) }, { bio: 'a'.repeat(2001) }])('rejects invalid profile data %j', async (patch) => {
     expect(await updateProfileAction({ ...input, ...patch })).toMatchObject({ success: false, code: 'VALIDATION' });

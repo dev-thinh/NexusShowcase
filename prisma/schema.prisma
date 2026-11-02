@@ -31,6 +31,7 @@ model Asset {
   provider          String
   fileId            String?
   ownerId           String?
+  byteSize          BigInt?
   private           Boolean   @default(false)
   createdAt         DateTime  @default(now())
   deletionToken     String?
@@ -40,6 +41,26 @@ model Asset {
   @@unique([provider, fileId])
   @@index([createdAt, deletedAt])
   @@map("assets")
+}
+
+model UploadReservation {
+  id        String @id @default(cuid())
+  ownerId   String
+  byteSize  BigInt
+  createdAt DateTime @default(now())
+
+  @@index([ownerId])
+  @@map("upload_reservations")
+}
+
+model AssetItemReference {
+  url    String
+  itemId String
+  item   ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@id([url, itemId])
+  @@index([itemId])
+  @@map("asset_item_references")
 }
 
 enum Role {
@@ -148,6 +169,7 @@ model User {
   email              String     @unique
   passwordHash       String?
   fullName           String
+  publicSlug         String     @unique @default(dbgenerated())
   studentId          String?
   avatarUrl          String?
   bio                String?
@@ -172,6 +194,7 @@ model User {
   resolvedReviewComments  ReviewComment[]      @relation("ResolvedReviewComments")
   itemAuditEvents         AuditEvent[]         @relation("ItemAuditEvents")
 
+  @@index([avatarUrl])
   @@map("users")
 }
 
@@ -193,6 +216,7 @@ model ShowcaseItem {
   status            ItemStatus     @default(DRAFT)
   visibility        ItemVisibility @default(PRIVATE)
   rejectionReason   String?
+  citationEnabled   Boolean        @default(true)
   publishedYear     Int?           @default(2026)
   publishedAt       DateTime?
   isPinned          Boolean        @default(false)
@@ -214,6 +238,7 @@ model ShowcaseItem {
   editorialDraft EditorialDraft?
   reviewComments ReviewComment[]
   auditEvents    AuditEvent[]
+  assetReferences AssetItemReference[]
 
   @@index([type, status])
   @@index([status, visibility])

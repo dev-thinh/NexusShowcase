@@ -11,6 +11,7 @@ const member = (
   contributions: number,
 ): MemberDirectoryEntry => ({
   id,
+  publicSlug: `member-${id}`,
   fullName,
   avatarUrl: null,
   bio: null,

@@ -87,6 +87,12 @@ export async function createTestFixtures(): Promise<DatabaseFixture & { cleanup(
     const guards = readFileSync(path.resolve('prisma/migrations/20261025_asset_registry_guards/migration.sql'), 'utf8').match(/CREATE FUNCTION[\s\S]*?\$\$;|CREATE TRIGGER[^;]+;/g);
     if (!guards || guards.length !== 9) throw new Error('Unexpected asset guard migration structure');
     for (const statement of guards) await scoped.$executeRawUnsafe(statement);
+    const slugGuards = readFileSync(path.resolve('prisma/migrations/20261027_public_profile_slugs/migration.sql'), 'utf8').match(/CREATE FUNCTION[\s\S]*?\$\$;|CREATE TRIGGER[^;]+;/g);
+    if (!slugGuards || slugGuards.length !== 2) throw new Error('Unexpected public slug migration structure');
+    for (const statement of slugGuards) await scoped.$executeRawUnsafe(statement);
+    const referenceTriggers = readFileSync(path.resolve('prisma/migrations/20261027_asset_quotas_references/migration.sql'), 'utf8').match(/CREATE FUNCTION[\s\S]*?\$\$;|CREATE TRIGGER[^;]+;/g);
+    if (!referenceTriggers || referenceTriggers.length !== 7) throw new Error('Unexpected asset reference migration structure');
+    for (const statement of referenceTriggers) await scoped.$executeRawUnsafe(statement);
     return { prisma: scoped, prefix, cleanup };
   } catch (error) {
     await cleanup();

@@ -15,7 +15,7 @@ it('atomically permits only the shared request budget under concurrent calls', a
 it('only one concurrent password change accepts the original password', async () => {
  const user = await prisma.user.create({ data: { email: 'password-race@test.invalid', fullName: 'Race', status: 'ACTIVE', role: 'MEMBER', passwordHash: await bcrypt.hash('original-password', 4) } });
  const actor = { ...user, status: 'ACTIVE' as const };
- const results = await Promise.all(['first-password-2026', 'second-password-2026'].map(newPassword => changePassword(actor, { currentPassword: 'original-password', newPassword })));
+ const results = await Promise.all(['First-password-2026!', 'Second-password-2026!'].map(newPassword => changePassword(actor, { currentPassword: 'original-password', newPassword })));
  expect(results.filter(result => result.success)).toHaveLength(1);
  const stored = await prisma.user.findUniqueOrThrow({ where: { id: user.id } });
  expect(stored.sessionVersion).toBe(2);

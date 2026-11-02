@@ -68,7 +68,7 @@ describe('publication library', () => {
       id: 'p1', slug: 'work', title: 'Công trình', summary: 'Tóm tắt', type,
       status: 'PUBLISHED', visibility: 'PUBLIC', isPinned: false, publishedYear: 2026,
       contributors: [], attachments: [], links: [
-        { type: 'PAPER_URL', url: 'https://example.com/paper' },
+        { type: 'PAPER_URL', url: 'https://example.com/paper', label: 'Tài nguyên của tác giả' },
         { type: 'GITHUB', url: 'https://github.com/example/robot' },
         { type: 'LIVE_DEMO', url: 'https://example.com/demo' },
       ],
@@ -76,15 +76,10 @@ describe('publication library', () => {
     const html = renderToStaticMarkup(await ExplorePage({ searchParams: Promise.resolve({}) }));
     expect(html).toContain('sm:grid-cols-[11rem_minmax(0,1fr)]');
     expect(html).toContain('Xem công trình');
-    if (type === 'RESEARCH_PAPER') {
-      expect(html).toContain('Trích dẫn khoa học');
-      expect(html).toContain('Bài báo gốc');
-      expect(html).not.toContain('href="https://example.com/demo"');
-    } else {
-      expect(html).toContain('href="https://github.com/example/robot"');
-      expect(html).toContain('href="https://example.com/demo"');
-      expect(html).not.toContain('Trích dẫn khoa học');
-      expect(html).not.toContain('Bài báo gốc');
-    }
+    expect(html).not.toContain('Tài nguyên của tác giả');
+    expect(html).toContain('Mã nguồn GitHub');
+    expect(html).toContain('lucide-github');
+    expect(html).not.toContain('href="https://example.com/demo"');
+    expect(html).toContain('Trích dẫn khoa học');
   });
 });

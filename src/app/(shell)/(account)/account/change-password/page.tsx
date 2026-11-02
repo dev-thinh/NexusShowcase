@@ -1,4 +1,5 @@
 import { getSession as auth } from '@/features/identity/server/session';
+import { prisma } from '@/server/db/prisma';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
@@ -11,5 +12,7 @@ export default async function ChangePasswordPage() {
     redirect('/login');
   }
 
-  redirect(`/members/${session.user.id}?password=change`);
+  const user = await prisma.user.findUnique({ where: { id: session.user.id, status: 'ACTIVE', deletedAt: null }, select: { id: true } });
+  if (!user) redirect('/login');
+  redirect(`/members/${user.id}?password=change`);
 }

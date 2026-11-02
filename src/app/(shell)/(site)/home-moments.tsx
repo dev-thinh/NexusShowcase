@@ -92,7 +92,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
       <div className="moments-heading container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div>
           <p className="moments-eyebrow">Nhịp sống sáng tạo <span aria-hidden="true">/</span> <span>Hoạt động CLB</span></p>
-          <h2 id="moments-title" className="moments-title">Những khoảnh khắc<br />cùng nhau <em>tạo nên công nghệ.</em></h2>
+          <h2 id="moments-title" className="moments-title"><span>Khoảnh khắc</span> <em>sáng tạo</em></h2>
         </div>
         <div className="moments-heading-actions">
           {initialGallery.isAdmin && !editing && <button ref={editButton} type="button" className="moments-edit-button" aria-label="Chỉnh sửa ảnh khoảnh khắc" title="Chỉnh sửa ảnh" disabled={opening} onClick={() => void startEditing()}>{opening ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}</button>}

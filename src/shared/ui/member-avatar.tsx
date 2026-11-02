@@ -13,7 +13,7 @@ export function MemberAvatar({ fullName, className = '', style, width, height, .
     hash = Math.imul(hash ^ character.codePointAt(0)!, 16777619) >>> 0;
   }
   const background = `hsl(${(hash % 36000) / 100} 65% 35%)`;
-  const lastWord = name.split(' ').at(-1) ?? '';
+  const lastWord = name.split(' ').findLast(word => /\p{L}/u.test(word)) ?? '';
   const initial = Array.from(lastWord.match(/\p{L}/u)?.[0].toLocaleUpperCase('vi') ?? '?')[0];
 
   return <MediaImage {...props} className={className} style={style} width={width} height={height} fallback={

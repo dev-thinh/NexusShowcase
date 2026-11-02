@@ -59,9 +59,10 @@ describe('rendered citation action grouping', () => {
     for (const group of groups) {
       const html = renderToStaticMarkup(group);
       expect(html).toMatch(/<a[^>]+href="[^"]*\/showcase\/paper-one[^"]*"[^>]*>Xem công trình/);
-      expect(html).toMatch(/<button[^>]*><span>Trích dẫn khoa học \(Cite\)<\/span><\/button>/);
-      expect(html).toContain('href="https://example.com/paper"');
-      expect(html).toContain('Bài báo gốc');
+      expect(html).toContain('aria-label="Trích dẫn công trình (Cite)"');
+      expect(html).toContain('lucide-quote');
+      expect(html).not.toContain('#resources');
+      expect(html).not.toContain('Original');
     }
   });
 });

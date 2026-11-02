@@ -13,7 +13,7 @@ it('preserves trimmed draft values, defaults and strict field validation', () =>
   expect(showcaseDraftInputSchema.safeParse({ title: 'Draft', unexpected: true }).success).toBe(false);
 });
 
-it('preserves localized submission errors grouped by their top-level field', () => {
+it('preserves localized submission errors at their exact field paths', () => {
   const result = showcaseSubmissionInputSchema.safeParse({ title: ' ', resources: [{ kind: 'LINK', label: '', url: 'javascript:alert(1)' }] });
   expect(result.success).toBe(false);
   if (result.success) throw new Error('Expected invalid submission');
@@ -24,7 +24,8 @@ it('preserves localized submission errors grouped by their top-level field', () 
       title: ['Vui lòng nhập tiêu đề.'],
       summary: ['Vui lòng nhập abstract / tóm tắt.'],
       contributors: ['Vui lòng thêm ít nhất một người đóng góp.'],
-      resources: expect.any(Array),
+      'resources.0.label': expect.any(Array),
+      'resources.0.url': expect.any(Array),
     },
   });
 });

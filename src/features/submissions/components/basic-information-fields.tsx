@@ -19,7 +19,7 @@ const inputClass = 'mt-2 w-full rounded-md border border-slate-200 bg-white px-3
 
 function FieldError({ id, errors }: { id: string; errors?: string[] }) {
   if (!errors?.length) return null;
-  return <p id={id} className="mt-1.5 text-sm text-[#1F2937]">{errors[0]}</p>;
+  return <p id={id} role="alert" className="mt-1.5 text-sm text-red-700">{errors[0]}</p>;
 }
 
 export function BasicInformationFields({ value, errors, onChange, reviewComments = [], categories = [], thumbnailImages = [], onBusy }: BasicInformationFieldsProps) {

@@ -3,7 +3,7 @@ import { acknowledgeSuccess, expect, login, test } from './fixtures';
 
 test('forced password change signs out and requires the new password', async ({ page, fixture, database }) => {
   const user = fixture.users[2];
-  const newPassword = randomBytes(24).toString('base64url');
+  const newPassword = `Aa1!${randomBytes(24).toString('base64url')}`;
   await login(page, user);
   await expect(page).toHaveURL(new RegExp(`/members/${user.id}\\?password=change$`));
   await expect(page.getByRole('dialog', { name: 'Đổi mật khẩu', exact: true })).toBeVisible();

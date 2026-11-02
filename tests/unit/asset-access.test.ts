@@ -51,3 +51,10 @@ it('preserves the explicit editor privilege to review registered draft media', a
   mocks.rows.mockResolvedValue([{ creatorId: 'author', status: 'PENDING_REVIEW', visibility: 'PRIVATE', live: [url], drafts: [] }]);
   expect(await getAssetAccess(url)).toEqual({ allowed: true, public: false });
 });
+
+it('restricts provenance hydration to the indexed candidate item IDs for the requested URL', async () => {
+  await getAssetAccess(url);
+  const sql = mocks.rows.mock.calls[0][0].join(' ');
+  expect(sql).toContain('asset_item_references');
+  expect(sql).not.toContain('normalize_asset_reference_text');
+});

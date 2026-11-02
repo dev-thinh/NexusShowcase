@@ -1,4 +1,5 @@
-import { articleSubmissionErrors, hasDetailedContent, isValidArticleContent } from '@/features/submissions/model/article';
+import { isGithubUrl } from '@/shared/lib/github-url';
+import { articleSubmissionIssues, hasDetailedContent, articleContentIssues } from '@/features/submissions/model/article';
 import { cuidSchema, MAX_CURRENT_YEAR, safeHttpUrlSchema, storedFileUrlSchema, trimmedText } from '@/shared/lib/validation';
 import { z } from 'zod';
 const storedResourceUrlSchema = z.string().regex(/^\/uploads\/resources\/[a-zA-Z0-9_-]+\.[a-z0-9]{1,16}$/);
@@ -31,12 +32,15 @@ export const submissionResourceSchema = z.object({
   fileName: trimmedText(160).optional(),
   fileSize: z.number().int().min(0).max(25 * 1024 * 1024).optional(),
   mimeType: trimmedText(120).optional(),
-}).strict();
+}).strict().refine(resource => resource.linkType !== 'GITHUB' || (resource.kind === 'LINK' && isGithubUrl(resource.url)), { message: 'Vui lòng nhập URL kho mã nguồn dạng https://github.com/owner/repository.', path: ['url'] });
 
 const showcaseWorkflowShape = {
+  citationEnabled: z.boolean().default(true),
   title: trimmedText(200).min(1, 'Vui lòng nhập tiêu đề.'),
   summary: trimmedText(2_000).default(''),
-  content: trimmedText(200_000).refine(isValidArticleContent, 'Nội dung section không hợp lệ.').default(''),
+  content: trimmedText(200_000).superRefine((content, context) => {
+    for (const issue of articleContentIssues(content)) context.addIssue({ code: 'custom', ...issue });
+  }).default(''),
   type: z.enum(['RESEARCH_PAPER', 'PROJECT']).default('PROJECT'),
   categoryId: cuidSchema.nullish(),
   thumbnailUrl: storedFileUrlSchema.nullish(),
@@ -50,8 +54,8 @@ const showcaseWorkflowShape = {
 export const showcaseDraftInputSchema = z.object(showcaseWorkflowShape).strict();
 
 export const showcaseSubmissionInputSchema = z.object(showcaseWorkflowShape).strict().superRefine((value, context) => {
-  for (const message of articleSubmissionErrors(value.content)) {
-    context.addIssue({ code: z.ZodIssueCode.custom, path: ['content'], message });
+  for (const issue of articleSubmissionIssues(value.content)) {
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['content', ...issue.path], message: issue.message });
   }
   if (value.type === 'RESEARCH_PAPER' && !hasDetailedContent(value.content) && !value.resources.some(r => r.kind === 'DOCUMENT' || r.linkType === 'PAPER_URL')) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['content'], message: 'Bài nghiên cứu cần nội dung chi tiết hoặc PDF/liên kết toàn văn.' });

@@ -3,7 +3,7 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 const sections = [
   { href: '/explore', label: 'Tất cả công trình' },
   { href: '/category/bai-bao-khoa-hoc', label: 'Nghiên cứu khoa học' },
-  { href: '/category/robotics-iot', label: 'Robotics & IoT' },
+  { href: '/category/robotics-iot', label: 'Dự án & Sản phẩm' },
 ];
 
 export function PublicationNavigation({ currentHref }: { currentHref: string }) {
