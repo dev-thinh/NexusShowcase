@@ -32,7 +32,7 @@ test('photo lanes resume after closing the viewer without leaving scrollbars', a
 
 test('photo wall moves, pauses and opens an accessible viewer', async ({ page }) => {
   await page.goto('/');
-  const wall = page.getByRole('region', { name: 'Những khoảnh khắc cùng nhau tạo nên công nghệ.' });
+  const wall = page.getByRole('region', { name: 'Khoảnh khắc sáng tạo' });
   await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
   await expect(wall).toBeVisible();
   await wall.scrollIntoViewIfNeeded();

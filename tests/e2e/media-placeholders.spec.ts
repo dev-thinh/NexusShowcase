@@ -11,8 +11,8 @@ test('empty galleries and cards show placeholders while members show letter avat
   await expect(page.locator('[data-media-placeholder]').first()).toBeVisible();
   await page.goto('/members');
   await expect(page.locator('[data-member-avatar-fallback]').first()).toBeVisible();
-  // Numeric fixture surnames have no letter, so the avatar uses its unknown initial.
-  await expect(page.getByRole('img', { name: 'Benchmark Member 000', exact: true })).toHaveText('?');
+  // Skip the numeric suffix and use the last word that contains a letter.
+  await expect(page.getByRole('img', { name: 'Benchmark Member 000', exact: true })).toHaveText('M');
 });
 
 test('a broken post image recovers into the shared placeholder', async ({ page, database }) => {
