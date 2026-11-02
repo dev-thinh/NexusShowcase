@@ -2,7 +2,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 import { HomeMemberWall } from '@/features/members/components/home-member-wall';
 
-const member = (index: number) => ({ id: `m${index}`, fullName: `Thành viên ${index}`, avatarUrl: null, role: 'MEMBER' as const });
+const member = (index: number) => ({ id: `m${index}`, publicSlug: `thanh-vien-${index}`, fullName: `Thành viên ${index}`, avatarUrl: null, role: 'MEMBER' as const });
 
 describe('homepage member wall', () => {
   it('shows a compact avatar list without biographies or contribution cards', () => {

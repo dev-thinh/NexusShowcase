@@ -18,8 +18,12 @@ it('paginates accent-insensitive author search without leaking another author or
   const actor = { id: authorId, fullName: 'Author', role: 'CORE_MEMBER' as const, status: 'ACTIVE' as const, mustChangePassword: false };
   const result = await listAuthorItems({ actor, q: 'TU HANH', filter: 'PENDING_REVIEW', page: 2 });
   expect(result.total).toBe(43);
-  expect(result.items).toHaveLength(20);
+  expect(result.items).toHaveLength(10);
   expect(result.page).toBe(2);
+  expect(result).toMatchObject({ pageSize: 10, totalPages: 5 });
+  const unfiltered = await listAuthorItems({ actor, q: '', filter: 'ALL', page: 2 });
+  expect(unfiltered.items).toHaveLength(10);
+  expect(unfiltered).toMatchObject({ page: 2, pageSize: 10, totalPages: 5 });
   expect(JSON.stringify(result)).not.toContain('PRIVATE LARGE CONTENT');
   expect(await authorItemStats(actor)).toMatchObject({ ALL: 43, PENDING_REVIEW: 43, DRAFT: 0 });
 });
@@ -34,5 +38,23 @@ it('keeps selected contributor names available independently of a search page', 
   expect(await selectedContributors([authorId])).toEqual([{ id: authorId, fullName: 'Nguyễn Văn An' }]);
   const result = await listAdminMembers({ q: 'nguyen van', role: 'CORE_MEMBER', page: '2oops' });
   expect(result).toMatchObject({ total: 1, page: 1 });
-  expect(Object.keys(result.items[0]).sort()).toEqual(['createdAt', 'fullName', 'id', 'role']);
+  expect(Object.keys(result.items[0]).sort()).toEqual(['createdAt', 'fullName', 'id', 'publicSlug', 'role']);
+});
+
+it('includes published contributions once while keeping drafts, review metadata and management permissions private', async () => {
+  const participant = await prisma.user.create({ data: { email: 'participant@nexus.test', fullName: 'Participant', role: 'CORE_MEMBER' } });
+  const actor = { id: participant.id, fullName: participant.fullName, role: 'CORE_MEMBER' as const, status: 'ACTIVE' as const, mustChangePassword: false };
+  const own = await prisma.showcaseItem.create({ data: { creatorId: participant.id, slug: 'participant-own', title: 'Shared scope own', summary: '', status: 'PUBLISHED', contributors: { create: { userId: participant.id, role: 'CONTRIBUTOR' } } } });
+  const shared = await prisma.showcaseItem.create({ data: { creatorId: authorId, slug: 'participant-shared', title: 'Shared scope contribution', summary: '', status: 'PUBLISHED', reviewStatus: 'PENDING_REVIEW', reviewVersion: 5, rejectionReason: 'SECRET REVIEW', contributors: { create: { userId: participant.id, role: 'ADVISOR' } } } });
+  await prisma.showcaseItem.create({ data: { creatorId: authorId, slug: 'participant-hidden-draft', title: 'Shared scope secret draft', summary: '', status: 'DRAFT', contributors: { create: { userId: participant.id, role: 'CONTRIBUTOR' } } } });
+  for (const q of ['', 'shared scope']) {
+    const result = await listAuthorItems({ actor, q, filter: 'ALL', page: 1 });
+    expect(result.total).toBe(2);
+    expect(new Set(result.items.map(item => item.id))).toEqual(new Set([own.id, shared.id]));
+    expect(result.items.find(item => item.id === own.id)?.canManage).toBe(true);
+    expect(result.items.find(item => item.id === shared.id)).toMatchObject({ canManage: false, reviewStatus: null, reviewVersion: 0, rejectionReason: null });
+    expect(JSON.stringify(result)).not.toContain('SECRET REVIEW');
+  }
+  expect((await listAuthorItems({ actor, q: '', filter: 'PENDING_REVIEW', page: 1 })).total).toBe(0);
+  expect(await authorItemStats(actor)).toMatchObject({ ALL: 2, PUBLISHED: 2, PENDING_REVIEW: 0, DRAFT: 0 });
 });

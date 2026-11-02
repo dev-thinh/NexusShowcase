@@ -22,7 +22,7 @@ export default async function NewItemPage() {
     <>
 
       <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <Breadcrumbs items={[{ label: "Quản lý công trình", href: "/dashboard" }, { label: "Đăng công trình mới" }]} />
+      <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/dashboard" }, { label: "Đăng công trình mới" }]} />
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
             <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">Đăng công trình mới</h1>

@@ -1,6 +1,6 @@
 import type { PublicMemberRole } from './directory';
 
-export type HomeMember = { id: string; fullName: string; avatarUrl: string | null; role: PublicMemberRole };
+export type HomeMember = { id: string; publicSlug: string; fullName: string; avatarUrl: string | null; role: PublicMemberRole };
 export type HomeMembersPayload = { members: HomeMember[]; total: number };
 
 export function homeMemberSlots(counts: Record<PublicMemberRole, number>): Record<PublicMemberRole, number> {

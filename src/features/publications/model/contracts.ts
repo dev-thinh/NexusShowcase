@@ -6,6 +6,7 @@ import type { publicationCardSelect, publicationDetailSelect } from '../server/s
 export type CitationDto = CitationItem;
 export function toCitationDto(item: CitationDto): CitationDto {
   return {
+    citationEnabled: item.citationEnabled,
     title: item.title,
     slug: item.slug,
     publishedYear: item.publishedYear,

@@ -49,9 +49,9 @@ export default async function HomePage({ searchParams }: {
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div className="home-section-heading">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1F2937]">Con người của CLB</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1F2937]">Đội ngũ CLB</p>
               <h2 id="home-members-title" className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-[#1F2937]">Thành viên</h2>
-              <p className="mt-3 text-sm text-[#1F2937]">Cùng nghiên cứu, cùng xây dựng và chia sẻ tri thức.</p>
+              <p className="mt-3 text-sm text-[#1F2937]">Cùng học hỏi, thử nghiệm và chia sẻ.</p>
             </div>
             <Link href="/members" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
               Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />

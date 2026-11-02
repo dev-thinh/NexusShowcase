@@ -17,6 +17,7 @@ import { useEffect, useRef, useState } from 'react';
 interface NavbarNavProps {
   user?: {
     id: string;
+    publicSlug: string;
     name?: string | null;
     avatarUrl?: string | null;
     role: string;
@@ -62,10 +63,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
   }, [pathname]);
 
   const isDashboardActive = pathname.startsWith('/dashboard');
-  const isAdminActive =
-    pathname === '/admin' ||
-    pathname.startsWith('/admin/reviews') ||
-    pathname.startsWith('/admin/members');
+  const isAdminActive = pathname === '/admin' || pathname.startsWith('/admin/');
   const isProfileActive = user ? pathname === `/members/${user.id}` : false;
   const isLoginActive = pathname === '/login';
 
@@ -114,17 +112,17 @@ export function NavbarNav({ user }: NavbarNavProps) {
               >
                 {[
                   ...(canUserReview(user) ? [{ href: '/admin', label: 'Quản trị', icon: ShieldCheck }] : []),
-                  { href: '/dashboard', label: 'Bài đăng của tôi', icon: LayoutDashboard },
+                  { href: '/dashboard', label: 'Công trình của tôi', icon: LayoutDashboard },
                   ...(canUserUpload(user) ? [{ href: '/dashboard/items/new', label: 'Đăng bài mới', icon: Plus }] : []),
                   { href: `/members/${user.id}`, label: 'Hồ sơ của tôi', icon: User },
                 ].map(({ href, label, icon: Icon }) => {
-                  const active = pathname === href;
+                  const active = href === '/admin' ? isAdminActive : pathname === href;
                   return (
                     <Link
                       key={href}
                       href={href}
                       aria-current={active ? 'page' : undefined}
-                      className={`flex items-center gap-2.5 min-h-11 px-3 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#153D67] ${active ? 'bg-[#FFFFFF] text-[#1F2937]' : 'text-foreground-muted hover:text-[#1F2937] hover:bg-[#FFFFFF]'}`}
+                      className={`flex items-center gap-2.5 min-h-11 px-3 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#153D67] ${active ? 'bg-[#153D67]/10 text-[#153D67]' : 'text-foreground-muted hover:text-[#1F2937] hover:bg-slate-50'}`}
                     >
                       <Icon aria-hidden="true" className="w-4 h-4 shrink-0" />
                       <span>{label}</span>
@@ -180,7 +178,7 @@ export function PublicNavigation() {
 
         {[
           { slug: 'bai-bao-khoa-hoc', name: 'Nghiên cứu khoa học' },
-          { slug: 'robotics-iot', name: 'Robotics & IoT' },
+          { slug: 'robotics-iot', name: 'Dự án & Sản phẩm' },
         ].map(({ slug, name }) => {
           const active = pathname === `/category/${slug}`;
           return (

@@ -54,6 +54,6 @@ export function SiteNavbar() {
 export async function AccountNavigation() {
   const session = await auth();
   const user = session?.user;
-  const member = user ? await prisma.user.findUnique({ where: { id: user.id }, select: { fullName: true, avatarUrl: true } }) : null;
-  return <NavbarNav user={user ? { id: user.id, name: member?.fullName ?? user.name, avatarUrl: member?.avatarUrl, role: user.role ?? 'GUEST' } : null} />;
+  const member = user ? await prisma.user.findUnique({ where: { id: user.id }, select: { publicSlug: true, fullName: true, avatarUrl: true } }) : null;
+  return <NavbarNav user={user && member ? { id: user.id, publicSlug: member.publicSlug, name: member?.fullName ?? user.name, avatarUrl: member?.avatarUrl, role: user.role ?? 'GUEST' } : null} />;
 }

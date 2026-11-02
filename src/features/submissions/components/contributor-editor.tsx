@@ -1,5 +1,6 @@
 'use client';
 
+import { SubmissionField } from './submission-field';
 import { searchContributors } from '@/features/identity/server/member-search-action';
 import type { ContributorInput } from '@/features/submissions/model/input';
 import { createLatestRequestGate } from '@/shared/lib/latest-request';
@@ -14,12 +15,13 @@ const roleLabels: Record<ContributorInput['role'], string> = {
 };
 
 interface ContributorEditorProps {
+  errors?: Record<string, string[]>;
   value: ContributorInput[];
   clubMembers: Array<{ id: string; fullName: string }>;
   onChange: (value: ContributorInput[]) => void;
 }
 
-export function ContributorEditor({ value, clubMembers, onChange }: ContributorEditorProps) {
+export function ContributorEditor({ value, clubMembers, onChange, errors = {} }: ContributorEditorProps) {
   const [showDetailedRoles, setShowDetailedRoles] = useState(false);
   const [memberQuery, setMemberQuery] = useState('');
   const [isMemberSearchOpen, setIsMemberSearchOpen] = useState(false);
@@ -180,21 +182,22 @@ export function ContributorEditor({ value, clubMembers, onChange }: ContributorE
         </div>
       )}
 
+      {errors.contributors?.length ? <SubmissionField name="contributors" errors={errors}><span /></SubmissionField> : null}
       <div className="mt-3 space-y-2">
         {value.map((contributor, index) => {
           const member = knownMembers.find((entry) => entry.id === contributor.userId);
           return (
-            <div key={`${contributor.userId ?? 'external'}-${index}`} className="panel-nested grid gap-2 !px-3 !py-1.5 shadow-none xl:grid-cols-[minmax(0,1fr)_10rem_2.25rem] xl:items-center">
+            <SubmissionField name={`contributors.${index}`} errors={errors} key={`${contributor.userId ?? 'external'}-${index}`} className="panel-nested grid gap-2 !px-3 !py-1.5 shadow-none xl:grid-cols-[minmax(0,1fr)_10rem_2.25rem] xl:items-center">
               {member ? (
                 <p className="text-sm font-semibold text-[#1F2937]">{member.fullName}</p>
               ) : (
-                <input value={contributor.externalName ?? ''} onChange={(event) => update(index, { externalName: event.target.value })} aria-label={`Tên người đóng góp ${index + 1}`} placeholder="Họ và tên" className="min-h-9 rounded-md border border-slate-200 px-3 text-sm" />
+                <SubmissionField name={`contributors.${index}.externalName`} errors={errors}><input value={contributor.externalName ?? ''} onChange={(event) => update(index, { externalName: event.target.value })} aria-label={`Tên người đóng góp ${index + 1}`} placeholder="Họ và tên" className="min-h-9 w-full rounded-md border border-slate-200 px-3 text-sm" /></SubmissionField>
               )}
-              {showDetailedRoles ? (
-              <input value={contributor.customRoleTitle ?? (contributor.role === 'CONTRIBUTOR' || contributor.role === 'CUSTOM' ? '' : roleLabels[contributor.role])} maxLength={100} onChange={event => update(index, { role: event.target.value.trim() ? 'CUSTOM' : 'CONTRIBUTOR', customRoleTitle: event.target.value })} aria-label={`Vai trò của người đóng góp ${index + 1}`} placeholder="Vai trò (tùy chọn)" className="min-h-9 min-w-0 rounded-md border border-slate-200 bg-white px-3 text-sm" />
+              {(showDetailedRoles || errors[`contributors.${index}.customRoleTitle`]?.length || errors[`contributors.${index}.role`]?.length) ? (
+              <SubmissionField name={`contributors.${index}.customRoleTitle`} errors={{ ...errors, [`contributors.${index}.customRoleTitle`]: [...(errors[`contributors.${index}.customRoleTitle`] ?? []), ...(errors[`contributors.${index}.role`] ?? [])] }}><input value={contributor.customRoleTitle ?? (contributor.role === 'CONTRIBUTOR' || contributor.role === 'CUSTOM' ? '' : roleLabels[contributor.role])} maxLength={100} onChange={event => update(index, { role: event.target.value.trim() ? 'CUSTOM' : 'CONTRIBUTOR', customRoleTitle: event.target.value })} aria-label={`Vai trò của người đóng góp ${index + 1}`} placeholder="Vai trò (tùy chọn)" className="min-h-9 min-w-0 w-full rounded-md border border-slate-200 bg-white px-3 text-sm" /></SubmissionField>
               ) : <span className="text-sm text-[#1F2937]">{contributor.customRoleTitle || roleLabels[contributor.role] || 'Thành viên đóng góp'}</span>}
               <button type="button" onClick={() => onChange(value.filter((_, current) => current !== index).map((entry, order) => ({ ...entry, displayOrder: order })))} aria-label={`Xóa người đóng góp ${index + 1}`} className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-[#1F2937] transition-colors hover:border-slate-200 hover:bg-[#FFFFFF] hover:text-[#1F2937]"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
-            </div>
+            </SubmissionField>
           );
         })}
       </div>

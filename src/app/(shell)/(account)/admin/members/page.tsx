@@ -2,7 +2,7 @@ import { AdminCreateMemberModal } from '@/features/identity/components/admin-cre
 import { AdminMemberTable } from '@/features/identity/components/admin-member-table';
 import { listAdminMembers } from '@/features/identity/server/member-queries';
 import { getSession as auth } from '@/features/identity/server/session';
-import { MemberPagination } from '@/shared/ui/member-pagination';
+import { PaginationFooter } from '@/shared/ui/member-pagination';
 import { Role } from '@prisma/client';
 
 import { redirect } from 'next/navigation';
@@ -35,7 +35,7 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
         </div>
 
         {/* Member Table with Search and Filters */}
-        <AdminMemberTable members={result.items} query={query} roleFilter={role} counts={result.counts} total={result.total} actions={<AdminCreateMemberModal />} /><MemberPagination page={result.page} totalPages={result.totalPages} basePath={basePath} />
+        <AdminMemberTable members={result.items} query={query} roleFilter={role} counts={result.counts} total={result.total} actions={<AdminCreateMemberModal />} /><PaginationFooter itemLabel="thành viên" page={result.page} totalPages={result.totalPages} pageSize={10} basePath={basePath} ariaLabel="Phân trang thành viên" />
       </section>
 
 

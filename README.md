@@ -34,7 +34,7 @@ CI dùng Node22, unit/typecheck/build trên Windows/Linux và PostgreSQL16 cho i
 ## 2. Hướng dẫn cài đặt cục bộ (Local Setup)
 
 ### 2.1. Yêu cầu môi trường
-- Node.js >= 20.9 (CI dùng Node.js 22)
+- Node.js >= 22 (CI dùng Node.js 22)
 - PostgreSQL cục bộ (mặc định cổng `5434` hoặc tùy chỉnh qua env)
 
 ### 2.2. Thiết lập cấu hình môi trường
@@ -46,21 +46,21 @@ cp .env.example .env
 Cấu hình các biến trong `.env`:
 ```env
 # Database kết nối cục bộ
-DATABASE_URL="postgresql://nexus:nexus_secret_2026@localhost:5434/nexus_showcase?schema=public"
+DATABASE_URL="postgresql://nexus_runtime:CHANGE_ME@127.0.0.1:5434/nexus_showcase?schema=public"
 
 # NextAuth Secret (tối thiểu 32 ký tự ngẫu nhiên)
-AUTH_SECRET="nexus-showcase-super-secret-key-32-chars-length"
+AUTH_SECRET="" # Sinh riêng bằng openssl rand -base64 48
 NEXTAUTH_URL="http://localhost:3000"
 
 # Tài khoản quản trị khởi tạo (Bootstrap Admin)
 BOOTSTRAP_ADMIN_EMAIL="admin01"
-BOOTSTRAP_ADMIN_PASSWORD="your_secure_local_admin_password"
+BOOTSTRAP_ADMIN_PASSWORD="" # Điền mật khẩu riêng: >=15 ký tự, <=72 byte UTF-8
 
-# Cờ đặt lại dữ liệu (mặc định false; chỉ đặt true khi muốn xóa và tạo lại toàn bộ từ đầu)
-RESET_DATABASE="false"
+# Chỉ bật cho database demo dùng riêng; không dùng trên production
+ALLOW_DEMO_SEED="false"
 
-# Database dành riêng cho kiểm thử tự động (bắt buộc khác DATABASE_URL và phải chứa "test")
-TEST_DATABASE_URL="postgresql://nexus:nexus_secret_2026@localhost:5434/nexus_showcase_test?schema=public"
+# Credential migration/Compose và DB test đặt riêng trong
+# .env.database.local và .env.test.local; xem hướng dẫn bảo mật bên dưới.
 ```
 
 > **Lưu ý bảo mật**: File `.env` đã được cấu hình trong `.gitignore` để tránh rò rỉ credential vào kho mã nguồn.
@@ -70,19 +70,23 @@ TEST_DATABASE_URL="postgresql://nexus:nexus_secret_2026@localhost:5434/nexus_sho
 # Cài mới trên database trống; DB hiện có xem quy trình riêng bên dưới
 npm run db:migrate
 
-# Nạp dữ liệu khởi tạo (idempotent, không phá hủy dữ liệu hiện có nếu RESET_DATABASE="false")
+# Tạo quản trị viên đầu tiên bằng BOOTSTRAP_ADMIN_EMAIL/PASSWORD riêng
 npm run db:seed
 ```
 
 DB đang có dữ liệu hoặc migration history cần đối chiếu trước khi deploy/resolve. Xem [quy trình database](docs/database-operations.md). `db:push` chỉ dành cho thử nghiệm schema cục bộ đã xác định rõ, không thay quy trình nâng cấp.
 
-`npm run db:verify-upgrade` kiểm chứng cài mới và nâng cấp trong hai schema UUID của DB test; `npm run db:inventory` chỉ đọc history/identifier/asset của DB runtime. Docker test riêng: `docker compose -f docker-compose.test.yml up -d` rồi dùng URL test cổng5435 trong `.env.example`. Báo cáo không chứa connection string hoặc email thô.
+`npm run db:verify-upgrade` kiểm chứng cài mới và nâng cấp trong hai schema UUID của DB test; `npm run db:inventory` chỉ đọc history/identifier/asset của DB runtime. Docker test riêng: `docker compose -f docker-compose.test.yml up -d` rồi dùng URL test cổng5435 trong `.env.test.example`. Báo cáo không chứa connection string hoặc email thô.
 
 Để thêm 20 bài mẫu công khai (10 Nghiên cứu khoa học, 10 Robotics & IoT) phục vụ kiểm tra chuyển tab và phân trang:
 ```bash
 npm run db:seed:mock
 ```
-Lệnh cần có admin đang hoạt động và `DATABASE_URL` trong `.env`. Có thể chạy lại mà không tạo trùng hoặc ghi đè bài hiện có.
+`db:seed` chỉ khởi tạo quản trị viên đầu tiên, yêu cầu mật khẩu riêng ít nhất 15 ký tự và tối đa 72 byte UTF-8, bắt buộc đổi mật khẩu khi đăng nhập. Nếu đã có tài khoản ADMIN (kể cả bị khóa), lệnh không thay đổi tài khoản nào. Lệnh không nâng quyền hay đặt lại mật khẩu tài khoản hiện có, không thêm bài mẫu và không xóa dữ liệu.
+
+`db:seed:mock` yêu cầu ít nhất một quản trị viên đang hoạt động, dùng quản trị viên đó làm tác giả khi chạy riêng. Lệnh giữ 20 bài mẫu: thêm bài còn thiếu, cập nhật tác giả và đặt chúng về công khai, giữ nội dung bài đã có. Chỉ chạy khi muốn xuất bản các bài giả lập này.
+
+Để tạo bản demo riêng, dùng database có một phần tên là `demo` (ví dụ `nexus_demo`), đặt `ALLOW_DEMO_SEED=true` và `NODE_ENV=development`, rồi chạy `npm run db:seed:demo`. Lệnh bị chặn trên production hoặc database không có phần tên `demo`. Demo tạo 5 tài khoản nếu chưa có: `admin@gmail.com`, `core@gmail.com`, `member1@gmail.com`, `member2@gmail.com`, `member3@gmail.com`, mật khẩu `123456`, cùng 20 bài mẫu. Chạy lại giữ nguyên mật khẩu, vai trò và trạng thái tài khoản hiện có. Không sử dụng các tài khoản demo cho triển khai thực tế. Không có chế độ `RESET_DATABASE`.
 
 ### 2.4. Khởi chạy ứng dụng
 ```bash
@@ -169,3 +173,13 @@ npx prisma migrate deploy
 Migration mới chỉ thêm cột, chuyển Editor hiện hữu thành Core Member và gộp trạng thái chờ biên tập vào chờ duyệt. Enum/bảng biên tập cũ được giữ để bảo toàn lịch sử; không thể cấp quyền Editor mới. Các endpoint biên tập cũ ngừng nhận thay đổi.
 
 Các kiểm thử database luôn dùng `TEST_DATABASE_URL` riêng. Kiểm thử luồng mới nằm trong `tests/integration/direct-approval.test.ts`.
+
+### Cấu hình bảo mật và vận hành
+
+Xem [hướng dẫn bảo mật hiện tại](docs/security-operations.md) trước khi public. `.env` chỉ chứa credential runtime; `.env.database.local` dành cho migration/Compose và `.env.test.local` dành cho DB test. Không đưa hai file quản trị này vào deployment ứng dụng. Cổng PostgreSQL local chỉ bind `127.0.0.1`; runtime role không được là superuser. Chạy Compose bằng `npm run db:up` sau khi cấu hình `.env.database.local`.
+
+URL hồ sơ dùng ID ổn định: `/members/<id>`. URL slug từng chia sẻ chuyển hướng về ID. Mọi thao tác sửa vẫn kiểm tra session và quyền trên server.
+
+### Demo đầy đủ các trạng thái
+
+Xem [hướng dẫn demo](docs/full-demo.md). `npm run demo:prepare` tạo dữ liệu trong database demo local riêng; `npm run demo` chạy bản xem ở http://127.0.0.1:3002, không đổi dữ liệu ở cổng 3000. Có 60 tài khoản, 56 bài đủ trạng thái, ảnh/tài liệu và các tình huống phân quyền.

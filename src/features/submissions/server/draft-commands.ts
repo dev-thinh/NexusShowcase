@@ -35,6 +35,7 @@ async function saveDraftInternal(
     if (!category || category.slug !== (values.type === 'RESEARCH_PAPER' ? 'bai-bao-khoa-hoc' : 'robotics-iot')) return { success: false, code: 'VALIDATION', error: 'Chuyên mục không khớp với loại công trình.' };
   }
   const data = {
+    citationEnabled: values.citationEnabled,
     title: values.title, summary: values.summary, content: values.content,
     type: values.type, categoryId: values.categoryId ?? null, thumbnailUrl: values.thumbnailUrl ?? null,
     publishedYear: values.publishedYear ?? new Date().getFullYear(),

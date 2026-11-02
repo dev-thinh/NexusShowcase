@@ -11,6 +11,16 @@ it('uses a letter rather than punctuation when the last word is parenthesized', 
   expect(renderToStaticMarkup(<MemberAvatar fullName="Quản Trị Viên (Admin)" />)).toContain('>A</span>');
 });
 
+it.each([
+  ['Nguyễn Văn An 123 🎉', 'A'],
+  ['Nguyễn Văn 123Ánh!!! 456', 'Á'],
+  ['Nguyễn Văn A\u0301nh 123', 'Á'],
+  ['123 !!! 🎉', '?'],
+  ['', '?'],
+])('ignores numbers and symbols when finding the final name word in %s', (fullName, initial) => {
+  expect(renderToStaticMarkup(<MemberAvatar fullName={fullName} />)).toContain(`>${initial}</span>`);
+});
+
 it('lets layout classes size the fallback instead of forcing image pixel dimensions', () => {
   const html = renderToStaticMarkup(<MemberAvatar fullName="Nguyễn Bảo Nhi" width={76} height={76} className="h-full w-full rounded-full" />);
   expect(html).not.toContain('width:76px');

@@ -3,13 +3,14 @@ import type { Prisma } from '@prisma/client';
 
 export const publicationCardSelect = {
   id: true, title: true, slug: true, summary: true, thumbnailUrl: true,
+  citationEnabled: true,
   type: true, scope: true, issuer: true, publishedYear: true,
   isPinned: true, visibility: true,
   contributors: {
-    select: { id: true, role: true, externalName: true, user: { select: { id: true, fullName: true } } },
+    select: { id: true, role: true, externalName: true, user: { select: { id: true, publicSlug: true, fullName: true } } },
     orderBy: { displayOrder: 'asc' },
   },
-  links: { select: { type: true, url: true } },
+  links: { select: { type: true, url: true, label: true } },
 } satisfies Prisma.ShowcaseItemSelect;
 
 export const publicationDetailSelect = {

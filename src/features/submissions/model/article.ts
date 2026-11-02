@@ -1,3 +1,4 @@
+import { isGithubUrl } from '@/shared/lib/github-url';
 import { z } from 'zod';
 
 export const ARTICLE_PREFIX = 'nexus-sections:v1\n';
@@ -55,23 +56,42 @@ export function parseArticleContent(content?: string | null): ArticleDocument | 
 export function serializeArticle(doc: ArticleDocument): string {
   return ARTICLE_PREFIX + JSON.stringify(doc);
 }
-export function isValidArticleContent(content: string): boolean {
-  return !content.startsWith(ARTICLE_PREFIX) || parseArticleContent(content) !== null;
+export function articleContentIssues(content: string): { path: (string | number)[]; message: string }[] {
+  if (!content.startsWith(ARTICLE_PREFIX)) return [];
+  let raw: unknown;
+  try { raw = JSON.parse(content.slice(ARTICLE_PREFIX.length)); }
+  catch { return [{ path: [], message: 'Không đọc được nội dung bài viết. Vui lòng kiểm tra lại các section.' }]; }
+  const parsed = articleDocumentSchema.safeParse(raw);
+  if (parsed.success) return [];
+  const fields: Record<string, string> = { text: 'Văn bản', title: 'Tiêu đề', caption: 'Chú thích', alt: 'Mô tả ảnh', url: 'Liên kết', fileName: 'Tên tệp', blocks: 'Số khối nội dung', sections: 'Số section', fileSize: 'Dung lượng tệp' };
+  return parsed.error.issues.map(issue => {
+    const sectionIndex = issue.path[0] === 'sections' && typeof issue.path[1] === 'number' ? issue.path[1] : undefined;
+    const blockIndex = issue.path[2] === 'blocks' && typeof issue.path[3] === 'number' ? issue.path[3] : undefined;
+    const location = sectionIndex === undefined ? '' : `Section ${sectionIndex + 1}${blockIndex === undefined ? '' : `, khối ${blockIndex + 1}`}: `;
+    const field = fields[String(issue.path.at(-1))] || 'Nội dung';
+    const message = (() => {
+    if (issue.code === 'too_big') return `${location}${field} vượt giới hạn ${issue.maximum}${issue.origin === 'string' ? ' ký tự' : issue.origin === 'array' ? ' mục' : ''}.`;
+    if (issue.path.at(-1) === 'url') return `${location}Liên kết không hợp lệ. Vui lòng tải lại tệp hoặc nhập URL HTTP(S) hợp lệ.`;
+    return `${location}${issue.code === 'custom' ? issue.message : `${field} không hợp lệ.`}`;
+    })();
+    return { path: issue.path as (string | number)[], message };
+  });
 }
-export function articleSubmissionErrors(content: string): string[] {
+export function articleSubmissionIssues(content: string): { path: (string | number)[]; message: string }[] {
   const doc = parseArticleContent(content);
   if (!doc) return [];
-  const errors: string[] = [];
-  for (const section of doc.sections) {
-    if (!section.title) errors.push('Mỗi section cần có tiêu đề.');
-    if (['abstract', 'tóm tắt'].includes(section.title.toLocaleLowerCase('vi'))) errors.push('Abstract / Tóm tắt đã là phần cố định, không cần thêm section trùng.');
-    if (!section.blocks.length || section.blocks.every(b => b.kind === 'TEXT' ? !b.text.trim() : !b.url)) errors.push(`Section “${section.title || 'chưa đặt tên'}” chưa có nội dung.`);
-    for (const block of section.blocks) {
-      if (block.kind === 'TEXT' && !block.text.trim()) errors.push('Hãy bổ sung hoặc xóa khối văn bản trống.');
-      if (block.kind !== 'TEXT' && !block.url) errors.push('Hãy hoàn tất hoặc xóa khối media chưa có tài nguyên.');
-      if (block.kind === 'IMAGE' && !block.alt.trim()) errors.push('Ảnh cần có mô tả để người đọc hiểu nội dung.');
-    }
-  }
+  const errors: { path: (string | number)[]; message: string }[] = [];
+  doc.sections.forEach((section, sectionIndex) => {
+    const sectionPath = ['sections', sectionIndex];
+    if (!section.title) errors.push({ path: [...sectionPath, 'title'], message: 'Mỗi section cần có tiêu đề.' });
+    if (['abstract', 'tóm tắt'].includes(section.title.toLocaleLowerCase('vi'))) errors.push({ path: [...sectionPath, 'title'], message: 'Abstract / Tóm tắt đã là phần cố định, không cần thêm section trùng.' });
+    if (!section.blocks.length) errors.push({ path: sectionPath, message: `Section “${section.title || 'chưa đặt tên'}” chưa có nội dung.` });
+    section.blocks.forEach((block, blockIndex) => {
+      const path = [...sectionPath, 'blocks', blockIndex, block.kind === 'TEXT' ? 'text' : 'url'];
+      if (block.kind === 'TEXT' && !block.text.trim()) errors.push({ path, message: 'Hãy bổ sung hoặc xóa khối văn bản trống.' });
+      if (block.kind !== 'TEXT' && !block.url) errors.push({ path, message: 'Hãy hoàn tất hoặc xóa khối media chưa có tài nguyên.' });
+    });
+  });
   return errors;
 }
 export function hasDetailedContent(content: string): boolean {
@@ -90,9 +110,7 @@ export function articleResources(content: string) {
     }];
   });
 }
-export function isGithubUrl(value: string) {
-  try { return new URL(value).hostname.toLowerCase() === 'github.com'; } catch { return false; }
-}
+export { isGithubUrl } from '@/shared/lib/github-url';
 
 // One-time, in-memory conversion: existing text/files remain editable and are saved only by the author.
 export function articleFromLegacy(content: string, resources: Array<{ kind: 'IMAGE' | 'DOCUMENT' | 'LINK'; label: string; url: string; linkType?: string; fileName?: string; fileSize?: number; mimeType?: string }> = []): ArticleDocument {

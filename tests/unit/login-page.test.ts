@@ -17,13 +17,15 @@ describe('login page', () => {
   it('restores the original split-screen login layout', async () => {
     const html = renderToStaticMarkup(await LoginPage());
     expect(html).toContain('lg:grid-cols-12');
-    expect(html).toContain('Ươm mầm nghiên cứu');
+    expect(html).toContain('Cùng nghiên cứu.');
+    expect(html).toContain('Cùng sáng tạo.');
     expect(html).toContain('max-w-7xl');
     expect(html).toContain('sm:px-6');
     expect(html).toContain('lg:px-8');
     expect(html.match(/<h1\b/g)).toHaveLength(2);
     expect(html).toContain('max-w-lg');
     expect(html).not.toContain('<footer');
+    expect(html).not.toContain('data-breadcrumbs');
     expect(html).toContain('href="/"');
     expect(html).toContain('href="/contact"');
   });

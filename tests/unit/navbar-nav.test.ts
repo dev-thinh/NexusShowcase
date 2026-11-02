@@ -8,7 +8,7 @@ describe('Navbar Nav Component Structure', () => {
     const content = fs.readFileSync(navbarNavPath, 'utf-8');
 
     // Personal actions belong to the authenticated profile disclosure.
-    expect(content).toContain('Bài đăng');
+    expect(content).toContain('Công trình của tôi');
     expect(content).not.toContain('<span>Dashboard</span>');
     expect(content).toContain('aria-controls="profile-navigation"');
     expect(content).toContain("href: '/dashboard'");
@@ -41,7 +41,7 @@ describe('Navbar Nav Component Structure', () => {
     const navbarNavPath = path.resolve(process.cwd(), 'src/app/(shell)/_components/navbar-nav.tsx');
     const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
     expect(navContent).toContain("name: 'Nghiên cứu khoa học'");
-    expect(navContent).toContain("name: 'Robotics & IoT'");
+    expect(navContent).toContain("name: 'Dự án & Sản phẩm'");
     expect(navContent).toContain('slug: \'bai-bao-khoa-hoc\'');
     expect(navContent).toContain('slug: \'robotics-iot\'');
   });

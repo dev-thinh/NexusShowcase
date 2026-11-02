@@ -4,6 +4,7 @@ type BreadcrumbItem = { label: string; href?: string };
 
 /** Pass the real page hierarchy, not the visitor's navigation history. */
 export function Breadcrumbs({ items }: { items: readonly BreadcrumbItem[] }) {
+  if (!items.length) return null;
   const trail = [{ label: 'Trang chủ', href: '/' }, ...items];
   return (
     <nav aria-label="Đường dẫn" className="mb-6 text-xs leading-5 text-[#1F2937]" data-breadcrumbs>

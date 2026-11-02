@@ -22,7 +22,7 @@ const snapshot: SubmissionSnapshot = {
     },
   ],
   resources: [
-    { kind: 'LINK', label: 'Mã nguồn', url: 'https://example.com/repo', linkType: 'GITHUB' },
+    { kind: 'LINK', label: 'Mã nguồn', url: 'https://github.com/lab/repo', linkType: 'GITHUB' },
   ],
 };
 
@@ -39,6 +39,7 @@ describe('submission snapshots', () => {
 
     expect(buildSubmissionSnapshot(source)).toEqual({
       ...snapshot,
+      citationEnabled: true,
       type: 'PROJECT', categoryId: undefined, thumbnailUrl: undefined,
       content: '',
       publishedYear: new Date().getFullYear(),
@@ -61,4 +62,10 @@ describe('submission snapshots', () => {
     const resources = [{ kind: 'DOCUMENT' as const, label: 'Bài báo', url: '/uploads/documents/paper.pdf' }];
     expect(mergeEditorialOverrides(snapshot, { resources } as never).resources).toEqual(snapshot.resources);
   });
+});
+
+it('preserves citation settings in revision snapshots', () => {
+  expect(buildSubmissionSnapshot({ ...snapshot, citationEnabled: false }).citationEnabled).toBe(false);
+  expect(buildSubmissionSnapshot({ ...snapshot, citationEnabled: true }).citationEnabled).toBe(true);
+  expect(buildSubmissionSnapshot(snapshot).citationEnabled).toBe(true);
 });

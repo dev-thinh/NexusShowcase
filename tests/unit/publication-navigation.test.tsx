@@ -7,7 +7,7 @@ describe('publication section navigation', () => {
     const html = renderToStaticMarkup(<PublicationNavigation currentHref={currentHref} />);
     expect(html).toContain('Tất cả công trình');
     expect(html).toContain('Nghiên cứu khoa học');
-    expect(html).toContain('Robotics &amp; IoT');
+    expect(html).toContain('Dự án &amp; Sản phẩm');
     const links = html.match(/<a\b[^>]*>/g) ?? [];
     expect(links).toHaveLength(3);
     const active = links.filter(link => link.includes('aria-current="page"'));

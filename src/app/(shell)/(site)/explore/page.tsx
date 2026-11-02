@@ -1,3 +1,5 @@
+import { ContributorNames } from '@/features/publications/components/contributor-names';
+import { CardResourceLink } from '@/features/publications/components/card-resource-link';
 import { SearchForm } from '@/shared/ui/validated-form';
 import { MediaImage } from '@/shared/ui/media-image';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
@@ -13,13 +15,10 @@ import { toCitationDto } from '@/features/publications/model/contracts';
 import { showcaseHref } from '@/features/publications/model/navigation';
 import { listPublications } from '@/features/publications/server/queries';
 import { EmptyState } from '@/shared/ui/empty-state';
-import { MemberPagination } from '@/shared/ui/member-pagination';
+import { PaginationFooter } from '@/shared/ui/member-pagination';
 import {
 ArrowRight,
 BookOpen,
-ExternalLink,
-Github,
-Globe,
 Search,
 } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
@@ -99,10 +98,9 @@ export default async function ExplorePage({ searchParams }: {
             <>
               <div className="space-y-4">
                 {searchItems.map(item => {
-                  const isPaper = item.type === 'RESEARCH_PAPER';
-                  const paperLink = item.links.find(link => link.type === 'PAPER_URL');
-                  const githubLink = item.links.find(link => link.type === 'GITHUB');
-                  const demoLink = item.links.find(link => link.type === 'LIVE_DEMO');
+
+
+
                   return (
                     <article key={item.id} className="clickable-card panel-public grid gap-5 transition-shadow hover:shadow-md sm:grid-cols-[11rem_minmax(0,1fr)] lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-7">
                       <CardLink slug={item.slug} returnTo={returnTo} />
@@ -118,14 +116,11 @@ export default async function ExplorePage({ searchParams }: {
                         {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
                       </div>
                         <h3 className="mt-3 h-7 shrink-0 line-clamp-1 text-lg font-semibold leading-7 text-[#1F2937]" title={item.title}><Link href={showcaseHref(item.slug, returnTo)} className="hover:underline">{item.title}</Link></h3>
-                        <p className="mt-2 truncate text-sm leading-6 text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>{item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}</p>
-                        {item.issuer && <p className="mt-1 truncate text-xs italic leading-4 text-[#1F2937]">{item.issuer}</p>}
+                        <p className="mt-2 truncate text-sm leading-6 text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}><ContributorNames contributors={item.contributors} /></p>
                         <p className="mb-3 mt-3 h-12 shrink-0 line-clamp-2 break-words text-sm leading-6 text-[#1F2937]">{item.summary}</p>
                         <footer className="-mb-5 mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
-                          {isPaper && <CitationModal item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />}
-                          {isPaper && paperLink && <a href={paperLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-1.5 text-[#1F2937] hover:underline">Bài báo gốc <ExternalLink aria-hidden="true" className="h-3 w-3" /></a>}
-                          {!isPaper && githubLink && <a href={githubLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-1.5 text-[#1F2937] hover:underline"><Github aria-hidden="true" className="h-3.5 w-3.5" />Mã nguồn</a>}
-                          {!isPaper && demoLink && <a href={demoLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-1.5 text-[#1F2937] hover:underline"><Globe aria-hidden="true" className="h-3.5 w-3.5" />Demo</a>}
+                          <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />
+                          <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
                           <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline">Xem công trình <ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>
                         </footer>
                       </div>
@@ -133,10 +128,7 @@ export default async function ExplorePage({ searchParams }: {
                   );
                 })}
               </div>
-              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
-                <p className="text-xs text-[#1F2937]">Trang {page} / {totalPages} · 10 công trình mỗi trang</p>
-                <MemberPagination page={page} totalPages={totalPages} basePath={searchPath} ariaLabel="Phân trang kho công trình" />
-              </div>
+              <PaginationFooter page={page} totalPages={totalPages} pageSize={pageSize} basePath={searchPath} ariaLabel="Phân trang kho công trình" />
             </>
           )}
         </main>

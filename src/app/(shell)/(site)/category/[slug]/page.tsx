@@ -1,3 +1,5 @@
+import { ContributorNames } from '@/features/publications/components/contributor-names';
+import { CardResourceLink } from '@/features/publications/components/card-resource-link';
 import { SearchForm } from '@/shared/ui/validated-form';
 import { MediaImage } from '@/shared/ui/media-image';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
@@ -13,8 +15,8 @@ import { listPublications } from '@/features/publications/server/queries';
 import { prisma } from '@/server/db/prisma';
 import { CustomSelect } from '@/shared/ui/custom-select';
 import { LoadingCards } from '@/shared/ui/loading-content';
-import { MemberPagination } from '@/shared/ui/member-pagination';
-import { ArrowRight, ExternalLink, Github, Globe, Search, Sparkles } from 'lucide-react';
+import { PaginationFooter } from '@/shared/ui/member-pagination';
+import { ArrowRight, Search, Sparkles } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
@@ -43,6 +45,7 @@ export default async function CategoryPage({
     notFound();
   }
 
+  const categoryName = slug === 'robotics-iot' ? 'Dự án & Sản phẩm' : category.name;
   const query = await searchParams;
   const categoryId = category.id;
   const pageSize = slug === 'bai-bao-khoa-hoc' ? 10 : 9;
@@ -76,12 +79,12 @@ export default async function CategoryPage({
             {slug === 'bai-bao-khoa-hoc' && (
               <div className="space-y-4">
                 {items.map(item => {
-                  const paperLink = item.links.find(link => link.type === 'PAPER_URL');
+
                   return (
                     <article key={item.id} className="clickable-card home-featured-card panel-public grid items-stretch gap-5 p-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-6 sm:p-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
                       <CardLink slug={item.slug} returnTo={returnTo} />
-                      <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-[#FFFFFF] p-2 sm:aspect-auto">
-                        <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa nghiên cứu: ${item.title}`} loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                      <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg sm:aspect-auto">
+                        <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa nghiên cứu: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
                       </Link>
                       <div className="flex min-w-0 flex-col">
                         <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
@@ -96,13 +99,12 @@ export default async function CategoryPage({
                         </h2>
                         <p className="mt-2 truncate text-sm leading-6 text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>
 
-                          {item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}
+                          <ContributorNames contributors={item.contributors} />
                         </p>
-                        {item.issuer && <p className="mt-1 truncate text-xs italic leading-4 text-[#1F2937]">{item.issuer}</p>}
                         <p className="mb-3 mt-3 h-12 shrink-0 line-clamp-2 break-words text-sm leading-6 text-[#1F2937]">{item.summary}</p>
                         <div className="-mb-5 mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
-                          <CitationModal item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />
-                          {paperLink && <a href={paperLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-1.5 text-[#1F2937] hover:underline">Bài báo gốc <ExternalLink className="h-3 w-3" aria-hidden="true" /></a>}
+                          <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />
+                          <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
                           <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline">Xem công trình <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
                         </div>
                       </div>
@@ -116,19 +118,23 @@ export default async function CategoryPage({
             {slug === 'robotics-iot' && (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {items.map((item) => {
-                  const demoLink = item.links.find((l) => l.type === 'LIVE_DEMO');
-                  const githubLink = item.links.find((l) => l.type === 'GITHUB');
+
+
                   return (
                     <article
                       key={item.id}
                       className="clickable-card home-featured-card panel-public !p-0 overflow-hidden flex flex-col"
                     >
                       <CardLink slug={item.slug} returnTo={returnTo} />
-                      <div className="aspect-video shrink-0 relative overflow-hidden"><MediaImage
+                      <div className="shrink-0 px-5 pt-5 sm:px-6 sm:pt-6">
+                        <div className="relative aspect-video overflow-hidden rounded-lg">
+                          <MediaImage
                             src={item.thumbnailUrl}
                             alt={item.title}
-                            loading="lazy" decoding="async" className="w-full h-full object-cover"
-                          /></div>
+                            loading="lazy" decoding="async" className="h-full w-full rounded-lg border-0 object-cover"
+                          />
+                        </div>
+                      </div>
 
                       <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
                         <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
@@ -149,13 +155,7 @@ export default async function CategoryPage({
 
                         <p className="mt-2 h-6 shrink-0 truncate text-sm leading-6 text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>
 
-                          {item.contributors.length > 0 ? item.contributors.map((c, index) => (
-                            <span key={c.id}>
-                              {c.user ? <Link href={`/members/${c.user.id}`} className="hover:text-[#1F2937]">{c.user.fullName}</Link> : c.externalName}
-
-                              {index < item.contributors.length - 1 ? ', ' : ''}
-                            </span>
-                          )) : null}
+                          <ContributorNames contributors={item.contributors} />
                         </p>
 
                         <p className="mb-3 mt-3 h-12 shrink-0 line-clamp-2 break-words text-sm leading-6 text-[#1F2937]">
@@ -164,30 +164,8 @@ export default async function CategoryPage({
 
 
                         <div className="-mb-5 mt-auto flex flex-wrap items-center justify-between gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
-                          <div className="flex items-center gap-2">
-                            {demoLink && (
-                              <a
-                                href={demoLink.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                title="Xem Live Demo"
-                                className="p-1.5 rounded-md hover:bg-[#FFFFFF] text-[#1F2937]"
-                              >
-                                <Globe className="w-4 h-4" />
-                              </a>
-                            )}
-                            {githubLink && (
-                              <a
-                                href={githubLink.url}
-                                target="_blank"
-                                rel="noreferrer"
-                                title="Mã nguồn GitHub"
-                                className="p-1.5 rounded-md hover:bg-[#FFFFFF] text-[#1F2937]"
-                              >
-                                <Github className="w-4 h-4" />
-                              </a>
-                            )}
-                          </div>
+                          <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center text-sm font-semibold text-[#1F2937] hover:underline" />
+                          <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
 
                           <Link
                             href={showcaseHref(item.slug, returnTo)}
@@ -207,13 +185,7 @@ export default async function CategoryPage({
           </div>
         )}
         {totalItems > 0 && (
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-4">
-            <p className="text-xs leading-6 text-[#1F2937]">
-              Hiển thị {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, totalItems)} / {totalItems} công trình
-              {totalPages > 1 && <span className="ml-2 border-l border-slate-200 pl-2">Trang {page}/{totalPages}</span>}
-            </p>
-            <MemberPagination page={page} totalPages={totalPages} basePath={basePath} ariaLabel="Phân trang công trình" />
-          </div>
+          <PaginationFooter page={page} totalPages={totalPages} pageSize={pageSize} basePath={basePath} ariaLabel="Phân trang công trình" />
         )}
     </>;
   }
@@ -225,14 +197,14 @@ export default async function CategoryPage({
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 max-w-7xl flex-1">
         {/* Category Header */}
         <header className="mb-6">
-          <Breadcrumbs items={[{ label: category.name }]} />
+          <Breadcrumbs items={[{ label: categoryName }]} />
           <div>
             <div className="min-w-0">
               <span className="page-eyebrow">
                 Chuyên mục công trình
               </span>
               <h1 className="page-title">
-                {category.name}
+                {categoryName}
               </h1>
               {category.description && (
                 <p className="text-sm text-[#1F2937] truncate max-w-3xl mt-1">

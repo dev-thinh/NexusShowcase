@@ -1,4 +1,5 @@
 export interface CitationItem {
+  citationEnabled?: boolean;
   title: string;
   slug: string;
   publishedYear?: number | null;

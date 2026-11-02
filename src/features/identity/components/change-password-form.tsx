@@ -3,7 +3,7 @@
 import { changePasswordAction } from '@/features/identity/server/account-actions';
 import { AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
 import { notifySuccess } from '@/shared/dialogs/success';
-import { signOut } from 'next-auth/react';
+import { signOutOnCurrentHost } from './sign-out-current-host';
 import { useEffect, useId, useState, useTransition } from 'react';
 import { changePasswordFormSchema } from '../model/password-input';
 import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
@@ -32,7 +32,7 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
       } else {
         setSuccess(true);
         await notifySuccess('Đã đổi mật khẩu. Vui lòng đăng nhập lại bằng mật khẩu mới.');
-        await signOut({ callbackUrl: '/login' });
+        await signOutOnCurrentHost('/login');
       }
       } catch { setSuccess(false); setError('Không đổi được mật khẩu. Vui lòng thử lại.'); }
     });

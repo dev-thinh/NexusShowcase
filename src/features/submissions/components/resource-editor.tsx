@@ -1,19 +1,25 @@
 'use client';
 
+import { SubmissionField } from './submission-field';
 import { uploadFileAction } from '@/features/assets/server/actions';
 import type { SubmissionResource } from '@/features/submissions/model/snapshot';
-import { Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { Github, Quote, Trash2 } from 'lucide-react';
+import { useRef, useState } from 'react';
 import { FilePicker } from '@/shared/ui/file-picker';
-import { notifySuccess } from '@/shared/dialogs/success';
 
-export function ResourceEditor({ value, onChange, onBusy }: { value: SubmissionResource[]; onChange: (value: SubmissionResource[]) => void; onBusy?: (busy: boolean) => void }) {
+export function ResourceEditor({ value, onChange, onBusy, citationEnabled = false, onCitationChange, errors = {} }: { errors?: Record<string, string[]>; citationEnabled?: boolean; onCitationChange?: (enabled: boolean) => void; value: SubmissionResource[]; onChange: (value: SubmissionResource[]) => void; onBusy?: (busy: boolean) => void }) {
+  const githubEnabled = value.some(resource => resource.linkType === 'GITHUB');
+  const savedGithub = useRef<SubmissionResource[]>([]);
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState('');
-  const [isResourceMenuOpen, setIsResourceMenuOpen] = useState(false);
-  const add = (kind: SubmissionResource['kind']) => {
-    onChange([...value, { kind, label: '', url: '', ...(kind === 'LINK' ? { linkType: 'OTHER' as const } : {}) }]);
-    setIsResourceMenuOpen(false);
+
+  const toggleGithub = (enabled: boolean) => {
+    if (enabled) {
+      onChange([...value, ...(savedGithub.current.length ? savedGithub.current : [{ kind: 'LINK' as const, label: 'Mã nguồn GitHub', url: '', linkType: 'GITHUB' as const }])]);
+    } else {
+      savedGithub.current = value.filter(resource => resource.linkType === 'GITHUB');
+      onChange(value.filter(resource => resource.linkType !== 'GITHUB'));
+    }
   };
   const update = (index: number, patch: Partial<SubmissionResource>) => onChange(value.map((entry, current) => current === index ? { ...entry, ...patch } : entry));
   const upload = async (index: number, file?: File) => {
@@ -30,7 +36,6 @@ export function ResourceEditor({ value, onChange, onBusy }: { value: SubmissionR
       const label = value[index].label.trim() || result.data.fileName || file.name;
       update(index, { url: result.data.url, label, fileName: label, fileSize: result.data.fileSize, mimeType: result.data.mimeType });
       setMessage('');
-      await notifySuccess('Đã tải tệp lên. Lưu bản nháp để giữ thay đổi.');
     } catch {
       setMessage('Không tải được tệp. Vui lòng thử lại.');
     } finally {
@@ -41,31 +46,32 @@ export function ResourceEditor({ value, onChange, onBusy }: { value: SubmissionR
 
   return (
     <div className="mt-5" aria-busy={uploading}>
-      <div className="relative" onBlur={event => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsResourceMenuOpen(false);
-      }} onKeyDown={event => {
-        if (event.key === 'Escape') { setIsResourceMenuOpen(false); event.currentTarget.querySelector('button')?.focus(); }
-      }}>
-        <button type="button" aria-expanded={isResourceMenuOpen} aria-controls="add-resource-options" onClick={() => setIsResourceMenuOpen(open => !open)} className="action-secondary-detail min-h-11 w-full">
-          Thêm tài nguyên
-        </button>
-        {isResourceMenuOpen && <div id="add-resource-options" className="absolute z-30 mt-2 w-full rounded-md border border-slate-200 bg-white p-1.5 shadow-lg shadow-[#153D67]">
-          <button type="button" onClick={() => add('DOCUMENT')} className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm text-[#1F2937] hover:bg-[#FFFFFF]">Tệp</button>
-          <button type="button" onClick={() => add('LINK')} className="flex min-h-11 w-full items-center rounded-md px-3 text-left text-sm text-[#1F2937] hover:bg-[#FFFFFF]">Liên kết</button>
-        </div>}
+      <div className="grid gap-3">
+        <label className="flex cursor-pointer items-center gap-4">
+          <span className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#1F2937]">
+            <Quote aria-hidden="true" className="h-5 w-5" /><span>Cite</span>
+          </span>
+          <input type="checkbox" checked={citationEnabled} onChange={event => onCitationChange?.(event.target.checked)} className="h-6 w-6 shrink-0 cursor-pointer accent-[#153D67] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30 focus-visible:ring-offset-2" />
+        </label>
+        <label className="flex cursor-pointer items-center gap-4">
+          <span className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#1F2937]">
+            <Github aria-hidden="true" className="h-5 w-5" /><span>GitHub</span>
+          </span>
+          <input type="checkbox" checked={githubEnabled} onChange={event => toggleGithub(event.target.checked)} aria-controls="github-resource-fields" className="h-6 w-6 shrink-0 cursor-pointer accent-[#153D67] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30 focus-visible:ring-offset-2" />
+        </label>
       </div>
       <p className="mt-2 text-sm text-[#1F2937]" aria-live="polite">{message}</p>
-      <div className="space-y-3">
+      <div id="github-resource-fields" className="space-y-3">{errors.resources?.length ? <SubmissionField name="resources" errors={errors}><span /></SubmissionField> : null}
         {value.map((resource, index) => (
-          <div key={`${resource.kind}-${index}`} className="panel-nested grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 !p-3 shadow-none">
-            <span className="col-span-2 text-sm font-semibold text-[#1F2937]">{resource.kind === 'LINK' ? 'Liên kết' : 'Tệp'}</span>
+          <SubmissionField name={`resources.${index}`} errors={errors} key={`${resource.kind}-${index}`}><div className="panel-nested grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 !p-3 shadow-none">
+            <span className="col-span-2 text-sm font-semibold text-[#1F2937]">{resource.linkType === 'GITHUB' ? 'Mã nguồn GitHub' : resource.kind === 'LINK' ? 'Liên kết' : 'Tệp'}</span>
             <div className="grid min-w-0 gap-2">
-              <input value={resource.label} onChange={(event) => update(index, { label: event.target.value, ...(resource.kind !== 'LINK' ? { fileName: event.target.value } : {}) })} maxLength={160} aria-label={`Tên tài nguyên ${index + 1}`} placeholder="Tên hiển thị" className="min-h-11 min-w-0 w-full rounded-md border border-slate-200 px-3 text-sm" />
-              {resource.kind === 'LINK' ? <input type="url" value={resource.url} onChange={(event) => update(index, { url: event.target.value })} aria-label={`URL tài nguyên ${index + 1}`} placeholder="https://" className="min-h-11 min-w-0 w-full rounded-md border border-slate-200 px-3 text-sm" /> : <FilePicker busy={uploading} label={resource.url ? 'Đổi tệp' : 'Chọn tệp'} onChange={(event) => void upload(index, event.target.files?.[0])} aria-label={`Chọn tệp cho tài nguyên ${index + 1}`} />}
+              {resource.linkType !== 'GITHUB' && <SubmissionField name={`resources.${index}.label`} errors={errors}><input value={resource.label} onChange={(event) => update(index, { label: event.target.value, ...(resource.kind !== 'LINK' ? { fileName: event.target.value } : {}) })} maxLength={160} aria-label={`Tên tài nguyên ${index + 1}`} placeholder="Tên hiển thị" className="min-h-11 min-w-0 w-full rounded-md border border-slate-200 px-3 text-sm" /></SubmissionField>}
+              <SubmissionField name={`resources.${index}.url`} errors={errors}>{resource.kind === 'LINK' ? <input type="url" value={resource.url} onChange={(event) => update(index, { url: event.target.value })} aria-label={`URL tài nguyên ${index + 1}`} placeholder={resource.linkType === 'GITHUB' ? 'https://github.com/owner/repository' : 'https://'} className="min-h-11 min-w-0 w-full rounded-md border border-slate-200 px-3 text-sm" /> : <FilePicker busy={uploading} label={resource.url ? 'Đổi tệp' : 'Chọn tệp'} onChange={(event) => void upload(index, event.target.files?.[0])} aria-label={`Chọn tệp cho tài nguyên ${index + 1}`} />}</SubmissionField>
               {resource.kind !== 'LINK' && resource.url && <a href={resource.url} target="_blank" rel="noopener noreferrer" className="break-words text-sm text-[#1F2937] hover:underline">{resource.label || resource.fileName || 'Xem tệp đã tải lên'}</a>}
             </div>
             <button type="button" onClick={() => onChange(value.filter((_, current) => current !== index))} aria-label={`Xóa tài nguyên ${index + 1}`} title="Xóa tài nguyên" className="inline-flex h-11 w-11 items-center justify-center rounded-md text-[#1F2937] transition-colors hover:bg-[#FFFFFF] hover:text-[#1F2937] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"><Trash2 aria-hidden="true" className="h-4 w-4" /></button>
-          </div>
+          </div></SubmissionField>
         ))}
       </div>
     </div>

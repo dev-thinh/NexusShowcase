@@ -1,5 +1,10 @@
 'use client';
 
+import { ContributorNames } from '@/features/publications/components/contributor-names';
+
+
+import { CardResourceLink } from '@/features/publications/components/card-resource-link';
+
 import { MediaImage } from '@/shared/ui/media-image';
 
 import { fetchDeferredJson } from '@/shared/lib/deferred-fetch';
@@ -18,7 +23,7 @@ import { toCitationDto } from '@/features/publications/model/contracts';
 import { showcaseHref } from '@/features/publications/model/navigation';
 
 import { EmptyState } from '@/shared/ui/empty-state';
-import { ArrowRight, ExternalLink } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
   export async function loadHomeFeatured(signal: AbortSignal) {
@@ -27,13 +32,13 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
     return <div className="grid gap-5">{featuredItems.length === 0 ? (
               <EmptyState title="Chưa có công trình nổi bật" description="Các công trình đã công bố sẽ xuất hiện tại đây." />
             ) : featuredItems.map(item => {
-              const paperLink = item.links.find(link => link.type === 'PAPER_URL');
-              const sourceLink = paperLink ?? item.links.find(link => link.type === 'GITHUB');
+
+
               return (
                 <article key={item.id} className="clickable-card home-featured-card panel-public grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white !p-0 md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
                   <CardLink slug={item.slug} returnTo={returnTo} />
                   <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:aspect-auto md:min-h-56 md:border-b-0 md:border-r">
-                    <MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="absolute inset-0 h-full w-full object-contain p-4" />
+                    <div className="absolute inset-4 flex items-center justify-center"><MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="home-featured-thumbnail" /></div>
                   </Link>
                   <div className="flex min-w-0 flex-col px-5 pt-4 sm:px-6 sm:pt-5">
                     <header>
@@ -50,25 +55,14 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
                       {item.contributors.length > 0 && (
                         <p className="mt-1 truncate text-sm leading-relaxed text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>
 
-                          {item.contributors.map((contributor, index) => (
-                            <span key={contributor.id}>
-                              {contributor.user ? <Link href={`/members/${contributor.user.id}`} className="hover:text-[#1F2937]">{contributor.user.fullName}</Link> : contributor.externalName}
-
-                              {index < item.contributors.length - 1 ? ', ' : ''}
-                            </span>
-                          ))}
+                          <ContributorNames contributors={item.contributors} />
                         </p>
                       )}
-                      {item.issuer && <p className="mt-1 text-sm italic leading-relaxed text-[#1F2937]">{item.issuer}</p>}
                     </header>
                     <p className="mb-2 mt-2 line-clamp-2 h-12 shrink-0 break-words text-sm leading-6 text-[#1F2937]">{item.summary}</p>
                     <footer className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-200 py-2">
-                      {sourceLink && (
-                        <a href={sourceLink.url} target="_blank" rel="noreferrer" className="inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline">
-                          {paperLink ? 'Bài báo gốc' : 'Mã nguồn'} <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                        </a>
-                      )}
-                      <CitationModal item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline" />
+                      <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline" />
+                      <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
                       <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:underline">
                         Xem công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>

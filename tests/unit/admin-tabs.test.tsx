@@ -7,7 +7,7 @@ beforeEach(() => { route.pathname = '/admin'; route.search = new URLSearchParams
 it('shows only the four management tabs and gives the active tab bold emphasis', () => {
   const html = renderToStaticMarkup(<AdminTabs />);
   expect(html).toContain('Tổng quan'); expect(html).toContain('Phê duyệt'); expect(html).toContain('Thành viên'); expect(html).toContain('Nội dung');
-  expect(html).not.toContain('Bài đăng của tôi'); expect(html).not.toContain('Hồ sơ của tôi');
+  expect(html).not.toContain('Công trình của tôi'); expect(html).not.toContain('Hồ sơ của tôi');
   expect(html.match(/aria-current="page"/g)).toHaveLength(1);
   expect(html).toMatch(/aria-current="page"[^>]*font-semibold/);
   expect(html).toContain('text-slate-500');

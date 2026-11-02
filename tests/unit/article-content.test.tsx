@@ -1,6 +1,6 @@
 import { createMemberInputSchema } from '@/features/identity/model/member-input';
 import { ArticleContent } from '@/features/submissions/components/article-content';
-import { ARTICLE_PREFIX, articleFromLegacy, articleResources, articleSubmissionErrors, parseArticleContent, serializeArticle } from '@/features/submissions/model/article';
+import { ARTICLE_PREFIX, articleFromLegacy, articleResources, articleSubmissionIssues, parseArticleContent, serializeArticle } from '@/features/submissions/model/article';
 import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
 import { parseVideoEmbedUrl } from '@/shared/lib/video-parser';
 import React from 'react';
@@ -45,7 +45,7 @@ describe('section article documents', () => {
     expect(parseArticleContent(serializeArticle(duplicate))).toBeNull();
     const unsafe = structuredClone(doc); unsafe.sections[1].blocks[1] = { id: 'unsafe', kind: 'LINK', url: 'javascript:alert(1)', caption: '', alt: '' };
     expect(parseArticleContent(serializeArticle(unsafe))).toBeNull();
-    expect(articleSubmissionErrors(serializeArticle({ version: 1, sections: [{ id: 'empty', title: '', blocks: [] }] }))).toHaveLength(2);
+    expect(articleSubmissionIssues(serializeArticle({ version: 1, sections: [{ id: 'empty', title: '', blocks: [] }] }))).toHaveLength(2);
   });
   it('renders media in its authored section and escapes arbitrary HTML', () => {
     const content = serializeArticle(articleFromLegacy('<script>alert(1)</script> **Kết quả**', [{ kind: 'LINK', label: 'Mã nguồn', url: 'https://github.com/lab/robot' }]));

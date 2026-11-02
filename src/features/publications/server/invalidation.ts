@@ -4,5 +4,6 @@ export function invalidatePublicationChange(input: { slugs: readonly string[]; m
   const paths = input.kind === 'SUBMISSION'
     ? ['/dashboard', '/admin/reviews']
     : ['/', '/admin', '/admin/content', '/dashboard', '/members', '/members/all', '/admin/reviews', '/category/bai-bao-khoa-hoc', '/category/robotics-iot'];
+  invalidatePaths(['/members/[id]'], 'page');
   invalidatePaths([...paths, ...input.slugs.map(slug => `/showcase/${slug}`), ...input.memberIds.map(id => `/members/${id}`)]);
 }
