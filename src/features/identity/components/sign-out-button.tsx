@@ -1,7 +1,7 @@
 'use client';
 
 import { Loader2, LogOut } from 'lucide-react';
-import { signOut } from 'next-auth/react';
+import { signOutOnCurrentHost } from './sign-out-current-host';
 import { useTransition } from 'react';
 
 export function SignOutButton({ variant = 'default' }: { variant?: 'default' | 'menu' }) {
@@ -9,7 +9,7 @@ export function SignOutButton({ variant = 'default' }: { variant?: 'default' | '
 
   const handleSignOut = () => {
     startTransition(async () => {
-      await signOut({ callbackUrl: '/' });
+      await signOutOnCurrentHost('/');
     });
   };
 

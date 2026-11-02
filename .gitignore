@@ -62,3 +62,6 @@ next-env.d.ts
 /.superpowers/
 /storage/*.json
 /public/uploads/
+
+# Isolated full demo build
+/.next-demo/

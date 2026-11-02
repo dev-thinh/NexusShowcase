@@ -32,6 +32,7 @@
     "db:cleanup-rate-limits": "tsx scripts/cleanup-rate-limits.ts",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:demo": "tsx prisma/seed-demo.ts",
     "db:seed:mock": "tsx prisma/seed-mock-posts.ts",
     "check:architecture": "node scripts/check-architecture.mjs",
     "audit:unused": "node scripts/audit-unused.mjs",
@@ -43,7 +44,10 @@
     "assets:reconcile:imagekit": "tsx scripts/reconcile-imagekit-assets.ts",
     "db:normalize-types": "tsx prisma/normalize-content-types.ts",
     "db:seed:categories": "tsx prisma/seed-categories.ts",
-    "db:up": "docker compose --env-file .env.database.local up -d"
+    "db:up": "docker compose --env-file .env.database.local up -d",
+    "demo:prepare": "tsx scripts/prepare-demo.ts",
+    "db:seed:full-demo": "tsx prisma/seed-full-demo.ts",
+    "demo": "tsx scripts/run-demo.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
