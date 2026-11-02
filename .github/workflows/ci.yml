@@ -67,3 +67,50 @@ jobs:
             test-results/navigation-*/trace.zip
             test-results/presentation-*/trace.zip
           if-no-files-found: ignore
+  deploy:
+    needs: [check, database-and-browser]
+    timeout-minutes: 45
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PRODUCTION_DEPLOY_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    environment:
+      name: production
+      url: https://roboticslab.tail3f6298.ts.net
+    concurrency:
+      group: production-deployment
+      cancel-in-progress: false
+    steps:
+      - name: Join deployment tailnet with OIDC
+        uses: tailscale/github-action@064b10558093f38325e838ddea35486bdc6b1d5c # v4
+        with:
+          oauth-client-id: ${{ vars.TS_CLIENT_ID }}
+          audience: ${{ vars.TS_AUDIENCE }}
+          tags: tag:roboticslab-ci
+      - name: Deploy exact checked commit
+        shell: bash
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ ]]
+          [[ "$DEPLOY_HOST" == '100.69.69.4' ]]
+          [[ -n "$DEPLOY_SSH_KEY" && -n "$DEPLOY_KNOWN_HOSTS" ]]
+          umask 077
+          credential_dir=$(mktemp -d "$RUNNER_TEMP/nexus-deploy.XXXXXX")
+          trap 'rm -rf -- "$credential_dir"' EXIT
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$credential_dir/key"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$credential_dir/known_hosts"
+          chmod 600 "$credential_dir/key" "$credential_dir/known_hosts"
+          ssh -F /dev/null -p 2222 -i "$credential_dir/key" \
+            -o BatchMode=yes -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$credential_dir/known_hosts" \
+            -o GlobalKnownHostsFile=/dev/null \
+            -o ConnectTimeout=30 \
+            -o ServerAliveInterval=30 -o ServerAliveCountMax=6 \
+            "nexusdeploy@$DEPLOY_HOST" "deploy $GITHUB_SHA $GITHUB_RUN_ID"

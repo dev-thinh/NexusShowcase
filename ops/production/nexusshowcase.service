@@ -1,0 +1,26 @@
+[Unit]
+Description=RoboticsLab web application
+After=network.target docker.service
+
+[Service]
+Type=exec
+User=nexusdeploy
+Group=nexusdeploy
+WorkingDirectory=/srv/nexusshowcase/current
+ExecStart=/usr/local/libexec/nexusshowcase/start.sh
+Environment=NODE_ENV=production
+Environment=HOME=/srv/nexusshowcase/home
+Environment=PATH=/opt/nexusshowcase/node/bin:/usr/bin:/bin
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGTERM
+CPUQuota=100%
+MemoryMax=2G
+MemorySwapMax=0
+Nice=10
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target
