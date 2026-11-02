@@ -32,3 +32,29 @@ test('contributed works appear read-only and author presentation is consistent i
   await expect(cardAuthor).toHaveCSS('font-weight', '400');
   await cardAuthor.hover();await expect(cardAuthor).toHaveCSS('font-weight', '600');
 });
+
+for (const width of [390, 1440]) {
+  test(`contributor follows draft and review stages without author actions at ${width}px`, async ({ page, database, fixture }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    const participant = fixture.users[3];
+    const item = await database.showcaseItem.create({ data: {
+      creatorId: fixture.users[1].id, slug: `contributor-tracking-${width}`, title: `Theo dõi đóng góp ${width}`, summary: 'Theo dõi giai đoạn xử lý',
+      status: 'DRAFT', contributors: { create: { userId: participant.id, role: 'CONTRIBUTOR' } },
+    } });
+    await login(page, participant);
+    for (const [status, label] of [['DRAFT', 'Bản nháp'], ['PENDING_REVIEW', 'Chờ duyệt']] as const) {
+      await database.showcaseItem.update({ where: { id: item.id }, data: { status } });
+      await page.goto(`/dashboard?filter=${status}&q=${encodeURIComponent(item.title)}`);
+      const work = page.locator('article').filter({ hasText: item.title });
+      await expect(work).toBeVisible();
+      await expect(work.getByText(label, { exact: true })).toBeVisible();
+      await expect(work.getByText('Chỉ theo dõi', { exact: true })).toBeVisible();
+      await expect(work.getByRole('link', { name: /Chỉnh sửa|Xem trước|Soạn bản cập nhật/ })).toHaveCount(0);
+      await expect(work.getByRole('button', { name: /Rút bài/ })).toHaveCount(0);
+    }
+    await database.showcaseItem.update({ where: { id: item.id }, data: { status: 'PUBLISHED' } });
+    await page.goto(`/dashboard?filter=PUBLISHED&q=${encodeURIComponent(item.title)}`);
+    const work = page.locator('article').filter({ hasText: item.title });
+    await expect(work.getByRole('link', { name: 'Xem bài', exact: true })).toBeVisible();
+  });
+}

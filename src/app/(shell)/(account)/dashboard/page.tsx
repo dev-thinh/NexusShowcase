@@ -30,7 +30,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   return <>
     <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <Breadcrumbs items={[{ label: "Công trình của tôi" }]} />
-      <ManagementHeader title="Công trình của tôi" description="Theo dõi công trình bạn đăng và các công trình đã xuất bản có bạn tham gia.">
+      <ManagementHeader title="Công trình của tôi" description="Theo dõi công trình bạn đăng hoặc đóng góp, từ bản nháp đến khi xuất bản.">
         {isUploader && <Link href="/dashboard/items/new" className="action-primary-detail"><Plus aria-hidden="true" className="h-4 w-4" />Đăng bài mới</Link>}
       </ManagementHeader>
       <div className="mb-6 grid grid-cols-3 gap-3">

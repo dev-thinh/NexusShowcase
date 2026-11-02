@@ -85,6 +85,15 @@ describe('management pages', () => {
     expect(readOnly).not.toContain(`/dashboard/items/${post.id}/edit`);
   });
 
+  it('shows contributor draft status without management actions or an inaccessible preview', () => {
+    const html = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, canManage: false }]} isUploader />);
+    expect(html).toContain(post.title);
+    expect(html).toContain('Chỉ theo dõi');
+    expect(html).not.toContain(`/dashboard/items/${post.id}/edit`);
+    expect(html).not.toContain(`/showcase/${post.slug}`);
+    expect(html).not.toContain('Rút bài để sửa');
+  });
+
   it('shows account actions only on the signed-in user profile', async () => {
     const own = renderToStaticMarkup(await MemberProfilePage({ params: Promise.resolve({ id: member.id }) }));
     expect(own).toContain('Đổi mật khẩu');
