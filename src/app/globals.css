@@ -614,6 +614,25 @@ strong {
   position: relative;
   padding-left: 1.25rem;
 }
+.home-section-eyebrow {
+  margin: 0;
+  color: var(--foreground-secondary);
+  font-size: 0.75rem;
+  font-weight: var(--font-weight-emphasis);
+  line-height: 1.5;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.home-section-title {
+  margin: 0.5rem 0 0;
+  max-width: 100%;
+  font-size: clamp(1.5rem, 2.3vw, 1.875rem);
+  font-weight: var(--font-weight-emphasis);
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+.research-band .home-section-eyebrow { color: #a5f3fc; }
 .home-section-heading::before {
   position: absolute;
   inset: 0.125rem auto 0.125rem 0;
@@ -682,11 +701,7 @@ strong {
 }
 
 .moments-wall { min-width: 0; overflow: hidden; background: #fff; padding-block: 0.5rem; }
-.moments-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 2rem; }
-.moments-eyebrow { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; color: #153d67; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; }
-.moments-eyebrow > span:last-child { font-size: 0.75rem; font-weight: 400; letter-spacing: 0; text-transform: none; color: #64748b; }
-.moments-title { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.25em; row-gap: 0.08em; margin-top: 0.75rem; max-width: 45rem; font-size: clamp(1.5rem, 2.3vw, 1.875rem); font-weight: 600; line-height: 1.25; letter-spacing: -0.025em; }
-.moments-title em { color: #153d67; font-family: Georgia, serif; font-size: 1em; font-weight: inherit; line-height: inherit; letter-spacing: inherit; }
+.moments-heading { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 2rem; }
 .moments-controls { display: flex; align-items: center; gap: 1rem; flex-shrink: 0; padding-bottom: 0.25rem; }
 .moments-heading-actions { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
 .moments-edit-button { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; border: 1px solid #d6e2ed; border-radius: 50%; background: #fff; color: #153d67; cursor: pointer; }

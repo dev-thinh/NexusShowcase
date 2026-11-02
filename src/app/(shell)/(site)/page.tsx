@@ -24,8 +24,8 @@ export default async function HomePage({ searchParams }: {
         <section className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-labelledby="featured-works-title">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div className="home-section-heading">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1F2937]">Dấu ấn nghiên cứu</p>
-              <h2 id="featured-works-title" className="mt-2 text-2xl font-semibold tracking-tight text-[#1F2937] sm:text-3xl">Công trình nổi bật</h2>
+              <p className="home-section-eyebrow">Dấu ấn nghiên cứu</p>
+              <h2 id="featured-works-title" className="home-section-title">Công trình nổi bật</h2>
             </div>
             <Link href="/explore" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
               Xem tất cả công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -49,14 +49,14 @@ export default async function HomePage({ searchParams }: {
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div className="home-section-heading">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1F2937]">Đội ngũ CLB</p>
-              <h2 id="home-members-title" className="mt-2 text-2xl sm:text-3xl font-semibold tracking-tight text-[#1F2937]">Thành viên</h2>
-              <p className="mt-3 text-sm text-[#1F2937]">Cùng học hỏi, thử nghiệm và chia sẻ.</p>
+              <p className="home-section-eyebrow">Đội ngũ CLB</p>
+              <h2 id="home-members-title" className="home-section-title">Thành viên</h2>
             </div>
             <Link href="/members" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
               Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
+          <p className="mb-6 text-sm text-slate-200">Cùng học hỏi, thử nghiệm và chia sẻ.</p>
           <HomeMembersSection />
           </div>
         </section>
