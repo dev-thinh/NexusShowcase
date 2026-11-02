@@ -6,9 +6,9 @@ import { expect, it } from 'vitest';
 
 const workflowPath = '.github/workflows/main-source-policy.yml';
 const repository = 'dev-thinh/NexusShowcase';
-function checkSource(head = 'dev', headRepository: string | null = repository, base = 'main', baseRepository = repository) {
-  const workflow = readFileSync(workflowPath, 'utf8');
-  const body = workflow.split('        run: |\n')[1];
+function checkSource(head = 'dev', headRepository: string | null = repository, base = 'main', baseRepository = repository, lineEnding = '\n') {
+  const workflow = readFileSync(workflowPath, 'utf8').replace(/\r?\n/g, lineEnding);
+  const body = workflow.replace(/\r\n/g, '\n').split('        run: |\n')[1];
   if (!body) throw new Error('Missing policy script');
   const script = body.split('\n').map(line => line.replace(/^          /, '')).join('\n');
   const directory = mkdtempSync(path.join(tmpdir(), 'nexus-main-policy-'));
@@ -47,4 +47,8 @@ it('reruns when a PR is retargeted and does not check out or execute PR code', (
   expect(workflow).toContain('permissions: {}');
   expect(workflow).not.toMatch(/^  pull_request:/m);
   expect(workflow).not.toContain('secrets.');
+});
+
+it('executes the policy from a Windows CRLF checkout', () => {
+  expect(checkSource('dev', repository, 'main', repository, '\r\n').status).toBe(0);
 });
