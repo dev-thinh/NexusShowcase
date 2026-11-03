@@ -65,7 +65,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
   }, [selected, editing]);
 
   useEffect(() => {
-    if (!keyboardBrowsing && window.matchMedia('(min-width: 768px) and (hover: hover) and (prefers-reduced-motion: no-preference)').matches) {
+    if (!keyboardBrowsing && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
       wallRef.current?.querySelectorAll('.moments-lane').forEach(lane => { lane.scrollLeft = 0; });
     }
   }, [keyboardBrowsing, selected]);
