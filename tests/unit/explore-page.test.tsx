@@ -17,9 +17,9 @@ beforeEach(() => {
 describe('publication library', () => {
   it('opens the entire library without requiring a keyword', async () => {
     const html = renderToStaticMarkup(await ExplorePage({ searchParams: Promise.resolve({}) }));
-    expect(html).toContain('Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT.</h1>');
+    expect(html).toContain('Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT - HCMUS.</h1>');
     expect(html.match(/Khám phá các bài nghiên cứu và dự án/g)).toHaveLength(1);
-    expect(html).toContain('Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT.');
+    expect(html).toContain('Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT - HCMUS.');
     expect(html).toContain('Tất cả công trình');
     expect(html).toContain('Chưa có công trình nào');
     expect(html).not.toContain('Kết quả tìm kiếm</h1>');
@@ -28,7 +28,7 @@ describe('publication library', () => {
 
   it('keeps its title while searching and clearing returns to the library', async () => {
     const html = renderToStaticMarkup(await ExplorePage({ searchParams: Promise.resolve({ q: '  robot  ' }) }));
-    expect(html).toContain('Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT.</h1>');
+    expect(html).toContain('Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT - HCMUS.</h1>');
     expect(html).toContain('0 công trình cho “robot”');
     expect(html).toContain('Không tìm thấy công trình phù hợp');
     expect(html).toContain('action="/explore"');

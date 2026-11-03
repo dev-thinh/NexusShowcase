@@ -24,7 +24,7 @@ export default function ContactPage() {
                 Kết nối &amp; Hợp tác
               </span>
               <h1 className="page-title">
-                Liên hệ Ban Điều Hành CLB Robotics &amp; IoT
+                Liên hệ Ban Điều Hành CLB Robotics &amp; IoT - HCMUS
               </h1>
             </div>
           </div>
@@ -32,35 +32,35 @@ export default function ContactPage() {
 
         <div className="mx-auto w-full max-w-3xl space-y-4">
             {/* Campus 1 */}
-            <div className="panel-detail">
+            <div className="panel-detail contact-card">
               <div className="mb-3">
                 <div className="min-w-0">
                   <span className="text-xs font-semibold uppercase text-[#1F2937] tracking-wider block">
                     Cơ sở 1 (Trụ sở chính)
                   </span>
                   <h2 className="text-base sm:text-lg font-semibold text-[#1F2937] leading-snug">
-                    CLB Robotics &amp; IoT
+                    CLB Robotics &amp; IoT - HCMUS
                   </h2>
                 </div>
               </div>
 
               <div className="space-y-2.5 text-sm text-[#1F2937]">
-                <div className="flex items-start gap-2.5">
+                <div className="contact-row">
                   <MapPin aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0 mt-0.5" />
                   <span>
                     Phòng I86, Tòa nhà I, 227 Nguyễn Văn Cừ, Phường 4, Quận 5, TP. Hồ Chí Minh
                   </span>
                 </div>
-                <div className="flex items-center gap-2.5">
+                <div className="contact-row">
                   <Mail aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0" />
                   <a
                     href="mailto:robotics-iot@hcmus.edu.vn"
-                    className="text-[#1F2937] hover:underline font-semibold"
+                    className="break-words text-[#1F2937] hover:underline font-semibold"
                   >
                     robotics-iot@hcmus.edu.vn
                   </a>
                 </div>
-                <div className="flex items-center gap-2.5">
+                <div className="contact-row">
                   <Phone aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0" />
                   <span>(028) 3835 4266 (Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM)</span>
                 </div>
@@ -68,7 +68,7 @@ export default function ContactPage() {
             </div>
 
             {/* Academic Department Affiliation */}
-            <div className="panel-nested">
+            <div className="panel-detail contact-card">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1.5">
                 Đơn vị chủ quản
               </h3>

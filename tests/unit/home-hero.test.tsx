@@ -23,7 +23,7 @@ describe('HomeHero', () => {
     const markup = renderToStaticMarkup(<HomeHero />);
 
     expect(markup).toContain('src="/logo.svg?white=2"');
-    expect(markup).toContain('alt="Logo CLB Robotics &amp; IoT"');
+    expect(markup).toContain('alt="Logo CLB Robotics &amp; IoT - HCMUS"');
   });
 
   it('keeps the artwork minimal with ambient energy and a cursor spotlight', () => {

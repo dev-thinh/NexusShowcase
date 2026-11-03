@@ -8,7 +8,7 @@ export function LoadingTitle({ fallback, pathname: destination }: { fallback: st
   const pathname = destination ?? currentPathname;
   const title = pathname === '/' ? 'Trang chủ'
     : pathname === '/explore' ? 'Khám phá công trình'
-    : pathname === '/members' ? 'Thành viên CLB Robotics & IoT'
+    : pathname === '/members' ? 'Thành viên CLB Robotics & IoT - HCMUS'
     : pathname === '/login' ? 'Đăng nhập'
     : pathname === '/account/change-password' ? 'Đổi mật khẩu'
     : pathname === '/admin/members' ? 'Quản lý thành viên'

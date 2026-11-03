@@ -593,6 +593,9 @@ strong {
   pointer-events: none;
 }
 
+/* The PNG has 56 transparent pixels before the visible logo in its 1080px canvas. */
+[data-brand-lockup='login'] > [role='img'] { transform: translateX(-5.185185%); }
+
 /* Keep the login slogan and supporting copy aligned with the form. */
 .login-title {
   max-width: 100%;
@@ -858,7 +861,20 @@ strong {
     padding-block: calc(var(--home-blend-depth) + 2rem);
   }
 }
-#home-content + footer { border-top: 0; }
+/* Keep only the footer edge separate; all other fades use the original styling. */
+#home-content .members-band::after {
+  background: linear-gradient(to bottom, #fff, rgb(255 255 255 / 0.962) 12.5%, rgb(255 255 255 / 0.854) 25%, rgb(255 255 255 / 0.691) 37.5%, rgb(255 255 255 / 0.5) 50%, rgb(255 255 255 / 0.309) 62.5%, rgb(255 255 255 / 0.146) 75%, rgb(255 255 255 / 0.038) 87.5%, rgb(255 255 255 / 0)) top / 100% var(--home-blend-depth) no-repeat;
+}
+.contact-card { text-align: left; }
+.contact-row {
+  display: grid;
+  grid-template-columns: 1rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.625rem;
+  line-height: 1.6;
+}
+.contact-row > svg { margin-top: 0.2rem; }
+.contact-row > :last-child { min-width: 0; overflow-wrap: anywhere; }
 #home-content .members-band .home-section-heading :is(h2, p) { color: #f8fafc; }
 .members-band .home-section-heading::before { background: #67e8f9; }
 .members-band .home-section-heading + a { color: #f8fafc; border-color: #55728e; }

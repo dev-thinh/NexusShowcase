@@ -67,7 +67,7 @@ export function HomeHero() {
 
       <div className="home-hero__grid container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="home-hero__intro relative z-10 max-w-3xl py-12 sm:py-16 lg:py-20">
-          <p className="home-hero__eyebrow">CLB Robotics &amp; IoT · HCMUS</p>
+          <p className="home-hero__eyebrow">CLB Robotics &amp; IoT - HCMUS</p>
           <h1 id="home-hero-title" className="home-hero__title">
             <span className="home-hero__title-line">Cùng nghiên cứu.</span>
             <span className="home-hero__title-line home-hero__title-accent">Cùng sáng tạo.</span>
@@ -96,7 +96,7 @@ export function HomeHero() {
                   <span key={layer} className="home-hero__heart-depth" style={{ '--depth': layer } as React.CSSProperties} aria-hidden="true" />
                 ))}
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.svg?white=2" alt="Logo CLB Robotics &amp; IoT" />
+                <img src="/logo.svg?white=2" alt="Logo CLB Robotics &amp; IoT - HCMUS" />
                 <span className="home-hero__heart-sheen" aria-hidden="true" />
               </div>
             </div>

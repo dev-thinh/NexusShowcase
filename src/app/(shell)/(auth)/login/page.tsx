@@ -1,3 +1,4 @@
+import { ClubLogo } from '@/shared/ui/club-logo';
 import { LoginForm } from '@/features/identity/components/login-form';
 import { Skeleton } from '@/shared/ui/skeleton';
 import { ArrowLeft, Mail } from 'lucide-react';
@@ -13,8 +14,8 @@ function LoginFormFallback() {
 }
 
 export const metadata = {
-  title: 'Đăng nhập - CLB Robotics & IoT',
-  description: 'Đăng nhập để chia sẻ công trình và kết nối cùng CLB Robotics & IoT, Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM.',
+  title: 'Đăng nhập - CLB Robotics & IoT - HCMUS',
+  description: 'Đăng nhập để chia sẻ công trình và kết nối cùng CLB Robotics & IoT - HCMUS.',
 };
 
 export default async function LoginPage() {
@@ -27,10 +28,8 @@ export default async function LoginPage() {
       <div className="container w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           <aside className="lg:col-span-7 xl:col-span-7 space-y-5">
-            <div data-brand-lockup="login" className="flex flex-col items-start gap-1.5 py-1 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3">
-              <div className="flex items-center gap-2 shrink-0 text-[#1F2937] text-xs font-semibold tracking-wide"><span className="w-1.5 h-1.5 rounded-[2px] bg-[#153D67]/70" /><span>CLB Robotics &amp; IoT</span></div>
-              <div className="hidden sm:block h-3.5 w-px bg-[#153D67]" />
-              <span className="text-[10px] sm:text-[13px] font-semibold text-[#1F2937] tracking-tight leading-relaxed">Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM</span>
+            <div data-brand-lockup="login" className="w-72 max-w-full py-1">
+              <ClubLogo />
             </div>
             <h1 className="login-title text-[#1F2937]"><span>Cùng nghiên cứu.</span><span className="text-[#153D67]">Cùng sáng tạo.</span></h1>
             <p className="login-copy text-base text-slate-600 leading-relaxed font-normal">Chia sẻ công trình, kết nối thành viên và phát triển ý tưởng Robotics &amp; IoT.</p>

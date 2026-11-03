@@ -3,7 +3,7 @@ import { prisma } from '@/server/db/prisma';
 import { redirect } from 'next/navigation';
 
 export const metadata = {
-  title: 'Đổi mật khẩu | CLB Robotics & IoT',
+  title: 'Đổi mật khẩu | CLB Robotics & IoT - HCMUS',
 };
 
 export default async function ChangePasswordPage() {
