@@ -169,14 +169,14 @@ button,
 input,
 textarea,
 select {
-  font-family: var(--font-sans), 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans, 'Inter'), system-ui, -apple-system, sans-serif;
 }
 
 code,
 pre,
 kbd,
 samp {
-  font-family: var(--font-mono), 'JetBrains Mono', Menlo, monospace !important;
+  font-family: var(--font-mono, 'JetBrains Mono'), Menlo, monospace !important;
 }
 
 body {
@@ -315,7 +315,7 @@ strong {
 .home-hero__eyebrow {
   margin-bottom: 1.25rem;
   color: #a5f3fc;
-  font-family: var(--font-sans), 'Inter', system-ui, sans-serif;
+  font-family: var(--font-sans, 'Inter'), system-ui, sans-serif;
   font-size: 0.75rem;
   font-weight: var(--font-weight-emphasis);
   letter-spacing: 0.14em;

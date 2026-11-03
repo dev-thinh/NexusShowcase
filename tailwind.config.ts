@@ -9,9 +9,9 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        sans: ['var(--font-sans)', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
-        serif: ['var(--font-sans)', '"Inter"', 'system-ui', '-apple-system', 'sans-serif'],
-        mono: ['var(--font-mono)', '"JetBrains Mono"', 'Menlo', 'monospace'],
+        sans: ['var(--font-sans, "Inter")', 'system-ui', '-apple-system', 'sans-serif'],
+        serif: ['var(--font-sans, "Inter")', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['var(--font-mono, "JetBrains Mono")', 'Menlo', 'monospace'],
       },
       colors: {
         // Semantic Token Mapping
