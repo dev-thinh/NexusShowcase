@@ -117,7 +117,8 @@ describe('search pagination', () => {
     expect(hrefs.every(url => url.searchParams.get('q') === q)).toBe(true);
     expect(hrefs.some(url => url.searchParams.get('page') === '3')).toBe(true);
     expect(hrefs.some(url => !url.searchParams.has('page'))).toBe(true);
-    expect(html).toContain('aria-current="page"');
+    expect(html).toMatch(/<input[^>]*type="number"[^>]*value="2"/);
+    expect(hrefs).toHaveLength(2);
   });
   it('bounds navigation controls and preserves other independently paginated groups', () => {
     const html = renderToStaticMarkup(<MemberPagination page={50} totalPages={10000} basePath="/members?corePage=7&page=3" pageParam="adminPage" />);

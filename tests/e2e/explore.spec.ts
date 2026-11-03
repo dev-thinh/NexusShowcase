@@ -38,7 +38,7 @@ test('legacy search links redirect with query and page intact', async ({ page })
 test('library pagination repeatedly completes without leaving the loading screen', async ({ page }) => {
   await page.goto('/explore');
   for (const destination of [2, 1, 2, 1]) {
-    await page.getByRole('navigation', { name: 'Phân trang kho công trình' }).getByRole('link', { name: String(destination), exact: true }).click();
+    await page.getByRole('navigation', { name: 'Phân trang kho công trình' }).getByRole('link', { name: destination === 2 ? 'Trang sau' : 'Trang trước', exact: true }).click();
     await expect(page).toHaveURL(destination === 2 ? /\/explore\?page=2$/ : /\/explore$/);
     await expect(page.getByRole('heading', { name: 'Tất cả công trình · 20 công trình' })).toBeVisible();
     await expect(page.locator('main article')).toHaveCount(10);

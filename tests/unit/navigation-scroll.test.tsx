@@ -60,7 +60,8 @@ it('starts smooth scrolling only after the destination commits', () => {
   animate(0);
   expect(window.scrollTo).toHaveBeenCalledWith({ top: 1200, left: 0, behavior: 'instant' });
   vi.mocked(requestAnimationFrame).mock.calls[1][0](16);
-  expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, left: 0, behavior: 'smooth' });
+  vi.mocked(requestAnimationFrame).mock.calls[2][0](performance.now() + 600);
+  expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, left: 0, behavior: 'instant' });
 });
 
 it('leaves filter changes and explicit scroll=false to native navigation', () => {
@@ -94,7 +95,8 @@ it.each(['/login', '/members'])('releases the loading shell when navigation redi
   vi.mocked(requestAnimationFrame).mock.calls[0][0](0);
   expect(renderProvider().props.children[1].props.style).toBeUndefined();
   vi.mocked(requestAnimationFrame).mock.calls[1][0](16);
-  expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, left: 0, behavior: 'smooth' });
+  vi.mocked(requestAnimationFrame).mock.calls[2][0](performance.now() + 600);
+  expect(window.scrollTo).toHaveBeenLastCalledWith({ top: 0, left: 0, behavior: 'instant' });
 });
 
 it('does not let completion of an older transition clear a newer navigation', () => {

@@ -1,9 +1,10 @@
-import { paginationWindow } from '@/shared/lib/pagination';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { PaginationNavigation } from '@/shared/ui/pagination-navigation';
+import { PaginationJump } from '@/shared/ui/pagination-jump';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
 const baseControlClass =
-  'h-9 min-w-9 px-3 rounded-lg inline-flex items-center justify-center text-sm font-semibold border transition-colors';
-const activePageClass = `${baseControlClass} bg-brand-button text-white border-slate-200`;
+  'h-11 min-w-11 px-3 sm:h-9 sm:min-w-9 rounded-lg inline-flex items-center justify-center text-sm font-semibold border transition-colors';
 const inactivePageClass = `${baseControlClass} bg-white text-[#1F2937] border-slate-200 hover:bg-[#FFFFFF] hover:border-slate-200`;
 const disabledClass = `${baseControlClass} bg-[#FFFFFF] text-[#1F2937] border-slate-200 cursor-not-allowed`;
 
@@ -33,45 +34,31 @@ export function MemberPagination({
   };
 
   return (
-    <nav
+    <PaginationNavigation page={page}
       aria-label={ariaLabel}
-      className="ml-auto flex max-w-full flex-wrap items-center justify-end gap-1.5"
+      className="flex w-full max-w-full flex-wrap items-center justify-center gap-2"
     >
       {page === 1 ? (
         <span aria-disabled="true" className={disabledClass}>
-          Trang trước
+          <ChevronLeft aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang trước</span>
         </span>
       ) : (
-        <Link href={hrefFor(page - 1)} className={inactivePageClass}>
-          Trang trước
+        <Link href={hrefFor(page - 1)} scroll={false} className={inactivePageClass}>
+          <ChevronLeft aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang trước</span>
         </Link>
       )}
 
-      {paginationWindow(page, totalPages).map(
-        (pageNumber, index) => pageNumber === 'gap' ? <span key={`gap-${index}`} aria-hidden="true" className="px-1 text-[#1F2937]">…</span> : (
-          <Link
-            key={pageNumber}
-            href={hrefFor(pageNumber)}
-            aria-current={pageNumber === page ? 'page' : undefined}
-            className={
-              pageNumber === page ? activePageClass : inactivePageClass
-            }
-          >
-            {pageNumber}
-          </Link>
-        ),
-      )}
-
+      <PaginationJump page={page} totalPages={totalPages} basePath={basePath} pageParam={pageParam} className="flex min-w-0" />
       {page === totalPages ? (
         <span aria-disabled="true" className={disabledClass}>
-          Trang sau
+          <ChevronRight aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang sau</span>
         </span>
       ) : (
-        <Link href={hrefFor(page + 1)} className={inactivePageClass}>
-          Trang sau
+        <Link href={hrefFor(page + 1)} scroll={false} className={inactivePageClass}>
+          <ChevronRight aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang sau</span>
         </Link>
       )}
-    </nav>
+    </PaginationNavigation>
   );
 }
 

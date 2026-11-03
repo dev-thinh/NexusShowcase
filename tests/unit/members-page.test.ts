@@ -48,9 +48,7 @@ describe('Members Directory Page', () => {
     expect(card).toContain('h-full');
     expect(card).toContain('mt-auto');
     expect(card).toContain('công trình');
-    expect(pagination).toContain(
-      "aria-current={pageNumber === page ? 'page' : undefined}",
-    );
+    expect(pagination).toContain('<PaginationJump page={page} totalPages={totalPages}');
     expect(pagination).toContain('Trang trước');
     expect(pagination).toContain('Trang sau');
   });

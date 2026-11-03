@@ -1312,6 +1312,7 @@ strong {
     padding-bottom: max(.75rem, env(safe-area-inset-bottom));
   }
   .submission-actions > p:empty { display: none; }
+  [data-pagination-footer] { gap: .75rem; padding-top: 1rem; }
   .modal-panel { scroll-padding-block: 1rem; }
 }
 
