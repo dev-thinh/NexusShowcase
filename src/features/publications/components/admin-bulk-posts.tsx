@@ -102,8 +102,8 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
   };
 
   return <>
-    <button type="button" className="action-secondary-detail" onClick={() => { setOpen(true); setLoading(true); setFilter(isPinMode ? 'PINNED' : 'PUBLIC'); setCounts(null); setSearch(''); setQuery(''); setPage(1); setReload(value => value + 1); }}>
-      {isPinMode ? <Pin aria-hidden="true" className="h-4 w-4" /> : <Globe aria-hidden="true" className="h-4 w-4" />}{title}
+    <button type="button" className="action-secondary-detail admin-bulk-trigger" onClick={() => { setOpen(true); setLoading(true); setFilter(isPinMode ? 'PINNED' : 'PUBLIC'); setCounts(null); setSearch(''); setQuery(''); setPage(1); setReload(value => value + 1); }}>
+      {isPinMode ? <Pin aria-hidden="true" className="h-4 w-4" /> : <Globe aria-hidden="true" className="h-4 w-4" />}<span>{title}</span>
     </button>
     {open && createPortal(<Modal isOpen onClose={close} title={title} description={isPinMode ? 'Tick là ghim trang chủ, bỏ tick là không ghim. Chỉnh các bài rồi bấm Áp dụng thay đổi. Tối đa 3 bài ghim.' : 'Tick là công khai, bỏ tick là nội bộ. Chỉnh các bài rồi bấm Áp dụng thay đổi.'} className="!max-w-3xl">
       <fieldset disabled={busy} className="min-w-0 space-y-4 disabled:opacity-60">

@@ -7,7 +7,7 @@ export function ResearchSectionHeading({ children }: { children?: ReactNode }) {
       <h2 id="research-directions-title" className="home-section-title">
         Nghiên cứu để ứng dụng
       </h2>
-      {children && <div className="flex shrink-0 flex-wrap items-center gap-3">{children}</div>}
+      {children && <div className="ml-auto flex shrink-0 flex-wrap items-center gap-3">{children}</div>}
     </div>
   </div>;
 }

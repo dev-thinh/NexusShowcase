@@ -27,7 +27,7 @@ export function AdminTabs() {
     }
   }, [pathname, query]);
 
-  return <nav ref={nav} aria-label="Điều hướng quản trị" className="mb-6 flex max-w-full gap-1 overflow-x-auto border-b border-slate-200" data-admin-tabs="true">
+  return <nav ref={nav} aria-label="Điều hướng quản trị" className="admin-navigation mb-6 flex max-w-full gap-1 overflow-x-auto border-b border-slate-200" data-admin-tabs="true">
     {tabs.map(tab => {
       const active = tab.href === '/admin' ? pathname === tab.href : pathname.startsWith(tab.href + '/') || pathname === tab.href;
       const href = pathname === tab.href ? pathname + (query ? `?${query}` : '') : saved.current[tab.href] ?? tab.href;

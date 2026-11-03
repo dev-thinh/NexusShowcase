@@ -83,7 +83,7 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
   return (
     <div className="mt-5">
       <div className="flex items-center">
-        <div className="flex w-full gap-2">
+        <div className="flex w-full flex-col gap-2 sm:flex-row">
           <button
             type="button"
             aria-expanded={isMemberSearchOpen}
@@ -92,11 +92,11 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
               if (isMemberSearchOpen) event.preventDefault();
             }}
             onClick={() => setIsMemberSearchOpen((current) => !current)}
-            className="action-secondary-detail min-h-11 flex-1 whitespace-nowrap"
+            className="action-secondary-detail min-h-11 min-w-0 flex-1"
           >
             Thêm thành viên CLB
           </button>
-          <button type="button" onClick={() => onChange([...value, { externalName: '', role: 'CONTRIBUTOR', displayOrder: value.length }])} className="action-secondary-detail min-h-11 flex-1 whitespace-nowrap">Thêm người bên ngoài</button>
+          <button type="button" onClick={() => onChange([...value, { externalName: '', role: 'CONTRIBUTOR', displayOrder: value.length }])} className="action-secondary-detail min-h-11 min-w-0 flex-1">Thêm người bên ngoài</button>
         </div>
 
       </div>

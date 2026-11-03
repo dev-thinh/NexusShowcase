@@ -4,7 +4,7 @@ import { MediaImage } from '@/shared/ui/media-image';
 import { FilePicker } from '@/shared/ui/file-picker';
 import { notifySuccess } from '@/shared/dialogs/success';
 
-import { Check, ChevronLeft, ChevronRight, ImageMinus, Loader2, Save, Trash2, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight, GripVertical, ImageMinus, Loader2, Save, Trash2, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Modal } from '@/shared/ui/modal';
@@ -127,6 +127,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
           <button type="button" className={mobilePanel === 'arrange' ? 'action-primary-detail' : 'action-secondary-detail'} disabled={locked} aria-pressed={mobilePanel === 'arrange'} onClick={() => setMobilePanel('arrange')}>Sắp xếp ảnh</button>
           <button type="button" className={mobilePanel === 'details' ? 'action-primary-detail' : 'action-secondary-detail'} disabled={locked} aria-pressed={mobilePanel === 'details'} onClick={() => setMobilePanel('details')}>Sửa ảnh</button>
         </div>
+        <p className="moments-editor__drag-hint">Kéo tay nắm để đổi vị trí; chạm ảnh để chỉnh sửa.</p>
         <div ref={contentRef} className="moments-editor__scroll">
           {error && <p role="alert" className="mb-4 whitespace-pre-line rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
           <fieldset disabled={locked} className="moments-editor__workspace" data-panel={mobilePanel}>
@@ -145,6 +146,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={110} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} draggable={false} />
                         <span className="moments-editor__slot-title">{photo.title}</span>
+                        <span data-moment-handle className="moments-editor__drag-handle" aria-hidden="true" title="Kéo để di chuyển ảnh"><GripVertical size={20} /></span>
                       </> : <MediaImage className="h-full w-full" alt="Vị trí ảnh trống" />}
                       <span className="moments-editor__slot-number">{column + 1}</span>
                     </button>;
@@ -188,6 +190,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                   <button type="button" className="moments-editor__asset-select" data-moment-drag={photo.id} data-drag-source={drag?.photoId === photo.id ? 'true' : undefined} aria-label={`Chọn ảnh: ${photo.title}`} onDragStart={event => event.preventDefault()} onClick={() => choose(photo)}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={120} sizes="(max-width: 767px) 30vw, 200px" loading="lazy" draggable={false} />
+                    <span data-moment-handle className="moments-editor__drag-handle" aria-hidden="true" title="Kéo để di chuyển ảnh"><GripVertical size={20} /></span>
                     {photo.slot !== null && <span className="moments-editor__used"><Check size={12} aria-hidden="true" />{research ? 'Ảnh' : photo.slot < 6 ? 'Trên' : 'Dưới'} {photo.slot % 6 + 1}</span>}
                     <span className="moments-editor__asset-title">{photo.title}</span>
                   </button>

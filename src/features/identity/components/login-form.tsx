@@ -151,7 +151,7 @@ export function LoginForm() {
                 onClick={() => setShowPassword(!showPassword)}
                 disabled={isPending}
                 aria-pressed={showPassword}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1F2937] hover:text-[#1F2937] p-1 rounded-md transition-colors cursor-pointer"
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#1F2937] hover:text-[#1F2937] p-1 rounded-md transition-colors cursor-pointer"
                 aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
               >
                 {showPassword ? <EyeOff aria-hidden="true" className="w-4 h-4" /> : <Eye aria-hidden="true" className="w-4 h-4" />}
@@ -184,7 +184,7 @@ export function LoginForm() {
             href="/contact"
             className="font-semibold text-[#1F2937] hover:underline"
           >
-            Liên hệ ban quản trị
+            Liên hệ Ban chủ nhiệm
           </Link>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import { MEMBER_ROLE_LABELS } from '@/features/identity/model/member-role';
 import type { PublicUser } from '@/features/identity/model/public-user';
 import type { Role } from '@prisma/client';
 
@@ -11,11 +12,7 @@ export type MemberDirectoryEntry = PublicUser & {
   _count: { contributions: number };
 };
 
-export const MEMBER_GROUP_LABELS: Record<PublicMemberRole, string> = {
-  ADMIN: 'Ban Chủ Nhiệm',
-  CORE_MEMBER: 'Nghiên cứu viên & Thành viên Kỳ cựu',
-  MEMBER: 'Thành viên',
-};
+export const MEMBER_GROUP_LABELS: Record<PublicMemberRole, string> = MEMBER_ROLE_LABELS;
 
 export function sortMembersByContribution<T extends Pick<MemberDirectoryEntry, 'id' | 'fullName' | '_count'>>(
   members: T[],

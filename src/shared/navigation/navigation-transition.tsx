@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, useCallback, useContext, useLayoutEffect, useMemo, useRef, useState, useTransition, type ReactNode } from 'react';
+import { scrollToTop } from './scroll-to-top';
 import { finishNavigation, navigationTarget, type NavigationDestination } from './state';
 
 interface NavigationTransition {
@@ -73,8 +74,7 @@ export function NavigationTransitionProvider({ children }: { children: ReactNode
         window.scrollTo({ top, left: 0, behavior: 'instant' });
         frame = requestAnimationFrame(() => {
           if (id !== sequence.current) return;
-          window.scrollTo({ top: 0, left: 0, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
-          cancelScroll.current = null;
+          cancelScroll.current = scrollToTop();
         });
       });
       cancelScroll.current = () => { cancelAnimationFrame(frame); cancelScroll.current = null; };

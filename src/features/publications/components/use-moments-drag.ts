@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 type Drag = { photoId: string; x: number; y: number; over: number | null; offsetX: number; offsetY: number; width: number; height: number };
 type Gesture = Omit<Drag, 'over'> & { startX: number; startY: number; active: boolean; touch: boolean; pointerId: number };
 
-/** Native touch listeners preserve scrolling until a hold activates photo placement. */
+/** Handles start touch placement immediately; the rest of each photo remains scrollable. */
 export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled: boolean, onDrop: (photoId: string, slot: number) => void) {
   const [drag, setDrag] = useState<Drag | null>(null);
   const dropRef = useRef(onDrop);
@@ -105,6 +105,11 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       if (event.touches.length !== 1) { finish(false); return; }
       const point = event.touches[0];
       begin(event.target, point.clientX, point.clientY, true, point.identifier);
+      if (gesture && event.target instanceof Element && event.target.closest('[data-moment-handle]')) {
+        clearTimeout(timer);
+        activate();
+        if (event.cancelable) event.preventDefault();
+      }
     };
     const touchMove = (event: TouchEvent) => {
       if (!gesture?.touch) return;
@@ -130,7 +135,7 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
     };
 
     element.addEventListener('pointerdown', pointerDown);
-    element.addEventListener('touchstart', touchStart, { passive: true });
+    element.addEventListener('touchstart', touchStart, { passive: false });
     element.addEventListener('click', click, true);
     element.addEventListener('contextmenu', context);
     element.addEventListener('wheel', cancel, { passive: true });

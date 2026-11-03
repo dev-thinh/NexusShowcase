@@ -1,6 +1,6 @@
 import { ContributorNames } from '@/features/publications/components/contributor-names';
 import { CardResourceLink } from '@/features/publications/components/card-resource-link';
-import { SearchForm } from '@/shared/ui/validated-form';
+import { PublicationFilters } from '@/features/publications/components/publication-filters';
 import { MediaImage } from '@/shared/ui/media-image';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getSession as auth } from '@/features/identity/server/session';
@@ -13,10 +13,9 @@ import { toCitationDto } from '@/features/publications/model/contracts';
 import { showcaseHref } from '@/features/publications/model/navigation';
 import { listPublications } from '@/features/publications/server/queries';
 import { prisma } from '@/server/db/prisma';
-import { CustomSelect } from '@/shared/ui/custom-select';
 import { LoadingCards } from '@/shared/ui/loading-content';
 import { PaginationFooter } from '@/shared/ui/member-pagination';
-import { ArrowRight, Search, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
@@ -81,13 +80,13 @@ export default async function CategoryPage({
                 {items.map(item => {
 
                   return (
-                    <article key={item.id} className="clickable-card home-featured-card panel-public grid items-stretch gap-5 p-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-6 sm:p-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
+                    <article key={item.id} className="clickable-card publication-card home-featured-card panel-public grid items-stretch gap-5 p-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-6 sm:p-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
                       <CardLink slug={item.slug} returnTo={returnTo} />
-                      <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg sm:aspect-auto">
+                      <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg sm:aspect-auto">
                         <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa nghiên cứu: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
                       </Link>
-                      <div className="flex min-w-0 flex-col">
-                        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                      <div className="publication-card__body flex min-w-0 flex-col">
+                        <div className="publication-card__meta flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
                           <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-[#1F2937]">
                           <TypeBadge type={item.type} size="sm" variant="outline" />
                           {item.publishedYear && <span>{item.publishedYear}</span>}
@@ -102,7 +101,7 @@ export default async function CategoryPage({
                           <ContributorNames contributors={item.contributors} />
                         </p>
                         <p className="mb-3 mt-3 h-12 shrink-0 line-clamp-2 break-words text-sm leading-6 text-[#1F2937]">{item.summary}</p>
-                        <div className="-mb-5 mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
+                        <div className="publication-card__footer -mb-5 mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
                           <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />
                           <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
                           <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline">Xem công trình <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
@@ -123,10 +122,10 @@ export default async function CategoryPage({
                   return (
                     <article
                       key={item.id}
-                      className="clickable-card home-featured-card panel-public !p-0 overflow-hidden flex flex-col"
+                      className="clickable-card publication-card home-featured-card panel-public !p-0 overflow-hidden flex flex-col"
                     >
                       <CardLink slug={item.slug} returnTo={returnTo} />
-                      <div className="shrink-0 px-5 pt-5 sm:px-6 sm:pt-6">
+                      <div className="publication-card__media shrink-0 px-5 pt-5 sm:px-6 sm:pt-6">
                         <div className="relative aspect-video overflow-hidden rounded-lg">
                           <MediaImage
                             src={item.thumbnailUrl}
@@ -136,10 +135,11 @@ export default async function CategoryPage({
                         </div>
                       </div>
 
-                      <div className="flex min-w-0 flex-1 flex-col p-5 sm:p-6">
-                        <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
+                      <div className="publication-card__body flex min-w-0 flex-1 flex-col p-5 sm:p-6">
+                        <div className="publication-card__meta flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
                           <div className="flex min-w-0 flex-wrap items-center gap-2">
                           <TypeBadge type={item.type} size="sm" variant="outline" />
+                          {item.publishedYear && <span className="text-xs">{item.publishedYear}</span>}
                         </div>
                         {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
                       </div>
@@ -163,7 +163,7 @@ export default async function CategoryPage({
                         </p>
 
 
-                        <div className="-mb-5 mt-auto flex flex-wrap items-center justify-between gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
+                        <div className="publication-card__footer -mb-5 mt-auto flex flex-wrap items-center justify-between gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
                           <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center text-sm font-semibold text-[#1F2937] hover:underline" />
                           <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
 
@@ -216,33 +216,7 @@ export default async function CategoryPage({
           <PublicationNavigation currentHref={`/category/${slug}`} />
         </header>
 
-        <SearchForm action={`/category/${slug}`} aria-label="Tìm kiếm và lọc công trình" className="mb-6 grid items-end gap-4 rounded-xl border border-slate-200 bg-white p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_8rem_11rem_auto]">
-          <div className="min-w-0">
-            <label htmlFor="category-search" className="text-xs font-semibold text-[#1F2937]">Tìm kiếm trong chuyên mục</label>
-            <div className="relative mt-2">
-              <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1F2937]" />
-              <input id="category-search" type="search" name="q" defaultValue={searchQuery} placeholder="Tiêu đề, tác giả, từ khóa..." className="h-11 w-full rounded-lg border border-slate-200 bg-[#FFFFFF] pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]" />
-            </div>
-          </div>
-          <div>
-            <label htmlFor="category-year" className="text-xs font-semibold text-[#1F2937]">Năm thực hiện</label>
-            <input id="category-year" type="text" inputMode="numeric" name="year" min={1900} max={2100} defaultValue={year ?? ''} placeholder="Tất cả" className="mt-2 h-11 w-full rounded-lg border border-slate-200 bg-[#FFFFFF] px-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]" />
-          </div>
-          <div>
-            <label htmlFor="category-sort" className="text-xs font-semibold text-[#1F2937]">Sắp xếp</label>
-            <CustomSelect key={sort} id="category-sort" name="sort" defaultValue={sort} className="mt-2" options={[
-              { value: 'featured', label: 'Ưu tiên nổi bật' },
-              { value: 'newest', label: 'Mới nhất' },
-              { value: 'oldest', label: 'Cũ nhất' },
-              { value: 'title', label: 'Tiêu đề A–Z' },
-            ]} />
-          </div>
-          <button type="submit" className="h-11 rounded-lg bg-brand-button px-5 text-sm font-semibold text-white transition hover:brightness-110">Áp dụng</button>
-          {hasFilters && <div className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-200 pt-3 md:col-span-4">
-            <p className="break-words text-xs text-[#1F2937]">Kết quả lọc công trình{searchQuery ? ` với “${searchQuery}”` : ''}{year ? ` · Năm ${year}` : ''}</p>
-            <Link href={`/category/${slug}`} className="inline-flex min-h-9 items-center text-xs font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link>
-          </div>}
-        </SearchForm>
+        <PublicationFilters action={`/category/${slug}`} searchLabel="Tìm kiếm trong chuyên mục" searchQuery={searchQuery} year={year} sort={sort} defaultSort="featured" hasFilters={hasFilters} />
 
         <Suspense key={returnToKey} fallback={<LoadingCards />}><CategoryResults /></Suspense>
       </main>

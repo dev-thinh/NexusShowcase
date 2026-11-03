@@ -1,6 +1,6 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { expect, test } from './fixtures';
+import { expect, openPublicNavigation, test } from './fixtures';
 test.use({ trace: 'retain-on-failure' });
 
 for (const width of [390, 768, 1440]) test(`keeps content readable with reduced motion at ${width}`, async ({ page }) => {
@@ -24,6 +24,7 @@ for (const width of [390, 768, 1440]) test(`keeps content readable with reduced 
   await capture('hero', '.home-hero');
   await capture('title', '.home-hero__title');
   await capture('art', '.home-hero__logo-core');
+  await openPublicNavigation(page);
   await capture('navigation', 'nav a[aria-current="page"]');
   await page.goto('/category/bai-bao-khoa-hoc');
   await expect(page.getByRole('heading', { name: 'Benchmark Research 0000', exact: true })).toBeVisible();

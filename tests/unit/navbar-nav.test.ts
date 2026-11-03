@@ -1,6 +1,11 @@
 import fs from 'fs';
 import path from 'path';
-import { describe, expect, it } from 'vitest';
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+import { describe, expect, it, vi } from 'vitest';
+vi.mock('@/shared/navigation/navigation-transition', () => ({ useNavigationPathname: () => '/', useNavigationVisualPathname: () => '/' }));
+vi.mock('@/shared/navigation/navigation-link', () => ({ NavigationLink: ({ children, prefetch: _prefetch, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { prefetch?: boolean }) => React.createElement('a', props, children) }));
+import { PublicNavigation } from '@/app/(shell)/_components/navbar-nav';
 
 describe('Navbar Nav Component Structure', () => {
   it('implements the exact requested order and naming', () => {
@@ -14,11 +19,17 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain("href: '/dashboard'");
     expect(content).toContain('bg-brand-button');
 
-    // Contains links to members and contact
-    expect(content).toContain('href="/members"');
-    expect(content).toContain('href="/contact"');
-    expect(content).toContain('Thành viên');
-    expect(content).toContain('Liên hệ');
+    const html = renderToStaticMarkup(React.createElement(PublicNavigation));
+    const links = [...html.matchAll(/<a[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/g)].map(match => ({ href: match[1], label: match[2].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&') }));
+    expect(links).toEqual([
+      { href: '/', label: 'Trang chủ' },
+      { href: '/category/bai-bao-khoa-hoc', label: 'Nghiên cứu khoa học' },
+      { href: '/category/robotics-iot', label: 'Dự án & Sản phẩm' },
+      { href: '/members', label: 'Thành viên' },
+      { href: '/contact', label: 'Liên hệ' },
+    ]);
+    expect(html).toContain('aria-controls="public-navigation"');
+    expect(html).toContain('aria-expanded="false"');
 
     // Layout assigns tabs and account actions to explicit columns in the
     // navbar's balanced three-column grid.
@@ -38,12 +49,9 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).not.toContain('featuredCategories');
     expect(content).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
 
-    const navbarNavPath = path.resolve(process.cwd(), 'src/app/(shell)/_components/navbar-nav.tsx');
-    const navContent = fs.readFileSync(navbarNavPath, 'utf-8');
-    expect(navContent).toContain("name: 'Nghiên cứu khoa học'");
-    expect(navContent).toContain("name: 'Dự án & Sản phẩm'");
-    expect(navContent).toContain('slug: \'bai-bao-khoa-hoc\'');
-    expect(navContent).toContain('slug: \'robotics-iot\'');
+    const html = renderToStaticMarkup(React.createElement(PublicNavigation));
+    expect(html).toContain('href="/category/bai-bao-khoa-hoc"');
+    expect(html).toContain('href="/category/robotics-iot"');
   });
 
   it('keeps one admin workspace entry and personal actions in the account menu', () => {

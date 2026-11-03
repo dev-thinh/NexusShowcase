@@ -35,21 +35,21 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
 
               return (
-                <article key={item.id} className="clickable-card home-featured-card panel-public grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white !p-0 md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
+                <article key={item.id} className="clickable-card home-featured-card publication-card panel-public grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white !p-0 md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
                   <CardLink slug={item.slug} returnTo={returnTo} />
-                  <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:aspect-auto md:min-h-56 md:border-b-0 md:border-r">
-                    <div className="absolute inset-4 flex items-center justify-center"><MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="home-featured-thumbnail" /></div>
+                  <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[2/1] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:aspect-auto md:min-h-56 md:border-b-0 md:border-r">
+                    <div className="absolute inset-0 flex items-center justify-center md:inset-4"><MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="home-featured-thumbnail" /></div>
                   </Link>
-                  <div className="flex min-w-0 flex-col px-5 pt-4 sm:px-6 sm:pt-5">
+                  <div className="relative flex min-w-0 flex-col px-3 pt-3 sm:px-6 sm:pt-5">
                     <header>
-                      <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
-                          <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-xs font-semibold text-[#1F2937]">
-                        <TypeBadge type={item.type} size="sm" variant="outline" />
-                        {item.publishedYear && <span>Năm {item.publishedYear}</span>}
+                      <div className="home-featured-meta publication-card__meta flex items-center justify-between gap-1 md:gap-3">
+                        <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-[#1F2937] md:flex-wrap md:gap-2">
+                          <TypeBadge type={item.type} size="sm" variant="outline" />
+                          {item.publishedYear && <span aria-label={`Năm ${item.publishedYear}`} className="whitespace-nowrap"><span className="hidden md:inline">Năm </span>{item.publishedYear}</span>}
+                        </div>
+                        {isAdmin && <div className="home-featured-admin shrink-0"><CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} /></div>}
                       </div>
-                        {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
-                      </div>
-                      <h3 className="mt-2 h-7 shrink-0 line-clamp-1 text-lg font-semibold leading-7 tracking-tight text-[#1F2937] sm:text-xl" title={item.title}>
+                      <h3 className="mt-2 shrink-0 line-clamp-2 text-base font-semibold leading-6 tracking-tight text-[#1F2937] md:h-7 md:line-clamp-1 md:text-xl md:leading-7" title={item.title}>
                         <Link href={showcaseHref(item.slug, returnTo)} className="hover:text-[#1F2937] focus-visible:underline">{item.title}</Link>
                       </h3>
                       {item.contributors.length > 0 && (
@@ -60,13 +60,14 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
                       )}
                     </header>
                     <p className="mb-2 mt-2 line-clamp-2 h-12 shrink-0 break-words text-sm leading-6 text-[#1F2937]">{item.summary}</p>
-                    <footer className="mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-200 py-2">
+                    <footer className="publication-card__footer mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-200 py-2">
                       <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline" />
                       <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
                       <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:underline">
                         Xem công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </footer>
+
                   </div>
                 </article>
               );

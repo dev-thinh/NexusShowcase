@@ -117,12 +117,14 @@ describe('submission add controls', () => {
     expect(html).not.toContain('role="menu"');
   });
 
-  it('uses equal-sized draft and submit actions with the concise submit label', () => {
+  it('preserves accessible save and submit labels with a compact mobile save label', () => {
     const html = renderToStaticMarkup(
       <SubmissionActionBar saveState="idle" onSave={() => undefined} onSubmit={() => undefined} />,
     );
 
-    expect(html).toContain('>Lưu bản nháp</button>');
+    expect(html).toContain('aria-label="Lưu bản nháp"');
+    expect(html).toContain('>Lưu nháp</span>');
+    expect(html).toContain('>Lưu bản nháp</span>');
     expect(html).toContain('>Gửi duyệt</button>');
     expect(html.match(/sm:w-40/g)).toHaveLength(2);
   });

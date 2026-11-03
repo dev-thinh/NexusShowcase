@@ -22,6 +22,14 @@ for (const width of [320, 375, 390, 768, 900]) {
     expect(art!.x + art!.width).toBeLessThanOrEqual(width);
     expect(art!.y).toBeGreaterThanOrEqual(intro!.y + intro!.height);
     await expect(page.locator('.home-hero__art')).toHaveCSS('opacity', '1');
+    const fadeStart = await page.locator('.home-hero').evaluate(element => {
+      const bounds = element.getBoundingClientRect();
+      const fade = getComputedStyle(element, '::after');
+      return bounds.bottom - parseFloat(fade.height) - parseFloat(fade.bottom);
+    });
+    expect(fadeStart).toBeGreaterThanOrEqual(843);
+    expect(art!.y + art!.height).toBeLessThanOrEqual(844);
+
     await page.screenshot({ path: `test-results/home-mobile-${width}.png` });
     for (const route of ['/', '/explore', '/members', '/contact', '/login', '/category/robotics-iot']) {
       if (route !== '/') await page.goto(route);

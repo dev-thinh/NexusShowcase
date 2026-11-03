@@ -59,3 +59,12 @@ export async function seedPhotoGalleries(database: PrismaClient) {
     await database.homeMomentsGallery.upsert({ where: { id }, create: { id, photos: [...photos] }, update: { photos: [...photos], version: 0 } });
   }
 }
+
+export async function openPublicNavigation(page: Page) {
+  await expect(page.locator('#site-navbar')).toBeVisible();
+  if ((page.viewportSize()?.width ?? 1440) >= 1024) return;
+  const toggle = page.locator('.site-mobile-menu-toggle');
+  await expect(toggle).toBeVisible();
+  if (await toggle.getAttribute('aria-expanded') !== 'true') await toggle.click();
+  await expect(page.getByRole('navigation', { name: 'Điều hướng chính', exact: true })).toBeVisible();
+}

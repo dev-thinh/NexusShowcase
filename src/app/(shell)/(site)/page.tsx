@@ -27,7 +27,7 @@ export default async function HomePage({ searchParams }: {
                 <p className="home-section-eyebrow">Dấu ấn nghiên cứu</p>
                 <h2 id="featured-works-title" className="home-section-title">Công trình nổi bật</h2>
               </div>
-              <Link href="/explore" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
+              <Link href="/explore" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
                 Xem tất cả công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
@@ -52,7 +52,7 @@ export default async function HomePage({ searchParams }: {
                 <p className="home-section-eyebrow">Đội ngũ CLB</p>
                 <h2 id="home-members-title" className="home-section-title">Thành viên</h2>
               </div>
-              <Link href="/members" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
+              <Link href="/members" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
                 Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>

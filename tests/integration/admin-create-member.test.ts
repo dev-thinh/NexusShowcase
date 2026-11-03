@@ -42,7 +42,7 @@ describe('Admin Create Member Action', () => {
     });
     expect(res.success).toBe(false);
     if (res.success) throw Error('Expected failure');
-    expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
+    expect(res.error).toContain('Chỉ Ban chủ nhiệm mới có quyền');
   });
 
   it('should allow admin to create a new member with a generated temporary password', async () => {

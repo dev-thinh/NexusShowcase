@@ -37,7 +37,7 @@ export function EmptyState({
           {actionHref ? (
             <Link
               href={actionHref}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] bg-white hover:bg-[#FFFFFF] border border-slate-200 hover:border-slate-200 transition-all cursor-pointer shadow-2xs"
+              className="inline-flex min-h-11 items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm sm:min-h-0 sm:text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] bg-white hover:bg-[#FFFFFF] border border-slate-200 hover:border-slate-200 transition-all cursor-pointer shadow-2xs"
             >
               <span>{actionLabel}</span>
             </Link>
@@ -45,7 +45,7 @@ export function EmptyState({
             <button
               type="button"
               onClick={onActionClick}
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] bg-white hover:bg-[#FFFFFF] border border-slate-200 hover:border-slate-200 transition-all cursor-pointer shadow-2xs"
+              className="inline-flex min-h-11 items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm sm:min-h-0 sm:text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] bg-white hover:bg-[#FFFFFF] border border-slate-200 hover:border-slate-200 transition-all cursor-pointer shadow-2xs"
             >
               <span>{actionLabel}</span>
             </button>

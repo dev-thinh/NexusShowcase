@@ -44,17 +44,20 @@ export function AdminRoleToggle({
   }
 
   const isCore = currentRole === 'CORE_MEMBER';
+  const description = isCore ? 'Thành viên này hiện đang có quyền nộp bài và quản lý công trình đại diện nhóm.' : 'Cấp quyền đăng bài để thành viên có thể đăng công trình và gửi xét duyệt.';
 
   return (
-    <div className="inline-flex items-center gap-2">
+    <div className="admin-role-control flex min-w-0 flex-none items-center gap-2">
       {error && <p role="alert" className="text-xs text-rose-800">{error}</p>}
       <button
         disabled={loading}
         onClick={toggleCoreMember}
-        className={`inline-flex items-center gap-1.5 min-h-9 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] disabled:opacity-50 ${
+        title={description}
+        aria-description={description}
+        className={`inline-flex items-center justify-center gap-1.5 min-h-11 px-3 sm:min-h-9 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] disabled:opacity-50 ${
           isCore
-            ? 'bg-white hover:bg-[#FFFFFF] text-[#1F2937] border border-slate-200'
-            : 'bg-brand-button hover:brightness-110 text-white'
+            ? 'border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+            : 'border border-slate-200 bg-white text-[#153D67] hover:bg-slate-50'
         }`}
       >
         {loading ? (
@@ -62,18 +65,12 @@ export function AdminRoleToggle({
         ) : isCore ? (
           <ArrowDownCircle className="w-3.5 h-3.5" />
         ) : (
-          <ArrowUpCircle className="w-3.5 h-3.5 text-white/80" />
+          <ArrowUpCircle className="w-3.5 h-3.5" />
         )}
         <span>{isCore ? 'Thu quyền đăng bài' : 'Cấp quyền đăng bài'}</span>
       </button>
 
-      <Tooltip
-        content={
-          isCore
-            ? 'Thành viên này hiện đang có quyền nộp bài và quản lý công trình đại diện nhóm.'
-            : 'Cấp quyền CORE MEMBER để thành viên này có thể đăng ký công trình và gửi xét duyệt.'
-        }
-      />
+      <div className="hidden lg:block"><Tooltip content={description} /></div>
     </div>
   );
 }

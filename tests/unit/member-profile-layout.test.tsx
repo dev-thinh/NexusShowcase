@@ -50,7 +50,7 @@ it('offers editing and password actions only on the owner profile without an inl
   expect(html).toContain('Đổi mật khẩu');
   expect(html).toContain('Tùy chọn ảnh đại diện');
   expect(html).not.toContain('href="/account/change-password"');
-  expect(html).not.toContain('<form');
+  expect(html.split('data-pagination-footer')[0]).not.toContain('<form');
   expect(html).not.toContain('Điều hướng quản lý');
   const breadcrumb = html.split('data-breadcrumbs="true"')[1].split('</nav>')[0];
   expect(breadcrumb).toContain('Hồ sơ của tôi');

@@ -111,7 +111,7 @@ export function SectionEditor({ content, resources, onChange, onBusy, errors = {
     </section>)}
     <div className="rounded-lg border border-dashed border-slate-200 bg-[#FFFFFF] p-4 sm:p-5">
       <button type="button" disabled={document.sections.length >= 30} onClick={() => addSection()} className="action-secondary-detail min-h-11 w-full"><Plus className="h-4 w-4" aria-hidden="true" />Thêm section</button>
-      <div className="mt-3 flex flex-wrap gap-2"><span className="py-1 text-xs text-[#1F2937]">Gợi ý:</span>{['Giới thiệu', 'Phương pháp', 'Thiết kế hệ thống', 'Thực nghiệm', 'Kết quả', 'Demo hoạt động', 'Kết luận'].map(title => <button key={title} type="button" disabled={document.sections.length >= 30} onClick={() => addSection(title)} className="rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs text-[#1F2937] hover:border-slate-200">{title}</button>)}</div>
+      <div className="mt-3 flex flex-wrap gap-2"><span className="py-1 text-xs text-[#1F2937]">Gợi ý:</span>{['Giới thiệu', 'Phương pháp', 'Thiết kế hệ thống', 'Thực nghiệm', 'Kết quả', 'Demo hoạt động', 'Kết luận'].map(title => <button key={title} type="button" disabled={document.sections.length >= 30} onClick={() => addSection(title)} className="min-h-11 rounded-md border border-slate-200 bg-white px-2.5 py-1.5 text-xs sm:min-h-0 text-[#1F2937] hover:border-slate-200">{title}</button>)}</div>
     </div>
   </div>;
 }

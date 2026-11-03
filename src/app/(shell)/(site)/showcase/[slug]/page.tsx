@@ -126,7 +126,7 @@ export default async function ShowcaseDetailPage({
                 </Link>
               ) : currentUser?.id === item.creatorId && currentUser?.role === 'MEMBER' ? (
                 <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-[#FFFFFF] text-[#1F2937] border border-slate-200">
-                  Chỉ xem (Cần quyền Core Member để sửa)
+                  Chỉ xem (Cần quyền Trưởng nhóm để sửa)
                 </span>
               ) : null
             )}

@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
   try {
     const actor = await getActor(['CORE_MEMBER', 'ADMIN']);
     if (!actor) {
-      return NextResponse.json({ error: 'Chỉ thành viên nòng cốt và Admin được tải tệp.', code: 'UNAUTHORIZED' }, { status: 403 });
+      return NextResponse.json({ error: 'Chỉ Trưởng nhóm và Ban chủ nhiệm được tải tệp.', code: 'UNAUTHORIZED' }, { status: 403 });
     }
     const throttle = await consumeRateLimit({ scope: 'upload-request', key: actor.id, limit: 60, windowMs: 60_000 });
     if (!throttle.allowed) return NextResponse.json({ error: 'Bạn tải tệp quá nhanh. Vui lòng thử lại sau.', code: 'RATE_LIMITED' }, { status: 429, headers: { 'Retry-After': String(throttle.retryAfterSeconds) } });

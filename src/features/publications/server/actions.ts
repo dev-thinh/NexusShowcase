@@ -4,14 +4,14 @@ import { invalidatePublicationChange } from './invalidation';
 import { setPublicationLifecycle, setPublicationPin, setPublicationVisibility } from './state-commands';
 export async function setShowcasePinAction(input: { itemId: string; enabled: boolean; replaceItemIds?: string[] }): ReturnType<typeof setPublicationPin> {
   const actor = await getActor(['ADMIN']);
-  if (!actor) return { success: false, code: 'UNAUTHORIZED' as const, error: 'Chỉ Quản trị viên được ghim bài.' };
+  if (!actor) return { success: false, code: 'UNAUTHORIZED' as const, error: 'Chỉ Ban chủ nhiệm được ghim bài.' };
   const result = await setPublicationPin(actor, input);
   if (result.success) invalidatePublicationChange({ slugs: result.data.slugs, memberIds: [], kind: 'PUBLICATION' });
   return result;
 }
 export async function setShowcaseVisibilityAction(input: { itemId: string; visibility: 'PUBLIC' | 'PRIVATE' }): ReturnType<typeof setPublicationVisibility> {
   const actor = await getActor(['ADMIN']);
-  if (!actor) return { success: false, code: 'UNAUTHORIZED' as const, error: 'Chỉ Quản trị viên được đổi hiển thị.' };
+  if (!actor) return { success: false, code: 'UNAUTHORIZED' as const, error: 'Chỉ Ban chủ nhiệm được đổi hiển thị.' };
   const result = await setPublicationVisibility(actor, input);
   if (result.success) invalidatePublicationChange({ slugs: result.data.slugs, memberIds: [], kind: 'PUBLICATION' });
   return result;
