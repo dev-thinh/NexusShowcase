@@ -32,7 +32,7 @@ test('cards show GitHub quick links and citation while every resource remains av
       await expect(page.getByRole('dialog', { name: 'Trích Dẫn Học Thuật (Citation Export)', exact: true })).toBeVisible();
       await page.getByRole('dialog').getByRole('button', { name: 'Đóng hộp thoại', exact: true }).click();
       await expect(page.getByRole('dialog')).toHaveCount(0);
-      expect(await card.locator('footer').evaluate(node => node.firstElementChild?.tagName)).toBe('BUTTON');
+      expect(await card.locator('.publication-card__footer').evaluate(node => node.firstElementChild?.tagName)).toBe('BUTTON');
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     }
     await page.locator('article').filter({ has: page.getByRole('heading', { name: item.title, exact: true }) }).getByRole('heading').getByRole('link').click();

@@ -39,7 +39,7 @@ export default function ContactPage() {
                     Cơ sở 1 (Trụ sở chính)
                   </span>
                   <h2 className="text-base sm:text-lg font-semibold text-[#1F2937] leading-snug">
-                    CLB Robotics - IoT, trường Đại học Khoa học tự nhiên, ĐHQG-HCM
+                    CLB Robotics - IoT, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM
                   </h2>
                 </div>
               </div>
