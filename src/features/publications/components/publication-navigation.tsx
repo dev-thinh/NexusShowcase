@@ -8,7 +8,7 @@ const sections = [
 
 export function PublicationNavigation({ currentHref }: { currentHref: string }) {
   return (
-    <nav aria-label="Chuyên mục công trình" className="mt-6 flex gap-6 overflow-x-auto border-b border-slate-200">
+    <nav aria-label="Chuyên mục công trình" className="publication-navigation mt-6 flex gap-6 overflow-x-auto border-b border-slate-200">
       {sections.map(section => {
         const active = section.href === currentHref;
         return (
