@@ -466,7 +466,7 @@ strong {
 
 @media (max-width: 900px) {
   .home-hero__grid { grid-template-columns: minmax(0, 1fr); align-content: center; gap: 0; min-height: calc(100svh - var(--hero-navbar-height, 4rem) - var(--home-blend-depth)); }
-  .home-hero { min-height: 100svh; }
+  .home-hero { min-height: calc(100dvh + var(--home-blend-depth)); }
   .home-hero .home-hero__intro { width: 100%; padding-block: 2.5rem 0; }
   .home-hero__art { width: min(65vw, 19rem); justify-self: center; opacity: 1; }
   .home-hero__logo-core { width: 38%; }
@@ -482,22 +482,57 @@ strong {
   .home-hero__primary-action { width: auto; max-width: 100%; }
   .home-hero__art { width: min(65vw, 17rem, 32svh); }
 }
-@media (max-width: 639px) {
-  #site-navbar .site-navbar-grid { padding-block: 0.5rem; row-gap: 0.375rem; }
-  #site-navbar .site-brand { padding: 0; }
+.site-public-navigation-shell { display: contents; }
+.site-mobile-menu-toggle { display: none; }
+@media (max-width: 1023px) {
+  #site-navbar .site-navbar-grid { grid-template-columns: minmax(0, 1fr) 2.75rem 2.75rem; column-gap: 0.5rem; padding-block: 0.5rem; row-gap: 0; }
+  #site-navbar .site-brand-container { grid-column: 1; grid-row: 1; padding-right: 0; }
+  #site-navbar .site-brand { width: 170px; max-width: 100%; padding: 0; }
+  #site-navbar :is(.site-account-navigation, .site-account-placeholder) { grid-column: 2; grid-row: 1; width: 2.75rem; }
+  #site-navbar .site-account-navigation > div { position: static; }
+  #site-navbar .site-account-navigation nav { right: 0.75rem; max-height: calc(100dvh - 6rem); }
+  #site-navbar .site-account-navigation > a,
+  #site-navbar .site-account-navigation > div > button { width: 2.75rem; height: 2.75rem; padding: 0; justify-content: center; }
+  #site-navbar .site-public-navigation-shell { display: block; grid-column: 3; grid-row: 1; }
+  #site-navbar .site-mobile-menu-toggle { display: inline-flex; align-items: center; justify-content: center; width: 2.75rem; height: 2.75rem; border-radius: 0.5rem; color: #153d67; background: #f1f5f9; transition: color 200ms ease, background-color 200ms ease; }
+  #site-navbar[data-banner-top='true'] .site-mobile-menu-toggle { color: #fff; background: rgb(255 255 255 / 0.1); }
   #site-navbar .site-public-navigation {
-    width: 100%;
-    min-width: 0;
+    position: absolute;
+    inset: 100% 0 auto;
+    display: flex;
+    flex-direction: column;
     flex-wrap: nowrap;
+    align-items: stretch;
     justify-content: flex-start;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scrollbar-width: thin;
-    scroll-padding-inline: 0.25rem;
-    padding-block: 0.125rem 0.375rem;
+    gap: 0.25rem;
+    width: 100%;
+    max-height: calc(100dvh - 6rem);
+    padding: 0.75rem 1rem 1rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 0 0 1rem 1rem;
+    background: #fff;
+    box-shadow: 0 12px 24px rgb(15 41 74 / 0.12);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-0.5rem);
+    transition: opacity 180ms ease, transform 180ms ease, visibility 0s linear 180ms;
   }
-  .site-public-navigation > a,
-  .site-account-navigation :is(a, button) { min-height: 2.75rem; }
+  #site-navbar .site-public-navigation[data-open='true'] { opacity: 1; visibility: visible; pointer-events: auto; transform: none; transition-delay: 0s; }
+  #site-navbar .site-public-navigation a { min-height: 3rem; height: auto; justify-content: flex-start; padding: 0.75rem; white-space: normal; }
+  #site-navbar .site-public-navigation[data-open] a { color: #334155; background: transparent; }
+  #site-navbar .site-public-navigation[data-open] a:hover { background: #f8fafc; }
+  #site-navbar .site-public-navigation[data-open] a[aria-current='page'] { color: #153d67; background: #eff6ff; }
+  #site-navbar:has(.site-public-navigation[data-open='true']) { --club-logo-color: #153d67; background: #fff; border-color: #e2e8f0; }
+  #site-navbar:has(.site-public-navigation[data-open='true']) .site-mobile-menu-toggle,
+  #site-navbar:has(.site-public-navigation[data-open='true']) .site-account-navigation > a,
+  #site-navbar:has(.site-public-navigation[data-open='true']) .site-account-navigation > div > button { color: #153d67; background: #f1f5f9; border-color: #e2e8f0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  #site-navbar .site-public-navigation,
+  #site-navbar .site-mobile-menu-toggle { transition: none; }
 }
 @media (max-width: 900px), (hover: none) {
   .home-hero__heart-tilt,
@@ -666,9 +701,9 @@ strong {
   pointer-events: none;
 }
 
-/* Include the banner fade in its screen height rather than adding it below. */
+/* Keep the fade below the first screen on both desktop and mobile. */
 .home-hero__grid {
-  min-height: calc(100svh - var(--hero-navbar-height, 4rem) - var(--home-blend-depth));
+  min-height: calc(100dvh - var(--hero-navbar-height, 4rem));
 }
 
 @media (min-width: 901px) {
@@ -1175,4 +1210,26 @@ strong {
   outline: 2px solid #dc2626;
   outline-offset: 3px;
   border-radius: 0.375rem;
+}
+
+@media (max-width: 1023px) {
+  #site-navbar :is(.site-public-navigation, #profile-navigation) {
+    right: .75rem; left: auto; width: 16rem; max-width: calc(100vw - 2rem);
+    margin-top: .5rem; padding: .375rem; gap: 0; border: 1px solid #e2e8f0; border-radius: .75rem;
+    background: #fff; box-shadow: 0 12px 24px rgb(15 41 74 / .12);
+  }
+  #site-navbar :is(.site-public-navigation, #profile-navigation) :is(a, button) {
+    display: flex; align-items: center; justify-content: flex-start; gap: .625rem;
+    min-height: 2.75rem; height: auto; padding: .75rem; border-radius: .5rem;
+    font-size: .875rem; font-weight: 600; line-height: 1.25rem; color: #475569;
+  }
+  #site-navbar :is(.site-public-navigation, #profile-navigation) a[aria-current='page'] { color: #153d67; background: #eff6ff; }
+  #site-navbar :is(.site-public-navigation, #profile-navigation) a:hover { background: #f8fafc; }
+}
+@media (max-width: 1023px) {
+  #site-navbar :is(.site-public-navigation, #profile-navigation) :is(a, button) > svg { width: 1rem; height: 1rem; flex-shrink: 0; }
+}
+
+@media (max-width: 1023px) {
+  #site-navbar .site-public-navigation { grid-column: auto; grid-row: auto; }
 }

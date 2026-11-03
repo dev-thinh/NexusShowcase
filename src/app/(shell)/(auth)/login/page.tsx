@@ -24,10 +24,10 @@ export default async function LoginPage() {
     <div className="absolute top-16 left-0 w-96 h-96 bg-[#FFFFFF] rounded-full blur-3xl pointer-events-none -translate-x-1/4 -translate-y-1/4" />
     <div className="absolute top-16 right-0 w-96 h-96 bg-[#FFFFFF] rounded-full blur-3xl pointer-events-none translate-x-1/4 -translate-y-1/4" />
     <div className="absolute bottom-10 right-1/4 w-80 h-80 bg-[#FFFFFF] rounded-full blur-3xl pointer-events-none" />
-    <main className="min-h-[calc(100dvh-4rem)] flex-1 flex items-center justify-center py-8 sm:py-10 lg:py-12 relative z-10">
+    <main className="flex-1 flex items-start justify-center py-6 sm:py-8 lg:items-center lg:py-12 relative z-10">
       <div className="container w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
-          <aside className="lg:col-span-7 xl:col-span-7 space-y-5">
+          <aside className="hidden lg:block lg:col-span-7 xl:col-span-7 space-y-5">
             <div data-brand-lockup="login" className="w-72 max-w-full py-1">
               <ClubLogo />
             </div>
@@ -38,7 +38,13 @@ export default async function LoginPage() {
               <Link href="/contact" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-white hover:bg-[#FFFFFF] text-[#1F2937] text-sm font-semibold border border-slate-200 shadow-2xs transition-all active:scale-[0.98]"><Mail className="w-4 h-4 text-[#1F2937]" /><span>Liên hệ</span></Link>
             </div>
           </aside>
-          <div className="lg:col-span-5 xl:col-span-5 w-full"><Suspense fallback={<LoginFormFallback />}><LoginForm /></Suspense></div>
+          <div className="lg:col-span-5 xl:col-span-5 w-full">
+            <Suspense fallback={<LoginFormFallback />}><LoginForm /></Suspense>
+            <nav aria-label="Điều hướng đăng nhập" className="mx-auto mt-5 flex max-w-lg items-center justify-center gap-6 text-sm text-slate-600 lg:hidden">
+              <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-sm hover:text-[#153D67]"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Trang chủ</Link>
+              <Link href="/contact" className="inline-flex min-h-11 items-center gap-2 rounded-sm hover:text-[#153D67]"><Mail className="h-4 w-4" aria-hidden="true" />Liên hệ</Link>
+            </nav>
+          </div>
         </div>
       </div>
     </main>

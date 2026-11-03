@@ -1,4 +1,4 @@
-import { expect, login, test } from './fixtures';
+import { expect, login, openPublicNavigation, test } from './fixtures';
 
 for (const width of [390, 1024, 1440]) test(`home account menu opens administration pages at ${width}px`, async ({ page, fixture }) => {
   await page.setViewportSize({ width, height: 900 });
@@ -8,6 +8,7 @@ for (const width of [390, 1024, 1440]) test(`home account menu opens administrat
     ['Quản trị', '/admin', 'Tổng quan'],
   ]) {
     if (new URL(page.url()).pathname !== '/') {
+      await openPublicNavigation(page);
       await page.locator('#site-navbar nav a[href="/"]').first().click();
       await expect(page.locator('#home-content')).toBeVisible();
     }

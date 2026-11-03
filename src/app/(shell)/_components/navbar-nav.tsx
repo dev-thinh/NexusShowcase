@@ -9,9 +9,11 @@ import { useNavigationPathname as usePathname, useNavigationVisualPathname } fro
 import {
 ChevronDown,
 LayoutDashboard,
+Menu,
 Plus,
 ShieldCheck,
 User,
+X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -91,13 +93,13 @@ export function NavbarNav({ user }: NavbarNavProps) {
               }`}
             >
               <MemberAvatar fullName={user.name || 'Thành viên'} src={user.avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
-              <span className="hidden sm:block truncate sm:max-w-[110px] font-semibold">
+              <span className="hidden lg:block truncate lg:max-w-[110px] font-semibold">
                 {user.name || 'Thành viên'}
               </span>
-              <span className="hidden sm:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
+              <span className="hidden lg:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
                 {getMemberRoleLabel(user.role)}
               </span>
-              <ChevronDown aria-hidden="true" className={`w-3.5 h-3.5 shrink-0 transition-transform motion-reduce:transition-none ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown aria-hidden="true" className={`hidden lg:block w-3.5 h-3.5 shrink-0 transition-transform motion-reduce:transition-none ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Keep links mounted while a navigation is pending: unmounting them
@@ -139,6 +141,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
           /* Khách: Nút Đăng nhập */
           <Link
             href="/login"
+            aria-label="Đăng nhập"
             className={
               isLoginActive
                 ? activeTabClass
@@ -146,7 +149,8 @@ export function NavbarNav({ user }: NavbarNavProps) {
             }
             aria-current={isLoginActive ? 'page' : undefined}
           >
-            <span>Đăng nhập</span>
+            <User className="h-5 w-5 lg:hidden" aria-hidden="true" />
+            <span className="hidden lg:inline">Đăng nhập</span>
           </Link>
         )}
       </div>
@@ -159,69 +163,57 @@ const activeTabClass =
 const inactiveTabClass =
     'h-9 px-3 sm:px-3.5 rounded-lg inline-flex items-center justify-center gap-2 text-xs sm:text-sm font-semibold text-foreground-muted hover:text-[#1F2937] hover:bg-[#FFFFFF] transition-colors shrink-0';
 
+const publicLinks = [
+  { href: '/', label: 'Trang chủ' },
+  { href: '/category/bai-bao-khoa-hoc', label: 'Nghiên cứu khoa học' },
+  { href: '/category/robotics-iot', label: 'Dự án & Sản phẩm' },
+  { href: '/members', label: 'Thành viên' },
+  { href: '/contact', label: 'Liên hệ' },
+];
+
 export function PublicNavigation() {
   const pathname = usePathname();
-  const navigationRef = useRef<HTMLElement>(null);
-  useEffect(() => {
-    const navigation = navigationRef.current;
-    const active = navigation?.querySelector<HTMLElement>('[aria-current="page"]');
-    if (!navigation || !active || navigation.scrollWidth <= navigation.clientWidth) return;
-    const bounds = navigation.getBoundingClientRect();
-    const target = active.getBoundingClientRect();
-    navigation.scrollLeft += target.left - bounds.left - (bounds.width - target.width) / 2;
-  }, [pathname]);
   const visualPathname = useNavigationVisualPathname();
-  const tabClass = (href: string) => visualPathname === href ? activeTabClass : inactiveTabClass;
-  const isExploreActive = pathname === '/';
-  const isMembersActive = pathname === '/members';
-  const isContactActive = pathname === '/contact';
-  return (<nav ref={navigationRef} aria-label="Điều hướng chính" className="site-public-navigation flex flex-wrap col-start-2 row-start-1 justify-self-center max-xl:col-start-1 max-xl:col-span-3 max-xl:row-start-2 max-xl:flex-wrap max-xl:justify-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
-        {/* 1. Tab: Trang chủ */}
-        <Link
-          href="/"
-          prefetch={false}
-          className={tabClass('/')}
-          aria-current={isExploreActive ? 'page' : undefined}
-        >
-          <span>Trang chủ</span>
-        </Link>
+  const [menuOpen, setMenuOpen] = useState(false);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
-        {[
-          { slug: 'bai-bao-khoa-hoc', name: 'Nghiên cứu khoa học' },
-          { slug: 'robotics-iot', name: 'Dự án & Sản phẩm' },
-        ].map(({ slug, name }) => {
-          const active = pathname === `/category/${slug}`;
-          return (
-            <Link
-              key={slug}
-              href={`/category/${slug}`}
-              prefetch={false}
-              className={tabClass(`/category/${slug}`)}
-              aria-current={active ? 'page' : undefined}
-            >
-              <span>{name}</span>
-            </Link>
-          );
-        })}
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const change = () => { if (desktop.matches) setMenuOpen(false); };
+    desktop.addEventListener('change', change);
+    return () => desktop.removeEventListener('change', change);
+  }, []);
+  useEffect(() => {
+    if (!menuOpen) return;
+    const outside = (event: Event) => {
+      if (event.target instanceof Node && !shellRef.current?.contains(event.target)) setMenuOpen(false);
+    };
+    const escape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setMenuOpen(false);
+      toggleRef.current?.focus();
+    };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('focusin', outside);
+    document.addEventListener('keydown', escape);
+    return () => {
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('focusin', outside);
+      document.removeEventListener('keydown', escape);
+    };
+  }, [menuOpen]);
 
-        {/* 2. Tab: Thành viên */}
-        <Link
-          href="/members"
-          prefetch={false}
-          className={tabClass('/members')}
-          aria-current={isMembersActive ? 'page' : undefined}
-        >
-          <span>Thành viên</span>
-        </Link>
-
-        {/* 5. Tab: Liên hệ */}
-        <Link
-          href="/contact"
-          prefetch={false}
-          className={tabClass('/contact')}
-          aria-current={isContactActive ? 'page' : undefined}
-        >
-          <span>Liên hệ</span>
-        </Link>
-      </nav>);
+  return <div ref={shellRef} className="site-public-navigation-shell">
+    <button ref={toggleRef} type="button" className="site-mobile-menu-toggle" aria-expanded={menuOpen} aria-controls="public-navigation" aria-label={menuOpen ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'} onClick={() => setMenuOpen(open => !open)}>
+      {menuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
+    </button>
+    <nav id="public-navigation" aria-label="Điều hướng chính" data-open={menuOpen ? 'true' : 'false'} className="site-public-navigation flex flex-wrap col-start-2 row-start-1 justify-self-center max-xl:col-start-1 max-xl:col-span-3 max-xl:row-start-2 max-xl:flex-wrap max-xl:justify-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto" onClick={event => {
+      if ((event.target as Element).closest('a')) setMenuOpen(false);
+    }}>
+      {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualPathname === href ? activeTabClass : inactiveTabClass} aria-current={pathname === href ? 'page' : undefined}><span>{label}</span></Link>)}
+    </nav>
+  </div>;
 }
