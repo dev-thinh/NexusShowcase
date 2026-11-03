@@ -47,7 +47,7 @@ describe('Admin Delete Member Action', () => {
     const res = await deleteMemberAction(testMember.id);
     expect(res.success).toBe(false);
     if (res.success) throw Error('Expected failure');
-    expect(res.error).toContain('Chỉ Quản trị viên (Admin) mới có quyền');
+    expect(res.error).toContain('Chỉ Ban chủ nhiệm mới có quyền');
   });
 
   it('should prevent admin from deleting their own account', async () => {
@@ -55,7 +55,7 @@ describe('Admin Delete Member Action', () => {
     const res = await deleteMemberAction(adminUser.id);
     expect(res.success).toBe(false);
     if (res.success) throw Error('Expected failure');
-    expect(res.error).toContain('Quản trị viên không thể tự xóa tài khoản của chính mình');
+    expect(res.error).toContain('Ban chủ nhiệm không thể tự xóa tài khoản của chính mình');
   });
 
   it('should prevent deleting another ADMIN account', async () => {
@@ -73,7 +73,7 @@ describe('Admin Delete Member Action', () => {
     const res = await deleteMemberAction(tempAdmin.id);
     expect(res.success).toBe(false);
     if (res.success) throw Error('Expected failure');
-    expect(res.error).toContain('Không thể xóa tài khoản Quản trị viên');
+    expect(res.error).toContain('Không thể xóa tài khoản Ban chủ nhiệm');
 
     await prisma.user.delete({ where: { id: tempAdmin.id } });
   });

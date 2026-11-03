@@ -5,7 +5,7 @@ import { getActor } from './actor';
 import { invalidateIdentityChange } from './invalidation';
 import { createMember, disableMember, updateMemberRole } from './member-commands';
 export type { CreateMemberInput } from '../model/member-input';
-const unauthorized = () => ({ success: false as const, code: 'UNAUTHORIZED' as const, error: 'Chỉ Quản trị viên (Admin) mới có quyền quản lý tài khoản.' });
+const unauthorized = () => ({ success: false as const, code: 'UNAUTHORIZED' as const, error: 'Chỉ Ban chủ nhiệm mới có quyền quản lý tài khoản.' });
 const invalid = () => ({ success: false as const, code: 'VALIDATION' as const, error: 'Thông tin tài khoản không hợp lệ.' });
 export async function createMemberAction(input: CreateMemberInput) {
   const actor = await getActor(['ADMIN']);

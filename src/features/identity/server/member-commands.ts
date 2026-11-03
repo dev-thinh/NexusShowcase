@@ -14,7 +14,7 @@ export async function updateMemberRole(actor: Actor, input: { targetUserId: stri
   const parsed = userRoleUpdateInputSchema.safeParse(input);
   if (!parsed.success) return { success: false, code: 'VALIDATION', error: 'Thông tin phân quyền không hợp lệ.' };
   const { targetUserId, newRole } = parsed.data;
-  if (actor.id === targetUserId && newRole !== 'ADMIN') return { success: false, code: 'FORBIDDEN', error: 'Admin không thể tự hạ quyền.' };
+  if (actor.id === targetUserId && newRole !== 'ADMIN') return { success: false, code: 'FORBIDDEN', error: 'Ban chủ nhiệm không thể tự hạ quyền.' };
   try {
     return await prisma.$transaction(async tx => {
       const current = await tx.user.findUnique({ where: { id: actor.id }, select: { role: true, status: true, deletedAt: true, mustChangePassword: true } });
@@ -23,7 +23,7 @@ export async function updateMemberRole(actor: Actor, input: { targetUserId: stri
       if (!target || target.deletedAt || target.status !== 'ACTIVE') return { success: false, code: 'NOT_FOUND', error: 'Không tìm thấy thành viên đang hoạt động.' } as const;
       if (target.role === 'ADMIN' && newRole !== 'ADMIN') {
         const admins = await tx.user.count({ where: { role: 'ADMIN', status: 'ACTIVE', deletedAt: null } });
-        if (admins <= 1) return { success: false, code: 'FORBIDDEN', error: 'Phải giữ ít nhất một Admin đang hoạt động.' } as const;
+        if (admins <= 1) return { success: false, code: 'FORBIDDEN', error: 'Phải giữ ít nhất một thành viên Ban chủ nhiệm đang hoạt động.' } as const;
       }
       const user = await tx.user.update({ where: { id: targetUserId }, data: { role: newRole, sessionVersion: { increment: 1 } }, select: safeMemberSelect });
       return { success: true, data: user } as const;
@@ -46,7 +46,7 @@ function toSafeMember(user: { id: string; fullName: string; role: Role; status: 
 async function createMemberInternal(actor: Actor, input: CreateMemberInput) {
   const admin = actor.role === 'ADMIN' && !actor.mustChangePassword ? actor : null;
   if (!admin) {
-    return { success: false as const, code: 'VALIDATION' as const, error: 'Chỉ Quản trị viên (Admin) mới có quyền tạo tài khoản thành viên.' };
+    return { success: false as const, code: 'VALIDATION' as const, error: 'Chỉ Ban chủ nhiệm mới có quyền tạo tài khoản thành viên.' };
   }
 
   const parsedInput = createMemberInputSchema.safeParse(input);
@@ -98,7 +98,7 @@ async function createMemberInternal(actor: Actor, input: CreateMemberInput) {
 async function disableMemberInternal(actor: Actor, targetUserId: string) {
   const admin = actor.role === 'ADMIN' && !actor.mustChangePassword ? actor : null;
   if (!admin) {
-    return { success: false as const, code: 'VALIDATION' as const, error: 'Chỉ Quản trị viên (Admin) mới có quyền xóa tài khoản thành viên.' };
+    return { success: false as const, code: 'VALIDATION' as const, error: 'Chỉ Ban chủ nhiệm mới có quyền xóa tài khoản thành viên.' };
   }
 
   const parsedInput = deleteMemberInputSchema.safeParse({ targetUserId });
@@ -108,7 +108,7 @@ async function disableMemberInternal(actor: Actor, targetUserId: string) {
   targetUserId = parsedInput.data.targetUserId;
 
   if (admin.id === targetUserId) {
-    return { success: false as const, code: 'VALIDATION' as const, error: 'Quản trị viên không thể tự xóa tài khoản của chính mình.' };
+    return { success: false as const, code: 'VALIDATION' as const, error: 'Ban chủ nhiệm không thể tự xóa tài khoản của chính mình.' };
   }
 
   return prisma.$transaction(async tx => {
@@ -127,7 +127,7 @@ async function disableMemberInternal(actor: Actor, targetUserId: string) {
       return { success: false as const, code: 'VALIDATION' as const, error: 'Không tìm thấy tài khoản thành viên cần xóa.' };
     }
     if (targetUser.role === 'ADMIN') {
-      return { success: false as const, code: 'VALIDATION' as const, error: 'Không thể xóa tài khoản Quản trị viên của hệ thống.' };
+      return { success: false as const, code: 'VALIDATION' as const, error: 'Không thể xóa tài khoản Ban chủ nhiệm của hệ thống.' };
     }
     const updated = await tx.user.updateMany({
       where: { id: targetUserId, role: { not: 'ADMIN' }, status: 'ACTIVE', deletedAt: null },

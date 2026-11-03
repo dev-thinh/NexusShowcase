@@ -33,7 +33,7 @@ async function dragSelectText(page: Page, text: Locator) {
 test('mouse text selection stays visible on public and login pages', async ({ page }) => {
   for (const path of ['/contact', '/login']) {
     await page.goto(path);
-    const heading = page.getByRole('heading', { name: path === '/contact' ? 'Liên hệ Ban Điều Hành CLB Robotics & IoT - HCMUS' : /Cùng nghiên cứu\.\s*Cùng sáng tạo\./, exact: true });
+    const heading = page.getByRole('heading', { name: path === '/contact' ? 'Liên hệ Ban chủ nhiệm CLB Robotics & IoT - HCMUS' : /Cùng nghiên cứu\.\s*Cùng sáng tạo\./, exact: true });
     await expect(heading).toBeVisible();
     await dragSelectText(page, heading);
   }

@@ -7,7 +7,7 @@ import { consumeRateLimit } from '@/features/identity/server/rate-limit';
 export type { UploadResult } from '../model/contracts';
 export async function uploadFileAction(formData: FormData): Promise<UploadResult> {
   const actor = await getActor(['CORE_MEMBER', 'ADMIN']);
-  if (!actor) return { success: false, code: 'UNAUTHORIZED', error: 'Chỉ thành viên nòng cốt và Admin được tải tệp.' };
+  if (!actor) return { success: false, code: 'UNAUTHORIZED', error: 'Chỉ Trưởng nhóm và Ban chủ nhiệm được tải tệp.' };
   if (!(formData instanceof FormData)) return { success: false, code: 'VALIDATION', error: 'Dữ liệu tải lên không hợp lệ.' };
   const file = formData.get('file');
   const kind = formData.get('type');

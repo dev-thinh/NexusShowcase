@@ -2,6 +2,7 @@
 
 import { AdminDeleteMemberModal } from '@/features/identity/components/admin-delete-member-modal';
 import { SearchForm as Form } from '@/shared/ui/validated-form';
+import { MEMBER_ROLE_LABELS, getMemberRoleLabel } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
 import { AdminRoleToggle } from '@/features/identity/components/admin-role-toggle';
 import type { Role } from '@prisma/client';
@@ -11,15 +12,15 @@ import type { ReactNode } from 'react';
 
 
 interface MemberItem { id: string; publicSlug: string; fullName: string; avatarUrl?: string | null; role: Role; createdAt: Date | string }
-const roleNames: Record<Role, string> = { ADMIN: 'Quản trị viên', CORE_MEMBER: 'Thành viên nòng cốt', MEMBER: 'Thành viên', EDITOR: 'Thành viên', GUEST: 'Khách' };
+
 
 export function AdminMemberTable({ members, query: searchQuery, roleFilter, counts, total, actions }: { members: MemberItem[]; query: string; roleFilter: 'ALL' | Role; counts: Record<'ALL' | Role, number>; total: number; actions?: ReactNode }) {
   const filteredMembers = members;
   const filters = [
     { value: 'ALL' as const, label: 'Tất cả', count: counts.ALL },
-    { value: 'CORE_MEMBER' as const, label: 'Nòng cốt', count: counts.CORE_MEMBER },
-    { value: 'MEMBER' as const, label: 'Thành viên', count: counts.MEMBER },
-    { value: 'ADMIN' as const, label: 'Quản trị viên', count: counts.ADMIN },
+    { value: 'CORE_MEMBER' as const, label: MEMBER_ROLE_LABELS.CORE_MEMBER, count: counts.CORE_MEMBER },
+    { value: 'MEMBER' as const, label: MEMBER_ROLE_LABELS.MEMBER, count: counts.MEMBER },
+    { value: 'ADMIN' as const, label: MEMBER_ROLE_LABELS.ADMIN, count: counts.ADMIN },
   ];
   return <div className="min-w-0">
     <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
@@ -36,7 +37,7 @@ export function AdminMemberTable({ members, query: searchQuery, roleFilter, coun
     <div aria-hidden="true" className="hidden grid-cols-[minmax(0,1fr)_12rem_minmax(16rem,auto)] gap-4 border-b border-slate-200 bg-[#FFFFFF] px-5 py-3 text-xs font-semibold text-[#1F2937] lg:grid"><span>Thành viên</span><span>Vai trò</span><span className="text-right">Thao tác</span></div>
     {!filteredMembers.length ? <div className="px-4 py-10 text-center"><p className="text-sm font-semibold text-[#1F2937]">Không tìm thấy thành viên</p><Link href="/admin/members" className="mt-3 text-sm font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link></div> : <ul className="divide-y divide-[#153D67]">{filteredMembers.map(member => <li key={member.id} className="grid min-w-0 gap-3 p-4 transition-colors hover:bg-[#FFFFFF] sm:p-5 lg:grid-cols-[minmax(0,1fr)_12rem_minmax(16rem,auto)] lg:items-center lg:gap-4">
       <div className="flex min-w-0 items-center gap-3"><MemberAvatar fullName={member.fullName} src={member.avatarUrl} className="h-10 w-10 shrink-0 rounded-full object-cover text-sm" /><div className="min-w-0"><Link href={`/members/${member.id}`} className="break-words text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline">{member.fullName}</Link><p className="mt-1 text-xs text-[#1F2937]">Tham gia {new Date(member.createdAt).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' })}</p></div></div>
-      <span className={`inline-flex w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-semibold ${member.role === 'ADMIN' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : member.role === 'CORE_MEMBER' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : 'border-slate-200 bg-white text-[#1F2937]'}`}>{member.role === 'ADMIN' ? <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" /> : member.role === 'CORE_MEMBER' ? <UserCheck aria-hidden="true" className="h-3.5 w-3.5" /> : <User aria-hidden="true" className="h-3.5 w-3.5" />}{roleNames[member.role]}</span>
+      <span className={`inline-flex w-fit items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-semibold ${member.role === 'ADMIN' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : member.role === 'CORE_MEMBER' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : 'border-slate-200 bg-white text-[#1F2937]'}`}>{member.role === 'ADMIN' ? <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" /> : member.role === 'CORE_MEMBER' ? <UserCheck aria-hidden="true" className="h-3.5 w-3.5" /> : <User aria-hidden="true" className="h-3.5 w-3.5" />}{getMemberRoleLabel(member.role)}</span>
       <div className="flex flex-wrap items-center gap-2 border-t border-slate-200 pt-3 lg:justify-end lg:border-0 lg:pt-0"><AdminRoleToggle userId={member.id} currentRole={member.role} /><AdminDeleteMemberModal member={member} /></div>
     </li>)}</ul>}
     </section>

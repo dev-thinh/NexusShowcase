@@ -26,8 +26,8 @@ const member = (
 describe('member directory', () => {
   it('maps the three public groups to the approved labels', () => {
     expect(MEMBER_GROUP_LABELS).toEqual({
-      ADMIN: 'Ban Chủ Nhiệm',
-      CORE_MEMBER: 'Nghiên cứu viên & Thành viên Kỳ cựu',
+      ADMIN: 'Ban chủ nhiệm',
+      CORE_MEMBER: 'Trưởng nhóm',
       MEMBER: 'Thành viên',
     });
   });

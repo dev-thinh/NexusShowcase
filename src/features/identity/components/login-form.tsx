@@ -184,7 +184,7 @@ export function LoginForm() {
             href="/contact"
             className="font-semibold text-[#1F2937] hover:underline"
           >
-            Liên hệ ban quản trị
+            Liên hệ Ban chủ nhiệm
           </Link>
         </div>
       </div>

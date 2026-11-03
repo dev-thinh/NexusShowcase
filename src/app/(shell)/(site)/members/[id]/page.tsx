@@ -1,3 +1,4 @@
+import { getMemberRoleLabel } from '@/features/identity/model/member-role';
 import { ProfileAvatar } from '@/features/identity/components/profile-avatar';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { publicUserSelect } from '@/features/identity/model/public-user';
@@ -38,16 +39,8 @@ export default async function MemberProfilePage({
   const publications = await listMemberPublications({ memberId: user.id, authenticated: !!session?.user, page: query.page ?? query.researchPage ?? query.projectPage, pageSize: 6 });
   const basePath = '/members/' + user.id;
 
-  const roleBadgeConfig = {
-    ADMIN: { label: 'Ban chủ nhiệm', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: ShieldCheck },
-    CORE_MEMBER: { label: 'Trưởng nhóm', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
-    EDITOR: { label: 'Thành viên', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
-    MEMBER: { label: 'Thành viên', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
-    GUEST: { label: 'Khách', color: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200', icon: UserCheck },
-  };
-
-  const currentRole = roleBadgeConfig[user.role] || roleBadgeConfig.MEMBER;
-  const RoleIcon = currentRole.icon;
+  const currentRole = { label: getMemberRoleLabel(user.role) };
+  const RoleIcon = user.role === 'ADMIN' ? ShieldCheck : UserCheck;
 
   const socialLinks = getProfileLinks(user);
   const profile = { fullName: user.fullName, bio: user.bio ?? '', links: socialLinks };

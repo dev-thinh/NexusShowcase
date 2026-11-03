@@ -71,7 +71,7 @@ export function AdminRoleToggle({
         content={
           isCore
             ? 'Thành viên này hiện đang có quyền nộp bài và quản lý công trình đại diện nhóm.'
-            : 'Cấp quyền CORE MEMBER để thành viên này có thể đăng ký công trình và gửi xét duyệt.'
+            : 'Cấp quyền đăng bài để thành viên có thể đăng công trình và gửi xét duyệt.'
         }
       />
     </div>

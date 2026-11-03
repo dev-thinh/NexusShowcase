@@ -1,5 +1,6 @@
 'use client';
 
+import { MEMBER_ROLE_LABELS } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
 
 import { useEffect, useId, useState } from 'react';
@@ -9,7 +10,7 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import type { HomeMember, HomeMembersPayload } from '../model/home';
 import type { PublicMemberRole } from '../model/directory';
 
-const labels: Record<PublicMemberRole, string> = { ADMIN: 'Ban chủ nhiệm', CORE_MEMBER: 'Core Member', MEMBER: 'Thành viên' };
+const labels: Record<PublicMemberRole, string> = MEMBER_ROLE_LABELS;
 
 export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersPayload & { showMeta?: boolean }) {
   const [active, setActive] = useState<{ member: HomeMember; x: number; y: number; below: boolean; viewport: number[] } | null>(null);

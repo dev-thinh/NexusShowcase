@@ -1,6 +1,7 @@
 'use client';
 
 import { SignOutButton } from '@/features/identity/components/sign-out-button';
+import { getMemberRoleLabel } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
 import { canUserReview, canUserUpload } from '@/features/identity/model/permissions';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
@@ -94,7 +95,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
                 {user.name || 'Thành viên'}
               </span>
               <span className="hidden sm:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
-                {{ ADMIN: 'Admin', CORE_MEMBER: 'Core', MEMBER: 'Member', GUEST: 'Khách' }[user.role] || 'Thành viên'}
+                {getMemberRoleLabel(user.role)}
               </span>
               <ChevronDown aria-hidden="true" className={`w-3.5 h-3.5 shrink-0 transition-transform motion-reduce:transition-none ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
             </button>

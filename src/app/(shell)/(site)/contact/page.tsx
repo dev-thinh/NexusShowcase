@@ -24,7 +24,7 @@ export default function ContactPage() {
                 Kết nối &amp; Hợp tác
               </span>
               <h1 className="page-title">
-                Liên hệ Ban Điều Hành CLB Robotics &amp; IoT - HCMUS
+                Liên hệ Ban chủ nhiệm CLB Robotics &amp; IoT - HCMUS
               </h1>
             </div>
           </div>
