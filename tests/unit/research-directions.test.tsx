@@ -12,8 +12,9 @@ it('pairs each research direction with an accessible local photograph and keeps 
   expect(html).not.toContain('data-media-placeholder');
   expect(html.match(/<h3/g)).toHaveLength(3);
   expect(html).toContain('Trí tuệ nhân tạo');
+  expect(html).not.toContain('research-direction__number');
   expect(html).toContain('Robot tự hành');
-  expect(html).toContain('IoT');
+  expect(html).toContain('Internet of Things');
 });
 
 it('shows saved photos to visitors and editing controls only to admins', () => {

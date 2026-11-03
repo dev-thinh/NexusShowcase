@@ -13,17 +13,17 @@ import { notifySuccess } from '@/shared/dialogs/success';
 const directions = [
   {
     title: 'Trí tuệ nhân tạo & Thị giác máy tính',
-    description: 'Phát triển mô hình học máy giúp hệ thống nhìn thấy và hiểu thế giới.',
+    description: 'Ứng dụng học máy để nhận diện hình ảnh và hiểu dữ liệu.',
     position: '50% 48%',
   },
   {
     title: 'Robot tự hành & Điều khiển',
-    description: 'Định vị, lập kế hoạch và điều khiển robot tương tác với môi trường.',
+    description: 'Giúp robot định vị, tìm đường và di chuyển tự động.',
     position: '54% 54%',
   },
   {
-    title: 'IoT & Hệ thống nhúng',
-    description: 'Kết nối cảm biến và thiết bị nhúng thành hệ thống dữ liệu thời gian thực.',
+    title: 'Internet of Things & Hệ thống nhúng',
+    description: 'Kết nối cảm biến, giám sát và điều khiển thiết bị từ xa.',
     position: '50% 50%',
   },
 ];
@@ -67,12 +67,14 @@ export function ResearchFlashcards({ initialGallery }: { initialGallery?: Moment
         <article className="research-direction" key={direction.title} aria-labelledby={`research-direction-${index}`}>
           <div className="research-direction__photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <MediaImage optimized src={photo?.src} alt={photo?.title || direction.title} width={1000} height={667} sizes="(max-width: 767px) 120px, 400px" loading="eager" decoding="async" className="h-full w-full object-cover" style={{ objectPosition: direction.position }} />
+            <MediaImage optimized src={photo?.src} alt={photo?.title || direction.title} width={1000} height={667} sizes="(max-width: 767px) calc(100vw - 32px), 400px" loading="eager" decoding="async" className="h-full w-full object-cover" style={{ objectPosition: direction.position }} />
           </div>
           <div className="research-direction__body">
             <div className="research-direction__heading">
-              <span className="research-direction__number" aria-hidden="true">0{index + 1}</span>
-              <h3 id={`research-direction-${index}`} className="research-direction__title">{direction.title}</h3>
+              <h3 id={`research-direction-${index}`} className="research-direction__title">
+                <span>{direction.title.split(' & ')[0]}</span>{' '}
+                <span>{direction.title.split(' & ')[1]}</span>
+              </h3>
             </div>
             <p className="research-direction__description">{direction.description}</p>
 
