@@ -44,7 +44,7 @@ export function BasicInformationFields({ value, errors, onChange, reviewComments
         <FieldError id="submission-summary-error" errors={errors.summary} />
         <ReviewComments comments={reviewComments} fieldKey="summary" />
       </div>
-      <div className="grid grid-cols-2 items-start gap-4">
+      <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
         <div className="min-w-0">
           <label htmlFor="submission-category" className="block text-sm font-semibold text-[#1F2937]">Chuyên mục</label>
           <CustomSelect className="mt-2" id="submission-category" value={value.categoryId ?? ''} placeholder="Chọn chuyên mục" options={categories.map(category => ({ value: category.id, label: category.name }))} invalid={!!errors.categoryId?.length} describedBy={errors.categoryId?.length ? 'submission-category-error' : undefined} onChange={id => {
