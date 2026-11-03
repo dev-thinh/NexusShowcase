@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, Expand, Loader2, Pause, Pencil, Play } from 'luc
 import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { Modal } from '@/shared/ui/modal';
+import { MomentPhotoViewer, prefetchMomentPhoto, type MomentPhotoOrigin } from './moment-photo-viewer';
 import { defaultMoments, momentRows, momentsSaveSchema, type MomentsPayload, type MomentsGallery } from '@/features/publications/model/moments';
 import { MomentsEditor } from '@/features/publications/components/moments-editor';
 import { notifySuccess } from '@/shared/dialogs/success';
@@ -45,6 +46,24 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
   const [keyboardBrowsing, setKeyboardBrowsing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
   const current = selected === null ? null : photos[selected];
+  const [viewerOrigin, setViewerOrigin] = useState<MomentPhotoOrigin | null>(null);
+
+  function thumbnailFor(id: string) {
+    return [...(wallRef.current?.querySelectorAll<HTMLButtonElement>('.moment-photo') ?? [])]
+      .find(button => button.dataset.photoId === id)?.querySelector('img');
+  }
+  function openViewer(index: number, button: HTMLButtonElement) {
+    const image = button.querySelector('img');
+    const bounds = image?.getBoundingClientRect();
+    setViewerOrigin(bounds ? { left: bounds.left, top: bounds.top, width: bounds.width, height: bounds.height } : null);
+    setSelected(index);
+  }
+  function moveViewer(step: number) {
+    setViewerOrigin(null);
+    setSelected(value => value === null ? null : (value + step + photos.length) % photos.length);
+  }
+  const thumbnail = current ? thumbnailFor(current.id) : null;
+
 
   // Restored focus after a modal closes is not a request to browse a strip.
   // Enter manual mode only for an actual Tab press outside the photo viewer.
@@ -81,11 +100,11 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
       if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
       event.preventDefault();
       const step = event.key === 'ArrowLeft' ? -1 : 1;
-      setSelected(value => value === null ? null : (value + step + photos.length) % photos.length);
+      moveViewer(step);
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [selected]);
+  }, [selected, photos.length]);
 
   return (
     <section ref={wallRef} className="moments-wall" aria-labelledby="moments-title" data-keyboard-browsing={keyboardBrowsing ? 'true' : undefined} data-paused={paused || selected !== null || editing ? 'true' : undefined}>
@@ -115,7 +134,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
                   {row.map((photo, index) => {
                     const photoIndex = photos.findIndex(item => item.id === photo.id);
                     return (
-                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': photo.tilt, '--photo-offset': index % 2 ? '0.75rem' : '-0.5rem' } as CSSProperties} tabIndex={copy ? -1 : undefined} aria-label={`Xem ảnh: ${photo.title}`} onClick={() => setSelected(photoIndex)}>
+                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': photo.tilt, '--photo-offset': index % 2 ? '0.75rem' : '-0.5rem' } as CSSProperties} tabIndex={copy ? -1 : undefined} data-photo-id={photo.id} aria-label={`Xem ảnh: ${photo.title}`} onPointerEnter={() => prefetchMomentPhoto(photo.src)} onFocus={() => prefetchMomentPhoto(photo.src)} onClick={event => openViewer(photoIndex, event.currentTarget)}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <MediaImage optimized src={photo.src} alt={copy ? '' : photo.alt} width={1000} height={750} sizes="(max-width: 767px) 240px, 304px" loading="eager" decoding="async" />
                         <span className="moment-photo__caption"><span>{photo.title}</span><Expand size={16} aria-hidden="true" /></span>
@@ -130,15 +149,16 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
       </div>}
 
       {current && createPortal(
-        <Modal isOpen onClose={closeViewer} title={current.title} className="!max-w-5xl">
-          <div className="moments-viewer">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <MediaImage src={current.src} alt={current.alt} width={1000} height={750} />
-          </div>
+        <Modal isOpen onClose={closeViewer} title={current.title} className="moments-viewer-modal !max-w-5xl">
+          <MomentPhotoViewer key={current.id} src={current.src} alt={current.alt} previewSrc={thumbnail?.currentSrc || `${current.src}?w=384`} ratio={thumbnail?.naturalWidth && thumbnail.naturalHeight ? thumbnail.naturalWidth / thumbnail.naturalHeight : 4 / 3} origin={viewerOrigin} onReady={() => {
+            if (photos.length < 2 || selected === null) return;
+            prefetchMomentPhoto(photos[(selected + 1) % photos.length].src);
+            prefetchMomentPhoto(photos[(selected - 1 + photos.length) % photos.length].src);
+          }} />
           <div className="moments-viewer__controls">
-            <button type="button" className="action-secondary-detail" aria-label="Ảnh trước" onClick={() => setSelected(value => value === null ? null : (value - 1 + photos.length) % photos.length)}><ArrowLeft size={18} aria-hidden="true" /></button>
+            <button type="button" className="action-secondary-detail" aria-label="Ảnh trước" onClick={() => moveViewer(-1)}><ArrowLeft size={18} aria-hidden="true" /></button>
             <span aria-live="polite">{selected! + 1} / {photos.length}</span>
-            <button type="button" className="action-secondary-detail" aria-label="Ảnh tiếp theo" onClick={() => setSelected(value => value === null ? null : (value + 1) % photos.length)}><ArrowRight size={18} aria-hidden="true" /></button>
+            <button type="button" className="action-secondary-detail" aria-label="Ảnh tiếp theo" onClick={() => moveViewer(1)}><ArrowRight size={18} aria-hidden="true" /></button>
           </div>
         </Modal>, document.body,
       )}
