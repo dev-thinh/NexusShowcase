@@ -1,5 +1,5 @@
 import { acknowledgeSuccess, expect, login, seedPhotoGalleries, test } from './fixtures';
-import { defaultMoments } from '../fixtures/moments';
+import { defaultMoments, fixtureImage } from '../fixtures/moments';
 import type { Locator, Page } from '@playwright/test';
 
 async function dragPhoto(page: Page, source: Locator, target: Locator) {
@@ -123,3 +123,41 @@ test('touch hold drags an image into another row while taps still open its detai
     await cdp.detach();
   } finally { await context.close(); await database.homeMomentsGallery.deleteMany(); }
 });
+
+for (const variant of ['moments', 'research'] as const) {
+  test(`touch handles place unused library photos in ${variant} without a long press`, async ({ browser, fixture, database }) => {
+    const context = await browser.newContext({ baseURL: process.env.HARNESS_BASE_URL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
+    const page = await context.newPage();
+    await seedPhotoGalleries(database);
+    const extra = { ...defaultMoments[0], id: 'library-touch-unused', src: '/uploads/thumbnails/fixture-touch-unused.png', title: 'Ảnh mới trong thư viện', slot: null, visible: false };
+    await page.route('**/uploads/thumbnails/fixture-touch-unused.png*', route => route.fulfill({ contentType: 'image/png', body: fixtureImage }));
+    await database.homeMomentsGallery.update({ where: { id: 'home' }, data: { photos: [...defaultMoments, extra] } });
+    try {
+      await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/');
+      await page.getByRole('button', { name: variant === 'moments' ? 'Chỉnh sửa ảnh khoảnh khắc' : 'Chỉnh sửa ảnh hướng nghiên cứu', exact: true }).tap();
+      const modal = page.getByRole('dialog', { name: variant === 'moments' ? 'Chỉnh sửa khoảnh khắc' : 'Chỉnh sửa ảnh hướng nghiên cứu', exact: true });
+      const handle = modal.locator('.moments-editor__asset-select[data-moment-drag="library-touch-unused"] [data-moment-handle]');
+      const target = modal.locator(`[data-moment-slot="${variant === 'moments' ? 6 : 1}"]`);
+      await expect(handle).toBeVisible();
+      await expect(handle).toHaveCSS('touch-action', 'none');
+      await handle.scrollIntoViewIfNeeded();
+      await expect(target).toBeInViewport();
+      const from = (await handle.boundingBox())!;
+      const to = (await target.boundingBox())!;
+      const cdp = await context.newCDPSession(page);
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: from.x + from.width / 2, y: from.y + from.height / 2 }] });
+      // Move immediately, rather than waiting for the long-press timer.
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: to.x + to.width / 2, y: to.y + to.height / 2 }] });
+      await expect(target).toHaveAttribute('data-drop-target', 'true');
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+      await expect(target).toHaveAttribute('data-moment-drag', extra.id);
+      await expect(page.locator('.moments-drag-preview')).toHaveCount(0);
+      await expect(modal.getByRole('button', { name: 'Sắp xếp ảnh', exact: true })).toHaveAttribute('aria-pressed', 'true');
+      await page.keyboard.press('Escape');
+      await expect(modal).toHaveCount(0);
+      const stored = await database.homeMomentsGallery.findUniqueOrThrow({ where: { id: 'home' } });
+      expect((stored.photos as Array<{ id: string; slot: number | null }>).find(photo => photo.id === extra.id)?.slot).toBeNull();
+      await cdp.detach();
+    } finally { await context.close(); await database.homeMomentsGallery.deleteMany(); }
+  });
+}

@@ -10,7 +10,8 @@ import { useMomentsDrag } from '@/features/publications/components/use-moments-d
 
 class PhotoElement extends EventTarget {
   dataset = { momentDrag: 'photo' };
-  closest() { return this; }
+  handle = false;
+  closest(selector: string) { return selector === '[data-moment-handle]' ? this.handle ? this : null : this; }
   contains() { return true; }
   matches() { return false; }
   getBoundingClientRect() { return { left: 0, top: 0, width: 100, height: 100 }; }
@@ -22,6 +23,7 @@ const dispatch = (target: EventTarget, type: string, props: Record<string, unkno
   const event = new Event(type, { cancelable: true });
   Object.assign(event, props);
   target.dispatchEvent(event);
+  return event;
 };
 const down = () => dispatch(root, 'pointerdown', { pointerType: 'mouse', button: 0, buttons: 1, isPrimary: true, pointerId: 1, clientX: 10, clientY: 10 });
 
@@ -59,4 +61,19 @@ it('cancels photo dragging when the user switches to the mouse wheel', () => {
   hooks.setDrag.mockClear();
   dispatch(root, 'wheel', {});
   expect(hooks.setDrag).toHaveBeenLastCalledWith(null);
+});
+
+it('starts a touch drag on the handle immediately without waiting for a hold', () => {
+  root.handle = true;
+  const event = dispatch(root, 'touchstart', { touches: [{ identifier: 1, clientX: 10, clientY: 10 }] });
+  expect(requestAnimationFrame).toHaveBeenCalled();
+  expect(event.defaultPrevented).toBe(true);
+});
+
+it('preserves normal touch scrolling outside the drag handle', () => {
+  dispatch(root, 'touchstart', { touches: [{ identifier: 1, clientX: 10, clientY: 10 }] });
+  const event = dispatch(windowTarget, 'touchmove', { touches: [{ identifier: 1, clientX: 30, clientY: 40 }] });
+  vi.advanceTimersByTime(500);
+  expect(requestAnimationFrame).not.toHaveBeenCalled();
+  expect(event.defaultPrevented).toBe(false);
 });
