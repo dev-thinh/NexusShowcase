@@ -8,8 +8,14 @@ for (const width of [320, 375, 390, 768, 900]) {
     await page.setViewportSize({ width, height: 844 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/');
-    const art = await page.locator('.home-hero__art').boundingBox();
-    const intro = await page.locator('.home-hero__intro').boundingBox();
+    const artElement = page.locator('.home-hero__art');
+    const introElement = page.locator('.home-hero__intro');
+    // Next.js can stream the page after navigation has completed.
+    await expect(artElement).toBeVisible();
+    await expect(introElement).toBeVisible();
+    await page.evaluate(() => document.fonts.ready);
+    const art = await artElement.boundingBox();
+    const intro = await introElement.boundingBox();
     expect(art).not.toBeNull();
     expect(intro).not.toBeNull();
     expect(art!.x).toBeGreaterThanOrEqual(0);
@@ -20,8 +26,12 @@ for (const width of [320, 375, 390, 768, 900]) {
     for (const route of ['/', '/explore', '/members', '/contact', '/login', '/category/robotics-iot']) {
       if (route !== '/') await page.goto(route);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-      const brand = await page.locator('.site-brand').boundingBox();
-      const account = await page.locator('#site-navbar').getByRole('link', { name: 'Đăng nhập', exact: true }).boundingBox();
+      const brandElement = page.locator('.site-brand');
+      const accountElement = page.locator('#site-navbar').getByRole('link', { name: 'Đăng nhập', exact: true });
+      await expect(brandElement).toBeVisible();
+      await expect(accountElement).toBeVisible();
+      const brand = await brandElement.boundingBox();
+      const account = await accountElement.boundingBox();
       expect(brand!.x + brand!.width).toBeLessThanOrEqual(account!.x);
     }
     await page.screenshot({ path: `test-results/mobile-layout-${width}.png`, fullPage: true });

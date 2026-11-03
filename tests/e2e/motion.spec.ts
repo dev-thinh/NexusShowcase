@@ -6,9 +6,12 @@ test('page navigation and scroll entries animate, and modal close waits for its 
     await page.addInitScript(() => {
       const animate = Element.prototype.animate;
       const durations: number[] = [];
-      Object.assign(window, { motionDurations: durations });
+      const dialogZoomDurations: number[] = [];
+      Object.assign(window, { motionDurations: durations, dialogZoomDurations });
       Element.prototype.animate = function (frames, options) {
-        durations.push(typeof options === 'number' ? options : Number(options?.duration ?? 0));
+        const duration = typeof options === 'number' ? options : Number(options?.duration ?? 0);
+        durations.push(duration);
+        if (this instanceof HTMLElement && this.getAttribute('role') === 'dialog') dialogZoomDurations.push(duration);
         return animate.call(this, frames, options);
       };
     });
@@ -27,7 +30,10 @@ test('page navigation and scroll entries animate, and modal close waits for its 
       await trigger.click();
       const dialog = page.getByRole('dialog');
       await expect(dialog).toBeVisible();
-      await expect(dialog).toHaveCSS('animation-name', 'ui-modal-in');
+      // Photo viewers zoom the entire dialog through WAAPI, while other modals use CSS.
+      await expect.poll(() => page.evaluate(() =>
+        (window as unknown as { dialogZoomDurations: number[] }).dialogZoomDurations.filter(duration => duration === 520).length,
+      )).toBe(attempt + 1);
       const remainsDuringExit = await page.getByRole('button', { name: 'Đóng hộp thoại' }).evaluate(button => {
         (button as HTMLButtonElement).click();
         return document.querySelector('[role="dialog"]') !== null;

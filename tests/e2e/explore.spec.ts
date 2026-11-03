@@ -7,13 +7,13 @@ test('both homepage entry points open the full library without a search term', a
   await expect(hero).toHaveAttribute('href', '/explore');
   await hero.click();
   await expect(page).toHaveURL(/\/explore$/);
-  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT.', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT - HCMUS.', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Tất cả công trình · 20 công trình' })).toBeVisible();
   await expect(page.locator('main article')).toHaveCount(10);
   await page.goBack();
   await page.getByRole('link', { name: 'Xem tất cả công trình', exact: true }).click();
   await expect(page).toHaveURL(/\/explore$/);
-  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT.', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT - HCMUS.', exact: true })).toBeVisible();
 });
 
 for (const resetLinkIndex of [0, 1]) test(`search and reset keep the library title and destination via reset link ${resetLinkIndex + 1}`, async ({ page }) => {
@@ -21,7 +21,7 @@ for (const resetLinkIndex of [0, 1]) test(`search and reset keep the library tit
   await page.getByRole('searchbox', { name: 'Từ khóa tìm kiếm' }).fill('library-no-matching-results');
   await page.getByRole('button', { name: 'Áp dụng', exact: true }).click();
   await expect(page).toHaveURL(/\/explore\?q=library-no-matching-results/);
-  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT.', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT - HCMUS.', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Không tìm thấy công trình phù hợp' })).toBeVisible();
   await page.getByRole('link', { name: 'Xóa bộ lọc', exact: true }).nth(resetLinkIndex).click();
   await expect(page).toHaveURL(/\/explore$/);
@@ -31,7 +31,7 @@ for (const resetLinkIndex of [0, 1]) test(`search and reset keep the library tit
 test('legacy search links redirect with query and page intact', async ({ page }) => {
   await page.goto('/?q=Benchmark&page=2');
   await expect(page).toHaveURL(/\/explore\?q=Benchmark&page=2$/);
-  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT.', exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Khám phá các bài nghiên cứu và dự án của CLB Robotics & IoT - HCMUS.', exact: true })).toBeVisible();
   await expect(page.locator('main article')).toHaveCount(10);
 });
 
