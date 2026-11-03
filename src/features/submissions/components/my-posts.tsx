@@ -1,6 +1,6 @@
 'use client';
 
-import { SearchForm } from '@/shared/ui/validated-form';
+import { ManagementFilters } from '@/shared/ui/management-filters';
 import { MediaImage } from '@/shared/ui/media-image';
 
 import { StatusBadge, TypeBadge } from '@/features/publications/components/badges';
@@ -9,7 +9,7 @@ import { postFilters, type PostFilter } from '@/features/submissions/model/dashb
 import { canReviewItem } from '@/features/submissions/model/workflow-state';
 import { EmptyState } from '@/shared/ui/empty-state';
 import type { ShowcaseItem } from '@prisma/client';
-import { AlertCircle, ArrowRight, FolderPlus, Search } from 'lucide-react';
+import { AlertCircle, ArrowRight, FolderPlus } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
 
@@ -17,12 +17,12 @@ export type MyPost = Pick<ShowcaseItem, 'id' | 'slug' | 'title' | 'summary' | 't
 
 export function MyPosts({ items, isUploader, query, filter, counts, total }: { items: MyPost[]; isUploader: boolean; query: string; filter: PostFilter; counts: Record<PostFilter, number>; total: number }) {
   const filteredItems = items;
-  return <section className="panel-operational min-w-0 !p-0 !shadow-none" aria-labelledby="my-posts-title">
-    <div className="space-y-4 border-b border-slate-200 p-4 sm:p-5">
-      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center"><h2 id="my-posts-title" className="text-lg font-semibold text-[#1F2937]">Công trình <span className="ml-1 text-sm font-normal text-[#1F2937]">{total}</span></h2><SearchForm action="/dashboard" className="relative w-full sm:max-w-xs"><input type="hidden" name="filter" value={filter} /><Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#1F2937]" /><label htmlFor="my-post-search" className="sr-only">Tìm công trình</label><input id="my-post-search" type="search" name="q" defaultValue={query} placeholder="Tìm công trình…" className="min-h-10 w-full rounded-md border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-slate-200 focus:ring-2 focus:ring-[#153D67]/10" /><button className="sr-only" type="submit">Tìm kiếm</button></SearchForm></div>
-      <div role="group" aria-label="Lọc trạng thái bài đăng" className="flex max-w-full flex-wrap gap-2">{postFilters.map(option => <Link key={option.value} href={`/dashboard?${new URLSearchParams({ filter: option.value, ...(query ? { q: query } : {}) })}`} scroll={false} aria-current={filter === option.value ? "page" : undefined} className={`inline-flex min-h-9 items-center gap-2 rounded-lg border px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30 ${filter === option.value ? 'border-[#153D67] bg-[#153D67] font-semibold text-white' : 'border-slate-200 bg-white text-slate-500 hover:text-slate-800'}`}>{option.label}<span className="text-xs tabular-nums">{counts[option.value]}</span></Link>)}</div>
+  return <section className="min-w-0" aria-labelledby="my-posts-title">
+    <div className="mb-4 space-y-4">
+      <h2 id="my-posts-title" className="text-lg font-semibold text-[#1F2937]">Công trình <span className="ml-1 text-sm font-normal text-slate-500">{total}</span></h2>
+      <ManagementFilters action="/dashboard" query={query} searchId="my-post-search" searchLabel="Tìm công trình" placeholder="Tìm công trình…" filterName="filter" filterValue={filter} filterLabel="Lọc trạng thái bài đăng" options={postFilters.map(option => ({ ...option, count: counts[option.value] }))} />
     </div>
-    {!counts.ALL ? <div className="p-4 sm:p-5"><EmptyState icon={FolderPlus} title="Bạn chưa có công trình nào" description={isUploader ? 'Các công trình bạn đăng hoặc tham gia sẽ xuất hiện tại đây.' : 'Liên hệ quản trị viên để được cấp quyền đăng bài.'} actionLabel={isUploader ? 'Đăng bài mới' : undefined} actionHref={isUploader ? '/dashboard/items/new' : undefined} /></div> : !filteredItems.length ? <div className="px-4 py-10 text-center"><p className="text-sm font-semibold text-[#1F2937]">Không có công trình phù hợp</p><Link href="/dashboard" className="mt-3 text-sm font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link></div> : <div className="divide-y divide-[#153D67]">{filteredItems.map(item => {
+    {!counts.ALL ? <div className="p-4 sm:p-5"><EmptyState icon={FolderPlus} title="Bạn chưa có công trình nào" description={isUploader ? 'Các công trình bạn đăng hoặc tham gia sẽ xuất hiện tại đây.' : 'Liên hệ quản trị viên để được cấp quyền đăng bài.'} actionLabel={isUploader ? 'Đăng bài mới' : undefined} actionHref={isUploader ? '/dashboard/items/new' : undefined} /></div> : !filteredItems.length ? <div className="px-4 py-10 text-center"><p className="text-sm font-semibold text-[#1F2937]">Không có công trình phù hợp</p><Link href="/dashboard" className="mt-3 text-sm font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link></div> : <div className="panel-operational divide-y divide-slate-100 overflow-hidden !rounded-xl !p-0 !shadow-none">{filteredItems.map(item => {
       const editable = item.canManage && isUploader && (['DRAFT', 'REVISION_REQUESTED'].includes(item.status) || item.status === 'PUBLISHED' && !canReviewItem(item));
       const feedback = (['REJECTED', 'REVISION_REQUESTED'].includes(item.status) || ['REJECTED', 'REVISION_REQUESTED'].includes(item.reviewStatus ?? '')) && item.rejectionReason;
       const canView = item.canManage || item.status === 'PUBLISHED';

@@ -52,7 +52,7 @@ export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) 
           setError(null);
           setIsOpen(true);
         }}
-        className="inline-flex items-center gap-1 min-h-9 px-2.5 py-1.5 rounded-md text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] hover:bg-[#FFFFFF] border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] transition-colors cursor-pointer"
+        className="inline-flex items-center justify-center gap-1 min-h-11 min-w-11 px-2.5 sm:min-h-9 sm:min-w-0 py-1.5 rounded-md text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] hover:bg-[#FFFFFF] border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] transition-colors cursor-pointer"
         title="Xóa tài khoản thành viên"
         aria-label={`Xóa tài khoản ${member.fullName}`}
       >

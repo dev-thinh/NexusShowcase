@@ -1,12 +1,12 @@
 import { getActor } from '@/features/identity/server/actor';
-import { SearchForm as Form } from '@/shared/ui/validated-form';
+import { ManagementFilters } from '@/shared/ui/management-filters';
 import { AdminBulkPosts } from '@/features/publications/components/admin-bulk-posts';
 import { TypeBadge } from '@/features/publications/components/badges';
 import { CardAdminControls } from '@/features/publications/components/card-admin-controls';
 import type { BulkPostFilter } from '@/features/publications/model/bulk-posts';
 import { searchBulkPostsAction } from '@/features/publications/server/bulk-actions';
 import { PaginationFooter } from '@/shared/ui/member-pagination';
-import { ArrowUpRight, Search } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -27,25 +27,21 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
   const baseParams = new URLSearchParams({ filter, ...(query ? { q: query } : {}) });
   return <section aria-labelledby="admin-content-title">
     <div className="mb-4"><h2 id="admin-content-title" className="text-lg font-semibold text-slate-900">Nội dung</h2><p className="mt-1 text-sm text-slate-500">Quản lý ghim và phạm vi hiển thị của công trình đã xuất bản.</p></div>
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-      <Form scroll={false} prefetch={false} action="/admin/content" className="flex w-full min-w-0 items-center gap-2 sm:w-auto sm:flex-1 sm:max-w-md">
-        <input type="hidden" name="filter" value={filter} />
-        <div className="relative min-w-0 flex-1"><Search aria-hidden="true" className="pointer-events-none absolute left-3 top-3 h-4 w-4 text-slate-400" /><input name="q" type="search" defaultValue={query} maxLength={200} aria-label="Tìm công trình đã xuất bản" placeholder="Tìm theo tiêu đề…" className="h-10 w-full rounded-lg border border-slate-200 bg-white pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#153D67]/30" /></div>
-        <button type="submit" className="action-secondary-detail">Tìm kiếm</button>
-      </Form>
-      <div className="flex w-full flex-wrap gap-2 sm:w-auto"><AdminBulkPosts mode="pin" /><AdminBulkPosts mode="visibility" /></div>
-    </div>
-    <div className="mb-4 flex flex-wrap gap-2" role="group" aria-label="Lọc nội dung">
-      {filters.map(option => {
-        const next = new URLSearchParams(baseParams); next.set('filter', option.value);
-        return <Link key={option.value} href={`/admin/content?${next}`} scroll={false} aria-current={filter === option.value ? 'true' : undefined} className={`inline-flex min-h-9 items-center gap-2 rounded-lg border px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30 ${filter === option.value ? 'border-[#153D67] bg-[#153D67] font-semibold text-white' : 'border-slate-200 bg-white text-slate-500 hover:text-slate-800'}`}>{option.label}<span className="text-xs tabular-nums">{result.counts[option.value]}</span></Link>;
-      })}
-    </div>
+    <ManagementFilters action="/admin/content" query={query} searchLabel="Tìm công trình đã xuất bản" placeholder="Tìm theo tiêu đề…" filterName="filter" filterValue={filter} filterLabel="Lọc nội dung" options={filters.map(option => ({ ...option, count: result.counts[option.value] }))} actions={<div className="admin-bulk-actions"><AdminBulkPosts mode="pin" /><AdminBulkPosts mode="visibility" /></div>} />
     <p className="mb-3 text-sm text-slate-500">{result.total} công trình{query ? ` phù hợp với “${query}”` : ''}</p>
     <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
-      {!result.items.length ? <p className="p-6 text-sm text-slate-500">{query ? 'Không tìm thấy công trình phù hợp.' : 'Chưa có công trình trong nhóm này.'}</p> : result.items.map(item => <article key={item.id} className="flex flex-col justify-between gap-4 p-4 sm:flex-row sm:items-center sm:px-5">
-        <div className="min-w-0 flex-1"><div className="mb-2 flex items-center gap-2"><TypeBadge type={item.type ?? 'PROJECT'} size="sm" />{item.publishedYear && <span className="text-xs text-slate-500">{item.publishedYear}</span>}</div><Link href={`/showcase/${item.slug}`} target="_blank" rel="noopener noreferrer" className="inline-flex max-w-full items-start gap-2 text-sm font-semibold text-slate-800 hover:underline"><span className="min-w-0 break-words">{item.title}</span><ArrowUpRight aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" /></Link></div>
-        <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />
+      {!result.items.length ? <p className="p-6 text-sm text-slate-500">{query ? 'Không tìm thấy công trình phù hợp.' : 'Chưa có công trình trong nhóm này.'}</p> : result.items.map(item => <article key={item.id} className="admin-content-row p-3 sm:p-4 sm:px-5">
+        <div className="admin-content-row__meta flex items-center justify-between gap-2">
+          <div className="flex min-w-0 items-center gap-1.5">
+            <TypeBadge type={item.type ?? 'PROJECT'} size="sm" variant="outline" />
+            {item.publishedYear && <span className="text-xs tabular-nums text-slate-500">{item.publishedYear}</span>}
+          </div>
+          <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />
+        </div>
+        <Link href={`/showcase/${item.slug}`} title={item.title} target="_blank" rel="noopener noreferrer" className="admin-content-row__title mt-1 flex min-w-0 items-start justify-between gap-2 text-sm font-semibold leading-5 text-slate-800 hover:underline">
+          <span className="min-w-0 break-words">{item.title}</span>
+          <ArrowUpRight aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
+        </Link>
       </article>)}
     </div>
     {result.total > 0 && <PaginationFooter page={result.page} totalPages={result.totalPages} pageSize={10} basePath={`/admin/content?${baseParams}`} ariaLabel="Phân trang nội dung" />}
