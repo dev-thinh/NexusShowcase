@@ -18,22 +18,22 @@ export default async function HomePage({ searchParams }: {
 
   return (
     <>
-
       <HomeHero />
-      <main className="w-full pt-10 sm:pt-14 flex-1 space-y-14 sm:space-y-16 scroll-mt-32" id="home-content">
-        <section className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-labelledby="featured-works-title">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="home-section-heading">
-              <p className="home-section-eyebrow">Dấu ấn nghiên cứu</p>
-              <h2 id="featured-works-title" className="home-section-title">Công trình nổi bật</h2>
+      <main className="w-full pt-10 sm:pt-14 flex-1 space-y-14 sm:space-y-16" id="home-content">
+        <section className="home-featured" aria-labelledby="featured-works-title">
+          <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="home-section-heading">
+                <p className="home-section-eyebrow">Dấu ấn nghiên cứu</p>
+                <h2 id="featured-works-title" className="home-section-title">Công trình nổi bật</h2>
+              </div>
+              <Link href="/explore" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
+                Xem tất cả công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
-            <Link href="/explore" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
-              Xem tất cả công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          <div className="mt-6 grid gap-5">
-            <HomeFeaturedSection />
-
+            <div className="mt-6 grid gap-5">
+              <HomeFeaturedSection />
+            </div>
           </div>
         </section>
 
@@ -47,21 +47,20 @@ export default async function HomePage({ searchParams }: {
 
         <section className="members-band" aria-labelledby="home-members-title">
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
-            <div className="home-section-heading">
-              <p className="home-section-eyebrow">Đội ngũ CLB</p>
-              <h2 id="home-members-title" className="home-section-title">Thành viên</h2>
+            <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+              <div className="home-section-heading">
+                <p className="home-section-eyebrow">Đội ngũ CLB</p>
+                <h2 id="home-members-title" className="home-section-title">Thành viên</h2>
+              </div>
+              <Link href="/members" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
+                Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
             </div>
-            <Link href="/members" className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
-              Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-          </div>
-          <p className="mb-6 text-sm text-slate-200">Cùng học hỏi, thử nghiệm và chia sẻ.</p>
-          <HomeMembersSection />
+            <p className="mb-6 text-sm text-slate-200">Cùng học hỏi, thử nghiệm và chia sẻ.</p>
+            <HomeMembersSection />
           </div>
         </section>
       </main>
-
     </>
   );
 }

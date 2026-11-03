@@ -75,11 +75,8 @@ export default async function MembersDirectoryPage() {
         <header className="mb-10 pb-7 border-b border-slate-200">
           <div className="min-w-0">
               <span className="page-eyebrow">Con người của CLB</span><h1 className="page-title">
-                Thành viên CLB Robotics &amp; IoT
+                Thành viên CLB Robotics &amp; IoT - HCMUS
               </h1>
-              <p className="mt-1.5 text-sm sm:text-base font-semibold text-[#1F2937]">
-                Cùng nghiên cứu, cùng xây dựng và chia sẻ tri thức.
-              </p>
           </div>
         </header>
 

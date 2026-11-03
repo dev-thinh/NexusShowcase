@@ -5,8 +5,8 @@ import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 
 
 export const metadata = {
-  title: 'Tất cả thành viên - CLB Robotics & IoT',
-  description: 'Danh sách thành viên CLB Robotics & IoT.',
+  title: 'Tất cả thành viên - CLB Robotics & IoT - HCMUS',
+  description: 'Danh sách thành viên CLB Robotics & IoT - HCMUS.',
 };
 
 export default async function AllMembersPage() {

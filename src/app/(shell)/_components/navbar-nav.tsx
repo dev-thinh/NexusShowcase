@@ -73,7 +73,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
 
 
       {/* GÓC TRÊN BÊN PHẢI: PROFILE VỚI MENU QUẢN TRỊ & ĐĂNG XUẤT */}
-      <div className="col-start-3 row-start-1 justify-self-end flex items-center gap-2 sm:gap-2.5 shrink-0 z-10">
+      <div className="site-account-navigation col-start-3 row-start-1 justify-self-end flex items-center gap-2 sm:gap-2.5 shrink-0 z-10">
         {user ? (
           <div className="relative" ref={profileMenuRef}>
             <button
@@ -90,7 +90,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
               }`}
             >
               <MemberAvatar fullName={user.name || 'Thành viên'} src={user.avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
-              <span className="truncate max-w-[65px] sm:max-w-[110px] font-semibold">
+              <span className="hidden sm:block truncate sm:max-w-[110px] font-semibold">
                 {user.name || 'Thành viên'}
               </span>
               <span className="hidden sm:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
@@ -160,12 +160,21 @@ const inactiveTabClass =
 
 export function PublicNavigation() {
   const pathname = usePathname();
+  const navigationRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const navigation = navigationRef.current;
+    const active = navigation?.querySelector<HTMLElement>('[aria-current="page"]');
+    if (!navigation || !active || navigation.scrollWidth <= navigation.clientWidth) return;
+    const bounds = navigation.getBoundingClientRect();
+    const target = active.getBoundingClientRect();
+    navigation.scrollLeft += target.left - bounds.left - (bounds.width - target.width) / 2;
+  }, [pathname]);
   const visualPathname = useNavigationVisualPathname();
   const tabClass = (href: string) => visualPathname === href ? activeTabClass : inactiveTabClass;
   const isExploreActive = pathname === '/';
   const isMembersActive = pathname === '/members';
   const isContactActive = pathname === '/contact';
-  return (<nav className="flex flex-wrap col-start-2 row-start-1 justify-self-center max-xl:col-start-1 max-xl:col-span-3 max-xl:row-start-2 max-xl:flex-wrap max-xl:justify-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
+  return (<nav ref={navigationRef} aria-label="Điều hướng chính" className="site-public-navigation flex flex-wrap col-start-2 row-start-1 justify-self-center max-xl:col-start-1 max-xl:col-span-3 max-xl:row-start-2 max-xl:flex-wrap max-xl:justify-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto">
         {/* 1. Tab: Trang chủ */}
         <Link
           href="/"

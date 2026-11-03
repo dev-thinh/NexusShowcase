@@ -11,7 +11,7 @@ it('replaces the visible previous page with the destination skeleton before data
   state.pathname = '/members';
   const html = renderToStaticMarkup(<NavigationContent><main>Previous page</main></NavigationContent>);
   expect(html).toContain('data-destination-loading="/members"');
-  expect(html).toContain('Thành viên CLB Robotics &amp; IoT');
+  expect(html).toContain('Thành viên CLB Robotics &amp; IoT - HCMUS');
   expect(html).toContain('hidden=""');
   expect(html).toContain('Previous page');
 });

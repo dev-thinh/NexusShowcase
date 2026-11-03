@@ -21,7 +21,7 @@ function normalizeAuthorNames(item: CitationItem): string[] {
     .map((c) => c.user?.fullName || c.externalName)
     .filter(Boolean) as string[];
 
-  if (rawNames.length === 0) return ['CLB Robotics & IoT'];
+  if (rawNames.length === 0) return ['CLB Robotics & IoT - HCMUS'];
   return rawNames.map(cleanAcademicTitles);
 }
 
@@ -51,7 +51,7 @@ export function generateBibTeX(item: CitationItem): string {
   const key = getCitationKey(item);
   const authors = normalizeAuthorNames(item);
   const authorsBib = authors.join(' and ');
-  const venue = item.issuer || 'CLB Robotics & IoT, Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM';
+  const venue = item.issuer || 'CLB Robotics & IoT - HCMUS';
   const year = item.publishedYear ?? new Date().getFullYear();
 
   return `@inproceedings{${key},
@@ -83,7 +83,7 @@ export function generateAPA(item: CitationItem): string {
     authorString = `${formattedAuthors.slice(0, -1).join(', ')}, & ${formattedAuthors[formattedAuthors.length - 1]}`;
   }
 
-  const venue = item.issuer || 'CLB Robotics & IoT';
+  const venue = item.issuer || 'CLB Robotics & IoT - HCMUS';
   const year = item.publishedYear ?? new Date().getFullYear();
   return `${authorString} (${year}). ${item.title}. ${venue}. https://robotics-iot.hcmus.edu.vn/showcase/${item.slug}`;
 }
@@ -101,7 +101,7 @@ export function generateIEEE(item: CitationItem): string {
     ? formattedAuthors[0]
     : formattedAuthors.slice(0, -1).join(', ') + ' and ' + formattedAuthors[formattedAuthors.length - 1];
 
-  const venue = item.issuer || 'CLB Robotics & IoT';
+  const venue = item.issuer || 'CLB Robotics & IoT - HCMUS';
   const year = item.publishedYear ?? new Date().getFullYear();
   return `${authorStr}, "${item.title}," ${venue}, ${year}.`;
 }

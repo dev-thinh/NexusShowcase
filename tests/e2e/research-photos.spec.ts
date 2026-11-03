@@ -1,6 +1,6 @@
 import { expect, seedPhotoGalleries, test } from './fixtures';
 
-test('research photos stay aligned on desktop and compact alongside readable text on mobile', async ({ page, database }) => {
+test('research cards stagger on desktop and stack photos above centered text on mobile', async ({ page, database }) => {
   test.setTimeout(60_000);
   await seedPhotoGalleries(database);
   // Measure static layout, rather than sequential frames of the page reveal.
@@ -18,12 +18,32 @@ test('research photos stay aligned on desktop and compact alongside readable tex
       const layout = await article.evaluate(element => {
         const photo = element.querySelector('.research-direction__photo')!.getBoundingClientRect();
         const body = element.querySelector('.research-direction__body')!.getBoundingClientRect();
-        return { photoRight: photo.right, photoBottom: photo.bottom, bodyX: body.x, bodyY: body.y };
+        const title = element.querySelector('h3')!.getBoundingClientRect();
+        const description = element.querySelector('.research-direction__description')!;
+        const copy = description.getBoundingClientRect();
+        return {
+          photoBottom: photo.bottom, bodyY: body.y,
+          titleCenter: (title.left + title.right) / 2,
+          descriptionCenter: (copy.left + copy.right) / 2,
+          photoCenter: (photo.left + photo.right) / 2,
+          descriptionAlign: getComputedStyle(description).textAlign,
+        };
       });
-      if (width >= 768) expect(layout.bodyY).toBeGreaterThanOrEqual(layout.photoBottom - 1);
-      else expect(layout.bodyX).toBeGreaterThanOrEqual(layout.photoRight - 1);
+      expect(layout.bodyY).toBeGreaterThanOrEqual(layout.photoBottom - 1);
+      expect(Math.abs(layout.titleCenter - layout.photoCenter)).toBeLessThan(1);
+      expect(Math.abs(layout.descriptionCenter - layout.photoCenter)).toBeLessThan(1);
+      expect(layout.descriptionAlign).toBe('center');
       await expect(article.getByRole('heading', { level: 3 })).toBeVisible();
     }
+    const photoTops = await articles.evaluateAll(elements => elements.map(element => element.querySelector('.research-direction__photo')!.getBoundingClientRect().top));
+    if (width >= 768) {
+      expect(photoTops[1]).toBeGreaterThan(photoTops[2]);
+      expect(photoTops[2]).toBeGreaterThan(photoTops[0]);
+    } else {
+      expect(photoTops[1]).toBeGreaterThan(photoTops[0]);
+      expect(photoTops[2]).toBeGreaterThan(photoTops[1]);
+    }
+    expect(await section.locator('.research-direction__number').count()).toBe(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     if (width === 1440 || width === 390) await page.locator('.research-band').screenshot({ path: `.tmp/research-photos-${width}.png` });
   }

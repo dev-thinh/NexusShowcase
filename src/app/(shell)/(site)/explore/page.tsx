@@ -52,7 +52,7 @@ export default async function ExplorePage({ searchParams }: {
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <Breadcrumbs items={[{ label: "Khám phá công trình" }]} />
             <p className="page-eyebrow">Nghiên cứu &amp; sáng tạo</p>
-            <h1 className="page-title mt-2 max-w-4xl text-balance">Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT.</h1>
+            <h1 className="page-title mt-2 max-w-4xl text-balance">Khám phá các bài nghiên cứu và dự án của CLB Robotics &amp; IoT - HCMUS.</h1>
             <PublicationNavigation currentHref="/explore" />
 
           </div>

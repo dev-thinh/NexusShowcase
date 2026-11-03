@@ -33,7 +33,7 @@ describe('login page', () => {
   it('preserves the original branding, background and navigation links', async () => {
     const html = renderToStaticMarkup(await LoginPage());
     expect(html).toContain('CLB Robotics &amp; IoT');
-    expect(html).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
+    expect(html).toContain('mask-image:url(/robotics-iot-club-hcmus.png)');
     expect(html).toContain('href="/contact"');
     expect(html).toContain('href="/"');
     expect(html).toContain('blur-3xl');

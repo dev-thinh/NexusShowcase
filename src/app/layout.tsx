@@ -22,7 +22,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'CLB Robotics & IoT - Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM',
+  title: 'CLB Robotics & IoT - HCMUS',
   description: 'Trưng bày công trình nghiên cứu khoa học, dự án công nghệ và sản phẩm Robotics & IoT',
 };
 
