@@ -4,7 +4,7 @@ import { SubmissionField } from './submission-field';
 import { searchContributors } from '@/features/identity/server/member-search-action';
 import type { ContributorInput } from '@/features/submissions/model/input';
 import { createLatestRequestGate } from '@/shared/lib/latest-request';
-import { Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { filterAvailableClubMembers } from './member-search';
 
@@ -92,11 +92,11 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
               if (isMemberSearchOpen) event.preventDefault();
             }}
             onClick={() => setIsMemberSearchOpen((current) => !current)}
-            className="action-secondary-detail min-h-11 min-w-0 flex-1"
+            className="action-secondary-detail min-h-11 min-w-0 flex-1 whitespace-nowrap !px-3"
           >
-            Thêm thành viên CLB
+            <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />Thành viên
           </button>
-          <button type="button" onClick={() => onChange([...value, { externalName: '', role: 'CONTRIBUTOR', displayOrder: value.length }])} className="action-secondary-detail min-h-11 min-w-0 flex-1">Thêm người bên ngoài</button>
+          <button type="button" onClick={() => onChange([...value, { externalName: '', role: 'CONTRIBUTOR', displayOrder: value.length }])} className="action-secondary-detail min-h-11 min-w-0 flex-1 whitespace-nowrap !px-3"><Plus className="h-4 w-4 shrink-0" aria-hidden="true" />Thành viên khác</button>
         </div>
 
       </div>
@@ -189,7 +189,7 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
           return (
             <SubmissionField name={`contributors.${index}`} errors={errors} key={`${contributor.userId ?? 'external'}-${index}`} className="panel-nested grid gap-2 !px-3 !py-1.5 shadow-none xl:grid-cols-[minmax(0,1fr)_10rem_2.25rem] xl:items-center">
               {member ? (
-                <p className="text-sm font-semibold text-[#1F2937]">{member.fullName}</p>
+                <p className="min-w-0 truncate text-sm font-semibold text-[#1F2937]" title={member.fullName}>{member.fullName}</p>
               ) : (
                 <SubmissionField name={`contributors.${index}.externalName`} errors={errors}><input value={contributor.externalName ?? ''} onChange={(event) => update(index, { externalName: event.target.value })} aria-label={`Tên người đóng góp ${index + 1}`} placeholder="Họ và tên" className="min-h-9 w-full rounded-md border border-slate-200 px-3 text-sm" /></SubmissionField>
               )}
