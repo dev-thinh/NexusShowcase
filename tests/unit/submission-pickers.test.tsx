@@ -19,8 +19,8 @@ describe('submission add controls', () => {
       <ContributorEditor value={[]} clubMembers={[{ id: 'member-1', fullName: 'Nguyễn An' }]} onChange={() => undefined} />,
     );
 
-    expect(html).toContain('>Thêm thành viên CLB</button>');
-    expect(html).toContain('>Thêm người bên ngoài</button>');
+    expect(html).toContain('>Thành viên</button>');
+    expect(html).toContain('>Thành viên khác</button>');
     expect(html.match(/flex-1/g)).toHaveLength(2);
     expect(html).toContain('Vai trò chi tiết');
     expect(html).not.toContain('justify-end gap-2 text-sm');

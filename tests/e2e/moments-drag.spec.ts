@@ -87,7 +87,7 @@ test('mouse drags swap, move across rows and place library images, then persist 
   } finally { await database.homeMomentsGallery.deleteMany(); }
 });
 
-test('touch hold drags an image into another row while taps still open its details', async ({ browser, fixture, database }) => {
+test('touch movement immediately drags an image while taps still open its details', async ({ browser, fixture, database }) => {
   const context = await browser.newContext({ baseURL: process.env.HARNESS_BASE_URL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
   const page = await context.newPage();
   await seedPhotoGalleries(database);
@@ -105,10 +105,6 @@ test('touch hold drags an image into another row while taps still open its detai
     const to = (await target.boundingBox())!;
     const cdp = await context.newCDPSession(page);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: from.x + from.width / 2, y: from.y + from.height / 2 }] });
-    await expect(page.locator('.moments-drag-preview')).toBeVisible();
-    const ghost = (await page.locator('.moments-drag-preview').boundingBox())!;
-    expect(Math.abs(ghost.x - from.x)).toBeLessThan(2);
-    expect(Math.abs(ghost.y - from.y)).toBeLessThan(2);
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: to.x + to.width / 2, y: to.y + to.height / 2 }] });
     await expect(target).toHaveAttribute('data-drop-target', 'true');
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
@@ -125,7 +121,7 @@ test('touch hold drags an image into another row while taps still open its detai
 });
 
 for (const variant of ['moments', 'research'] as const) {
-  test(`touch handles place unused library photos in ${variant} without a long press`, async ({ browser, fixture, database }) => {
+  test(`touching photos directly places unused library photos in ${variant} without a long press`, async ({ browser, fixture, database }) => {
     const context = await browser.newContext({ baseURL: process.env.HARNESS_BASE_URL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'reduce' });
     const page = await context.newPage();
     await seedPhotoGalleries(database);
@@ -136,7 +132,7 @@ for (const variant of ['moments', 'research'] as const) {
       await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/');
       await page.getByRole('button', { name: variant === 'moments' ? 'Chỉnh sửa ảnh khoảnh khắc' : 'Chỉnh sửa ảnh hướng nghiên cứu', exact: true }).tap();
       const modal = page.getByRole('dialog', { name: variant === 'moments' ? 'Chỉnh sửa khoảnh khắc' : 'Chỉnh sửa ảnh hướng nghiên cứu', exact: true });
-      const handle = modal.locator('.moments-editor__asset-select[data-moment-drag="library-touch-unused"] [data-moment-handle]');
+      const handle = modal.locator('.moments-editor__asset-select[data-moment-drag="library-touch-unused"]');
       const target = modal.locator(`[data-moment-slot="${variant === 'moments' ? 6 : 1}"]`);
       await expect(handle).toBeVisible();
       await expect(handle).toHaveCSS('touch-action', 'none');

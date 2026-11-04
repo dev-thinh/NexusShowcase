@@ -5,7 +5,6 @@ vi.mock('@/shared/lib/deferred-fetch', () => ({ fetchDeferredJson: async (url: s
 vi.mock('@/features/members/server/queries', () => ({ getHomeMembers: mocks.members }));
 vi.mock('server-only', () => ({}));
 import CategoryPage from '@/app/(shell)/(site)/category/[slug]/page';
-import ExplorePage from '@/app/(shell)/(site)/explore/page';
 import { loadHomeFeatured } from '@/app/(shell)/(site)/home-sections';
 import { CitationModal } from '@/features/publications/components/citation-modal';
 import React from 'react';
@@ -50,10 +49,10 @@ async function citationGroups(node: React.ReactNode): Promise<React.ReactElement
 }
 
 describe('rendered citation action grouping', () => {
-  it.each(['home', 'library', 'category'] as const)('groups detail, citation and original-paper actions in %s', async view => {
+  it.each(['home', 'category'] as const)('groups detail, citation and original-paper actions in %s', async view => {
     const page = view === 'category'
       ? await CategoryPage({ params: Promise.resolve({ slug: 'bai-bao-khoa-hoc' }), searchParams: Promise.resolve({}) })
-      : view === 'home' ? await loadHomeFeatured(new AbortController().signal) : await ExplorePage({ searchParams: Promise.resolve({ q: 'paper' }) });
+      : await loadHomeFeatured(new AbortController().signal);
     const groups = await citationGroups(page);
     expect(groups.length).toBeGreaterThan(0);
     for (const group of groups) {

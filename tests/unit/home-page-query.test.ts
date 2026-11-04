@@ -13,8 +13,8 @@ describe('Home Page Minimalist Revamp', () => {
     expect(content).not.toContain('totalAchievements');
   });
 
-  it('keeps the library aware of visitor permissions', () => {
-    const pagePath = path.resolve(process.cwd(), 'src/app/(shell)/(site)/explore/page.tsx');
+  it('keeps the research category aware of visitor permissions', () => {
+    const pagePath = path.resolve(process.cwd(), 'src/app/(shell)/(site)/category/[slug]/page.tsx');
     const content = fs.readFileSync(pagePath, 'utf-8');
 
     expect(content).toContain('visibility');
@@ -35,8 +35,8 @@ describe('Home Page Minimalist Revamp', () => {
     const content = fs.readFileSync(pagePath, 'utf-8');
 
     expect(content).toContain('<HomeHero />');
-    expect(content).toContain('href="/explore"');
-    expect(content).toContain('Xem tất cả công trình');
+    expect(content).toContain('href="/category/bai-bao-khoa-hoc"');
+    expect(content).toContain('Xem nghiên cứu khoa học');
     expect(content).not.toContain('id="home-search"');
     expect(content).not.toContain('Kết quả tìm kiếm');
 

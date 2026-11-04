@@ -39,7 +39,7 @@ export default function ContactPage() {
                     Cơ sở 1 (Trụ sở chính)
                   </span>
                   <h2 className="text-base sm:text-lg font-semibold text-[#1F2937] leading-snug">
-                    CLB Robotics &amp; IoT - HCMUS
+                    CLB Robotics - IoT, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM
                   </h2>
                 </div>
               </div>
@@ -48,21 +48,21 @@ export default function ContactPage() {
                 <div className="contact-row">
                   <MapPin aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0 mt-0.5" />
                   <span>
-                    Phòng I86, Tòa nhà I, 227 Nguyễn Văn Cừ, Phường 4, Quận 5, TP. Hồ Chí Minh
+                    Phòng i86, Tòa nhà i, 227 Nguyễn Văn Cừ, Phường Chợ Quán, TP.HCM
                   </span>
                 </div>
                 <div className="contact-row">
                   <Mail aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0" />
                   <a
-                    href="mailto:robotics-iot@hcmus.edu.vn"
+                    href="mailto:robotics@hcmus.edu.vn"
                     className="break-words text-[#1F2937] hover:underline font-semibold"
                   >
-                    robotics-iot@hcmus.edu.vn
+                    robotics@hcmus.edu.vn
                   </a>
                 </div>
                 <div className="contact-row">
                   <Phone aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0" />
-                  <span>(028) 3835 4266 (Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM)</span>
+                  <a href="https://zalo.me/0366399748" target="_blank" rel="noreferrer" className="font-semibold hover:underline">Zalo: 0366 399 748</a>
                 </div>
               </div>
             </div>
@@ -70,10 +70,10 @@ export default function ContactPage() {
             {/* Academic Department Affiliation */}
             <div className="panel-detail contact-card">
               <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1.5">
-                Đơn vị chủ quản
+                Đơn vị chủ quản:
               </h3>
               <p className="text-sm font-semibold text-[#1F2937]">
-                Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM
+                Phòng thí nghiệm Trí tuệ Nhân tạo (AILab), trường Đại học Khoa học tự nhiên, ĐHQG-HCM
               </p>
               <div className="mt-2.5 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#1F2937]">
                 <a

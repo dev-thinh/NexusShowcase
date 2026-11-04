@@ -11,7 +11,7 @@ for (const width of [320, 390]) test(`filters and content management align witho
   expect(Math.abs(year.x - sort.x)).toBeLessThan(1);
   expect(Math.abs(year.width - sort.width)).toBeLessThan(1);
   expect(sort.y).toBeGreaterThan(year.y + year.height);
-  await expect(page.getByRole('navigation', { name: 'Chuyên mục công trình' })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: 'Chuyên mục công trình' })).toHaveCount(0);
   await filter.screenshot({ path: `/tmp/nexus-mobile-audit/aligned-filter-${width}.png` });
   await login(page, fixture.users[0], '/admin/content');
   const actions = page.locator('.admin-bulk-actions');

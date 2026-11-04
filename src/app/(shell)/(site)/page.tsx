@@ -1,6 +1,6 @@
+import { HomeContentProvider, HomeText, HomeContentLink as Link } from '@/features/publications/components/home-content-provider';
 import { HomeFeaturedSection, HomeMembersSection, HomeMomentsSection, HomeResearchSection } from './home-sections';
 import { HomeHero } from '@/features/publications/components/home-hero';
-import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { ArrowRight } from 'lucide-react';
 import { redirect } from 'next/navigation';
 
@@ -13,22 +13,22 @@ export default async function HomePage({ searchParams }: {
     const query = new URLSearchParams();
     if (params.q.trim()) query.set('q', params.q.trim());
     if (params.page) query.set('page', params.page);
-    redirect('/explore' + (query.size ? '?' + query : ''));
+    redirect('/category/bai-bao-khoa-hoc' + (query.size ? '?' + query : ''));
   }
 
   return (
-    <>
+    <HomeContentProvider>
       <HomeHero />
       <main className="w-full pt-10 sm:pt-14 flex-1 space-y-14 sm:space-y-16" id="home-content">
         <section className="home-featured" aria-labelledby="featured-works-title">
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="home-section-heading">
-                <p className="home-section-eyebrow">Dấu ấn nghiên cứu</p>
-                <h2 id="featured-works-title" className="home-section-title">Công trình nổi bật</h2>
+                <p className="home-section-eyebrow"><HomeText field="featuredEyebrow">Dấu ấn nghiên cứu</HomeText></p>
+                <h2 id="featured-works-title" className="home-section-title"><HomeText field="featuredTitle">Công trình nổi bật</HomeText></h2>
               </div>
-              <Link href="/explore" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
-                Xem tất cả công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <Link href="/category/bai-bao-khoa-hoc" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
+                <HomeText field="featuredAction">Xem nghiên cứu khoa học</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
             <div className="mt-6 grid gap-5">
@@ -49,18 +49,17 @@ export default async function HomePage({ searchParams }: {
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
               <div className="home-section-heading">
-                <p className="home-section-eyebrow">Đội ngũ CLB</p>
-                <h2 id="home-members-title" className="home-section-title">Thành viên</h2>
+                <p className="home-section-eyebrow"><HomeText field="membersEyebrow">Đội ngũ CLB</HomeText></p>
+                <h2 id="home-members-title" className="home-section-title"><HomeText field="membersTitle">Thành viên</HomeText></h2>
               </div>
               <Link href="/members" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
-                Xem tất cả thành viên <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <HomeText field="membersAction">Xem tất cả thành viên</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
-            <p className="mb-6 text-sm text-slate-200">Cùng học hỏi, thử nghiệm và chia sẻ.</p>
             <HomeMembersSection />
           </div>
         </section>
       </main>
-    </>
+    </HomeContentProvider>
   );
 }

@@ -26,7 +26,7 @@ describe('submission editor shell', () => {
   it('uses compact contributor rows with member, external, and free-text role flows', () => {
     const contributors = read('src/features/submissions/components/contributor-editor.tsx');
     expect(contributors).toContain('Thêm thành viên CLB');
-    expect(contributors).toContain('Thêm người bên ngoài');
+    expect(contributors).toContain('Thành viên khác');
     expect(contributors).toContain('customRoleTitle');
     expect(contributors).not.toContain('<select');
     expect(contributors).toContain('panel-nested');

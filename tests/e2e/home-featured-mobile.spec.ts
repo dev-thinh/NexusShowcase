@@ -22,7 +22,7 @@ for (const width of [320, 390]) test(`home cards stay compact and section action
   await card.evaluate(element => element.scrollIntoView({ block: 'center' }));
   await card.screenshot({ path: `/tmp/nexus-mobile-audit/featured-${width}.png` });
   for (const [parent, action] of [
-    [section, section.getByRole('link', { name: 'Xem tất cả công trình', exact: true })],
+    [section, section.getByRole('link', { name: 'Xem nghiên cứu khoa học', exact: true })],
     [page.locator('.members-band'), page.getByRole('link', { name: 'Xem tất cả thành viên', exact: true })],
   ] as const) {
     const heading = parent.locator('.home-section-heading');

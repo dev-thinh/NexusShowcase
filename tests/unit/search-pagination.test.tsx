@@ -5,7 +5,7 @@ vi.mock('@/shared/lib/deferred-fetch', () => ({ fetchDeferredJson: async (url: s
 vi.mock('@/features/members/server/queries', () => ({ getHomeMembers: mocks.members }));
 vi.mock('server-only', () => ({}));
 import HomePage from '@/app/(shell)/(site)/page';
-import ExplorePage from '@/app/(shell)/(site)/explore/page';
+import CategoryPage from '@/app/(shell)/(site)/category/[slug]/page';
 import { loadHomeFeatured } from '@/app/(shell)/(site)/home-sections';
 import { HomeFeaturedSection, HomeMembersSection } from '@/app/(shell)/(site)/home-sections';
 import { MemberPagination } from '@/shared/ui/member-pagination';
@@ -15,9 +15,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   session: null as null | { user: { id: string; role?: string } },
-  count: vi.fn(), findMany: vi.fn(), members: vi.fn(),
+  count: vi.fn(), findMany: vi.fn(), members: vi.fn(), category: vi.fn(),
 }));
-vi.mock('@/server/db/prisma', () => ({ prisma: { showcaseItem: { count: mocks.count, findMany: mocks.findMany }, user: { findMany: mocks.members } } }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { showcaseItem: { count: mocks.count, findMany: mocks.findMany }, category: { findUnique: mocks.category }, user: { findMany: mocks.members } } }));
 vi.mock('@/features/publications/server/actions', () => ({ setShowcasePinAction: vi.fn(), setShowcaseVisibilityAction: vi.fn() }));
 vi.mock('@/features/identity/server/auth', () => ({ auth: () => mocks.session }));
 vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => null }));
@@ -31,9 +31,10 @@ beforeEach(() => {
   mocks.count.mockResolvedValue(25);
   mocks.findMany.mockResolvedValue([]);
   mocks.members.mockResolvedValue([]);
+  mocks.category.mockResolvedValue({ id: 'papers', name: 'Nghiên cứu khoa học', slug: 'bai-bao-khoa-hoc' });
 });
 
-const load = (page?: string) => ExplorePage({ searchParams: Promise.resolve({ q: '  robot  ', page }) });
+const load = async (page?: string) => resolveServerSections(await CategoryPage({ params: Promise.resolve({ slug: 'bai-bao-khoa-hoc' }), searchParams: Promise.resolve({ q: '  robot  ', page }) }));
 
 async function resolveServerSections(node: React.ReactNode): Promise<React.ReactNode> {
   if (Array.isArray(node)) return Promise.all(node.map(resolveServerSections));

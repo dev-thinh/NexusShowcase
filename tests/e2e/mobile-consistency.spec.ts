@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 import { expect, login, test } from './fixtures';
 
-async function expectPageToFit(page: Page, path: string, destination = path) {
+// The retired route streams a redirect; measure the destination document only.
+async function expectPageToFit(page: Page, path: string, destination = path === '/explore' ? '/category/bai-bao-khoa-hoc' : path) {
   await expect(page).toHaveURL(url => `${url.pathname}${url.search}` === destination);
   await expect(page.locator('main').first()).toBeVisible();
   await expect(page.getByRole('status', { name: /Đang tải/ })).toHaveCount(0);

@@ -84,6 +84,17 @@ npm run db:seed:mock
 ```
 `db:seed` chỉ khởi tạo quản trị viên đầu tiên, yêu cầu mật khẩu riêng ít nhất 15 ký tự và tối đa 72 byte UTF-8, bắt buộc đổi mật khẩu khi đăng nhập. Nếu đã có tài khoản ADMIN (kể cả bị khóa), lệnh không thay đổi tài khoản nào. Lệnh không nâng quyền hay đặt lại mật khẩu tài khoản hiện có, không thêm bài mẫu và không xóa dữ liệu.
 
+Để **tạo thêm admin** mà không thay đổi tài khoản cũ, chạy trong thư mục dự án trên server sau khi áp dụng migration và generate Prisma Client:
+
+```bash
+npm run db:migrate
+npx prisma generate
+npm run admin:create -- --identifier btlam --hidden
+```
+
+Lệnh hỏi mật khẩu ngay trên terminal (ẩn khi nhập), yêu cầu ít nhất 15 ký tự và tối đa 72 byte UTF-8. `--hidden` chỉ ẩn tài khoản mới khỏi danh sách thành viên và đội ngũ trang chủ, kể cả tổng số thành viên; đăng nhập, quyền quản trị và hồ sơ cá nhân vẫn hoạt động bình thường. Tài khoản vẫn có trong quản lý thành viên của admin. Bỏ `--hidden` để tạo admin hiển thị bình thường. Tên đăng nhập trùng bị từ chối, không nâng quyền hay đặt lại mật khẩu tài khoản có sẵn. Đăng nhập lần đầu bắt buộc đổi mật khẩu. Có thể truyền `NEW_ADMIN_PASSWORD` qua môi trường cho tác vụ tự động. Build và khởi động lại ứng dụng sau khi cập nhật code để áp dụng bộ lọc mới.
+
+
 `db:seed:mock` yêu cầu ít nhất một quản trị viên đang hoạt động, dùng quản trị viên đó làm tác giả khi chạy riêng. Lệnh giữ 20 bài mẫu: thêm bài còn thiếu, cập nhật tác giả và đặt chúng về công khai, giữ nội dung bài đã có. Chỉ chạy khi muốn xuất bản các bài giả lập này.
 
 Để tạo bản demo riêng, dùng database có một phần tên là `demo` (ví dụ `nexus_demo`), đặt `ALLOW_DEMO_SEED=true` và `NODE_ENV=development`, rồi chạy `npm run db:seed:demo`. Lệnh bị chặn trên production hoặc database không có phần tên `demo`. Demo tạo 5 tài khoản nếu chưa có: `admin@gmail.com`, `core@gmail.com`, `member1@gmail.com`, `member2@gmail.com`, `member3@gmail.com`, mật khẩu `123456`, cùng 20 bài mẫu. Chạy lại giữ nguyên mật khẩu, vai trò và trạng thái tài khoản hiện có. Không sử dụng các tài khoản demo cho triển khai thực tế. Không có chế độ `RESET_DATABASE`.

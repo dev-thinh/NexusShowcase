@@ -22,7 +22,11 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'CLB Robotics & IoT - HCMUS',
+  title: 'Hoạt động | Robotics & IoT HCMUS',
+  icons: {
+    icon: { url: '/logo.svg', type: 'image/svg+xml' },
+    shortcut: '/logo.svg',
+  },
   description: 'Trưng bày công trình nghiên cứu khoa học, dự án công nghệ và sản phẩm Robotics & IoT',
 };
 

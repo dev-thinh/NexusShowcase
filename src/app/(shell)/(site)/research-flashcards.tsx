@@ -1,5 +1,6 @@
 'use client';
 
+import { HomeText, useHomeText } from '@/features/publications/components/home-content-provider';
 import { MediaImage } from '@/shared/ui/media-image';
 
 import { useRef, useState } from 'react';
@@ -10,25 +11,13 @@ import type { MomentsGallery, MomentsPayload } from '@/features/publications/mod
 import { ResearchSectionHeading } from './research-section-heading';
 import { notifySuccess } from '@/shared/dialogs/success';
 
-const directions = [
-  {
-    title: 'Trí tuệ nhân tạo & Thị giác máy tính',
-    description: 'Ứng dụng học máy để nhận diện hình ảnh và hiểu dữ liệu.',
-    position: '50% 48%',
-  },
-  {
-    title: 'Robot tự hành & Điều khiển',
-    description: 'Giúp robot định vị, tìm đường và di chuyển tự động.',
-    position: '54% 54%',
-  },
-  {
-    title: 'Internet of Things & Hệ thống nhúng',
-    description: 'Kết nối cảm biến, giám sát và điều khiển thiết bị từ xa.',
-    position: '50% 50%',
-  },
-];
-
 export function ResearchFlashcards({ initialGallery }: { initialGallery?: MomentsPayload }) {
+  const text = useHomeText();
+  const directions = [
+    { id: 'one', title: text.researchOneTitle, titleField: 'researchOneTitle', descriptionField: 'researchOneDescription', description: text.researchOneDescription, position: '50% 48%' },
+    { id: 'two', title: text.researchTwoTitle, titleField: 'researchTwoTitle', descriptionField: 'researchTwoDescription', description: text.researchTwoDescription, position: '54% 54%' },
+    { id: 'three', title: text.researchThreeTitle, titleField: 'researchThreeTitle', descriptionField: 'researchThreeDescription', description: text.researchThreeDescription, position: '50% 50%' },
+  ] as const;
   const [gallery, setGallery] = useState<MomentsPayload>(initialGallery ?? { version: 0, photos: defaultResearchImages, isAdmin: false });
   const [editing, setEditing] = useState(false);
   const [opening, setOpening] = useState(false);
@@ -64,19 +53,18 @@ export function ResearchFlashcards({ initialGallery }: { initialGallery?: Moment
       {directions.map((direction, index) => {
         const photo = gallery.photos.find(photo => photo.slot === index);
         return (
-        <article className="research-direction" key={direction.title} aria-labelledby={`research-direction-${index}`}>
+        <article className="research-direction" key={direction.id} aria-labelledby={`research-direction-${index}`}>
           <div className="research-direction__photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <MediaImage optimized src={photo?.src} alt={photo?.title || direction.title} width={1000} height={667} sizes="(max-width: 767px) calc(100vw - 32px), 400px" loading="eager" decoding="async" className="h-full w-full object-cover" style={{ objectPosition: direction.position }} />
           </div>
           <div className="research-direction__body">
             <div className="research-direction__heading">
-              <h3 id={`research-direction-${index}`} className="research-direction__title">
-                <span>{direction.title.split(' & ')[0]}</span>{' '}
-                <span>{direction.title.split(' & ')[1]}</span>
+              <h3 id={`research-direction-${index}`} className="research-direction__title whitespace-pre-line [overflow-wrap:anywhere]">
+                <HomeText field={direction.titleField} />
               </h3>
             </div>
-            <p className="research-direction__description">{direction.description}</p>
+            <p className="research-direction__description whitespace-pre-line [overflow-wrap:anywhere]"><HomeText field={direction.descriptionField} /></p>
 
           </div>
         </article>

@@ -8,7 +8,8 @@ export function showcaseReturnTarget(raw: string | undefined, fallback: string) 
   try {
     const url = new URL(raw, 'https://nexus.local');
     if (url.origin !== 'https://nexus.local') return fallback;
-    if (url.pathname === '/' || url.pathname === '/explore') return url.pathname + url.search;
+    if (url.pathname === '/explore') return '/category/bai-bao-khoa-hoc' + url.search;
+    if (url.pathname === '/') return url.pathname + url.search;
     if (['/category/bai-bao-khoa-hoc', '/category/robotics-iot'].includes(url.pathname)) return url.pathname + url.search;
   } catch { /* Fall back to the item's category for an invalid source. */ }
   return fallback;
