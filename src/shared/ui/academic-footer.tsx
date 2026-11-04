@@ -32,7 +32,6 @@ export function AcademicFooter() {
 
         <div className="flex flex-col gap-2 border-t border-slate-200 py-5 text-xs leading-relaxed text-[#1F2937] sm:flex-row sm:items-center sm:justify-between sm:gap-6">
           <p>&copy; {new Date().getFullYear()} CLB Robotics &amp; IoT - HCMUS</p>
-          <p>Hỗ trợ trích dẫn BibTeX, APA và IEEE</p>
         </div>
       </div>
     </footer>

@@ -11,7 +11,7 @@ export const homeTextGroups = [
   { title: 'Công trình nổi bật', fields: [
     { key: 'featuredEyebrow', label: 'Dòng giới thiệu', value: 'Dấu ấn nghiên cứu' },
     { key: 'featuredTitle', label: 'Tiêu đề', value: 'Công trình nổi bật' },
-    { key: 'featuredAction', label: 'Nhãn nút xem tất cả', value: 'Xem tất cả công trình' },
+    { key: 'featuredAction', label: 'Nhãn nút xem tất cả', value: 'Xem nghiên cứu khoa học' },
   ] },
   { title: 'Hướng nghiên cứu', fields: [
     { key: 'researchEyebrow', label: 'Dòng giới thiệu', value: 'Hướng nghiên cứu' },
@@ -60,6 +60,7 @@ export function normalizeHomeText(value: unknown): HomeText {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return homeContentSchema.shape.text.parse(value);
   const text = { ...value } as Record<string, unknown>;
   delete text.membersDescription;
+  if (text.featuredAction === 'Xem tất cả công trình') text.featuredAction = 'Xem nghiên cứu khoa học';
   for (const prefix of ['researchOne', 'researchTwo', 'researchThree']) {
     const subtitle = text[`${prefix}Subtitle`];
     const title = text[`${prefix}Title`];

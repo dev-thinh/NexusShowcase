@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures';
 
-for (const path of ['/explore', '/category/robotics-iot']) {
+for (const path of ['/category/bai-bao-khoa-hoc', '/category/robotics-iot']) {
   test(`mobile filters expand and preserve submitted values on ${path}`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 844 });
     await page.goto(path);
@@ -26,7 +26,7 @@ for (const path of ['/explore', '/category/robotics-iot']) {
 
 test('desktop filters remain directly available', async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
-  await page.goto('/explore');
+  await page.goto('/category/bai-bao-khoa-hoc');
   const form = page.getByRole('search');
   await expect(form.getByLabel('Năm thực hiện')).toBeVisible();
   await expect(form.getByRole('combobox')).toBeVisible();

@@ -3,11 +3,11 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
 describe('HomeHero', () => {
-  it('opens the entire library through one primary action', () => {
+  it('opens scientific research through one primary action', () => {
     const markup = renderToStaticMarkup(<HomeHero />);
 
     expect(markup).toContain('id="home-hero-title"');
-    expect(markup).toContain('href="/explore"');
+    expect(markup).toContain('href="/category/bai-bao-khoa-hoc"');
     expect(markup).not.toContain('href="#home-search"');
     expect(markup).not.toContain('home-hero__secondary-action');
   });

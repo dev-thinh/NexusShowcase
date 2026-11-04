@@ -13,7 +13,7 @@ test('cards show GitHub quick links and citation while every resource remains av
     ] });
     for (const width of [1440, 390]) {
       await page.setViewportSize({ width, height: 1000 });
-      await page.goto(`/explore?q=${encodeURIComponent(item.title)}`);
+      await page.goto(`${item.type === 'PROJECT' ? '/category/robotics-iot' : '/category/bai-bao-khoa-hoc'}?q=${encodeURIComponent(item.title)}`);
       const card = page.locator('article').filter({ has: page.getByRole('heading', { name: item.title, exact: true }) });
       const resources = card.locator('[data-card-resources]');
       await expect(resources.getByRole('link')).toHaveCount(sources.length);

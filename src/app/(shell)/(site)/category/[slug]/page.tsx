@@ -8,7 +8,6 @@ import { TypeBadge } from '@/features/publications/components/badges';
 import { CardAdminControls } from '@/features/publications/components/card-admin-controls';
 import { CardLink } from '@/features/publications/components/card-link';
 import { CitationModal } from '@/features/publications/components/citation-modal';
-import { PublicationNavigation } from '@/features/publications/components/publication-navigation';
 import { toCitationDto } from '@/features/publications/model/contracts';
 import { showcaseHref } from '@/features/publications/model/navigation';
 import { listPublications } from '@/features/publications/server/queries';
@@ -213,7 +212,6 @@ export default async function CategoryPage({
               )}
             </div>
           </div>
-          <PublicationNavigation currentHref={`/category/${slug}`} />
         </header>
 
         <PublicationFilters action={`/category/${slug}`} searchLabel="Tìm kiếm trong chuyên mục" searchQuery={searchQuery} year={year} sort={sort} defaultSort="featured" hasFilters={hasFilters} />

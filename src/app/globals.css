@@ -740,38 +740,6 @@ strong {
 .login-title > span { display: block; }
 .login-copy { max-width: 43ch; text-wrap: pretty; }
 
-/* Keep all three library categories visible and easy to tap on phones. */
-@media (max-width: 639px) {
-  .publication-navigation {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.25rem;
-    width: 100%;
-    padding: 0.25rem;
-    overflow: visible;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.75rem;
-    background: #f8fafc;
-  }
-  .publication-navigation a {
-    min-width: 0;
-    min-height: 3.5rem;
-    justify-content: center;
-    padding: 0.5rem;
-    border: 0;
-    border-radius: 0.5rem;
-    color: #475569;
-    font-size: clamp(0.75rem, 3.3vw, 0.875rem);
-    line-height: 1.4;
-    text-align: center;
-    white-space: normal;
-    text-wrap: balance;
-  }
-  .publication-navigation a:hover { background: #fff; }
-  .publication-navigation a[aria-current='page'] { color: #fff; background: var(--brand-blue); box-shadow: 0 1px 3px rgb(15 41 74 / 0.12); }
-  .publication-navigation a[aria-current='page']:focus-visible { --tw-ring-color: #fff; }
-}
-
 /* Home content repeats one banner blue on white surfaces. */
 #home-content h2,
 #home-content h3 {

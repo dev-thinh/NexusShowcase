@@ -19,7 +19,7 @@ test('contributed works appear read-only and author presentation is consistent i
   await expect(author).toHaveCSS('font-weight', '400');
   await author.hover();await expect(author).toHaveCSS('font-weight', '600');
   await expect(page.locator('p [title="Tác giả ngoài CLB"]').first()).toBeVisible();
-  await page.goto(`/explore?q=${encodeURIComponent(item.title)}`);
+  await page.goto(`${item.type === 'PROJECT' ? '/category/robotics-iot' : '/category/bai-bao-khoa-hoc'}?q=${encodeURIComponent(item.title)}`);
   const card = page.locator('article').filter({ hasText: item.title });
   const external = card.locator('[title="Tác giả ngoài CLB"]');
   await expect(external).toBeVisible();

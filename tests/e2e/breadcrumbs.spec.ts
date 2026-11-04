@@ -35,12 +35,12 @@ test('account and administration pages use the shared hierarchy', async ({ page,
 });
 
 test('detail breadcrumb preserves library filters and pagination', async ({ page }) => {
-  const source = '/explore?q=Benchmark&page=2';
+  const source = '/category/bai-bao-khoa-hoc?q=Benchmark&page=2';
   await page.goto(`/showcase/benchmark-0?returnTo=${encodeURIComponent(source)}`);
-  const parent = page.locator('[data-breadcrumbs]').getByRole('link', { name: 'Khám phá công trình', exact: true });
+  const parent = page.locator('[data-breadcrumbs]').getByRole('link', { name: 'Nghiên cứu khoa học', exact: true });
   await expect(parent).toHaveAttribute('href', source);
   await parent.click();
-  await expect(page).toHaveURL(/\/explore\?q=Benchmark&page=2$/);
+  await expect(page).toHaveURL(/\/category\/bai-bao-khoa-hoc\?q=Benchmark&page=2$/);
 });
 
 for (const width of [390, 1440]) {

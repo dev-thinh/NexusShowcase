@@ -95,7 +95,7 @@ export function HomeHero() {
             <HomeText field="heroDescription">Khám phá Robotics, IoT và hệ thống nhúng qua những dự án thực tế.</HomeText>
           </p>
           <div className="home-hero__actions mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Link href="/explore" className="home-hero__primary-action">
+            <Link href="/category/bai-bao-khoa-hoc" className="home-hero__primary-action">
               <span><HomeText field="heroAction">Khám phá công trình</HomeText></span>
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
