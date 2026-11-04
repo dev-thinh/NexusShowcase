@@ -14,7 +14,7 @@ export default async function AdminDashboardPage() {
   if (session.user.mustChangePassword) redirect('/account/change-password');
   const [pendingCount, totalMembers, pinnedCount, recent] = await Promise.all([
     prisma.showcaseItem.count({ where: pendingReviewWhere }),
-    prisma.user.count({ where: { status: 'ACTIVE', deletedAt: null } }),
+    prisma.user.count({ where: { status: 'ACTIVE', deletedAt: null, hiddenFromDirectory: false } }),
     prisma.showcaseItem.count({ where: { status: 'PUBLISHED', isPinned: true } }),
     prisma.showcaseItem.findMany({ where: { status: { in: ['PUBLISHED', 'PENDING_REVIEW', 'READY_FOR_APPROVAL'] } }, orderBy: [{ updatedAt: 'desc' }, { id: 'asc' }], take: 5, select: { id: true, slug: true, title: true, status: true, reviewStatus: true, updatedAt: true } }),
   ]);

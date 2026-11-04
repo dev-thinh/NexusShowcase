@@ -14,7 +14,15 @@ it('adds a hidden admin without changing existing accounts or public member coun
   expect(await bcrypt.compare('private-admin-password-2026', hidden.passwordHash!)).toBe(true);
   expect(await prisma.user.findUniqueOrThrow({ where: { id: existing.id } })).toEqual(existing);
   expect(await prisma.user.count({ where: { role: 'ADMIN' } })).toBe(2);
-  expect((await listAdminMembers({ q: '', role: 'ADMIN', page: 1 })).items.map(user => user.id)).toContain(hidden.id);
+  for (const role of ['ALL', 'ADMIN'] as const) {
+    for (const q of ['', 'btlam', 'existing']) {
+      const result = await listAdminMembers({ q, role, page: 999 });
+      expect(result.items.map(user => user.id)).toEqual(q === 'btlam' ? [] : [existing.id]);
+      expect(result.total).toBe(q === 'btlam' ? 0 : 1);
+      expect(result.counts).toMatchObject({ ALL: 1, ADMIN: 1 });
+      expect(result.totalPages).toBe(1);
+    }
+  }
   for (const authenticated of [false, true]) {
     const directory = await listDirectory({ authenticated, role: 'ADMIN', page: 1, pageSize: 'all' });
     expect(directory.total).toBe(1);

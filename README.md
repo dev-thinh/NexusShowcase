@@ -92,7 +92,7 @@ npx prisma generate
 npm run admin:create -- --identifier btlam --hidden
 ```
 
-Lệnh hỏi mật khẩu ngay trên terminal (ẩn khi nhập), yêu cầu ít nhất 15 ký tự và tối đa 72 byte UTF-8. `--hidden` chỉ ẩn tài khoản mới khỏi danh sách thành viên và đội ngũ trang chủ, kể cả tổng số thành viên; đăng nhập, quyền quản trị và hồ sơ cá nhân vẫn hoạt động bình thường. Tài khoản vẫn có trong quản lý thành viên của admin. Bỏ `--hidden` để tạo admin hiển thị bình thường. Tên đăng nhập trùng bị từ chối, không nâng quyền hay đặt lại mật khẩu tài khoản có sẵn. Đăng nhập lần đầu bắt buộc đổi mật khẩu. Có thể truyền `NEW_ADMIN_PASSWORD` qua môi trường cho tác vụ tự động. Build và khởi động lại ứng dụng sau khi cập nhật code để áp dụng bộ lọc mới.
+Lệnh hỏi mật khẩu ngay trên terminal (ẩn khi nhập), yêu cầu ít nhất 15 ký tự và tối đa 72 byte UTF-8. `--hidden` ẩn tài khoản mới khỏi danh sách thành viên, đội ngũ trang chủ và danh sách quản trị thành viên, kể cả tìm kiếm, bộ lọc và số lượng thống kê; đăng nhập, quyền quản trị và hồ sơ cá nhân vẫn hoạt động bình thường. Quản lý tài khoản ẩn qua server; cờ này không chặn truy cập hồ sơ bằng đường dẫn trực tiếp. Bỏ `--hidden` để tạo admin hiển thị bình thường. Tên đăng nhập trùng bị từ chối, không nâng quyền hay đặt lại mật khẩu tài khoản có sẵn. Đăng nhập lần đầu bắt buộc đổi mật khẩu. Có thể truyền `NEW_ADMIN_PASSWORD` qua môi trường cho tác vụ tự động. Build và khởi động lại ứng dụng sau khi cập nhật code để áp dụng bộ lọc mới.
 
 
 `db:seed:mock` yêu cầu ít nhất một quản trị viên đang hoạt động, dùng quản trị viên đó làm tác giả khi chạy riêng. Lệnh giữ 20 bài mẫu: thêm bài còn thiếu, cập nhật tác giả và đặt chúng về công khai, giữ nội dung bài đã có. Chỉ chạy khi muốn xuất bản các bài giả lập này.
