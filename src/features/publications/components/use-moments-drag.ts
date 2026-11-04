@@ -100,10 +100,6 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       if (event.touches.length !== 1) { finish(false); return; }
       const point = event.touches[0];
       begin(event.target, point.clientX, point.clientY, true, point.identifier);
-      if (gesture && event.target instanceof Element && event.target.closest('[data-moment-handle]')) {
-        activate();
-        if (event.cancelable) event.preventDefault();
-      }
     };
     const touchMove = (event: TouchEvent) => {
       if (!gesture?.touch) return;

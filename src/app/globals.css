@@ -932,21 +932,6 @@ strong {
 .moments-editor :disabled, .moments-editor fieldset:disabled label { opacity: 0.5; cursor: not-allowed; }
 .moments-editor [data-moment-drag] { touch-action: none; cursor: grab; user-select: none; -webkit-touch-callout: none; }
 .moments-editor [data-moment-drag] img { -webkit-touch-callout: none; }
-.moments-editor__drag-handle {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 1;
-  display: grid;
-  place-items: center;
-  width: 2rem;
-  height: 2rem;
-  color: #153d67;
-  touch-action: none;
-  -webkit-user-select: none;
-  cursor: grab;
-}
-.moments-editor__drag-handle > svg { padding: 0.125rem; border-radius: 0.25rem; background: rgb(255 255 255 / 0.95); box-shadow: 0 1px 4px rgb(15 41 74 / 0.2); }
 .moments-editor__drag-hint { margin: 0.5rem 1.25rem 0; color: #64748b; font-size: 0.75rem; text-align: left; }
 
 .moments-editor [data-drag-source='true'] { opacity: 0.4; }
