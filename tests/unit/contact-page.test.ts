@@ -8,8 +8,10 @@ describe('Contact Page', () => {
     expect(fs.existsSync(contactPath)).toBe(true);
 
     const content = fs.readFileSync(contactPath, 'utf-8');
-    expect(content).toContain('Nguyễn Văn Cừ');
-    expect(content).toContain('robotics-iot@');
-    expect(content).toContain('Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM');
+    expect(content).toContain('Phòng i86, Tòa nhà i, 227 Nguyễn Văn Cừ, Phường Chợ Quán, TP.HCM');
+    expect(content).toContain('Zalo: 0366 399 748');
+    expect(content).toContain('https://zalo.me/0366399748');
+    expect(content).toContain('robotics@hcmus.edu.vn');
+    expect(content).toContain('Phòng thí nghiệm Trí tuệ Nhân tạo (AILab), trường Đại học Khoa học tự nhiên, ĐHQG-HCM');
   });
 });
