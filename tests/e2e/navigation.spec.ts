@@ -43,7 +43,7 @@ test('shows feedback before delayed RSC and keeps the committed tab active', asy
     }
     await route.continue();
   });
-  await page.goto('/category/robotics-iot');
+  await page.goto('/projects');
   await expect(page.getByRole('heading', { name: 'Benchmark Robotics 0001', exact: true })).toBeVisible();
   await page.evaluate(() => {
     const link = document.querySelector<HTMLAnchorElement>('nav a[href="/"]')!;
@@ -62,7 +62,7 @@ test('shows feedback before delayed RSC and keeps the committed tab active', asy
   try {
     const destinationTab = page.locator('nav a[href="/"]').first();
     await expect(destinationTab).toHaveClass(/bg-brand-button/);
-    await expect(page.locator('nav a[href="/category/robotics-iot"]').first()).not.toHaveClass(/bg-brand-button/);
+    await expect(page.locator('nav a[href="/projects"]').first()).not.toHaveClass(/bg-brand-button/);
     await expect(page.locator('[data-destination-loading="/"]')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Benchmark Robotics 0001', exact: true })).toBeHidden();
     await expect(page.locator('html')).toHaveAttribute('data-feedback-ms', /\d/);
@@ -70,7 +70,7 @@ test('shows feedback before delayed RSC and keeps the committed tab active', asy
   } finally { release(); }
   const active = page.locator('nav a[aria-current="page"]').first();
   // During a suspended transition, a committed loading shell or the old committed route can be visible.
-  if (page.url().includes('/category/')) await expect(active).toHaveAttribute('href', '/category/robotics-iot');
+  if (page.url().includes('/category/')) await expect(active).toHaveAttribute('href', '/projects');
   await expect(page.locator('#home-content')).toBeVisible();
   await page.locator('[data-deferred-section="featured"]').scrollIntoViewIfNeeded();
   await expect(page.getByRole('heading', { name: 'Benchmark Research 0000', exact: true })).toBeVisible();
@@ -81,7 +81,7 @@ test('latest rapid destination wins and history and modified clicks stay native'
   const network = await context.newCDPSession(page);
   await network.send('Network.enable');
   await network.send('Network.emulateNetworkConditions', { offline: false, latency: 700, downloadThroughput: -1, uploadThroughput: -1 });
-  for (const href of ['/', '/category/robotics-iot', '/members']) await page.locator(`nav a[href="${href}"]`).first().click();
+  for (const href of ['/', '/projects', '/members']) await page.locator(`nav a[href="${href}"]`).first().click();
   await expect(page).toHaveURL(/\/members$/);
   await expect(page.getByRole('link', { name: 'Benchmark Member 000 · Ban chủ nhiệm', exact: true })).toBeVisible();
   await network.send('Network.emulateNetworkConditions', { offline: false, latency: 0, downloadThroughput: -1, uploadThroughput: -1 });
@@ -103,8 +103,8 @@ test('home navigation displays route content', async ({ page }) => {
   await page.locator('[data-deferred-section="featured"]').scrollIntoViewIfNeeded();
   await expect(page.getByRole('heading', { name: 'Benchmark Research 0000', exact: true })).toBeVisible();
   for (const [href, title] of [
-    ['/category/bai-bao-khoa-hoc', 'Benchmark Research 0000'],
-    ['/category/robotics-iot', 'Benchmark Robotics 0001'],
+    ['/research', 'Benchmark Research 0000'],
+    ['/projects', 'Benchmark Robotics 0001'],
     ['/members', 'Benchmark Member 000'],
   ]) {
     await page.locator(`nav a[href="${href}"]`).first().click();

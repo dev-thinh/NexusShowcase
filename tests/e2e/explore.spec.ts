@@ -1,5 +1,5 @@
 import { expect, test } from './fixtures';
-const research = '/category/bai-bao-khoa-hoc';
+const research = '/research';
 
 test('both homepage entry points open research after retiring the all-publications page', async ({ page }) => {
   await page.goto('/');
@@ -17,7 +17,7 @@ test('research search and reset stay within the category', async ({ page }) => {
   await page.goto(research);
   await page.getByRole('searchbox', { name: 'Từ khóa tìm kiếm' }).fill('library-no-matching-results');
   await page.getByRole('button', { name: 'Áp dụng', exact: true }).click();
-  await expect(page).toHaveURL(/\/category\/bai-bao-khoa-hoc\?q=library-no-matching-results/);
+  await expect(page).toHaveURL(/\/research\?q=library-no-matching-results/);
   await expect(page.getByRole('heading', { name: 'Không tìm thấy công trình phù hợp' })).toBeVisible();
   await page.getByRole('link', { name: 'Xóa bộ lọc', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(`${research}$`));
@@ -27,7 +27,7 @@ test('research search and reset stay within the category', async ({ page }) => {
 for (const source of ['/explore?q=Benchmark&year=2026&sort=title&page=2', '/?q=Benchmark&page=2']) {
   test(`legacy URL redirects to research with parameters intact: ${source}`, async ({ page }) => {
     await page.goto(source);
-    await expect(page).toHaveURL(/\/category\/bai-bao-khoa-hoc\?/);
+    await expect(page).toHaveURL(/\/research\?/);
     const current = new URL(page.url());
     for (const [key, value] of new URL(source, 'https://test.local').searchParams) expect(current.searchParams.get(key)).toBe(value);
     await expect(page.getByRole('navigation', { name: 'Chuyên mục công trình', exact: true })).toHaveCount(0);

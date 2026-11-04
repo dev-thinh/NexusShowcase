@@ -11,14 +11,14 @@ export default async function NewItemPage() {
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (!user || !canUserUpload(user)) redirect('/dashboard');
+  if (!user || !canUserUpload(user)) redirect('/my-works');
   if (user.mustChangePassword) redirect('/account/change-password');
 
   return (
     <>
 
       <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/dashboard" }, { label: "Đăng công trình mới" }]} />
+      <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/my-works" }, { label: "Đăng công trình mới" }]} />
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
             <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">Đăng công trình mới</h1>

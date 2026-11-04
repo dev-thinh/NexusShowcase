@@ -4,7 +4,7 @@ for (const width of [320, 390, 1440]) {
   test(`admin bulk buttons match and page jump preserves filters at ${width}px`, async ({ page, fixture }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await login(page, fixture.users[0], '/admin/content');
+    await login(page, fixture.users[0], '/admin/works');
     const actions = page.locator('.admin-bulk-actions');
     await expect(actions).toBeVisible();
     const sizes = await actions.getByRole('button').evaluateAll(buttons => buttons.map(button => {

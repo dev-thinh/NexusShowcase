@@ -3,7 +3,7 @@ import { expect, login, test } from './fixtures';
 for (const width of [320, 390]) test(`filters and content management align without wrapped actions at ${width}px`, async ({ page, fixture }) => {
   await page.setViewportSize({ width, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto('/category/bai-bao-khoa-hoc');
+  await page.goto('/research');
   const filter = page.getByRole('search');
   await filter.getByRole('button', { name: /Bộ lọc/ }).click();
   const year = (await filter.getByLabel('Năm thực hiện').boundingBox())!;
@@ -13,7 +13,7 @@ for (const width of [320, 390]) test(`filters and content management align witho
   expect(sort.y).toBeGreaterThan(year.y + year.height);
   await expect(page.getByRole('navigation', { name: 'Chuyên mục công trình' })).toHaveCount(0);
   await filter.screenshot({ path: `/tmp/nexus-mobile-audit/aligned-filter-${width}.png` });
-  await login(page, fixture.users[0], '/admin/content');
+  await login(page, fixture.users[0], '/admin/works');
   const actions = page.locator('.admin-bulk-actions');
   await expect(actions).toBeVisible();
   for (const button of await actions.getByRole('button').all()) {

@@ -4,7 +4,7 @@ for (const width of [320, 390]) {
   test(`mobile login prioritizes the form without repeated branding at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 740 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await page.goto('/login?callbackUrl=%2Fdashboard');
+    await page.goto('/login?callbackUrl=%2Fmy-works');
     const main = page.getByRole('main');
     await expect(main.locator('[data-brand-lockup="login"]')).toBeHidden();
     await expect(main.getByRole('heading', { level: 1 })).toHaveCount(1);

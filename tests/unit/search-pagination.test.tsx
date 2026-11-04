@@ -5,7 +5,7 @@ vi.mock('@/shared/lib/deferred-fetch', () => ({ fetchDeferredJson: async (url: s
 vi.mock('@/features/members/server/queries', () => ({ getHomeMembers: mocks.members }));
 vi.mock('server-only', () => ({}));
 import HomePage from '@/app/(shell)/(site)/page';
-import CategoryPage from '@/app/(shell)/(site)/category/[slug]/page';
+import CategoryPage from '@/features/publications/components/category-page';
 import { loadHomeFeatured } from '@/app/(shell)/(site)/home-sections';
 import { HomeFeaturedSection, HomeMembersSection } from '@/app/(shell)/(site)/home-sections';
 import { MemberPagination } from '@/shared/ui/member-pagination';

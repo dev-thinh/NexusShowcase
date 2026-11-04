@@ -15,7 +15,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
-  if (!user || !canUserUpload(user)) redirect('/dashboard');
+  if (!user || !canUserUpload(user)) redirect('/my-works');
   if (user.mustChangePassword) redirect('/account/change-password');
 
   const { id } = await params;
@@ -33,10 +33,10 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
     },
   });
   if (!item) notFound();
-  if (item.creatorId !== user.id) redirect('/dashboard');
+  if (item.creatorId !== user.id) redirect('/my-works');
   const editable = item.status === 'PUBLISHED' ? !['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.reviewStatus ?? '') : ['DRAFT', 'REVISION_REQUESTED'].includes(item.status);
   if (!editable) return <main className="container mx-auto max-w-4xl flex-1 px-4 py-8 sm:px-6">
-    <Breadcrumbs items={[{ label: 'Công trình của tôi', href: '/dashboard' }, { label: 'Bản khôi phục' }]} />
+    <Breadcrumbs items={[{ label: 'Công trình của tôi', href: '/my-works' }, { label: 'Bản khôi phục' }]} />
     <h1 className="page-title">Bản khôi phục trên thiết bị</h1>
     <p className="my-4 text-sm">Công trình hiện không được chỉnh sửa. Bạn vẫn có thể lấy lại nội dung chưa đồng bộ trên thiết bị này.</p>
     <ReadOnlyDraftRecoveries accountId={user.id} itemId={item.id} serverVersion={item.reviewVersion} />
@@ -51,7 +51,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
     <>
 
       <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-      <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/dashboard" }, { label: "Chỉnh sửa công trình" }]} />
+      <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/my-works" }, { label: "Chỉnh sửa công trình" }]} />
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
             <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">{item.status === 'PUBLISHED' ? 'Soạn bản cập nhật' : item.status === 'REVISION_REQUESTED' ? 'Chỉnh sửa theo phản hồi' : 'Chỉnh sửa bản nháp'}</h1>

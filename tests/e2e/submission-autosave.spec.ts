@@ -2,8 +2,9 @@ import { expect, login, test } from './fixtures';
 
 test('creates an empty draft immediately and autosaves without blocking typing or duplicating preview', async ({ page, fixture, database }) => {
  const author = fixture.users.find(user => user.role === 'CORE_MEMBER')!;
- await login(page, author, '/dashboard/items/new');
- await expect(page).toHaveURL(/\/dashboard\/items\/[^/]+\/edit$/);
+ await login(page, author);
+ await page.getByRole('link',{name:'Đăng bài mới',exact:true}).click();
+ await expect(page).toHaveURL(/\/my-works\/[^/]+\/edit$/);
  const id = page.url().split('/').at(-2)!;
  expect(await database.showcaseItem.findUniqueOrThrow({where:{id}})).toMatchObject({creatorId:author.id,status:'DRAFT',title:''});
  await expect(page.getByRole('button',{name:'Xem trước',exact:true})).toHaveCount(1);
@@ -16,12 +17,15 @@ test('creates an empty draft immediately and autosaves without blocking typing o
  await expect(page.locator('#submission-title')).toHaveValue('Tự lưu công trình');
  await page.getByRole('button',{name:'Xem trước',exact:true}).click();
  await expect(page.getByRole('button',{name:'Soạn thảo',exact:true})).toHaveCount(1);
+ await page.locator('[data-breadcrumbs]').getByRole('link',{name:'Công trình của tôi',exact:true}).click();
+ await expect(page).toHaveURL(/\/my-works$/);
+ await expect(page.getByRole('heading',{level:3,name:'Tự lưu công trình',exact:true})).toBeVisible();
 });
 
 test('preserves both tabs on version conflict', async ({ page, context, fixture, database }) => {
  const author = fixture.users.find(user=>user.role==='CORE_MEMBER')!;
- await login(page,author,'/dashboard/items/new');
- await expect(page).toHaveURL(/\/dashboard\/items\/[^/]+\/edit$/);
+ await login(page,author,'/my-works/new');
+ await expect(page).toHaveURL(/\/my-works\/[^/]+\/edit$/);
  const url = page.url(); const id=url.split('/').at(-2)!;
  const second = await context.newPage();
  try {
@@ -44,8 +48,8 @@ test('preserves both tabs on version conflict', async ({ page, context, fixture,
 
 test('recovers offline edits after reload and reconnect', async ({ page, context, fixture, database }) => {
  const author = fixture.users.find(user=>user.role==='CORE_MEMBER')!;
- await login(page,author,'/dashboard/items/new');
- await expect(page).toHaveURL(/\/dashboard\/items\/[^/]+\/edit$/);
+ await login(page,author,'/my-works/new');
+ await expect(page).toHaveURL(/\/my-works\/[^/]+\/edit$/);
  const id=page.url().split('/').at(-2)!;
  await test.step('retain an offline edit locally',async()=>{
   await context.setOffline(true);

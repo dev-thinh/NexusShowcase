@@ -1,6 +1,6 @@
 # Submission Autosave Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Create drafts immediately, preserve incomplete edits through network/navigation failures, and keep one preview control at the bottom of the editor.
 
@@ -47,12 +47,12 @@
 - Add a `DraftMutation` persistence record keyed by actor plus mutation ID, storing operation, payload digest, item ID and successful response; commit record and mutation in one transaction. Do not expose another actor's receipt.
 - Reuse `authorDraft` for authoritative author editing snapshots on unpublished as well as published items; `getAuthorDraft` remains the backwards-compatible reader. Unpublished scalar title/summary/type projections keep dashboard lists useful; do not rebuild incomplete resource/contributor relations on autosave.
 
-- [ ] Add failing tests: empty title and unfinished URL round-trip verbatim; malformed/oversized structures reject; submission still requires valid title/resources/contributors; unauthorized asset references reject.
-- [ ] Add integration tests for replayed creation, replayed save, same mutation ID/different payload rejection, actor isolation, competing versions, and commit-then-retry with exactly one version increment.
-- [ ] Run `npx vitest run tests/unit/draft-validation.test.ts` and targeted integration tests using the existing isolated database harness; confirm new cases fail for the intended reasons.
-- [ ] Implement bounded draft schemas and transactional receipt persistence. Creation defaults to PRIVATE/DRAFT, empty title/summary, citation disabled and the actor as initial contributor. Never mutate from render.
-- [ ] Update save to store the complete snapshot without `publicationResources` normalization; update unpublished scalar projections only. Preserve ownership/status/version checks and asset reference guards.
-- [ ] Run Prisma generation, typecheck and the targeted tests; migration must apply to existing fixtures and preserve legacy drafts.
+- [x] Add failing tests: empty title and unfinished URL round-trip verbatim; malformed/oversized structures reject; submission still requires valid title/resources/contributors; unauthorized asset references reject.
+- [x] Add integration tests for replayed creation, replayed save, same mutation ID/different payload rejection, actor isolation, competing versions, and commit-then-retry with exactly one version increment.
+- [x] Run `npx vitest run tests/unit/draft-validation.test.ts` and targeted integration tests using the existing isolated database harness; confirm new cases fail for the intended reasons.
+- [x] Implement bounded draft schemas and transactional receipt persistence. Creation defaults to PRIVATE/DRAFT, empty title/summary, citation disabled and the actor as initial contributor. Never mutate from render.
+- [x] Update save to store the complete snapshot without `publicationResources` normalization; update unpublished scalar projections only. Preserve ownership/status/version checks and asset reference guards.
+- [x] Run Prisma generation, typecheck and the targeted tests; migration must apply to existing fixtures and preserve legacy drafts.
 
 ### Task 2: Submit and load the authoritative editing snapshot
 
@@ -66,10 +66,10 @@
 - `submitDraftCommand(actor, SubmissionInput)` consumes `authorDraft` when present, falls back to existing item relations for legacy drafts, validates complete submission data and constructs the normalized immutable review snapshot.
 - Edit route supplies the authoritative draft, ID and reviewVersion to `SubmissionEditor`; incomplete data is not passed through a lossy legacy resource conversion.
 
-- [ ] Write failing cases for legacy draft fallback, incomplete authorDraft rejection on submit, valid snapshot submission, and published edits leaving live fields unchanged.
-- [ ] Run the targeted tests and confirm the failures.
-- [ ] Implement snapshot-first loading/submission; update valid relations/projections at submission where existing downstream code requires them. Preserve review status, immutable revisions and audit behavior.
-- [ ] Run targeted workflow and conflict tests plus `npm run typecheck`.
+- [x] Write failing cases for legacy draft fallback, incomplete authorDraft rejection on submit, valid snapshot submission, and published edits leaving live fields unchanged.
+- [x] Run the targeted tests and confirm the failures.
+- [x] Implement snapshot-first loading/submission; update valid relations/projections at submission where existing downstream code requires them. Preserve review status, immutable revisions and audit behavior.
+- [x] Run targeted workflow and conflict tests plus `npm run typecheck`.
 
 ### Task 3: Browser recovery and serialized save coordination
 
@@ -83,11 +83,11 @@
 - Recovery functions `listRecoveries(storage, accountId, itemId)`, `writeRecovery(storage, record)`, `removeRecovery(storage, record)` return explicit success/error results; conditional removal requires matching session and sequence. Each mounted editor gets a distinct session UUID, including duplicated tabs; existing records are discovered for recovery rather than overwritten.
 - `DraftSaveCoordinator` accepts injected save action, timers, recovery writer and event callbacks. Exposes `update(data)`, `flush()`, `retry()`, `dispose()`; returns acknowledged ID/version/sequence from flush. Holds immutable pending payload and mutation ID across uncertain retries; newer edits wait for acknowledgement.
 
-- [ ] Add fake-storage tests for account isolation, independent tab sessions, malformed data, quota exceptions and conditional deletion of only the acknowledged sequence.
-- [ ] Add fake-timer/deferred-promise tests for 1500ms idle save, 10000ms maximum, one in-flight request, edits during save, identical mutation retry after lost response, bounded retry delays and stopping on conflict/authorization/status errors.
-- [ ] Run both test files to verify failures before implementation.
-- [ ] Implement recovery and coordinator without React/Next dependencies so behavior is directly testable. Persist pending mutation envelopes before sending. A manual/submit flush waits for latest edits, not only the currently pending request.
-- [ ] Verify both test files pass, including dispose retaining recovery and preventing background writes after unmount.
+- [x] Add fake-storage tests for account isolation, independent tab sessions, malformed data, quota exceptions and conditional deletion of only the acknowledged sequence.
+- [x] Add fake-timer/deferred-promise tests for 1500ms idle save, 10000ms maximum, one in-flight request, edits during save, identical mutation retry after lost response, bounded retry delays and stopping on conflict/authorization/status errors.
+- [x] Run both test files to verify failures before implementation.
+- [x] Implement recovery and coordinator without React/Next dependencies so behavior is directly testable. Persist pending mutation envelopes before sending. A manual/submit flush waits for latest edits, not only the currently pending request.
+- [x] Verify both test files pass, including dispose retaining recovery and preventing background writes after unmount.
 
 ### Task 4: Integrate autosave, recovery and editor controls
 
@@ -102,13 +102,13 @@
 - Recoveries block automatic writes until the user restores or discards them. Same-base recovery resumes saving; stale recovery stays blocked and offers current-server reload plus copy/export of local text, with no blind overwrite.
 - `SubmissionActionBar` uses save-status text separately from submit busy state. `SubmissionEditor` locks editing for submission, not autosave; uploads keep their existing necessary restrictions.
 
-- [ ] Add meaningful browser cases for typing while saving, offline edit/reload/recover/reconnect, storage failure, two-tab conflict and submitting while an earlier save is pending. Update existing reducer assertions where the state contract changes.
-- [ ] Confirm new tests fail before integrating.
-- [ ] Connect coordinator and recovery lifecycle; write browser backup on edits, handle online/offline events and keep beforeunload only when durability is uncertain. Report storage failure honestly.
-- [ ] Implement inline restore/discard/copy recovery controls; do not focus/scroll on background save failures.
-- [ ] Make submit validate complete data, wait for latest flush, freeze editing during its final transition and stop autosave after successful submission. Preserve recovery on failure.
-- [ ] Remove the top preview button; bottom preview uses an eye icon at every viewport and switches label to Soạn thảo when active. Keep manual Save and accurate saved/offline/conflict states.
-- [ ] Run targeted editor/coordinator tests and the browser cases.
+- [x] Add meaningful browser cases for typing while saving, offline edit/reload/recover/reconnect, storage failure, two-tab conflict and submitting while an earlier save is pending. Update existing reducer assertions where the state contract changes.
+- [x] Confirm new tests fail before integrating.
+- [x] Connect coordinator and recovery lifecycle; write browser backup on edits, handle online/offline events and keep beforeunload only when durability is uncertain. Report storage failure honestly.
+- [x] Implement inline restore/discard/copy recovery controls; do not focus/scroll on background save failures.
+- [x] Make submit validate complete data, wait for latest flush, freeze editing during its final transition and stop autosave after successful submission. Preserve recovery on failure.
+- [x] Remove the top preview button; bottom preview uses an eye icon at every viewport and switches label to Soạn thảo when active. Keep manual Save and accurate saved/offline/conflict states.
+- [x] Run targeted editor/coordinator tests and the browser cases.
 
 ### Task 5: Immediate creation, recovery access and release verification
 
@@ -126,8 +126,19 @@
 - Non-editable owner routes show a recovery-only panel so retained local records can be copied/exported/discarded; never enable edits on pending/archived items. Do not expose records to other accounts.
 - Autosave does not trigger broad public/member invalidation on every write; mutation boundaries still refresh private lists and review transitions appropriately.
 
-- [ ] Add tests for double click, lost create response, offline retry, GET/prefetch with no database write, correct default citation/contributor state, and recovery accessibility after another tab submits.
-- [ ] Confirm failures, implement creation entry and non-editable recovery route, then rerun cases.
-- [ ] Run `npm run check`, relevant integration tests, migration upgrade verification, and browser harness workflow scenarios. Fix regressions rather than weakening assertions.
-- [ ] Review the complete diff against the approved spec, particularly asset-reference triggers for authorDraft, raw snapshot parsing and save receipt concurrency. Request an independent final code review and resolve material findings.
-- [ ] Update plan checkboxes and report evidence, changed behavior and any remaining deployment requirement (including applying migration). Leave changes reviewable; do not deploy or merge without an explicit request.
+- [x] Add tests for double click, lost create response, offline retry, GET/prefetch with no database write, correct default citation/contributor state, and recovery accessibility after another tab submits.
+- [x] Confirm failures, implement creation entry and non-editable recovery route, then rerun cases.
+- [x] Run `npm run check`, relevant integration tests, migration upgrade verification, and browser harness workflow scenarios. Fix regressions rather than weakening assertions.
+- [x] Review the complete diff against the approved spec, particularly asset-reference triggers for authorDraft, raw snapshot parsing and save receipt concurrency. Request an independent final code review and resolve material findings.
+- [x] Update plan checkboxes and report evidence, changed behavior and any remaining deployment requirement (including applying migration). Leave changes reviewable; do not deploy or merge without an explicit request.
+
+
+## Execution results
+
+Implemented in `feat/submission-autosave`; authoritative snapshots use `authorDraft`, and mutations are recorded transactionally in `draft_mutations`. Existing draft fields/relations remain the legacy loading fallback; validated resource/contributor projections are rebuilt at submission. Correctable validation failures permit a new save, including corrections made while the rejected request was pending. Unrecoverable browser writes are never reported durable and the editor offers content export.
+
+An independent final reviewer identified three issues (browser writer/reader size contract, corrections during a validation response, and article URL constraints). All were reproduced with failing tests and fixed. Full check passed with 838 unit tests before the route follow-up, and full integration passed with 116 tests. Fresh and legacy migration verification passed. Production browser scenarios covered immediate creation/single preview, offline reload recovery, two tabs, conference metadata, direct approval and private PDF access.
+
+The user's subsequent canonical URL request is documented in `../specs/2026-11-04-canonical-page-urls.md`; implementation route locations and links now follow those names. The route follow-up full check passed 841 unit tests and all 116 integration tests; separate review found no issues. Final focused production browser rerun: 5/5 passed (legacy redirects, canonical navigation, immediate draft/single preview/list refresh, two-tab conflict, offline reload recovery). The preceding broader run passed the other 20 related navigation/workflow scenarios.
+
+Deployment requires applying `20261104_submission_autosave`; this work does not publish or deploy the application.

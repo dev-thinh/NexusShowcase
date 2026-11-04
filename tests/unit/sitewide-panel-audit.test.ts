@@ -7,7 +7,7 @@ const source = (path: string) => readFileSync(join(root, path), 'utf8');
 
 describe('sitewide public panel audit', () => {
   it.each([
-    'src/app/(shell)/(site)/category/[slug]/page.tsx',
+    'src/features/publications/components/category-page.tsx',
   ])('%s uses the shared public panel treatment', (path) => {
     expect(source(path)).toContain('panel-public');
   });

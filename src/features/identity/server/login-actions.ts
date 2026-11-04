@@ -17,7 +17,7 @@ export async function loginAction(
   const password = formData.get('password') as string;
   const destination = formData.get('redirectTo');
   const redirectTo = typeof destination === 'string' && /^\/(?![\/\\])/.test(destination) && !/[\u0000-\u0020]/.test(destination)
-    ? destination : '/dashboard';
+    ? destination : '/my-works';
 
   if (!email || !password) {
     return { error: 'Vui lòng nhập đầy đủ email và mật khẩu.' };

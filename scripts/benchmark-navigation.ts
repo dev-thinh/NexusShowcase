@@ -7,8 +7,8 @@ import path from 'node:path';
 type Event = { name: 'auth' | 'query'; durationMs: number; timestamp: number };
 type Route = { path: string; shellSelector: string; shellText?: string; dataText: string };
 const routes: Route[] = [
-  { path: '/category/bai-bao-khoa-hoc', shellSelector: 'main h1', shellText: 'Benchmark Research', dataText: 'Benchmark Research 0000' },
-  { path: '/category/robotics-iot', shellSelector: 'main h1', shellText: 'Benchmark Robotics', dataText: 'Benchmark Robotics 0001' },
+  { path: '/research', shellSelector: 'main h1', shellText: 'Benchmark Research', dataText: 'Benchmark Research 0000' },
+  { path: '/projects', shellSelector: 'main h1', shellText: 'Benchmark Robotics', dataText: 'Benchmark Robotics 0001' },
   { path: '/members', shellSelector: 'main h1', dataText: 'Benchmark Member 000' },
   { path: '/', shellSelector: '#home-content', dataText: 'Công trình nổi bật' },
 ];

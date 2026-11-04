@@ -1,3 +1,4 @@
+import { categoryPagePath } from '../../src/shared/lib/page-urls';
 import { Prisma } from '@prisma/client';
 import { acknowledgeSuccess, expect, login, test } from './fixtures';
 
@@ -10,7 +11,7 @@ test('conference editor preserves both milestone dates and supports research pap
   const researchCategory = await database.category.findUniqueOrThrow({ where: { slug: 'bai-bao-khoa-hoc' } });
   const projectCategory = await database.category.findUniqueOrThrow({ where: { slug: 'robotics-iot' } });
   let itemId: string | undefined;
-  await login(page, fixture.users[1], '/dashboard/items/new');
+  await login(page, fixture.users[1], '/my-works/new');
   try {
     await expect(page.getByLabel('Bài có thông tin hội nghị')).not.toBeChecked();
     await page.locator('#submission-title').fill(title);
@@ -41,7 +42,7 @@ test('conference editor preserves both milestone dates and supports research pap
     const item = await database.showcaseItem.findFirstOrThrow({ where: { title, creatorId: fixture.users[1].id } });
     itemId = item.id;
     expect(item.conference).toEqual({ ...conference, rankings: conference.rankings.slice(0, 2) });
-    await page.goto(`/dashboard/items/${item.id}/edit`);
+    await page.goto(`/my-works/${item.id}/edit`);
     await expect(page.locator('#conference-name')).toHaveValue(conference.name);
     await page.getByRole('button', { name: 'Xóa xếp hạng 2', exact: true }).click();
     await expect(page.locator('#conference-ranking-system-1')).toHaveCount(0);
@@ -59,7 +60,7 @@ test('conference editor preserves both milestone dates and supports research pap
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
     await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
     expect((await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id } })).conference).toMatchObject({ status: 'PUBLISHED', acceptedDate: conference.acceptedDate, publicationDate: '2027-03-01' });
-    await page.goto(`/dashboard/items/${item.id}/edit`);
+    await page.goto(`/my-works/${item.id}/edit`);
     await expect(page.locator('#conference-publication-date')).toHaveValue('2027-03-01');
     await page.getByRole('combobox', { name: 'Trạng thái công bố', exact: true }).click();
     await page.getByRole('option', { name: 'Đã chấp nhận', exact: true }).click();
@@ -89,7 +90,7 @@ for (const type of ['RESEARCH_PAPER', 'PROJECT'] as const) test(`conference meta
     } });
     for (const width of [320, 390, 640, 700, 768, 900, 1024, 1100, 1280, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
-      for (const path of ['/', `/category/${slug}?q=Conference%20alignment`]) {
+      for (const path of ['/', `${categoryPagePath(slug)}?q=Conference%20alignment`]) {
         await page.goto(path);
         if (path === '/') {
           const section = page.locator('[data-deferred-section="featured"]');
@@ -140,18 +141,18 @@ for (const type of ['RESEARCH_PAPER', 'PROJECT'] as const) test(`conference meta
       }
     }
     await database.showcaseItem.update({ where: { id: originals[0].id }, data: { conference: { ...conference, status: 'PUBLISHED', publicationDate: '2027-03-01' } } });
-    await page.goto(`/category/${slug}?q=Conference%20alignment`);
+    await page.goto(`${categoryPagePath(slug)}?q=Conference%20alignment`);
     const metadata = page.locator('[data-card-conference]').filter({ hasText: conference.name });
     await expect(metadata).toContainText('Đã công bố');
     await expect(metadata).toContainText('01/03/2027');
     await expect(metadata).not.toContainText('20/12/2026');
-    await page.goto(`/showcase/${originals[0].slug}`);
+    await page.goto(`/works/${originals[0].slug}`);
     const detail = page.getByRole('region', { name: 'Thông tin hội nghị', exact: true });
     await expect(detail).toContainText(conference.name);
     await expect(detail).toContainText(conference.rankings[3].system);
     await expect(detail).toContainText('01/03/2027');
     await expect(detail).not.toContainText('20/12/2026');
-    await page.goto(`/showcase/${originals[1].slug}`);
+    await page.goto(`/works/${originals[1].slug}`);
     await expect(page.getByRole('heading', { name: titles[1], exact: true })).toBeVisible();
     await expect(page.getByRole('region', { name: 'Thông tin hội nghị', exact: true })).toHaveCount(0);
   } finally {

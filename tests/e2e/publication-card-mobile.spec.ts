@@ -4,7 +4,7 @@ for (const width of [320, 390]) test(`publication cards share compact actions an
   await page.setViewportSize({ width, height: 844 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await login(page, fixture.users[0], '/');
-  for (const path of ['/', '/explore', '/category/bai-bao-khoa-hoc', '/category/robotics-iot']) {
+  for (const path of ['/', '/explore', '/research', '/projects']) {
     if (path !== '/') await page.goto(path);
     const card = page.locator('.publication-card').first();
     await expect(card).toBeVisible();

@@ -25,13 +25,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const filter = postFilters.find(option => option.value === params.filter)?.value ?? 'ALL';
   const actor = { id: user.id, fullName: user.fullName, role: user.role, status: 'ACTIVE' as const, mustChangePassword: false };
   const [posts, counts] = await Promise.all([listAuthorItems({ actor, q: query, filter, page: params.page }), authorItemStats(actor)]);
-  const basePath = '/dashboard?' + new URLSearchParams({ filter, ...(query ? { q: query } : {}) });
+  const basePath = '/my-works?' + new URLSearchParams({ filter, ...(query ? { q: query } : {}) });
 
   return <>
     <main className="container mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
       <Breadcrumbs items={[{ label: "Công trình của tôi" }]} />
       <ManagementHeader title="Công trình của tôi" description="Theo dõi công trình bạn đăng hoặc đóng góp, từ bản nháp đến khi xuất bản.">
-        {isUploader && <Link href="/dashboard/items/new" className="action-primary-detail"><Plus aria-hidden="true" className="h-4 w-4" />Đăng bài mới</Link>}
+        {isUploader && <Link href="/my-works/new" className="action-primary-detail"><Plus aria-hidden="true" className="h-4 w-4" />Đăng bài mới</Link>}
       </ManagementHeader>
       <div className="mb-6 grid grid-cols-3 gap-3">
         <ManagementStat label="Tổng công trình" value={counts.ALL} icon={FileText} />

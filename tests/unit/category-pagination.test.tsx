@@ -1,5 +1,5 @@
 vi.mock('server-only', () => ({}));
-import CategoryPageShell from '@/app/(shell)/(site)/category/[slug]/page';
+import CategoryPageShell from '@/features/publications/components/category-page';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';

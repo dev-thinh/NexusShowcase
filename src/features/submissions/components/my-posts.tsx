@@ -20,13 +20,13 @@ export function MyPosts({ items, isUploader, query, filter, counts, total }: { i
   return <section className="min-w-0" aria-labelledby="my-posts-title">
     <div className="mb-4 space-y-4">
       <h2 id="my-posts-title" className="text-lg font-semibold text-[#1F2937]">Công trình <span className="ml-1 text-sm font-normal text-slate-500">{total}</span></h2>
-      <ManagementFilters action="/dashboard" query={query} searchId="my-post-search" searchLabel="Tìm công trình" placeholder="Tìm công trình…" filterName="filter" filterValue={filter} filterLabel="Lọc trạng thái bài đăng" options={postFilters.map(option => ({ ...option, count: counts[option.value] }))} />
+      <ManagementFilters action="/my-works" query={query} searchId="my-post-search" searchLabel="Tìm công trình" placeholder="Tìm công trình…" filterName="filter" filterValue={filter} filterLabel="Lọc trạng thái bài đăng" options={postFilters.map(option => ({ ...option, count: counts[option.value] }))} />
     </div>
-    {!counts.ALL ? <div className="p-4 sm:p-5"><EmptyState icon={FolderPlus} title="Bạn chưa có công trình nào" description={isUploader ? 'Các công trình bạn đăng hoặc tham gia sẽ xuất hiện tại đây.' : 'Liên hệ quản trị viên để được cấp quyền đăng bài.'} actionLabel={isUploader ? 'Đăng bài mới' : undefined} actionHref={isUploader ? '/dashboard/items/new' : undefined} /></div> : !filteredItems.length ? <div className="px-4 py-10 text-center"><p className="text-sm font-semibold text-[#1F2937]">Không có công trình phù hợp</p><Link href="/dashboard" className="mt-3 text-sm font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link></div> : <div className="panel-operational divide-y divide-slate-100 overflow-hidden !rounded-xl !p-0 !shadow-none">{filteredItems.map(item => {
+    {!counts.ALL ? <div className="p-4 sm:p-5"><EmptyState icon={FolderPlus} title="Bạn chưa có công trình nào" description={isUploader ? 'Các công trình bạn đăng hoặc tham gia sẽ xuất hiện tại đây.' : 'Liên hệ quản trị viên để được cấp quyền đăng bài.'} actionLabel={isUploader ? 'Đăng bài mới' : undefined} actionHref={isUploader ? '/my-works/new' : undefined} /></div> : !filteredItems.length ? <div className="px-4 py-10 text-center"><p className="text-sm font-semibold text-[#1F2937]">Không có công trình phù hợp</p><Link href="/my-works" className="mt-3 text-sm font-semibold text-[#1F2937] hover:underline">Xóa bộ lọc</Link></div> : <div className="panel-operational divide-y divide-slate-100 overflow-hidden !rounded-xl !p-0 !shadow-none">{filteredItems.map(item => {
       const editable = item.canManage && isUploader && (['DRAFT', 'REVISION_REQUESTED'].includes(item.status) || item.status === 'PUBLISHED' && !canReviewItem(item));
       const feedback = (['REJECTED', 'REVISION_REQUESTED'].includes(item.status) || ['REJECTED', 'REVISION_REQUESTED'].includes(item.reviewStatus ?? '')) && item.rejectionReason;
       const canView = item.canManage || item.status === 'PUBLISHED';
-      const href = editable && item.status !== 'PUBLISHED' ? `/dashboard/items/${item.id}/edit` : `/showcase/${item.slug}`;
+      const href = editable && item.status !== 'PUBLISHED' ? `/my-works/${item.id}/edit` : `/works/${item.slug}`;
       return <article key={item.id} className="p-4 sm:p-5">
         <div className="flex items-start gap-4">
           {canView && <Link href={href} tabIndex={-1} aria-hidden="true" className="hidden shrink-0 sm:block"><MediaImage src={item.thumbnailUrl} alt="" loading="lazy" className="h-20 w-28 rounded-md border border-slate-200 object-cover" /></Link>}
@@ -36,9 +36,9 @@ export function MyPosts({ items, isUploader, query, filter, counts, total }: { i
         <div className="mt-3 flex flex-wrap items-center justify-end gap-2">
           {!item.canManage && <span className="text-xs text-[#1F2937]">Chỉ theo dõi</span>}
           {item.canManage && isUploader && canReviewItem(item) && <WithdrawSubmissionButton itemId={item.id} reviewVersion={item.reviewVersion} />}
-          {editable ? <Link href={`/dashboard/items/${item.id}/edit`} className="action-secondary-card">{item.status === 'PUBLISHED' ? 'Soạn bản cập nhật' : item.status === 'REVISION_REQUESTED' ? 'Sửa theo phản hồi' : 'Chỉnh sửa'}</Link> : (item.status === 'REJECTED' || !isUploader && ['DRAFT', 'REVISION_REQUESTED'].includes(item.status)) && <span className="text-xs text-[#1F2937]">Chỉ đọc</span>}
-          {item.canManage && isUploader && !editable && <Link href={`/dashboard/items/${item.id}/edit`} className="action-secondary-card">Bản khôi phục</Link>}
-          {canView && <Link href={`/showcase/${item.slug}`} className="action-secondary-card">{item.status === 'PUBLISHED' ? 'Xem bài' : 'Xem trước'}<ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>}
+          {editable ? <Link href={`/my-works/${item.id}/edit`} className="action-secondary-card">{item.status === 'PUBLISHED' ? 'Soạn bản cập nhật' : item.status === 'REVISION_REQUESTED' ? 'Sửa theo phản hồi' : 'Chỉnh sửa'}</Link> : (item.status === 'REJECTED' || !isUploader && ['DRAFT', 'REVISION_REQUESTED'].includes(item.status)) && <span className="text-xs text-[#1F2937]">Chỉ đọc</span>}
+          {item.canManage && isUploader && !editable && <Link href={`/my-works/${item.id}/edit`} className="action-secondary-card">Bản khôi phục</Link>}
+          {canView && <Link href={`/works/${item.slug}`} className="action-secondary-card">{item.status === 'PUBLISHED' ? 'Xem bài' : 'Xem trước'}<ArrowRight aria-hidden="true" className="h-3.5 w-3.5" /></Link>}
         </div>
       </article>;
     })}</div>}

@@ -14,7 +14,7 @@ describe('operational panel consistency', () => {
     expect(read(file)).toContain('panel-operational');
   });
 
-  it.each(['src/app/dashboard/loading.tsx', 'src/app/admin/loading.tsx'])(
+  it.each(['src/app/my-works/loading.tsx', 'src/app/admin/loading.tsx'])(
     'keeps the current page until the management destination is ready: %s',
     (file) => {
       expect(fs.existsSync(path.resolve(process.cwd(), file))).toBe(false);

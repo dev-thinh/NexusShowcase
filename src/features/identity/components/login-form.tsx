@@ -20,7 +20,7 @@ import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') || '/my-works';
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');

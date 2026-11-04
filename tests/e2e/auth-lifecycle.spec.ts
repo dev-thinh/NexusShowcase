@@ -15,5 +15,5 @@ test('forced password change signs out and requires the new password', async ({ 
   await expect(page).toHaveURL(/\/login$/);
   expect(await database.user.findUnique({ where: { id: user.id }, select: { mustChangePassword: true, sessionVersion: true } })).toEqual({ mustChangePassword: false, sessionVersion: 2 });
   await login(page, { ...user, password: newPassword });
-  await expect(page).toHaveURL(/\/dashboard$/);
+  await expect(page).toHaveURL(/\/my-works$/);
 });

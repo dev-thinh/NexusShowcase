@@ -1,3 +1,4 @@
+import { categoryPagePath } from '@/shared/lib/page-urls';
 import { ConferenceDetails } from '@/features/publications/components/conference-details';
 import { ContributorNames, ContributorName } from '@/features/publications/components/contributor-names';
 import { MediaImage } from '@/shared/ui/media-image';
@@ -52,7 +53,7 @@ export default async function ShowcaseDetailPage({
   }
 
   if (item.visibility === 'PRIVATE' && !currentUser) {
-    redirect(`/login?callbackUrl=/showcase/${slug}`);
+    redirect(`/login?callbackUrl=/works/${slug}`);
   }
 
   const structured = parseArticleContent(item.content);
@@ -62,13 +63,13 @@ export default async function ShowcaseDetailPage({
   const categorySlug = item.type === 'PROJECT' ? 'robotics-iot' : 'bai-bao-khoa-hoc';
   const categoryName = item.type === 'PROJECT' ? 'Dự án & Sản phẩm' : 'Nghiên cứu khoa học';
   const source = await searchParams;
-  const backHref = showcaseReturnTarget(source?.returnTo, `/category/${categorySlug}`);
+  const backHref = showcaseReturnTarget(source?.returnTo, categoryPagePath(categorySlug));
   const breadcrumbParents = currentUser?.role === 'ADMIN' && item.status === 'PENDING_REVIEW'
     ? [{ label: 'Quản trị', href: '/admin' }, { label: 'Phê duyệt bài đăng', href: '/admin/reviews' }]
     : backHref === '/' ? [] : [{
-      label: backHref.startsWith('/explore') || backHref.startsWith('/?') ? 'Khám phá công trình'
-        : backHref.startsWith('/category/robotics-iot') ? 'Dự án & Sản phẩm'
-        : backHref.startsWith('/category/bai-bao-khoa-hoc') ? 'Nghiên cứu khoa học' : categoryName,
+      label: backHref.startsWith('/?') ? 'Khám phá công trình'
+        : backHref.startsWith('/projects') ? 'Dự án & Sản phẩm'
+        : backHref.startsWith('/research') ? 'Nghiên cứu khoa học' : categoryName,
       href: backHref,
     }];
   const documents = item.attachments.filter(attachment => !attachment.mimeType.startsWith('image/'));
@@ -120,7 +121,7 @@ export default async function ShowcaseDetailPage({
             {(item.status === 'DRAFT' || item.status === 'REVISION_REQUESTED') && (
               ((currentUser?.id === item.creatorId && (currentUser?.role === 'CORE_MEMBER' || currentUser?.role === 'ADMIN')) || currentUser?.role === 'ADMIN') ? (
                 <Link
-                  href={`/dashboard/items/${item.id}/edit`}
+                  href={`/my-works/${item.id}/edit`}
                   className="px-4 py-2 bg-brand-button hover:brightness-110 text-white rounded-lg text-xs font-semibold transition-all shadow-xs"
                 >
                   {item.status === 'REVISION_REQUESTED' ? 'Sửa & Gửi lại duyệt' : 'Chỉnh sửa bài viết'}

@@ -7,19 +7,19 @@ export function LoadingTitle({ fallback, pathname: destination }: { fallback: st
   const currentPathname = usePathname();
   const pathname = destination ?? currentPathname;
   const title = pathname === '/' ? 'Trang chủ'
-    : pathname === '/explore' ? 'Khám phá công trình'
     : pathname === '/members' ? 'Thành viên CLB Robotics & IoT - HCMUS'
     : pathname === '/login' ? 'Đăng nhập'
     : pathname === '/account/change-password' ? 'Đổi mật khẩu'
     : pathname === '/admin/members' ? 'Quản lý thành viên'
     : pathname.startsWith('/admin/reviews') ? 'Phê duyệt bài đăng'
+    : pathname === '/admin/works' ? 'Nội dung'
     : pathname === '/admin' ? 'Tổng quan quản trị'
-    : pathname.includes('/items/new') ? 'Đăng công trình mới'
+    : pathname === '/my-works/new' ? 'Đăng công trình mới'
     : pathname.includes('/edit') ? 'Chỉnh sửa bài đăng'
-    : pathname.startsWith('/dashboard') ? 'Công trình của tôi'
+    : pathname.startsWith('/my-works') ? 'Công trình của tôi'
     : pathname.startsWith('/members/all') ? 'Tất cả thành viên'
-    : pathname.startsWith('/category/bai-bao-khoa-hoc') ? 'Nghiên cứu khoa học'
-    : pathname.startsWith('/category/robotics-iot') ? 'Dự án & Sản phẩm'
+    : pathname.startsWith('/research') ? 'Nghiên cứu khoa học'
+    : pathname.startsWith('/projects') ? 'Dự án & Sản phẩm'
     : fallback;
   return <h1 className="text-2xl font-semibold tracking-tight text-[#1F2937] sm:text-3xl">{title}</h1>;
 }

@@ -28,7 +28,7 @@ export function NewDraft({ accountId }: { accountId: string }) {
           if (!active) return;
           if (!result.success) { setError(result.error); return; }
           try { if (window.sessionStorage.getItem(key) === mutationId) window.sessionStorage.removeItem(key); } catch {}
-          router.replace(`/dashboard/items/${result.data.id}/edit`);
+          router.replace(`/my-works/${result.data.id}/edit`);
         } catch { if (active) setError('Chưa tạo được bản nháp. Kiểm tra kết nối và thử lại.'); }
         finally { pending = false; if (active) setBusy(false); }
       });

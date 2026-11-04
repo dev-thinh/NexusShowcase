@@ -210,7 +210,7 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
       }
       coordinator.dispose();
       await notifySuccess('Đã gửi công trình để xét duyệt.');
-      router.replace('/dashboard'); return true;
+      router.replace('/my-works'); return true;
     } catch {
       dispatch({ type: 'failed', error: 'Không gửi được bài. Bản nháp đã lưu vẫn được giữ lại.' }); return false;
     } finally { busyRef.current = false; setSubmitting(false); }

@@ -4,7 +4,7 @@ for (const width of [390, 1440]) {
   test(`public pages use the same breadcrumb at ${width}px`, async ({ page, fixture }) => {
     await page.setViewportSize({ width, height: 900 });
     let reference: unknown;
-    for (const route of ['/explore', '/category/bai-bao-khoa-hoc', '/category/robotics-iot', '/members', '/members/all', `/members/${fixture.users[1].id}`, '/showcase/benchmark-0', '/contact']) {
+    for (const route of ['/explore', '/research', '/projects', '/members', '/members/all', `/members/${fixture.users[1].id}`, '/works/benchmark-0', '/contact']) {
       await page.goto(route);
       const breadcrumb = page.getByRole('navigation', { name: 'Đường dẫn', exact: true });
       await expect(breadcrumb).toHaveCount(1);
@@ -25,7 +25,7 @@ for (const width of [390, 1440]) {
 
 test('account and administration pages use the shared hierarchy', async ({ page, fixture }) => {
   await login(page, fixture.users[0], '/admin');
-  for (const route of ['/admin', '/admin/members', '/admin/reviews', '/dashboard', '/dashboard/items/new', '/account/change-password']) {
+  for (const route of ['/admin', '/admin/members', '/admin/reviews', '/my-works', '/my-works/new', '/account/change-password']) {
     await page.goto(route);
     const breadcrumb = page.locator('[data-breadcrumbs]');
     await expect(breadcrumb).toHaveCount(1);
@@ -35,12 +35,12 @@ test('account and administration pages use the shared hierarchy', async ({ page,
 });
 
 test('detail breadcrumb preserves library filters and pagination', async ({ page }) => {
-  const source = '/category/bai-bao-khoa-hoc?q=Benchmark&page=2';
-  await page.goto(`/showcase/benchmark-0?returnTo=${encodeURIComponent(source)}`);
+  const source = '/research?q=Benchmark&page=2';
+  await page.goto(`/works/benchmark-0?returnTo=${encodeURIComponent(source)}`);
   const parent = page.locator('[data-breadcrumbs]').getByRole('link', { name: 'Nghiên cứu khoa học', exact: true });
   await expect(parent).toHaveAttribute('href', source);
   await parent.click();
-  await expect(page).toHaveURL(/\/category\/bai-bao-khoa-hoc\?q=Benchmark&page=2$/);
+  await expect(page).toHaveURL(/\/research\?q=Benchmark&page=2$/);
 });
 
 for (const width of [390, 1440]) {

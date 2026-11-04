@@ -13,7 +13,7 @@ export default async function HomePage({ searchParams }: {
     const query = new URLSearchParams();
     if (params.q.trim()) query.set('q', params.q.trim());
     if (params.page) query.set('page', params.page);
-    redirect('/category/bai-bao-khoa-hoc' + (query.size ? '?' + query : ''));
+    redirect('/research' + (query.size ? '?' + query : ''));
   }
 
   return (
@@ -27,7 +27,7 @@ export default async function HomePage({ searchParams }: {
                 <p className="home-section-eyebrow"><HomeText field="featuredEyebrow">Dấu ấn nghiên cứu</HomeText></p>
                 <h2 id="featured-works-title" className="home-section-title"><HomeText field="featuredTitle">Công trình nổi bật</HomeText></h2>
               </div>
-              <Link href="/category/bai-bao-khoa-hoc" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
+              <Link href="/research" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
                 <HomeText field="featuredAction">Xem nghiên cứu khoa học</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>

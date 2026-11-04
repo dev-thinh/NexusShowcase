@@ -1,3 +1,4 @@
+import { categoryPagePath } from '@/shared/lib/page-urls';
 import { ConferenceCardBanner } from '@/features/publications/components/conference-card-banner';
 import { PublicationCardMeta } from '@/features/publications/components/publication-card-meta';
 import { PublicationCardDescription } from '@/features/publications/components/publication-card-description';
@@ -21,7 +22,6 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { notFound, redirect } from 'next/navigation';
 import { Suspense } from 'react';
 
-export const dynamic = 'force-dynamic';
 
 export default async function CategoryPage({
   params,
@@ -31,8 +31,8 @@ export default async function CategoryPage({
   searchParams: Promise<{ page?: string; q?: string; year?: string; sort?: string }>;
 }) {
   const { slug } = await params;
-  if (slug === 'du-an-sang-tao') redirect('/category/robotics-iot');
-  if (slug === 'thanh-tich') redirect('/category/bai-bao-khoa-hoc');
+  if (slug === 'du-an-sang-tao') redirect('/projects');
+  if (slug === 'thanh-tich') redirect('/research');
   const session = await auth();
   const isAdmin = (session?.user as { role?: string } | undefined)?.role === 'ADMIN';
   const currentUser = session?.user;
@@ -57,7 +57,7 @@ export default async function CategoryPage({
   if (searchQuery) filterParams.set('q', searchQuery);
   if (year) filterParams.set('year', String(year));
   if (sort !== 'featured') filterParams.set('sort', sort);
-  const basePath = `/category/${slug}${filterParams.size ? `?${filterParams}` : ''}`;
+  const basePath = `${categoryPagePath(slug)}${filterParams.size ? `?${filterParams}` : ''}`;
   const hasFilters = !!(searchQuery || year || sort !== 'featured');
   const returnToKey = `${basePath}:${query.page ?? '1'}`;
   async function CategoryResults() {
@@ -211,7 +211,7 @@ export default async function CategoryPage({
           </div>
         </header>
 
-        <PublicationFilters action={`/category/${slug}`} searchLabel="Tìm kiếm trong chuyên mục" searchQuery={searchQuery} year={year} sort={sort} defaultSort="featured" hasFilters={hasFilters} />
+        <PublicationFilters action={categoryPagePath(slug)} searchLabel="Tìm kiếm trong chuyên mục" searchQuery={searchQuery} year={year} sort={sort} defaultSort="featured" hasFilters={hasFilters} />
 
         <Suspense key={returnToKey} fallback={<LoadingCards />}><CategoryResults /></Suspense>
       </main>

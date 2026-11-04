@@ -8,7 +8,7 @@ for (const width of [320, 1280]) {
     const navigation = page.getByRole('navigation', { name: 'Điều hướng quản trị' });
     for (const [label, path, filterLabel] of [
       ['Thành viên', '/admin/members', 'Lọc theo vai trò'],
-      ['Nội dung', '/admin/content', 'Lọc nội dung'],
+      ['Nội dung', '/admin/works', 'Lọc nội dung'],
       ['Phê duyệt', '/admin/reviews', ''],
     ]) {
       await navigation.getByRole('link', { name: label, exact: true }).click();

@@ -26,7 +26,7 @@ for (const width of [390, 768, 1440]) test(`keeps content readable with reduced 
   await capture('art', '.home-hero__logo-core');
   await openPublicNavigation(page);
   await capture('navigation', 'nav a[aria-current="page"]');
-  await page.goto('/category/bai-bao-khoa-hoc');
+  await page.goto('/research');
   await expect(page.getByRole('heading', { name: 'Benchmark Research 0000', exact: true })).toBeVisible();
   await capture('card', 'article');
   await page.getByRole('button', { name: 'Trích dẫn công trình (Cite)', exact: true }).first().click();

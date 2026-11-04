@@ -8,7 +8,7 @@ const tabs = [
   { href: '/admin', label: 'Tổng quan' },
   { href: '/admin/reviews', label: 'Phê duyệt' },
   { href: '/admin/members', label: 'Thành viên' },
-  { href: '/admin/content', label: 'Nội dung' },
+  { href: '/admin/works', label: 'Nội dung' },
 ] as const;
 
 export function AdminTabs() {

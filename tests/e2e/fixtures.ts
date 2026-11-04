@@ -27,7 +27,7 @@ export async function acknowledgeSuccess(page: Page, message?: string) {
   await dialog.getByRole('button', { name: 'Đã hiểu', exact: true }).click();
   await expect(dialog).toHaveCount(0);
 }
-export async function login(page: Page, user: TestUser, callbackUrl = '/dashboard') {
+export async function login(page: Page, user: TestUser, callbackUrl = '/my-works') {
   // Fixture logins repeat across browser scenarios. Reset only this seeded
   // identity's budget; direct form submissions still exercise real throttling.
   if (!process.env.HARNESS_MANIFEST) throw Error('Missing isolated harness manifest.');

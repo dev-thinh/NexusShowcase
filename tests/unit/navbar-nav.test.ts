@@ -16,15 +16,15 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain('Công trình của tôi');
     expect(content).not.toContain('<span>Dashboard</span>');
     expect(content).toContain('aria-controls="profile-navigation"');
-    expect(content).toContain("href: '/dashboard'");
+    expect(content).toContain("href: '/my-works'");
     expect(content).toContain('bg-brand-button');
 
     const html = renderToStaticMarkup(React.createElement(PublicNavigation));
     const links = [...html.matchAll(/<a[^>]*href="([^"]+)"[^>]*>(.*?)<\/a>/g)].map(match => ({ href: match[1], label: match[2].replace(/<[^>]+>/g, '').replace(/&amp;/g, '&') }));
     expect(links).toEqual([
       { href: '/', label: 'Trang chủ' },
-      { href: '/category/bai-bao-khoa-hoc', label: 'Nghiên cứu khoa học' },
-      { href: '/category/robotics-iot', label: 'Dự án & Sản phẩm' },
+      { href: '/research', label: 'Nghiên cứu khoa học' },
+      { href: '/projects', label: 'Dự án & Sản phẩm' },
       { href: '/members', label: 'Thành viên' },
       { href: '/contact', label: 'Liên hệ' },
     ]);
@@ -50,8 +50,8 @@ describe('Navbar Nav Component Structure', () => {
     expect(content).toContain('grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]');
 
     const html = renderToStaticMarkup(React.createElement(PublicNavigation));
-    expect(html).toContain('href="/category/bai-bao-khoa-hoc"');
-    expect(html).toContain('href="/category/robotics-iot"');
+    expect(html).toContain('href="/research"');
+    expect(html).toContain('href="/projects"');
   });
 
   it('keeps one admin workspace entry and personal actions in the account menu', () => {
@@ -61,6 +61,6 @@ describe('Navbar Nav Component Structure', () => {
     expect(navContent).toContain("href: '/admin', label: 'Quản trị'");
     expect(navContent).not.toContain("href: '/admin/reviews'");
     expect(navContent).not.toContain("href: '/admin/members'");
-    expect(navContent).toContain("href: '/dashboard'");
+    expect(navContent).toContain("href: '/my-works'");
   });
 });

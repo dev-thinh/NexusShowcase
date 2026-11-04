@@ -60,7 +60,7 @@ export function generateBibTeX(item: CitationItem): string {
   booktitle = {${venue}},
   year = {${year}},
   organization = {Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM},
-  url = {https://robotics-iot.hcmus.edu.vn/showcase/${item.slug}}
+  url = {https://robotics-iot.hcmus.edu.vn/works/${item.slug}}
 }`;
 }
 
@@ -85,7 +85,7 @@ export function generateAPA(item: CitationItem): string {
 
   const venue = item.issuer || 'CLB Robotics & IoT - HCMUS';
   const year = item.publishedYear ?? new Date().getFullYear();
-  return `${authorString} (${year}). ${item.title}. ${venue}. https://robotics-iot.hcmus.edu.vn/showcase/${item.slug}`;
+  return `${authorString} (${year}). ${item.title}. ${venue}. https://robotics-iot.hcmus.edu.vn/works/${item.slug}`;
 }
 
 export function generateIEEE(item: CitationItem): string {

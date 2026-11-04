@@ -19,7 +19,7 @@ test('a broken post image recovers into the shared placeholder', async ({ page, 
   const item = await database.showcaseItem.findFirstOrThrow({ where: { status: 'PUBLISHED', visibility: 'PUBLIC' }, select: { id: true, slug: true, title: true, thumbnailUrl: true } });
   try {
     await database.showcaseItem.update({ where: { id: item.id }, data: { thumbnailUrl: '/uploads/thumbnails/missing-image-test.png' } });
-    await page.goto(`/showcase/${item.slug}`);
+    await page.goto(`/works/${item.slug}`);
     await expect(page.getByRole('img', { name: `Hình minh họa: ${item.title}: Chưa có ảnh`, exact: true })).toHaveAttribute('data-media-placeholder', 'true');
   } finally {
     await database.showcaseItem.update({ where: { id: item.id }, data: { thumbnailUrl: item.thumbnailUrl } });

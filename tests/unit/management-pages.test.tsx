@@ -13,7 +13,7 @@ vi.mock('@/features/identity/server/auth', () => ({ auth: mocks.auth }));
 vi.mock('@/server/db/prisma', () => ({ prisma: { user: { groupBy: mocks.groups, findUnique: mocks.userFind, findMany: mocks.members, count: mocks.memberCount }, showcaseItem: { groupBy: mocks.groups, findMany: mocks.items, count: mocks.itemCount } } }));
 vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => <header>CLB Robotics &amp; IoT</header> }));
 vi.mock('@/shared/ui/academic-footer', () => ({ AcademicFooter: () => <footer>CLB Robotics &amp; IoT</footer> }));
-vi.mock('next/navigation', () => ({ usePathname: () => '/dashboard', useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }), redirect: (url: string) => { throw new Error(`redirect:${url}`); }, notFound: () => { throw new Error('notFound'); } }));
+vi.mock('next/navigation', () => ({ usePathname: () => '/my-works', useRouter: () => ({ push: vi.fn(), refresh: vi.fn() }), redirect: (url: string) => { throw new Error(`redirect:${url}`); }, notFound: () => { throw new Error('notFound'); } }));
 vi.mock('@/features/identity/server/member-actions', () => ({ createMemberAction: vi.fn(), updateUserRoleAction: vi.fn(), deleteMemberAction: vi.fn() }));
 vi.mock('@/features/publications/server/actions', () => ({ setShowcasePinAction: vi.fn() }));
 vi.mock('@/features/review/server/actions', () => ({ withdrawSubmissionAction: vi.fn() }));
@@ -21,7 +21,7 @@ vi.stubGlobal('React', React);
 
 import AdminMembersPage from '@/app/(shell)/(account)/admin/members/page';
 import AdminDashboardPage from '@/app/(shell)/(account)/admin/page';
-import DashboardPage from '@/app/(shell)/(account)/dashboard/page';
+import DashboardPage from '@/app/(shell)/(account)/my-works/page';
 import MemberProfilePage from '@/app/(shell)/(site)/members/[id]/page';
 
 const post: MyPost = { canManage: true, id: 'post-1', slug: 'robot-tu-hanh', title: 'Robot tự hành', summary: 'Hệ thống điều hướng trong nhà', type: 'PROJECT', status: 'DRAFT', reviewStatus: null, reviewVersion: 0, rejectionReason: null, publishedYear: 2026, updatedAt: new Date('2026-10-17T00:00:00Z'), thumbnailUrl: null };
@@ -76,21 +76,21 @@ describe('management pages', () => {
 
   it('offers draft editing and locks pending submissions until they are withdrawn', () => {
     const draft = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader />);
-    expect(draft).toContain(`/dashboard/items/${post.id}/edit`);
+    expect(draft).toContain(`/my-works/${post.id}/edit`);
     const pending = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PENDING_REVIEW' }]} isUploader /></DialogProvider>);
     expect(pending).toContain('Rút bài để sửa');
     expect(pending).toContain('Bản khôi phục');
     const readOnly = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader={false} />);
     expect(readOnly).toContain('Chỉ đọc');
-    expect(readOnly).not.toContain(`/dashboard/items/${post.id}/edit`);
+    expect(readOnly).not.toContain(`/my-works/${post.id}/edit`);
   });
 
   it('shows contributor draft status without management actions or an inaccessible preview', () => {
     const html = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, canManage: false }]} isUploader />);
     expect(html).toContain(post.title);
     expect(html).toContain('Chỉ theo dõi');
-    expect(html).not.toContain(`/dashboard/items/${post.id}/edit`);
-    expect(html).not.toContain(`/showcase/${post.slug}`);
+    expect(html).not.toContain(`/my-works/${post.id}/edit`);
+    expect(html).not.toContain(`/works/${post.slug}`);
     expect(html).not.toContain('Rút bài để sửa');
   });
 
@@ -138,6 +138,6 @@ it('does not offer editing or withdrawal for a contributed work owned by someone
   const html = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 0, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 1, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PUBLISHED', canManage: false }]} isUploader />);
   expect(html).toContain('Xem bài');
   expect(html).not.toContain('Soạn bản cập nhật');
-  expect(html).not.toContain(`/dashboard/items/${post.id}/edit`);
+  expect(html).not.toContain(`/my-works/${post.id}/edit`);
   expect(html).not.toContain('Rút');
 });

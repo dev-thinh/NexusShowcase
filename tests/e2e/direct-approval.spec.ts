@@ -52,7 +52,7 @@ test('admin directly approves a submission and preserves live content until upda
   const publicContext = await browser.newContext({ baseURL });
   try {
     const visitor = await publicContext.newPage();
-    await visitor.goto(`/showcase/${slug}`);
+    await visitor.goto(`/works/${slug}`);
     await expect(visitor.getByRole('heading', { name: snapshot.title, exact: true })).toBeVisible();
     const update = { ...snapshot, title: 'Browser approved update' };
     await database.showcaseItem.update({ where: { id: item.id }, data: { reviewStatus: 'PENDING_REVIEW', reviewVersion: 2, authorDraft: update, revisions: { create: { revisionNumber: 2, snapshot: update, submittedById: author.id } } } });

@@ -45,7 +45,7 @@ for (const width of [320, 390, 1440]) test(`member rows balance identity with da
   await page.getByRole('button', { name: 'Hủy bỏ', exact: true }).click();
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page.keyboard.press('Escape');
-  await page.goto('/admin/content');
+  await page.goto('/admin/works');
   const bulk = page.locator('.admin-bulk-actions');
   await expect(bulk).toBeVisible();
   const filterBox = (await panel.boundingBox())!;

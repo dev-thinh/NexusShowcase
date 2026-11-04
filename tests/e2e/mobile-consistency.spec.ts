@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, login, test } from './fixtures';
 
 // The retired route streams a redirect; measure the destination document only.
-async function expectPageToFit(page: Page, path: string, destination = path === '/explore' ? '/category/bai-bao-khoa-hoc' : path) {
+async function expectPageToFit(page: Page, path: string, destination = path === '/explore' ? '/research' : path) {
   await expect(page).toHaveURL(url => `${url.pathname}${url.search}` === destination);
   await expect(page.locator('main').first()).toBeVisible();
   await expect(page.getByRole('status', { name: /Đang tải/ })).toHaveCount(0);
@@ -25,12 +25,12 @@ for (const width of [320, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 844 });
     await page.emulateMedia({ reducedMotion: 'reduce' });
     const item = await database.showcaseItem.findFirstOrThrow({ where: { status: 'PUBLISHED' } });
-    for (const path of ['/explore', '/category/bai-bao-khoa-hoc', '/category/robotics-iot', '/members', '/contact', '/login', `/showcase/${item.slug}`]) {
+    for (const path of ['/explore', '/research', '/projects', '/members', '/contact', '/login', `/works/${item.slug}`]) {
       await page.goto(path);
       await expectPageToFit(page, path);
     }
     await login(page, fixture.users[0], '/admin');
-    for (const path of ['/admin', '/admin/members', '/admin/content', '/admin/reviews', '/dashboard', `/members/${fixture.users[0].id}`, '/account/change-password', '/dashboard/items/new']) {
+    for (const path of ['/admin', '/admin/members', '/admin/works', '/admin/reviews', '/my-works', `/members/${fixture.users[0].id}`, '/account/change-password', '/my-works/new']) {
       await page.goto(path);
       const destination = path === '/account/change-password' ? `/members/${fixture.users[0].id}?password=change` : path;
       await expectPageToFit(page, path, destination);
@@ -42,7 +42,7 @@ for (const width of [320, 390, 768, 1440]) {
 test('small phone editor has readable fields and actions', async ({ page, fixture }) => {
   await page.setViewportSize({ width: 320, height: 740 });
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await login(page, fixture.users[1], '/dashboard/items/new');
+  await login(page, fixture.users[1], '/my-works/new');
   const category = page.getByRole('combobox', { name: 'Chuyên mục', exact: true });
   await expect(category).toBeVisible();
   expect((await category.boundingBox())!.width).toBeGreaterThan(200);
@@ -73,7 +73,7 @@ test('small phone pagination stays on one row and dashboard uses shared filters'
   expect((await next.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   await next.click();
   await expect(page).toHaveURL(/page=2/);
-  await page.goto('/dashboard');
+  await page.goto('/my-works');
   const form = page.getByRole('search', { name: 'Tìm kiếm và lọc' });
   const toggle = form.getByRole('button', { name: /Bộ lọc/ });
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');

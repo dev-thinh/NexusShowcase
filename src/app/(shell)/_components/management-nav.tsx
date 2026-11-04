@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react';
 export function ManagementNav({ active, userId }: { active: 'posts' | 'profile'; userId: string }) {
   const isActive = (id: string, _href: string) => active === id;
   const links = [
-    { id: 'posts', href: '/dashboard', label: 'Công trình của tôi' },
+    { id: 'posts', href: '/my-works', label: 'Công trình của tôi' },
     { id: 'profile', href: `/members/${userId}`, label: 'Hồ sơ của tôi' },
   ];
   const navRef = useRef<HTMLElement>(null);

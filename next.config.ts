@@ -1,3 +1,4 @@
+import { legacyPageRedirects } from './src/shared/lib/page-urls';
 import type { NextConfig } from 'next';
 
 const contentSecurityPolicy = `
@@ -56,6 +57,7 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      ...legacyPageRedirects,
       {
         source: '/api/auth/signin',
         destination: '/login',
