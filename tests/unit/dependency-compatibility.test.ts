@@ -6,9 +6,9 @@ import { expect, it } from 'vitest';
 import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
 import { validationFailure } from '@/features/submissions/model/validation-result';
 
-it('preserves trimmed draft values, defaults and strict field validation', () => {
+it('preserves verbatim draft values, defaults and strict field validation', () => {
   expect(showcaseDraftInputSchema.parse({ title: ' Draft ' })).toMatchObject({
-    title: 'Draft', summary: '', content: '', type: 'PROJECT', contributors: [], resources: [],
+    title: ' Draft ', summary: '', content: '', type: 'PROJECT', contributors: [], resources: [],
   });
   expect(showcaseDraftInputSchema.safeParse({ title: 'Draft', unexpected: true }).success).toBe(false);
 });

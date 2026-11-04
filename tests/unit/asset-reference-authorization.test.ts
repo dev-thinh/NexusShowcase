@@ -3,7 +3,7 @@ import type { Actor } from '@/features/identity/model/session';
 const mocks = vi.hoisted(() => ({ registry: vi.fn(), rows: vi.fn(), create: vi.fn() }));
 vi.mock('server-only', () => ({}));
 vi.mock('@/features/assets/server/registry', () => ({ findRegisteredAsset: mocks.registry }));
-vi.mock('@/server/db/prisma', () => ({ prisma: { $queryRaw: mocks.rows, showcaseItem: { create: mocks.create }, homeMomentsGallery: { findMany: async () => [] }, user: { findFirst: async () => null } } }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { $transaction: (run: (tx: unknown) => Promise<unknown>) => run({ showcaseItem: { create: mocks.create } }), $queryRaw: mocks.rows, showcaseItem: { create: mocks.create }, homeMomentsGallery: { findMany: async () => [] }, user: { findFirst: async () => null } } }));
 vi.mock('@/features/identity/server/actor', () => ({ getActor: async () => null }));
 import { saveDraftCommand } from '@/features/submissions/server/draft-commands';
 const actor: Actor = { id: 'author', fullName: 'Author', role: 'CORE_MEMBER', status: 'ACTIVE', mustChangePassword: false };

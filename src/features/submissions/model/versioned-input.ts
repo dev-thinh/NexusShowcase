@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const saveDraftEnvelopeSchema = z.object({
   itemId: cuidSchema.nullable(),
+  mutationId: z.uuid().optional(),
   expectedReviewVersion: z.number().int().nonnegative().optional(),
   draft: z.unknown(),
 }).strict().superRefine((input, context) => {

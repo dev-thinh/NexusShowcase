@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { canUserUpload } from '@/features/identity/model/permissions';
 import { getSession as auth } from '@/features/identity/server/session';
-import { SubmissionEditor } from '@/features/submissions/components/submission-editor';
+import { NewDraft } from '@/features/submissions/components/new-draft';
 import { prisma } from '@/server/db/prisma';
 import { redirect } from 'next/navigation';
 
@@ -14,10 +14,6 @@ export default async function NewItemPage() {
   if (!user || !canUserUpload(user)) redirect('/dashboard');
   if (user.mustChangePassword) redirect('/account/change-password');
 
-  const members = [{ id: user.id, fullName: user.fullName }];
-
-  const categories = await prisma.category.findMany({ where: { slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } }, select: { id: true, name: true, slug: true } });
-
   return (
     <>
 
@@ -26,9 +22,9 @@ export default async function NewItemPage() {
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
             <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">Đăng công trình mới</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#1F2937]">Lưu bản nháp chỉ với tiêu đề. Trước khi gửi duyệt, bổ sung tóm tắt và ít nhất một người đóng góp.</p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#1F2937]">Bản nháp được tạo ngay và tự động lưu khi bạn soạn thảo.</p>
           </header>
-          <SubmissionEditor initialData={{}} currentUser={{ id: user.id, fullName: user.fullName, role: user.role }} clubMembers={members} categories={categories} mode="create" />
+          <NewDraft accountId={user.id} />
         </div>
       </main>
 

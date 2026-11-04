@@ -79,7 +79,7 @@ describe('management pages', () => {
     expect(draft).toContain(`/dashboard/items/${post.id}/edit`);
     const pending = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PENDING_REVIEW' }]} isUploader /></DialogProvider>);
     expect(pending).toContain('Rút bài để sửa');
-    expect(pending).not.toContain(`/dashboard/items/${post.id}/edit`);
+    expect(pending).toContain('Bản khôi phục');
     const readOnly = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader={false} />);
     expect(readOnly).toContain('Chỉ đọc');
     expect(readOnly).not.toContain(`/dashboard/items/${post.id}/edit`);

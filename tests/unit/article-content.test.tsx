@@ -21,7 +21,8 @@ describe('section article documents', () => {
     const editing = structuredClone(doc);
     editing.sections[1].blocks[1] = { id: 'video', kind: 'VIDEO', url: 'https:/', caption: '', alt: '' };
     expect(articleFromLegacy(serializeArticle(editing))).toEqual(editing);
-    expect(showcaseDraftInputSchema.safeParse({ title: 'Robot', content: serializeArticle(editing) }).success).toBe(false);
+    expect(showcaseDraftInputSchema.safeParse({ title: 'Robot', content: serializeArticle(editing) }).success).toBe(true);
+    expect(showcaseSubmissionInputSchema.safeParse({ title: 'Robot', summary: 'Summary', contributors: [contributor], content: serializeArticle(editing) }).success).toBe(false);
   });
   it('preserves Vietnamese text, whitespace and oversized blocks throughout editing', () => {
     const editing = structuredClone(doc);

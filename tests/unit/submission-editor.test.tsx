@@ -17,7 +17,7 @@ describe('submission editor shell', () => {
     expect(editor).toContain('panel-detail');
     expect(editor).toContain('SectionEditor');
     expect(editor).toContain('ArticleContent');
-    expect(editor).toContain('Xem trước');
+    expect(editor).toContain('SubmissionActionBar');
     expect(editor).toContain('ResourceEditor');
     expect(editor).toContain('Tài nguyên đính kèm');
     expect(editor).toContain("role: 'CONTRIBUTOR'");
@@ -88,9 +88,9 @@ describe('submission editor shell', () => {
 
   it('shows explicit save states in a responsive action bar', () => {
     const actions = read('src/features/submissions/components/submission-action-bar.tsx');
-    expect(actions).toContain('Chưa lưu');
+    expect(actions).toContain('Chưa đồng bộ');
     expect(actions).toContain('Đang lưu…');
-    expect(actions).toContain("saved: ''");
+    expect(actions).toContain("saved: 'Đã lưu'");
     expect(actions).toContain('Lưu thất bại');
     expect(actions).toContain('sticky bottom-0');
     expect(actions).not.toContain('fixed');

@@ -10,11 +10,11 @@ describe('member submission routes', () => {
     'src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx',
   ])('%s uses the shared submission editor and document width', (file) => {
     const source = read(file);
-    expect(source).toContain('SubmissionEditor');
+    expect(source).toContain(file.includes('/new/') ? 'NewDraft' : 'SubmissionEditor');
     expect(source).toContain('max-w-7xl');
     expect(source).not.toContain('max-w-6xl');
     expect(source).not.toContain('ItemForm');
-    expect(source).toContain('prisma.category.findMany');
+    if (!file.includes('/new/')) expect(source).toContain('prisma.category.findMany');
   });
 
   it('adapts existing draft records through one mapper', () => {

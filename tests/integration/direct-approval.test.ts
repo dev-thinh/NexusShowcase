@@ -118,9 +118,11 @@ describe('author sections and direct admin approval', () => {
     if (!saved.success) throw Error(saved.error);
     const id = saved.data.id; items.push(id);
     let item = await prisma.showcaseItem.findUniqueOrThrow({ where: { id }, include: { links: true, attachments: true } });
+    expect(item.authorDraft).toMatchObject({ resources, content: payload().content });
+    expect((await submitDraft(id)).success).toBe(true);
+    item = await prisma.showcaseItem.findUniqueOrThrow({ where: { id }, include: { links: true, attachments: true } });
     expect(item.links.map(link => link.url)).toEqual(expect.arrayContaining([resources[0].url, 'https://github.com/lab/robot']));
     expect(item.attachments.map(file => file.fileName)).toEqual(expect.arrayContaining(['Báo cáo toàn văn', 'Mô hình đã huấn luyện']));
-    expect((await submitDraft(id)).success).toBe(true);
     expect((await publish(id)).success).toBe(true);
     item = await prisma.showcaseItem.findUniqueOrThrow({ where: { id }, include: { links: true, attachments: true } });
     expect(item.links.find(link => link.url === resources[0].url)?.label).toBe('Dataset thực nghiệm');

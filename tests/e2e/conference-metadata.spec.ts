@@ -18,8 +18,8 @@ test('conference editor preserves both milestone dates and supports research pap
     await page.getByRole('option', { name: researchCategory.name, exact: true }).click();
     await page.getByLabel('Bài có thông tin hội nghị').check();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await expect(page.getByRole('alert').filter({ hasText: 'Vui lòng nhập tên hội nghị.' })).toBeVisible();
-    await expect(page.locator('#conference-name')).toBeFocused();
+    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
+    await expect(page.locator('#conference-name')).toHaveValue('');
     await page.locator('#conference-name').fill(conference.name);
     await page.locator('#conference-date').fill(conference.eventDate);
     await page.locator('#conference-accepted-date').fill(conference.acceptedDate);

@@ -1,4 +1,5 @@
 'use server';
+import { z } from 'zod';
 import { getActor } from '@/features/identity/server/actor';
 import { invalidatePublicationChange } from '@/features/publications/server/invalidation';
 import { validationFailure } from '../model/validation-result';
@@ -11,7 +12,7 @@ export async function saveShowcaseDraftAction(input: SaveDraftInput) {
   const parsed = saveDraftEnvelopeSchema.safeParse(input);
   if (!parsed.success) return validationFailure(parsed.error);
   const result = await saveDraftCommand(actor, parsed.data);
-  if (result.success) invalidatePublicationChange({ slugs: [], memberIds: [], kind: 'SUBMISSION' });
+  // Autosave returns data only: broad invalidation would rerender the editor on every keystroke burst.
   return result;
 }
 export async function submitShowcaseForReviewAction(input: SubmissionInput) {
@@ -29,4 +30,15 @@ export async function withdrawSubmissionAction(itemId: string, reviewVersion: nu
   const result = await withdrawDraftCommand(actor, itemId, reviewVersion);
   if (result.success) invalidatePublicationChange({ slugs: [], memberIds: [], kind: 'SUBMISSION' });
   return result;
+}
+
+export async function createShowcaseDraftAction(input: { mutationId: string }) {
+  const actor = await getActor(['CORE_MEMBER', 'ADMIN']);
+  if (!actor) return { success: false as const, code: 'UNAUTHORIZED' as const, error: 'Bạn không có quyền tạo bản nháp.' };
+  const parsed = z.object({ mutationId: z.uuid() }).strict().safeParse(input);
+  if (!parsed.success) return validationFailure(parsed.error);
+  return saveDraftCommand(actor, { itemId: null, mutationId: parsed.data.mutationId, draft: {
+    title: '', citationEnabled: false,
+    contributors: [{ userId: actor.id, role: 'CONTRIBUTOR', displayOrder: 0 }],
+  } });
 }

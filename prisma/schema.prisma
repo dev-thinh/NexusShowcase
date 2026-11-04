@@ -370,3 +370,16 @@ model ItemAttachment {
 
   @@map("item_attachments")
 }
+
+// Receipts carry no media-bearing snapshot: asset references stay in authorDraft.
+model DraftMutation {
+  actorId String
+  mutationId String
+  operation String
+  payloadHash String
+  response Json
+  createdAt DateTime @default(now())
+
+  @@id([actorId, mutationId])
+  @@map("draft_mutations")
+}

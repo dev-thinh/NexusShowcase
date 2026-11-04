@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { showcaseDraftInputSchema } from '@/features/submissions/model/input';
+import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
 import { buildSubmissionSnapshot } from '@/features/submissions/model/snapshot-mapper';
 
 const conference = { name: 'Hội nghị Robotics quốc tế', status: 'ACCEPTED', eventDate: '2027-02-18', acceptedDate: '2026-12-01', rankings: [{ system: 'Hệ thống A', rank: 'Hạng 1' }, { system: 'Hệ thống B', rank: 'Hạng 2' }] };
@@ -23,7 +23,7 @@ describe('optional conference metadata', () => {
     { ...conference, rankings: Array.from({ length: 9 }, () => ({ system: 'A', rank: 'B' })) },
     { ...conference, rankings: [{ system: 'A', rank: 'B' }, { system: ' a ', rank: ' b ' }] },
   ])('rejects malformed or unbounded conference information: %j', value => {
-    expect(showcaseDraftInputSchema.safeParse({ ...draft, conference: value }).success).toBe(false);
+    expect(showcaseSubmissionInputSchema.safeParse({ ...draft, summary: 'Summary', contributors: [{ externalName: 'Author', role: 'CONTRIBUTOR', displayOrder: 0 }], resources: [{ kind: 'LINK', label: 'Paper', url: 'https://example.org', linkType: 'PAPER_URL' }], conference: value }).success).toBe(false);
   });
   it('preserves conference data on project submissions', () => {
     expect(showcaseDraftInputSchema.parse({ ...draft, type: 'PROJECT' }).conference).toEqual(conference);
