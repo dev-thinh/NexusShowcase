@@ -1,11 +1,11 @@
 import { expect, seedPhotoGalleries, test } from './fixtures';
 
-test('research cards stagger on desktop and stack photos above centered text on mobile', async ({ page, database }) => {
+test('research cards align on desktop and stack photos above centered text on mobile', async ({ page, database }) => {
   test.setTimeout(60_000);
   await seedPhotoGalleries(database);
   // Measure static layout, rather than sequential frames of the page reveal.
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  for (const width of [1440, 768, 390, 320]) {
+  for (const width of [1440, 1100, 1024, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 900 });
     await page.goto('/');
     const section = page.locator('[data-deferred-section="research"]');
@@ -37,13 +37,13 @@ test('research cards stagger on desktop and stack photos above centered text on 
     }
     const photoTops = await articles.evaluateAll(elements => elements.map(element => element.querySelector('.research-direction__photo')!.getBoundingClientRect().top));
     if (width >= 768) {
-      expect(photoTops[1]).toBeGreaterThan(photoTops[2]);
-      expect(photoTops[2]).toBeGreaterThan(photoTops[0]);
+      expect(Math.max(...photoTops) - Math.min(...photoTops)).toBeLessThan(1);
     } else {
       expect(photoTops[1]).toBeGreaterThan(photoTops[0]);
       expect(photoTops[2]).toBeGreaterThan(photoTops[1]);
     }
     expect(await section.locator('.research-direction__number').count()).toBe(0);
+    if (width === 1440) await section.screenshot({ path: '/tmp/nexus-research-aligned-1440.png' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     if (width === 1440 || width === 390) await page.locator('.research-band').screenshot({ path: `.tmp/research-photos-${width}.png` });
   }

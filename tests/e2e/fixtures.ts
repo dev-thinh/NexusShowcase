@@ -62,7 +62,7 @@ export async function seedPhotoGalleries(database: PrismaClient) {
 
 export async function openPublicNavigation(page: Page) {
   await expect(page.locator('#site-navbar')).toBeVisible();
-  if ((page.viewportSize()?.width ?? 1440) >= 1024) return;
+  if ((page.viewportSize()?.width ?? 1440) >= 1280) return;
   const toggle = page.locator('.site-mobile-menu-toggle');
   await expect(toggle).toBeVisible();
   if (await toggle.getAttribute('aria-expanded') !== 'true') await toggle.click();
