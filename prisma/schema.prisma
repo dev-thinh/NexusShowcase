@@ -7,6 +7,15 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model HomePageContent {
+  id        String   @id
+  text      Json
+  version   Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@map("home_page_content")
+}
+
 model HomeMomentsGallery {
   id        String   @id
   photos    Json
