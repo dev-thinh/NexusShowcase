@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 import { expect, login, test } from './fixtures';
 
-async function expectPageToFit(page: Page, path: string) {
+async function expectPageToFit(page: Page, path: string, destination = path) {
+  await expect(page).toHaveURL(url => `${url.pathname}${url.search}` === destination);
   await expect(page.locator('main').first()).toBeVisible();
   await expect(page.getByRole('status', { name: /Đang tải/ })).toHaveCount(0);
   await expect(page.locator('[data-destination-loading]')).toHaveCount(0);
@@ -30,7 +31,8 @@ for (const width of [320, 390, 768, 1440]) {
     await login(page, fixture.users[0], '/admin');
     for (const path of ['/admin', '/admin/members', '/admin/content', '/admin/reviews', '/dashboard', `/members/${fixture.users[0].id}`, '/account/change-password', '/dashboard/items/new']) {
       await page.goto(path);
-      await expectPageToFit(page, path);
+      const destination = path === '/account/change-password' ? `/members/${fixture.users[0].id}?password=change` : path;
+      await expectPageToFit(page, path, destination);
       if (width === 320) await page.screenshot({ path: `/tmp/nexus-mobile-audit/${path.replaceAll('/', '-')}.png`, fullPage: true });
     }
   });
