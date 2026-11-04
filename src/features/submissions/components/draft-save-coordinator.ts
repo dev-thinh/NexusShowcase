@@ -79,7 +79,12 @@ export class DraftSaveCoordinator {
       if (this.disposed) return null; // Leave the durable request available for receipt replay.
       if (!result.success) {
         this.blocked = !['INTERNAL', 'RATE_LIMITED', 'VALIDATION'].includes(result.code);
-        if (result.code === 'VALIDATION') this.pending = undefined;
+        if (result.code === 'VALIDATION') {
+          this.pending = undefined;
+          // A correction may already be waiting; only leave the unchanged,
+          // explicitly rejected payload idle until its author edits it.
+          if (this.snapshot.editSequence !== pending.editSequence) continue;
+        }
         this.snapshot.status = this.blocked ? 'conflict' : this.online ? 'error' : 'offline';
         this.snapshot.error = result.error; this.emit();
         if (!this.blocked && this.online && result.code !== 'VALIDATION') {

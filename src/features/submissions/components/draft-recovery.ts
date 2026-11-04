@@ -43,7 +43,10 @@ export function listRecoveries(storage: StorageAccess, accountId: string, itemId
   } catch { return { records: [], error: true }; }
 }
 export function writeRecovery(storage: StorageAccess, record: DraftRecovery): boolean {
-  try { storage.setItem(keyOf(record), JSON.stringify(record)); return true; } catch { return false; }
+  try {
+    if (!recoverySchema.safeParse(record).success) return false;
+    storage.setItem(keyOf(record), JSON.stringify(record)); return true;
+  } catch { return false; }
 }
 export function removeRecovery(storage: StorageAccess, record: DraftRecovery): boolean {
   try {

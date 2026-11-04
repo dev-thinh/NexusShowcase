@@ -15,3 +15,7 @@ it('preserves unfinished section urls and whitespace but rejects malformed artic
   expect(showcaseDraftInputSchema.safeParse({ title: '', content: ARTICLE_PREFIX + '{"sections":"bad"}' }).success).toBe(false);
   expect(showcaseDraftInputSchema.safeParse({ title: 'x'.repeat(201) }).success).toBe(false);
 });
+it.each(['javascript:alert(1)', 'data:text/html,unsafe', 'https://example.org/'+ 'a'.repeat(2048), '/uploads/../secret.pdf'])('rejects unsafe or oversized article urls even while editing: %s', url => {
+ const content=ARTICLE_PREFIX+JSON.stringify({version:1,sections:[{id:'s',title:'Section',blocks:[{id:'b',kind:'LINK',url,caption:'',alt:''}]}]});
+ expect(showcaseDraftInputSchema.safeParse({title:'Draft',content}).success).toBe(false);
+});

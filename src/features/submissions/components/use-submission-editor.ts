@@ -217,5 +217,5 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
   }, [router]);
 
   return { state, updateField, saveDraft, submitForReview, ready, submitting, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice, locallySaved,
-    activeRecovery: state.saveState === 'conflict' ? activeRecordRef.current : null };
+    activeRecovery: state.saveState === 'conflict' || storageError ? activeRecordRef.current : null };
 }

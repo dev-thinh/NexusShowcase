@@ -27,3 +27,8 @@ it('retains edits that exceed server validation limits so they can still be copi
  expect(writeRecovery(storage,oversized)).toBe(true);
  expect(listRecoveries(storage,'account','item').records[0]?.data.title).toBe(oversized.data.title);
 });
+it('never promises durability for a record that cannot be read back', () => {
+ const storage=memory(); const oversized={...record,data:{title:'a'.repeat(2_000_001)}};
+ expect(writeRecovery(storage,oversized)).toBe(false);
+ expect(storage.length).toBe(0);
+});

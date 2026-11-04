@@ -83,3 +83,14 @@ it('starts a fresh maximum-save window after a slow in-flight request', async ()
  for(let n=0;n<10;n++){coordinator.update({title:`after ${n}`});await vi.advanceTimersByTimeAsync(1000);}
  expect(save).toHaveBeenCalledTimes(3); coordinator.dispose();
 });
+it('automatically saves a correction made before an invalid request returns', async () => {
+ let resolve!: (value: {success:false;code:'VALIDATION';error:string})=>void;
+ const save=vi.fn(async (_input:SaveDraftInput)=>receipt(1)).mockImplementationOnce(()=>new Promise(r=>{resolve=r as never;}));
+ const {coordinator}=setup(save);
+ coordinator.update({title:'x'.repeat(201)}); const flush=coordinator.flush();
+ coordinator.update({title:'Corrected while pending'}); resolve({success:false,code:'VALIDATION',error:'Too long'});
+ await flush;
+ expect(save).toHaveBeenCalledTimes(2);
+ expect(coordinator.snapshot).toMatchObject({status:'saved',isDirty:false,data:{title:'Corrected while pending'}});
+ coordinator.dispose();
+});
