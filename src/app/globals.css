@@ -930,7 +930,7 @@ strong {
 .moments-editor__footer { display: flex; flex-shrink: 0; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.75rem 1.25rem; border-top: 1px solid #e2e8f0; background: #fff; }
 .moments-editor :is(button, input, select):focus-visible, .moments-editor label:has(input[type='file']:focus-visible) { outline: 2px solid #153d67; outline-offset: 2px; }
 .moments-editor :disabled, .moments-editor fieldset:disabled label { opacity: 0.5; cursor: not-allowed; }
-.moments-editor [data-moment-drag] { cursor: grab; user-select: none; -webkit-touch-callout: none; }
+.moments-editor [data-moment-drag] { touch-action: none; cursor: grab; user-select: none; -webkit-touch-callout: none; }
 .moments-editor [data-moment-drag] img { -webkit-touch-callout: none; }
 .moments-editor__drag-handle {
   position: absolute;

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type RefObject } from 'react';
 type Drag = { photoId: string; x: number; y: number; over: number | null; offsetX: number; offsetY: number; width: number; height: number };
 type Gesture = Omit<Drag, 'over'> & { startX: number; startY: number; active: boolean; touch: boolean; pointerId: number };
 
-/** Handles start touch placement immediately; the rest of each photo remains scrollable. */
+/** Photos drag on movement; stationary taps still select them for editing. */
 export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled: boolean, onDrop: (photoId: string, slot: number) => void) {
   const [drag, setDrag] = useState<Drag | null>(null);
   const dropRef = useRef(onDrop);
@@ -15,7 +15,6 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
     const element = root.current;
     if (!element || disabled) { setDrag(null); return; }
     let gesture: Gesture | null = null;
-    let timer: ReturnType<typeof setTimeout> | undefined;
     let frame = 0;
     let suppressClickUntil = 0;
     const targetAt = (x: number, y: number) => {
@@ -51,7 +50,6 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       frame = requestAnimationFrame(scrollEdges);
     };
     const finish = (commit: boolean) => {
-      clearTimeout(timer);
       cancelAnimationFrame(frame);
       const current = gesture;
       gesture = null;
@@ -68,15 +66,12 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       suppressClickUntil = 0;
       const bounds = source.getBoundingClientRect();
       gesture = { photoId: source.dataset.momentDrag!, x, y, startX: x, startY: y, offsetX: x - bounds.left, offsetY: y - bounds.top, width: bounds.width, height: bounds.height, active: false, touch, pointerId };
-      // Mouse placement starts only after movement; a stationary press is not a drag.
-      if (touch) timer = setTimeout(activate, 350);
     };
     const move = (x: number, y: number) => {
       if (!gesture) return false;
       gesture.x = x; gesture.y = y;
       if (!gesture.active && Math.hypot(x - gesture.startX, y - gesture.startY) > 8) {
-        if (gesture.touch) { finish(false); return false; }
-        clearTimeout(timer); activate();
+        activate();
       }
       update();
       return gesture?.active ?? false;
@@ -106,7 +101,6 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
       const point = event.touches[0];
       begin(event.target, point.clientX, point.clientY, true, point.identifier);
       if (gesture && event.target instanceof Element && event.target.closest('[data-moment-handle]')) {
-        clearTimeout(timer);
         activate();
         if (event.cancelable) event.preventDefault();
       }
@@ -148,7 +142,7 @@ export function useMomentsDrag(root: RefObject<HTMLDivElement | null>, disabled:
     window.addEventListener('blur', cancel);
     window.addEventListener('keydown', key, true);
     return () => {
-      clearTimeout(timer); cancelAnimationFrame(frame); gesture = null;
+      cancelAnimationFrame(frame); gesture = null;
       element.removeEventListener('pointerdown', pointerDown);
       element.removeEventListener('touchstart', touchStart);
       element.removeEventListener('click', click, true);

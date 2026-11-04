@@ -127,7 +127,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
           <button type="button" className={mobilePanel === 'arrange' ? 'action-primary-detail' : 'action-secondary-detail'} disabled={locked} aria-pressed={mobilePanel === 'arrange'} onClick={() => setMobilePanel('arrange')}>Sắp xếp ảnh</button>
           <button type="button" className={mobilePanel === 'details' ? 'action-primary-detail' : 'action-secondary-detail'} disabled={locked} aria-pressed={mobilePanel === 'details'} onClick={() => setMobilePanel('details')}>Sửa ảnh</button>
         </div>
-        <p className="moments-editor__drag-hint">Kéo tay nắm để đổi vị trí; chạm ảnh để chỉnh sửa.</p>
+        <p className="moments-editor__drag-hint">Chạm và kéo ảnh để đổi vị trí, không cần giữ lâu. Chạm nhanh để chỉnh sửa; vuốt ngoài ảnh để cuộn.</p>
         <div ref={contentRef} className="moments-editor__scroll">
           {error && <p role="alert" className="mb-4 whitespace-pre-line rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
           <fieldset disabled={locked} className="moments-editor__workspace" data-panel={mobilePanel}>
