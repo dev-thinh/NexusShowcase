@@ -109,3 +109,10 @@ it('keeps citation optional for new posts and preserves the saved toggle', () =>
   expect(enabled.isDirty).toBe(true);
   expect(submissionEditorReducer(enabled, { type: 'field', field: 'citationEnabled', value: false }).data.citationEnabled).toBe(false);
 });
+
+
+it('preserves conference metadata when switching a research draft to a project', () => {
+  const initial = createInitialSubmissionState({ type: 'RESEARCH_PAPER', conference: { name: 'Conference', rankings: [] } });
+  expect(initial.data.conference?.name).toBe('Conference');
+  expect(submissionEditorReducer(initial, { type: 'field', field: 'type', value: 'PROJECT' }).data.conference).toEqual(initial.data.conference);
+});

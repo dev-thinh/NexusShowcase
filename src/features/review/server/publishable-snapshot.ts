@@ -6,6 +6,7 @@ import { z } from 'zod';
 export function parsePublishableSnapshot(snapshot: EffectivePublication) {
   const parsed = showcaseSubmissionInputSchema.safeParse({
     citationEnabled: snapshot.citationEnabled ?? true,
+    conference: snapshot.conference,
     title: snapshot.title, summary: snapshot.summary, content: snapshot.content,
     type: snapshot.type, categoryId: snapshot.categoryId, thumbnailUrl: snapshot.thumbnailUrl,
     publishedYear: snapshot.publishedYear, suggestedField: snapshot.suggestedField,

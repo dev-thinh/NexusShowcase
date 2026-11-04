@@ -220,6 +220,7 @@ model ShowcaseItem {
   type              ItemType       @default(PROJECT)
   suggestedField    String?
   customProjectType String?
+  conference        Json?
   scope             ItemScope?
   issuer            String?
   thumbnailUrl      String?

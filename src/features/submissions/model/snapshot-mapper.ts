@@ -1,3 +1,4 @@
+import { readConference } from '@/features/publications/model/conference';
 import type {
 EditorialOverrides,
 EffectivePublication,
@@ -31,6 +32,7 @@ function buildResources(source: SubmissionSnapshotSource): SubmissionResource[] 
 
 export function buildSubmissionSnapshot(source: SubmissionSnapshotSource): SubmissionSnapshot {
   return {
+    conference: readConference(source.conference),
     type: source.type === 'RESEARCH_PAPER' ? 'RESEARCH_PAPER' : 'PROJECT',
     categoryId: source.categoryId,
     thumbnailUrl: source.thumbnailUrl,

@@ -40,6 +40,7 @@ describe('submission snapshots', () => {
     expect(buildSubmissionSnapshot(source)).toEqual({
       ...snapshot,
       citationEnabled: true,
+      conference: null,
       type: 'PROJECT', categoryId: undefined, thumbnailUrl: undefined,
       content: '',
       publishedYear: new Date().getFullYear(),

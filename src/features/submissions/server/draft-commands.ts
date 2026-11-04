@@ -36,6 +36,7 @@ async function saveDraftInternal(
   }
   const data = {
     citationEnabled: values.citationEnabled,
+    conference: values.conference ?? Prisma.DbNull,
     title: values.title, summary: values.summary, content: values.content,
     type: values.type, categoryId: values.categoryId ?? null, thumbnailUrl: values.thumbnailUrl ?? null,
     publishedYear: values.publishedYear ?? new Date().getFullYear(),

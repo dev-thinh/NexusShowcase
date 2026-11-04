@@ -39,6 +39,7 @@ export function createInitialSubmissionState(
     editSequence: 0,
     data: {
       citationEnabled: initialData.citationEnabled ?? Boolean(initialData.id),
+      conference: initialData.conference ?? null,
       title: initialData.title ?? '',
       summary: initialData.summary ?? '',
       content: serializeArticle(articleFromLegacy(initialData.content ?? '')),

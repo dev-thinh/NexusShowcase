@@ -1,3 +1,4 @@
+import { conferenceSchema } from '@/features/publications/model/conference';
 import { isGithubUrl } from '@/shared/lib/github-url';
 import { articleSubmissionIssues, hasDetailedContent, articleContentIssues } from '@/features/submissions/model/article';
 import { cuidSchema, MAX_CURRENT_YEAR, safeHttpUrlSchema, storedFileUrlSchema, trimmedText } from '@/shared/lib/validation';
@@ -36,6 +37,7 @@ export const submissionResourceSchema = z.object({
 
 const showcaseWorkflowShape = {
   citationEnabled: z.boolean().default(true),
+  conference: conferenceSchema.nullish(),
   title: trimmedText(200).min(1, 'Vui lòng nhập tiêu đề.'),
   summary: trimmedText(2_000).default(''),
   content: trimmedText(200_000).superRefine((content, context) => {
@@ -51,7 +53,9 @@ const showcaseWorkflowShape = {
   resources: z.array(submissionResourceSchema).max(200).default([]),
 };
 
-export const showcaseDraftInputSchema = z.object(showcaseWorkflowShape).strict();
+const normalizeConference = <T extends { conference?: z.output<typeof conferenceSchema> | null }>(value: T) => ({ ...value, conference: value.conference ?? null });
+
+export const showcaseDraftInputSchema = z.object(showcaseWorkflowShape).strict().transform(normalizeConference);
 
 export const showcaseSubmissionInputSchema = z.object(showcaseWorkflowShape).strict().superRefine((value, context) => {
   for (const issue of articleSubmissionIssues(value.content)) {
@@ -66,7 +70,7 @@ export const showcaseSubmissionInputSchema = z.object(showcaseWorkflowShape).str
   if (value.contributors.length === 0) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['contributors'], message: 'Vui lòng thêm ít nhất một người đóng góp.' });
   }
-});
+}).transform(normalizeConference);
 
 
 export type ContributorInput = z.input<typeof contributorInputSchema>;
