@@ -1,5 +1,7 @@
 'use client';
 
+import { ErrorNotice } from '@/shared/ui/error-notice';
+
 import { HomeText } from '@/features/publications/components/home-content-provider';
 import { MediaImage } from '@/shared/ui/media-image';
 
@@ -124,7 +126,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
         </div>
       </div>
 
-      {notice && <p role="status" className="container mx-auto mt-4 max-w-7xl px-4 text-sm text-emerald-800 sm:px-6 lg:px-8">{notice}</p>}
+      {notice && <div className="container mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8"><ErrorNotice message={notice} /></div>}
       {editing && <MomentsEditor gallery={gallery} protectedSources={protectedSources} onSave={finishEditing} onCancel={() => finishEditing()} />}
       {photos.length === 0 ? <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><MediaImage alt="Khoảnh khắc CLB" className="h-64 w-full rounded-lg" /></div> : <div className="moments-strips">
         {rows.map((row, laneIndex) => row.length > 0 && (

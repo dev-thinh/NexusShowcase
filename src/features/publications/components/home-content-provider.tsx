@@ -163,9 +163,9 @@ export function HomeContentProvider({ children }: { children: ReactNode }) {
       setErrors(current => ({ ...current, [field]: undefined }));
     } }}>
       {children}
-      {loadFailed && <div role="status" className="container mx-auto px-4 py-3 text-sm text-slate-600">Chưa tải được nội dung cập nhật. <button type="button" className="underline" onClick={() => setAttempt(value => value + 1)}>Thử lại</button></div>}
+      {loadFailed && <div role="alert" className="container mx-auto px-4 py-3 text-sm text-slate-600">Chưa tải được nội dung cập nhật. <button type="button" className="underline" onClick={() => setAttempt(value => value + 1)}>Thử lại</button></div>}
       {content.isAdmin && <div role="region" aria-label="Chỉnh sửa nội dung Trang chủ" className={`home-content-toolbar fixed bottom-5 right-4 z-40 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-2 sm:right-6 ${editing ? 'rounded-2xl border border-slate-200 bg-white p-1.5 text-slate-900 shadow-lg' : ''}`}>
-        {notice && <p role={editing ? 'alert' : 'status'} className={`max-w-sm text-sm ${editing ? '' : 'rounded-lg border bg-white p-3 text-slate-700 shadow'}`}>{notice}</p>}
+        {notice && <p role={notice === 'Đã cập nhật nội dung Trang chủ.' ? 'status' : 'alert'} className={`max-w-sm text-sm ${editing ? '' : 'rounded-lg border bg-white p-3 text-slate-700 shadow'}`}>{notice}</p>}
         {editing ? <>
           {conflict && <button type="button" disabled={busy} className="min-h-11 text-sm underline" onClick={() => setConfirmAction('reload')}>Tải bản mới nhất</button>}
           {confirmAction && <div className="max-w-sm text-sm">

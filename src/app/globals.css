@@ -1436,3 +1436,12 @@ strong {
 /* Publication thumbnails may include wide logos; preserve the complete source image. */
 .publication-card__media { background: #f8fafc; }
 .publication-card__media img { width: 100%; height: 100%; object-fit: contain; }
+
+
+/* Shared error semantics: field validation and failed actions use the same red. */
+[role='alert'] { color: #b91c1c; -webkit-text-fill-color: currentColor; }
+[role='alert'] :is(p, span, strong, svg) { color: inherit; }
+.error-notice { display: flex; align-items: flex-start; gap: .625rem; padding: .875rem; border: 1px solid #fecaca; border-radius: .5rem; background: #fef2f2; font-size: .875rem; line-height: 1.5rem; }
+.error-notice:focus { outline: 2px solid #fecaca; outline-offset: 2px; }
+:is(input, textarea, select, button[role='combobox'])[aria-invalid='true'] { border-color: #b91c1c; }
+:is(input, textarea, select, button[role='combobox'])[aria-invalid='true']:focus { --tw-ring-color: #fecaca; outline-color: #b91c1c; }

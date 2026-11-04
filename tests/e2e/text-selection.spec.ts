@@ -52,7 +52,7 @@ test('password errors appear only after failed validation and remain selectable'
   await dialog.getByRole('button', { name: 'Xác nhận đổi mật khẩu', exact: true }).click();
   const error = dialog.getByRole('alert').filter({ hasText: 'Mật khẩu mới cần ít nhất 8 ký tự, có chữ hoa, số và ký tự đặc biệt.' });
   await expect(error).toHaveCSS('font-weight', '400');
-  await expect(error).toHaveCSS('color', 'rgb(159, 18, 57)');
+  await expect(error).toHaveCSS('color', 'rgb(185, 28, 28)');
   await expect(input).toHaveAttribute('aria-invalid', 'true');
   await expect(input).toHaveAttribute('aria-describedby', await error.getAttribute('id') as string);
   await dragSelectText(page, error);
