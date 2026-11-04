@@ -1,5 +1,6 @@
 'use client';
 
+import { ConferenceFields } from './conference-fields';
 import type { ShowcaseDraftInput } from '@/features/submissions/model/input';
 import { CustomSelect } from '@/shared/ui/custom-select';
 import { ReviewComments, reviewCommentId, type AuthorReviewComment } from './review-comments';
@@ -60,6 +61,7 @@ export function BasicInformationFields({ value, errors, onChange, reviewComments
           <FieldError id="submission-year-error" errors={errors.publishedYear} />
         </div>
       </div>
+      <ConferenceFields value={value.conference} errors={errors} onChange={conference => onChange('conference', conference)} />
     </div>
   );
 }

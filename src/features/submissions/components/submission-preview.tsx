@@ -1,3 +1,4 @@
+import { ConferenceDetails } from '@/features/publications/components/conference-details';
 import { MediaImage } from '@/shared/ui/media-image';
 import { ArticleContent, ArticleTableOfContents } from '@/features/submissions/components/article-content';
 import { ResourceLinks } from '@/features/submissions/components/resource-links';
@@ -17,6 +18,7 @@ export function SubmissionPreview({ snapshot }: { snapshot: SubmissionSnapshot }
         {snapshot.thumbnailUrl && <MediaImage src={snapshot.thumbnailUrl} alt={`Hình minh họa: ${snapshot.title}`} className="article-header-thumbnail" />}
       </div>
     </header>
+    <ConferenceDetails value={snapshot.conference} />
     <ArticleTableOfContents content={content} />
     <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{snapshot.summary}</p></section>
     <ArticleContent content={content} />

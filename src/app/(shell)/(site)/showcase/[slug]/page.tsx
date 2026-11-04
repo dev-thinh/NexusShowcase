@@ -1,3 +1,4 @@
+import { ConferenceDetails } from '@/features/publications/components/conference-details';
 import { ContributorNames, ContributorName } from '@/features/publications/components/contributor-names';
 import { MediaImage } from '@/shared/ui/media-image';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
@@ -163,6 +164,7 @@ export default async function ShowcaseDetailPage({
 
         <div className="container mx-auto grid max-w-7xl items-start gap-10 px-4 py-9 sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-14 lg:px-8">
           <article className="min-w-0 space-y-8 sm:space-y-10">
+            <ConferenceDetails value={item.conference} />
             <section id="abstract" aria-labelledby="abstract-title" className="scroll-mt-24">
               <h2 id="abstract-title" className="mb-3 text-base font-semibold text-[#1F2937]">Tóm tắt</h2>
               <p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{item.summary}</p>

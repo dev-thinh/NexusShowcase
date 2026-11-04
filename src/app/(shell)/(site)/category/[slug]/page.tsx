@@ -1,10 +1,12 @@
+import { ConferenceCardBanner } from '@/features/publications/components/conference-card-banner';
+import { PublicationCardMeta } from '@/features/publications/components/publication-card-meta';
+import { PublicationCardDescription } from '@/features/publications/components/publication-card-description';
 import { ContributorNames } from '@/features/publications/components/contributor-names';
 import { CardResourceLink } from '@/features/publications/components/card-resource-link';
 import { PublicationFilters } from '@/features/publications/components/publication-filters';
 import { MediaImage } from '@/shared/ui/media-image';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getSession as auth } from '@/features/identity/server/session';
-import { TypeBadge } from '@/features/publications/components/badges';
 import { CardAdminControls } from '@/features/publications/components/card-admin-controls';
 import { CardLink } from '@/features/publications/components/card-link';
 import { CitationModal } from '@/features/publications/components/citation-modal';
@@ -75,35 +77,34 @@ export default async function CategoryPage({
         ) : (
           <div>
             {slug === 'bai-bao-khoa-hoc' && (
-              <div className="space-y-4">
+              <div className="grid items-start gap-4">
                 {items.map(item => {
 
                   return (
-                    <article key={item.id} className="clickable-card publication-card home-featured-card panel-public grid items-stretch gap-5 p-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-6 sm:p-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
+                    <article key={item.id} className="clickable-card publication-card home-featured-card panel-public flex min-w-0 flex-col overflow-hidden !p-0">
                       <CardLink slug={item.slug} returnTo={returnTo} />
-                      <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg sm:aspect-auto">
-                        <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa nghiên cứu: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
-                      </Link>
-                      <div className="publication-card__body flex min-w-0 flex-col">
-                        <div className="publication-card__meta flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
-                          <div className="flex min-w-0 flex-wrap items-center gap-2 text-xs text-[#1F2937]">
-                          <TypeBadge type={item.type} size="sm" variant="outline" />
-                          {item.publishedYear && <span>{item.publishedYear}</span>}
-                        </div>
-                        {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
-                      </div>
-                        <h2 className="mt-3 h-7 shrink-0 line-clamp-1 text-lg font-semibold leading-7 text-[#1F2937]" title={item.title}>
-                          <Link href={showcaseHref(item.slug, returnTo)} className="hover:underline">{item.title}</Link>
-                        </h2>
-                        <p className="mt-2 truncate text-sm leading-6 text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>
+                      <ConferenceCardBanner value={item.conference} />
+                      <div className="publication-card__content grid min-w-0 items-stretch gap-5 p-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-6 sm:p-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
+                        <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg sm:aspect-auto">
+                          <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa nghiên cứu: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
+                        </Link>
+                        <div className="publication-card__body flex min-w-0 flex-col">
+                          <PublicationCardMeta type={item.type} year={item.publishedYear}>
+                            {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
+                          </PublicationCardMeta>
+                          <h2 className="publication-card__title" title={item.title}>
+                            <Link href={showcaseHref(item.slug, returnTo)} className="hover:underline">{item.title}</Link>
+                          </h2>
+                          <p className="mt-2 h-6 shrink-0 truncate text-sm leading-6 text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>
 
-                          <ContributorNames contributors={item.contributors} />
-                        </p>
-                        <p className="mb-3 mt-3 h-12 shrink-0 line-clamp-2 break-words text-sm leading-6 text-[#1F2937]">{item.summary}</p>
-                        <div className="publication-card__footer -mb-5 mt-auto flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
-                          <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />
-                          <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
-                          <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline">Xem công trình <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
+                            <ContributorNames contributors={item.contributors} />
+                          </p>
+                          <PublicationCardDescription summary={item.summary} className="mb-2 mt-2" />
+                          <div className="publication-card__footer -mb-5 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
+                            <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />
+                            <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
+                            <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline">Xem công trình <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
+                          </div>
                         </div>
                       </div>
                     </article>
@@ -114,7 +115,7 @@ export default async function CategoryPage({
 
             {/* 2. SHOWCASE_GRID Layout */}
             {slug === 'robotics-iot' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid items-start grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {items.map((item) => {
 
 
@@ -124,6 +125,8 @@ export default async function CategoryPage({
                       className="clickable-card publication-card home-featured-card panel-public !p-0 overflow-hidden flex flex-col"
                     >
                       <CardLink slug={item.slug} returnTo={returnTo} />
+                      <ConferenceCardBanner value={item.conference} />
+                      <div className="publication-card__content flex min-w-0 flex-col">
                       <div className="publication-card__media shrink-0 px-5 pt-5 sm:px-6 sm:pt-6">
                         <div className="relative aspect-video overflow-hidden rounded-lg">
                           <MediaImage
@@ -134,16 +137,11 @@ export default async function CategoryPage({
                         </div>
                       </div>
 
-                      <div className="publication-card__body flex min-w-0 flex-1 flex-col p-5 sm:p-6">
-                        <div className="publication-card__meta flex flex-wrap items-start justify-between gap-x-3 gap-y-2">
-                          <div className="flex min-w-0 flex-wrap items-center gap-2">
-                          <TypeBadge type={item.type} size="sm" variant="outline" />
-                          {item.publishedYear && <span className="text-xs">{item.publishedYear}</span>}
-                        </div>
-                        {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
-                      </div>
-
-                        <h2 className="mt-3 h-14 shrink-0 line-clamp-2 text-lg font-semibold leading-7 text-[#1F2937]">
+                      <div className="publication-card__body flex min-w-0 flex-col p-5 sm:p-6">
+                        <PublicationCardMeta type={item.type} year={item.publishedYear}>
+                          {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
+                        </PublicationCardMeta>
+                        <h2 className="publication-card__title" title={item.title}>
                           <Link
                             href={showcaseHref(item.slug, returnTo)}
                             className="hover:text-[#1F2937] transition-colors"
@@ -157,12 +155,10 @@ export default async function CategoryPage({
                           <ContributorNames contributors={item.contributors} />
                         </p>
 
-                        <p className="mb-3 mt-3 h-12 shrink-0 line-clamp-2 break-words text-sm leading-6 text-[#1F2937]">
-                          {item.summary}
-                        </p>
+                        <PublicationCardDescription summary={item.summary} className="mb-2 mt-2" />
 
 
-                        <div className="publication-card__footer -mb-5 mt-auto flex flex-wrap items-center justify-between gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
+                        <div className="publication-card__footer -mb-5 flex flex-wrap items-center justify-between gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
                           <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center text-sm font-semibold text-[#1F2937] hover:underline" />
                           <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
 
@@ -174,6 +170,7 @@ export default async function CategoryPage({
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
                         </div>
+                      </div>
                       </div>
                     </article>
                   );
