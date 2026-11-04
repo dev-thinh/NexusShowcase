@@ -93,13 +93,13 @@ export function NavbarNav({ user }: NavbarNavProps) {
               }`}
             >
               <MemberAvatar fullName={user.name || 'Thành viên'} src={user.avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
-              <span className="hidden lg:block truncate lg:max-w-[110px] font-semibold">
+              <span className="hidden xl:block truncate xl:max-w-[110px] font-semibold">
                 {user.name || 'Thành viên'}
               </span>
-              <span className="hidden lg:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
+              <span className="hidden xl:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
                 {getMemberRoleLabel(user.role)}
               </span>
-              <ChevronDown aria-hidden="true" className={`hidden lg:block w-3.5 h-3.5 shrink-0 transition-transform motion-reduce:transition-none ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown aria-hidden="true" className={`hidden xl:block w-3.5 h-3.5 shrink-0 transition-transform motion-reduce:transition-none ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Keep links mounted while a navigation is pending: unmounting them
@@ -149,8 +149,8 @@ export function NavbarNav({ user }: NavbarNavProps) {
             }
             aria-current={isLoginActive ? 'page' : undefined}
           >
-            <User className="h-5 w-5 lg:hidden" aria-hidden="true" />
-            <span className="hidden lg:inline">Đăng nhập</span>
+            <User className="h-5 w-5 xl:hidden" aria-hidden="true" />
+            <span className="hidden xl:inline">Đăng nhập</span>
           </Link>
         )}
       </div>
@@ -180,7 +180,7 @@ export function PublicNavigation() {
 
   useEffect(() => { setMenuOpen(false); }, [pathname]);
   useEffect(() => {
-    const desktop = window.matchMedia('(min-width: 1024px)');
+    const desktop = window.matchMedia('(min-width: 1280px)');
     const change = () => { if (desktop.matches) setMenuOpen(false); };
     desktop.addEventListener('change', change);
     return () => desktop.removeEventListener('change', change);
@@ -210,7 +210,7 @@ export function PublicNavigation() {
     <button ref={toggleRef} type="button" className="site-mobile-menu-toggle" aria-expanded={menuOpen} aria-controls="public-navigation" aria-label={menuOpen ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'} onClick={() => setMenuOpen(open => !open)}>
       {menuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
     </button>
-    <nav id="public-navigation" aria-label="Điều hướng chính" data-open={menuOpen ? 'true' : 'false'} className="site-public-navigation flex flex-wrap col-start-2 row-start-1 justify-self-center max-xl:col-start-1 max-xl:col-span-3 max-xl:row-start-2 max-xl:flex-wrap max-xl:justify-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto" onClick={event => {
+    <nav id="public-navigation" aria-label="Điều hướng chính" data-open={menuOpen ? 'true' : 'false'} className="site-public-navigation flex flex-nowrap col-start-2 row-start-1 justify-self-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto" onClick={event => {
       if ((event.target as Element).closest('a')) setMenuOpen(false);
     }}>
       {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualPathname === href ? activeTabClass : inactiveTabClass} aria-current={pathname === href ? 'page' : undefined}><span>{label}</span></Link>)}

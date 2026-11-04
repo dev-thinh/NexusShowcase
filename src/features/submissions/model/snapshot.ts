@@ -1,4 +1,5 @@
 import type { ContributorInput } from '@/features/submissions/model/input';
+import { readConference, type Conference } from '@/features/publications/model/conference';
 import type { ItemType, LinkType } from '@prisma/client';
 
 export type SubmissionResource = {
@@ -16,6 +17,7 @@ export type SnapshotContributor = ContributorInput & {
 };
 
 export interface SubmissionSnapshot {
+  conference?: Conference | null;
   citationEnabled?: boolean;
   type?: 'RESEARCH_PAPER' | 'PROJECT';
   categoryId?: string | null;
@@ -49,6 +51,7 @@ export interface EffectivePublication extends SubmissionSnapshot {
 }
 
 export interface SubmissionSnapshotSource {
+  conference?: unknown;
   citationEnabled?: boolean;
   type?: ItemType;
   categoryId?: string | null;
@@ -71,6 +74,7 @@ export interface SubmissionSnapshotSource {
 }
 
 export function mapShowcaseItemToSubmission(item: {
+  conference?: unknown;
   citationEnabled?: boolean;
   id: string;
   title: string;
@@ -97,6 +101,7 @@ export function mapShowcaseItemToSubmission(item: {
 }): SubmissionSnapshot & { id: string } {
   return {
     id: item.id,
+    conference: readConference(item.conference),
     citationEnabled: item.citationEnabled ?? true,
     type: item.type === 'RESEARCH_PAPER' ? 'RESEARCH_PAPER' : 'PROJECT',
     categoryId: item.categoryId,

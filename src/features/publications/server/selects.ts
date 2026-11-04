@@ -3,7 +3,7 @@ import type { Prisma } from '@prisma/client';
 
 export const publicationCardSelect = {
   id: true, title: true, slug: true, summary: true, thumbnailUrl: true,
-  citationEnabled: true,
+  citationEnabled: true, conference: true,
   type: true, scope: true, issuer: true, publishedYear: true,
   isPinned: true, visibility: true,
   contributors: {

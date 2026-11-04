@@ -1,7 +1,8 @@
 'use client';
 
+import { ErrorNotice } from '@/shared/ui/error-notice';
 import { changePasswordAction } from '@/features/identity/server/account-actions';
-import { AlertCircle, ArrowRight, Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { notifySuccess } from '@/shared/dialogs/success';
 import { signOutOnCurrentHost } from './sign-out-current-host';
 import { useEffect, useId, useState, useTransition } from 'react';
@@ -52,15 +53,7 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
           </div>
         </div>}
 
-        {error && (
-          <div
-            role="alert"
-            className="mt-4 p-3 rounded-md bg-[#FFFFFF] border border-slate-200 text-[#1F2937] text-sm flex items-start gap-2.5"
-          >
-            <AlertCircle className="w-4 h-4 text-[#1F2937] shrink-0 mt-0.5" />
-            <div className="font-semibold leading-relaxed">{error}</div>
-          </div>
-        )}
+        <ErrorNotice message={error} focus className="mt-4" />
 
         <ValidatedForm schema={changePasswordFormSchema} values={{ currentPassword, newPassword, confirmPassword }} inlineErrors onSubmit={handleSubmit} className="space-y-3.5">
           <div>

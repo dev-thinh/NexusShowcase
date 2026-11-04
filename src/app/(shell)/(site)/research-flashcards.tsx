@@ -1,5 +1,7 @@
 'use client';
 
+import { ErrorNotice } from '@/shared/ui/error-notice';
+
 import { HomeText, useHomeText } from '@/features/publications/components/home-content-provider';
 import { MediaImage } from '@/shared/ui/media-image';
 
@@ -48,7 +50,7 @@ export function ResearchFlashcards({ initialGallery }: { initialGallery?: Moment
     <>
       <ResearchSectionHeading>{gallery.isAdmin && !editing && <button ref={editButton} type="button" className="moments-edit-button" aria-label="Chỉnh sửa ảnh hướng nghiên cứu" title="Chỉnh sửa ảnh" disabled={opening} onClick={() => void startEditing()}>{opening ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}</button>}</ResearchSectionHeading>
       {editing && <MomentsEditor variant="research" gallery={gallery} sharedLibrary={gallery.library} onSave={finishEditing} onCancel={() => finishEditing()} />}
-      {message && <p role="status" className="mt-3 text-sm">{message}</p>}
+      <ErrorNotice message={message} className="mt-3" />
     <div className="research-directions">
       {directions.map((direction, index) => {
         const photo = gallery.photos.find(photo => photo.slot === index);

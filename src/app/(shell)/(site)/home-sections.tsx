@@ -1,5 +1,10 @@
 'use client';
 
+import { ConferenceCardBanner } from '@/features/publications/components/conference-card-banner';
+
+import { PublicationCardMeta } from '@/features/publications/components/publication-card-meta';
+import { PublicationCardDescription } from '@/features/publications/components/publication-card-description';
+
 import { ContributorNames } from '@/features/publications/components/contributor-names';
 
 
@@ -15,7 +20,6 @@ import type { PublicationCardDto } from '@/features/publications/model/contracts
 import type { HomeMembersPayload } from '@/features/members/model/home';
 import type { MomentsPayload } from '@/features/publications/model/moments';
 
-import { TypeBadge } from '@/features/publications/components/badges';
 import { CardAdminControls } from '@/features/publications/components/card-admin-controls';
 import { CardLink } from '@/features/publications/components/card-link';
 import { CitationModal } from '@/features/publications/components/citation-modal';
@@ -29,45 +33,42 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
   export async function loadHomeFeatured(signal: AbortSignal) {
     const { items: featuredItems, isAdmin } = await fetchDeferredJson<{ items: PublicationCardDto[]; isAdmin: boolean }>('/api/home?section=featured', signal);
     const returnTo = '/';
-    return <div className="grid gap-5">{featuredItems.length === 0 ? (
+    return <div className="grid items-start gap-5">{featuredItems.length === 0 ? (
               <EmptyState title="Chưa có công trình nổi bật" description="Các công trình đã công bố sẽ xuất hiện tại đây." />
             ) : featuredItems.map(item => {
 
 
               return (
-                <article key={item.id} className="clickable-card home-featured-card publication-card panel-public grid min-w-0 overflow-hidden rounded-xl border border-slate-200 bg-white !p-0 md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
+                <article key={item.id} className="clickable-card home-featured-card publication-card panel-public flex min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white !p-0">
                   <CardLink slug={item.slug} returnTo={returnTo} />
-                  <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[2/1] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:aspect-auto md:min-h-56 md:border-b-0 md:border-r">
-                    <div className="absolute inset-0 flex items-center justify-center md:inset-4"><MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="home-featured-thumbnail" /></div>
-                  </Link>
-                  <div className="relative flex min-w-0 flex-col px-3 pt-3 sm:px-6 sm:pt-5">
-                    <header>
-                      <div className="home-featured-meta publication-card__meta flex items-center justify-between gap-1 md:gap-3">
-                        <div className="flex min-w-0 items-center gap-1.5 text-xs font-semibold text-[#1F2937] md:flex-wrap md:gap-2">
-                          <TypeBadge type={item.type} size="sm" variant="outline" />
-                          {item.publishedYear && <span aria-label={`Năm ${item.publishedYear}`} className="whitespace-nowrap"><span className="hidden md:inline">Năm </span>{item.publishedYear}</span>}
-                        </div>
-                        {isAdmin && <div className="home-featured-admin shrink-0"><CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} /></div>}
-                      </div>
-                      <h3 className="mt-2 shrink-0 line-clamp-2 text-base font-semibold leading-6 tracking-tight text-[#1F2937] md:h-7 md:line-clamp-1 md:text-xl md:leading-7" title={item.title}>
-                        <Link href={showcaseHref(item.slug, returnTo)} className="hover:text-[#1F2937] focus-visible:underline">{item.title}</Link>
-                      </h3>
-                      {item.contributors.length > 0 && (
-                        <p className="mt-1 truncate text-sm leading-relaxed text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>
+                  <ConferenceCardBanner value={item.conference} />
+                  <div className="publication-card__content grid min-w-0 md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
+                    <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[2/1] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:aspect-auto md:border-b-0 md:border-r">
+                      <div className="absolute inset-0 flex items-center justify-center md:inset-4"><MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="home-featured-thumbnail" /></div>
+                    </Link>
+                    <div className="relative flex min-w-0 flex-col px-3 pt-3 sm:px-6 sm:pt-5">
+                      <header>
+                        <PublicationCardMeta type={item.type} year={item.publishedYear}>
+                          {isAdmin && <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />}
+                        </PublicationCardMeta>
+                        <h3 className="publication-card__title" title={item.title}>
+                          <Link href={showcaseHref(item.slug, returnTo)} className="hover:text-[#1F2937] focus-visible:underline">{item.title}</Link>
+                        </h3>
+                          <p className="mt-1 h-6 shrink-0 truncate text-sm leading-relaxed text-foreground-muted" title={item.contributors.map(c => c.user?.fullName || c.externalName).filter(Boolean).join(', ')}>
 
-                          <ContributorNames contributors={item.contributors} />
-                        </p>
-                      )}
-                    </header>
-                    <p className="mb-2 mt-2 line-clamp-2 h-12 shrink-0 break-words text-sm leading-6 text-[#1F2937]">{item.summary}</p>
-                    <footer className="publication-card__footer mt-auto flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-200 py-2">
-                      <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline" />
-                      <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
-                      <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:underline">
-                        Xem công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                      </Link>
-                    </footer>
+                            <ContributorNames contributors={item.contributors} />
+                          </p>
+                      </header>
+                      <PublicationCardDescription summary={item.summary} className="mb-2 mt-2" />
+                      <footer className="publication-card__footer flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-200 py-2">
+                        <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline" />
+                        <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
+                        <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:underline">
+                          Xem công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                        </Link>
+                      </footer>
 
+                    </div>
                   </div>
                 </article>
               );

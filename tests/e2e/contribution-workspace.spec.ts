@@ -2,7 +2,7 @@ import { expect, login, test } from './fixtures';
 
 test('contributed works appear read-only and author presentation is consistent in cards and detail', async ({ page, database, fixture }) => {
   const participant = fixture.users[3];
-  const item = await database.showcaseItem.findFirstOrThrow({ where: { status: 'PUBLISHED', creatorId: fixture.users[1].id } });
+  const item = await database.showcaseItem.findFirstOrThrow({ where: { status: 'PUBLISHED', creatorId: fixture.users[1].id, contributors: { none: { userId: participant.id } } } });
   await database.showcaseItem.update({ where: { id: item.id }, data: { issuer: 'Hội nghị nghiên cứu sinh viên · Dữ liệu minh họa' } });
   await database.itemContributor.createMany({ data: [
     { itemId: item.id, userId: participant.id, role: 'CONTRIBUTOR', displayOrder: 10 },

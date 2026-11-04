@@ -3,7 +3,7 @@ import type { ActionResult } from '@/shared/lib/action-result';
 import type { ZodError } from 'zod';
 
 export function submissionValidationMessage(error: ZodError): string {
-  const labels: Record<string, string> = { title: 'Tiêu đề', summary: 'Tóm tắt', content: 'Nội dung', contributors: 'Người đóng góp', resources: 'Tài nguyên', categoryId: 'Chuyên mục', thumbnailUrl: 'Ảnh đại diện', publishedYear: 'Năm thực hiện' };
+  const labels: Record<string, string> = { conference: 'Thông tin hội nghị', title: 'Tiêu đề', summary: 'Tóm tắt', content: 'Nội dung', contributors: 'Người đóng góp', resources: 'Tài nguyên', categoryId: 'Chuyên mục', thumbnailUrl: 'Ảnh đại diện', publishedYear: 'Năm thực hiện' };
   const messages = Object.entries(formErrors(error)).map(([path, message]) => {
     const [field, index] = path.split('.');
     return `${labels[field] || field}${/^\d+$/.test(index ?? '') ? ` ${Number(index) + 1}` : ''}: ${message}`;

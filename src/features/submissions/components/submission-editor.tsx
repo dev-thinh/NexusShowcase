@@ -1,5 +1,7 @@
 'use client';
 
+import { ConferenceDetails } from '@/features/publications/components/conference-details';
+
 import { focusFirstSubmissionError } from './submission-field';
 import { MediaImage } from '@/shared/ui/media-image';
 
@@ -65,6 +67,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
           </div>
           {state.data.thumbnailUrl && <MediaImage src={state.data.thumbnailUrl} alt={`Hình minh họa: ${state.data.title || 'Công trình'}`} className="article-header-thumbnail" />}
         </header>
+        <ConferenceDetails value={state.data.conference} />
         <ArticleTableOfContents content={content} />
         <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{state.data.summary || 'Chưa có tóm tắt.'}</p></section>
         <ArticleContent content={content} />
@@ -75,7 +78,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
 
           </section>
           <div className="min-w-0 border-t border-slate-200 bg-[#FFFFFF] p-4 sm:p-8 lg:border-t-0">
-            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">Tác giả và người đóng góp</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm người tham gia và xác nhận vai trò của từng người.</p><ReviewComments comments={reviewComments} fieldKey="contributors" /><ContributorEditor errors={state.fieldErrors} value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
+            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">Tác giả và người đóng góp</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">Thêm người tham gia và xác nhận vai trò của từng người. Người đăng không bắt buộc phải là tác giả; chỉ giữ những người thực sự đóng góp.</p><ReviewComments comments={reviewComments} fieldKey="contributors" /><ContributorEditor errors={state.fieldErrors} value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
             <section className="mt-7 border-t border-slate-200 pt-6" aria-labelledby="submission-resources-title">
               <h2 id="submission-resources-title" className="text-lg font-semibold text-[#1F2937]">Tài nguyên đính kèm</h2>
               <ReviewComments comments={reviewComments} fieldKey="resources" />

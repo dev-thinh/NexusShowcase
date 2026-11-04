@@ -25,7 +25,7 @@ async function main() {
   const prisma = new PrismaClient();
   try {
     await createAdditionalAdmin(prisma, { identifier: values.identifier, password, hidden: values.hidden });
-    console.log(values.hidden ? 'Đã tạo admin ẩn khỏi danh sách thành viên và đội ngũ trang chủ.' : 'Đã tạo thêm admin.');
+    console.log(values.hidden ? 'Đã tạo admin ẩn khỏi danh sách thành viên, đội ngũ trang chủ và quản trị thành viên.' : 'Đã tạo thêm admin.');
     console.log('Đăng nhập và đổi mật khẩu ở lần đầu sử dụng.');
   } finally { await prisma.$disconnect(); }
 }

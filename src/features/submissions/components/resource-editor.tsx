@@ -60,7 +60,7 @@ export function ResourceEditor({ value, onChange, onBusy, citationEnabled = fals
           <input type="checkbox" checked={githubEnabled} onChange={event => toggleGithub(event.target.checked)} aria-controls="github-resource-fields" className="h-6 w-6 shrink-0 cursor-pointer accent-[#153D67] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30 focus-visible:ring-offset-2" />
         </label>
       </div>
-      <p className="mt-2 text-sm text-[#1F2937]" aria-live="polite">{message}</p>
+      <p role={message && !uploading ? 'alert' : 'status'} className="mt-2 text-sm" aria-live={uploading ? 'polite' : undefined}>{message}</p>
       <div id="github-resource-fields" className="space-y-3">{errors.resources?.length ? <SubmissionField name="resources" errors={errors}><span /></SubmissionField> : null}
         {value.map((resource, index) => (
           <SubmissionField name={`resources.${index}`} errors={errors} key={`${resource.kind}-${index}`}><div className="panel-nested grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-start gap-3 !p-3 shadow-none">

@@ -11,6 +11,7 @@ export async function applyReviewedSnapshot(tx: Prisma.TransactionClient, input:
   if (!category || !['bai-bao-khoa-hoc', 'robotics-iot'].includes(category.slug)) throw new StateConflict();
   const changed = await tx.showcaseItem.updateMany({ where: { id: itemId, reviewVersion: expectedReviewVersion }, data: {
     citationEnabled: snapshot.citationEnabled ?? true,
+    conference: snapshot.conference ?? Prisma.DbNull,
     title: snapshot.title, summary: snapshot.summary, content: snapshot.content,
     type: category.slug === 'bai-bao-khoa-hoc' ? 'RESEARCH_PAPER' : 'PROJECT', categoryId,
     thumbnailUrl: snapshot.thumbnailUrl === undefined ? previous.thumbnailUrl : snapshot.thumbnailUrl,

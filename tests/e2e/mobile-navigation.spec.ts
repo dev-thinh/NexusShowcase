@@ -1,6 +1,6 @@
 import { expect, test } from './fixtures';
 
-for (const width of [320, 390, 768, 900]) {
+for (const width of [320, 390, 768, 900, 1024, 1100, 1279]) {
   test(`mobile header uses one row and a readable disclosure menu at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 844 });
     await page.goto('/');
@@ -51,13 +51,16 @@ for (const width of [320, 390, 768, 900]) {
   });
 }
 
-test('desktop retains the visible navigation links', async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
+for (const width of [1280, 1440]) test(`desktop retains one row of visible navigation at ${width}px`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
   await page.goto('/');
   await expect(page.locator('.site-mobile-menu-toggle')).toBeHidden();
   const navigation = page.getByRole('navigation', { name: 'Điều hướng chính', exact: true });
   await expect(navigation).toBeVisible();
   await expect(navigation.getByRole('link')).toHaveCount(5);
+  const positions = await navigation.getByRole('link').evaluateAll(links => links.map(link => link.getBoundingClientRect().y));
+  expect(Math.max(...positions) - Math.min(...positions)).toBeLessThan(1);
+  expect((await page.locator('#site-navbar').boundingBox())!.height).toBeLessThan(80);
   await navigation.getByRole('link', { name: 'Liên hệ', exact: true }).click();
   await expect(page).toHaveURL(/\/contact$/);
 });

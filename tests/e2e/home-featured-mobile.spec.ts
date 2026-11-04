@@ -11,8 +11,8 @@ for (const width of [320, 390]) test(`home cards stay compact and section action
   await expect(card).toBeVisible();
   const photo = card.getByRole('link', { name: /^Xem công trình:/ });
   expect((await photo.boundingBox())!.height).toBeLessThan(200);
-  const admin = card.locator('.home-featured-admin');
-  const metadata = card.locator('.home-featured-meta');
+  const admin = card.locator('.publication-card-meta__controls');
+  const metadata = card.locator('.publication-card-meta');
   const metaBox = (await metadata.boundingBox())!;
   const adminBox = (await admin.boundingBox())!;
   expect(adminBox.y).toBeGreaterThanOrEqual(metaBox.y);

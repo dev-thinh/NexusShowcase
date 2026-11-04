@@ -1,8 +1,8 @@
 'use client';
 
+import { ErrorNotice } from '@/shared/ui/error-notice';
 import { loginAction } from '@/features/identity/server/login-actions';
 import {
-AlertCircle,
 ArrowRight,
 Eye,
 EyeOff,
@@ -74,16 +74,7 @@ export function LoginForm() {
           <h1 className="text-2xl font-semibold text-[#1F2937] leading-tight">Đăng nhập</h1>
         </div>
 
-        {error && (
-          <div
-            id="login-error"
-            role="alert"
-            className="mt-4 p-3.5 rounded-lg bg-[#FFFFFF] border border-slate-200 text-[#1F2937] text-sm flex items-center gap-2.5 animate-in fade-in"
-          >
-            <AlertCircle className="w-4 h-4 text-[#1F2937] shrink-0" />
-            <div className="font-semibold">{error}</div>
-          </div>
-        )}
+        <ErrorNotice id="login-error" message={error} focus className="mt-4" />
 
         {success && (
           <div
@@ -115,8 +106,9 @@ export function LoginForm() {
                 spellCheck={false}
                 required
                 aria-describedby={error ? 'login-error' : undefined}
+                aria-invalid={Boolean(error)}
                 value={identifier}
-                onChange={(e) => setIdentifier(e.target.value)}
+                onChange={(e) => { setIdentifier(e.target.value); setError(null); }}
                 placeholder="Nhập tên đăng nhập hoặc email..."
                 disabled={isPending}
                 className="w-full pl-10 pr-4 py-3 text-sm sm:text-base bg-white hover:border-slate-200 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 text-[#1F2937] transition-all font-semibold disabled:opacity-50"
@@ -140,8 +132,9 @@ export function LoginForm() {
                 autoComplete="current-password"
                 required
                 aria-describedby={error ? 'login-error' : undefined}
+                aria-invalid={Boolean(error)}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => { setPassword(e.target.value); setError(null); }}
                 placeholder="••••••••"
                 disabled={isPending}
                 className="w-full pl-10 pr-10 py-3 text-sm sm:text-base bg-white hover:border-slate-200 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 text-[#1F2937] transition-all font-semibold disabled:opacity-50"
