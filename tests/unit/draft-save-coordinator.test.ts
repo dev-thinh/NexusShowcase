@@ -94,3 +94,9 @@ it('automatically saves a correction made before an invalid request returns', as
  expect(coordinator.snapshot).toMatchObject({status:'saved',isDirty:false,data:{title:'Corrected while pending'}});
  coordinator.dispose();
 });
+it('does not claim an old replayed receipt saved over a newer server draft',async()=>{
+ const coordinator=new DraftSaveCoordinator({itemId:'item',reviewVersion:3,data:{title:'Server new'},save:async()=>receipt(1),persist:()=>true,onChange:()=>{}});
+ coordinator.restore({title:'Unfinished local'},0,1,{input:{itemId:'item',expectedReviewVersion:0,mutationId:crypto.randomUUID(),draft:{title:'Unfinished local'}},editSequence:1});
+ expect(await coordinator.flush()).toBeNull();
+ expect(coordinator.snapshot).toMatchObject({status:'conflict',isDirty:true,data:{title:'Unfinished local'}}); coordinator.dispose();
+});

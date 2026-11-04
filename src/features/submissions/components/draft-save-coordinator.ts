@@ -75,7 +75,7 @@ export class DraftSaveCoordinator {
       this.snapshot.status = 'saving'; this.snapshot.error = null; this.emit();
       let result: ActionResult<Receipt>;
       try { result = await this.options.save(pending.input); }
-      catch { result = { success: false, code: 'INTERNAL', error: 'Không kết nối được máy chủ. Nội dung chưa đồng bộ.' }; }
+      catch { result = { success: false, code: 'INTERNAL', error: 'Không kết nối được máy chủ. Bản nháp sẽ được lưu lại khi có mạng.' }; }
       if (this.disposed) return null; // Leave the durable request available for receipt replay.
       if (!result.success) {
         this.blocked = !['INTERNAL', 'RATE_LIMITED', 'VALIDATION'].includes(result.code);
@@ -92,6 +92,12 @@ export class DraftSaveCoordinator {
           this.retryTimer = setTimeout(() => { this.retryTimer = undefined; void this.flush(); }, delay);
         }
         return null;
+      }
+      if (result.data.reviewVersion < this.options.reviewVersion) {
+        this.pending = undefined; this.blocked = true;
+        this.snapshot.status = 'conflict';
+        this.snapshot.error = 'Bài đã được sửa ở tab khác. Nội dung đang viết vẫn được giữ lại.';
+        this.emit(); return null;
       }
       this.failures = 0; this.pending = undefined;
       last = { ...result.data, editSequence: pending.editSequence };

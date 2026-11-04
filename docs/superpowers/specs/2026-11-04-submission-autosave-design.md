@@ -53,3 +53,8 @@ Không làm cộng tác thời gian thực hoặc tự hợp nhất mọi xung �
 - Snapshot JSON của draft là nguồn nạp lại editor, giữ nguyên dữ liệu đang nhập. Không chỉ nới validation rồi tái dựng từ contributor/resource relations vì có thể làm mất phần dang dở. Chỉ tạo projection/relations hợp lệ theo nhu cầu workflow, tiếp tục kiểm tra quyền tệp. Cần tương thích dữ liệu draft cũ khi chuyển đổi.
 - Mỗi lần lưu có mutation ID ổn định qua retry. Server nhận diện request đã commit nhưng mất phản hồi và trả lại kết quả tương ứng, tránh xung đột giả do chính lần lưu trước. Không dùng một ID cho hai payload khác nhau.
 - Có lối truy cập để xem/sao chép bản khôi phục khi bài đã chuyển sang chờ duyệt hoặc không còn được chỉnh sửa; không để redirect của trang edit khiến dữ liệu cục bộ trở nên không thể truy cập.
+
+
+## Điều chỉnh UX theo yêu cầu ngày 2026-11-05
+
+Người viết không cần biết cơ chế lưu trên máy và lưu lên server. Khi mở lại bài sau gián đoạn, tự tiếp tục từ nội dung đang viết nếu phiên bản tương thích; không hiện bảng Khôi phục / Tải bản sao / Bỏ bản khôi phục trong luồng bình thường. Bỏ các bản giữ tạm đã giống nội dung lưu trên server. Trạng thái thường chỉ là Đang lưu... và Đã lưu; chỉ báo Đã lưu khi có xác nhận lưu thành công. Nếu có xung đột thực sự giữa hai tab, giữ nguyên nội dung, hiện thông báo ngắn và để phần đối chiếu/sao chép trong mục chi tiết thu gọn. Không tự ghi đè một bản mới hơn.

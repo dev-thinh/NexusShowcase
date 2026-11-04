@@ -11,7 +11,7 @@ import { useCallback, useEffect, useReducer, useRef, useState, startTransition }
 import { notifySuccess } from '@/shared/dialogs/success';
 
 import { DraftSaveCoordinator, type SaveSnapshot, type SaveState } from './draft-save-coordinator';
-import { listRecoveries, removeRecovery, writeRecovery, type DraftRecovery } from './draft-recovery';
+import { chooseDraftRecovery, listRecoveries, removeRecovery, writeRecovery, type DraftRecovery } from './draft-recovery';
 export type { SaveState } from './draft-save-coordinator';
 
 export interface SubmissionEditorState {
@@ -56,7 +56,7 @@ export function createInitialSubmissionState(
       resources: initialData.draftSnapshot ? (initialData.resources ?? []) : standaloneResources(initialData.content ?? '', initialData.resources ?? []),
     },
     fieldErrors: {},
-    saveState: 'idle',
+    saveState: initialData.id ? 'saved' : 'idle',
     isDirty: false,
     formError: null,
   };
@@ -100,7 +100,6 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
   const [recoveries, setRecoveries] = useState<DraftRecovery[]>([]);
   const [storageError, setStorageError] = useState(false);
   const [saveNotice, setSaveNotice] = useState<string | null>(null);
-  const [locallySaved, setLocallySaved] = useState(true);
   const coordinatorRef = useRef<DraftSaveCoordinator | null>(null);
   const activeRecordRef = useRef<DraftRecovery | null>(null);
   const initialRef = useRef({ data: state.data, itemId: initialData.id, version: initialData.reviewVersion ?? 0, accountId });
@@ -115,8 +114,12 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
       const result = listRecoveries(window.localStorage, initial.accountId, initial.itemId);
       existing = result.records; setStorageError(result.error);
     } catch { setStorageError(true); }
-    recoveryPendingRef.current = existing.length > 0;
-    setRecoveries(existing);
+    const recovery = chooseDraftRecovery(existing, initial.data, initial.version);
+    for (const obsolete of recovery.obsolete) {
+      try { removeRecovery(window.localStorage, obsolete); } catch {}
+    }
+    recoveryPendingRef.current = recovery.conflicts.length > 0;
+    setRecoveries(recovery.conflicts);
     const sessionId = crypto.randomUUID();
     const coordinator = new DraftSaveCoordinator({
       itemId: initial.itemId, reviewVersion: initial.version, data: initial.data,
@@ -137,7 +140,7 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
         } catch { return false; }
       },
       onChange: snapshot => {
-        dispatch({ type: 'snapshot', snapshot }); setLocallySaved(snapshot.locallySaved);
+        dispatch({ type: 'snapshot', snapshot });
         setStorageError(!snapshot.locallySaved); setSaveNotice(snapshot.error);
       },
     });
@@ -146,7 +149,15 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
     const beforeUnload = (event: BeforeUnloadEvent) => {
       if (coordinator.snapshot.isDirty && !coordinator.snapshot.locallySaved) event.preventDefault();
     };
+    // Set connectivity before restoring so offline recovery never depends on a request.
     online();
+    if (recovery.resume) {
+      const record = recovery.resume;
+      coordinator.restore(record.data, record.expectedReviewVersion, record.editSequence, record.pendingMutation);
+      if (coordinator.snapshot.locallySaved) {
+        try { removeRecovery(window.localStorage, record); } catch {}
+      }
+    }
     window.addEventListener('online', online); window.addEventListener('offline', online);
     window.addEventListener('beforeunload', beforeUnload);
     setReady(true);
@@ -216,6 +227,6 @@ export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & {
     } finally { busyRef.current = false; setSubmitting(false); }
   }, [router]);
 
-  return { state, updateField, saveDraft, submitForReview, ready, submitting, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice, locallySaved,
+  return { state, updateField, saveDraft, submitForReview, ready, submitting, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice,
     activeRecovery: state.saveState === 'conflict' || storageError ? activeRecordRef.current : null };
 }

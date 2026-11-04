@@ -32,3 +32,18 @@ it('never promises durability for a record that cannot be read back', () => {
  expect(writeRecovery(storage,oversized)).toBe(false);
  expect(storage.length).toBe(0);
 });
+
+it('automatically resumes the latest compatible draft and ignores already-saved copies', async () => {
+ const { chooseDraftRecovery }=await import('@/features/submissions/components/draft-recovery');
+ const saved={...record,sessionId:'saved',data:{title:'Server'}};
+ const newer={...record,sessionId:'newer',updatedAt:3,data:{title:'Continue writing'}};
+ const result=chooseDraftRecovery([record,saved,newer],{title:'Server'},0);
+ expect(result.resume).toEqual(newer);
+ expect(result.obsolete).toEqual([saved]);
+ expect(result.conflicts).toEqual([]);
+});
+it('never automatically overwrites a newer server draft with a stale browser copy', async()=>{
+ const { chooseDraftRecovery }=await import('@/features/submissions/components/draft-recovery');
+ const result=chooseDraftRecovery([record],{title:'Changed elsewhere'},2);
+ expect(result.resume).toBeUndefined(); expect(result.conflicts).toEqual([record]);
+});

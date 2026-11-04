@@ -38,7 +38,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
     ...initialData,
     contributors: [{ userId: currentUser.id, role: 'CONTRIBUTOR' as const, displayOrder: 0 }],
   };
-  const { state, updateField, saveDraft, submitForReview, ready, submitting, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice, locallySaved, activeRecovery } = useSubmissionEditor(dataWithAuthor, currentUser.id);
+  const { state, updateField, saveDraft, submitForReview, ready, submitting, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice, activeRecovery } = useSubmissionEditor(dataWithAuthor, currentUser.id);
   const [preview, setPreview] = useState(false);
   const [uploads, setUploads] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
@@ -59,9 +59,9 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
   const images = articleFromLegacy(content, state.data.resources ?? []).sections.flatMap(section => section.blocks).filter((block): block is Extract<ArticleBlock, { kind: 'IMAGE' }> => block.kind === 'IMAGE' && !!block.url);
   return (
     <form ref={formRef} className="submission-form panel-detail w-full !p-0" onSubmit={event => event.preventDefault()} noValidate>
-      <DraftRecoveryPanel records={recoveries} serverVersion={initialData.reviewVersion ?? 0} onRestore={restoreRecovery} onDiscard={discardRecovery} />
-      {activeRecovery && <><DraftRecoveryPanel records={[activeRecovery]} serverVersion={-1} /><p className="px-4 py-3 text-sm sm:px-8">Giữ bản sao trước khi <button type="button" className="underline" onClick={() => window.location.reload()}>tải bản mới từ máy chủ</button>.</p></>}
-      {storageError && <p role="status" className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm sm:px-8">Không lưu được bản khôi phục trên thiết bị. Hãy giữ trang mở cho đến khi nội dung được đồng bộ lên máy chủ.</p>}
+      {recoveries.length > 0 && <div className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm sm:px-8"><p>Bài đã được sửa ở tab khác. Nội dung chưa lưu vẫn được giữ lại.</p><details className="mt-2"><summary className="cursor-pointer">Xem nội dung đang giữ</summary><DraftRecoveryPanel records={recoveries} serverVersion={initialData.reviewVersion ?? 0} onRestore={restoreRecovery} onDiscard={discardRecovery} /></details></div>}
+      {activeRecovery && <><details className="px-4 py-3 text-sm sm:px-8"><summary className="cursor-pointer">Xem nội dung chưa lưu</summary><DraftRecoveryPanel records={[activeRecovery]} serverVersion={-1} /></details><p className="px-4 py-3 text-sm sm:px-8">Giữ bản sao trước khi <button type="button" className="underline" onClick={() => window.location.reload()}>tải bản mới từ máy chủ</button>.</p></>}
+      {storageError && <p role="status" className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm sm:px-8">Chưa giữ được nội dung trên thiết bị. Vui lòng giữ trang mở cho đến khi hiện “Đã lưu”.</p>}
       {saveNotice && <p role="status" className="px-4 py-3 text-sm text-red-700 sm:px-8">{saveNotice}</p>}
       {reviewComments.length > 0 && <aside aria-label="Yêu cầu chỉnh sửa" className="border-b border-slate-200 bg-[#FFFFFF] px-4 py-4 text-sm text-[#1F2937] sm:px-8"><h2 className="font-semibold">Phản hồi cần xử lý</h2><ul className="mt-2 list-disc space-y-1 pl-5">{reviewComments.filter(comment => comment.audience === 'AUTHOR').map(comment => <li key={comment.id}>{comment.body}</li>)}</ul></aside>}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-8"><p className="text-sm font-semibold text-[#1F2937]">{preview ? 'Bản xem trước · Chưa xuất bản' : 'Workspace soạn thảo'}</p></div>
@@ -100,7 +100,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
 
       </fieldset>}
       {state.formError && !Object.values(state.fieldErrors).some(messages => messages.length) && <p role="alert" tabIndex={-1} data-submit-error className="mx-6 my-3 rounded-md border border-red-500 p-3 text-sm text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">{state.formError}</p>}
-      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} locallySaved={locallySaved} dirty={state.isDirty} disabled={busy} onSave={async () => { if (await saveDraft()) await notifySuccess('Đã lưu bản nháp công trình.'); }} onSubmit={async () => { if (await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
+      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={busy} onSave={async () => { if (await saveDraft()) await notifySuccess('Đã lưu bản nháp công trình.'); }} onSubmit={async () => { if (await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
     </form>
   );
 }

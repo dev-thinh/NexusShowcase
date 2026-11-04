@@ -57,3 +57,17 @@ export function removeRecovery(storage: StorageAccess, record: DraftRecovery): b
     storage.removeItem(keyOf(record)); return true;
   } catch { return false; }
 }
+
+/** Resume ordinary interrupted writing silently; ask only for a real version conflict. */
+export function chooseDraftRecovery(records: DraftRecovery[], serverData: ShowcaseDraftInput, serverVersion: number) {
+  const normalized = (data: ShowcaseDraftInput) => {
+    const parsed = showcaseDraftInputSchema.safeParse(data);
+    return JSON.stringify(parsed.success ? parsed.data : data);
+  };
+  const saved = normalized(serverData);
+  const obsolete = records.filter(record => normalized(record.data) === saved);
+  const remaining = records.filter(record => !obsolete.includes(record)).sort((a, b) => b.updatedAt - a.updatedAt);
+  const resume = remaining.find(record => record.expectedReviewVersion === serverVersion || Boolean(record.pendingMutation));
+  const conflicts = resume ? [] : remaining;
+  return { resume, obsolete, conflicts };
+}

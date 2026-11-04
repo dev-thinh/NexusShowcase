@@ -54,13 +54,13 @@ test('recovers offline edits after reload and reconnect', async ({ page, context
  await test.step('retain an offline edit locally',async()=>{
   await context.setOffline(true);
   await page.locator('#submission-summary').fill('Viết khi mất mạng');
-  await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu trên thiết bị');
+  await expect.poll(() => page.evaluate(() => Object.keys(localStorage).some(key => key.startsWith('nexus:draft-recovery:') && localStorage.getItem(key)?.includes('Viết khi mất mạng')))).toBe(true);
  });
  await test.step('reload and restore while writes are unavailable',async()=>{
   await page.route('**/*', async route => route.request().method()==='POST' && route.request().headers()['next-action'] ? route.abort() : route.continue());
   await context.setOffline(false); await page.reload();
-  await expect(page.getByRole('region',{name:'Khôi phục bản nháp'})).toBeVisible();
-  await page.getByRole('button',{name:'Khôi phục',exact:true}).click();
+  await expect(page.getByRole('region',{name:'Khôi phục bản nháp'})).toHaveCount(0);
+  await expect(page.getByRole('button',{name:'Khôi phục',exact:true})).toHaveCount(0);
   await expect(page.locator('#submission-summary')).toHaveValue('Viết khi mất mạng');
  });
  await test.step('sync the restored edit',async()=>{
