@@ -14,7 +14,7 @@ const hasVietnameseCollation = cache(async () => {
 export async function rankedMembers(input: { authenticated: boolean; role?: PublicMemberRole; take: number; skip: number }): Promise<MemberDirectoryEntry[]> {
   if (!await hasVietnameseCollation()) {
     // Explicit compatibility fallback: scan ranking metadata only, hydrate the requested page.
-    const where = { status: 'ACTIVE' as const, deletedAt: null, role: input.role ?? { in: ['ADMIN', 'CORE_MEMBER', 'MEMBER'] as PublicMemberRole[] } };
+    const where = { status: 'ACTIVE' as const, deletedAt: null, hiddenFromDirectory: false, role: input.role ?? { in: ['ADMIN', 'CORE_MEMBER', 'MEMBER'] as PublicMemberRole[] } };
     const counts = { select: { contributions: { where: { item: publishedWhere(input.authenticated) } } } };
     const metadata = await prisma.user.findMany({ where, select: { id: true, fullName: true, role: true, _count: counts } });
     const priority = { ADMIN: 0, CORE_MEMBER: 1, MEMBER: 2 };
@@ -31,7 +31,7 @@ export async function rankedMembers(input: { authenticated: boolean; role?: Publ
     FROM users u
     LEFT JOIN item_contributors c ON c."userId" = u.id
     LEFT JOIN showcase_items i ON i.id = c."itemId" AND i.status = 'PUBLISHED' AND (${input.authenticated} OR i.visibility = 'PUBLIC')
-    WHERE u.status = 'ACTIVE' AND u."deletedAt" IS NULL AND u.role::text IN ('ADMIN', 'CORE_MEMBER', 'MEMBER') ${role}
+    WHERE u.status = 'ACTIVE' AND u."deletedAt" IS NULL AND u."hiddenFromDirectory" = false AND u.role::text IN ('ADMIN', 'CORE_MEMBER', 'MEMBER') ${role}
     GROUP BY u.id
     ORDER BY CASE u.role::text WHEN 'ADMIN' THEN 0 WHEN 'CORE_MEMBER' THEN 1 ELSE 2 END,
       count(i.id) DESC, u."fullName" COLLATE "vi-x-icu", u.id

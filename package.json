@@ -47,7 +47,8 @@
     "db:up": "docker compose --env-file .env.database.local up -d",
     "demo:prepare": "tsx scripts/prepare-demo.ts",
     "db:seed:full-demo": "tsx prisma/seed-full-demo.ts",
-    "demo": "tsx scripts/run-demo.ts"
+    "demo": "tsx scripts/run-demo.ts",
+    "admin:create": "tsx scripts/create-admin.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.0.0",
