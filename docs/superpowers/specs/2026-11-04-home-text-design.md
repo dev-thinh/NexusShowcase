@@ -1,0 +1,7 @@
+# Editable homepage text
+
+Admins enter editing mode using “Chỉnh sửa nội dung” on the homepage. Public text becomes accessible, automatically growing textareas in the same locations, retaining the page layout and typography. A fixed toolbar offers save/cancel and reports errors without losing the draft. Cancelling changed copy asks before discarding; save failures retain copy, stale versions require loading the latest version with confirmation. Public viewers continue seeing saved copy. Existing research and moments photo editors remain unchanged.
+
+Editable copy covers the banner, section headings, action labels, and research card titles/descriptions. Each of the three research cards uses one combined title. The member section has no description line. Existing split research-card titles are joined with “ & ” while preserving custom copy; retired keys are removed from JSON and the record version increments so old drafts cannot overwrite it. A dedicated migration handles stored records, and server read normalization supports legacy records during rollout.
+
+Architecture: versioned HomePageContent JSON record, strict Zod schema, public read/admin-only same-origin write API, client context holding saved copy and a separate draft. Deferred homepage loading stays intact. Editable action labels render within non-link containers while editing to avoid nested interactive elements. Plain text only. The user requested editing directly on the rendered page; the previous grouped modal form has been removed.

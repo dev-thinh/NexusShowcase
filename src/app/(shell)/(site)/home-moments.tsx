@@ -1,5 +1,6 @@
 'use client';
 
+import { HomeText } from '@/features/publications/components/home-content-provider';
 import { MediaImage } from '@/shared/ui/media-image';
 
 import { ArrowLeft, ArrowRight, Expand, Loader2, Pause, Pencil, Play } from 'lucide-react';
@@ -110,8 +111,8 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
     <section ref={wallRef} className="moments-wall" aria-labelledby="moments-title" data-keyboard-browsing={keyboardBrowsing ? 'true' : undefined} data-paused={paused || selected !== null || editing ? 'true' : undefined}>
       <div className="moments-heading container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="home-section-heading">
-          <p className="home-section-eyebrow">Hoạt động CLB</p>
-          <h2 id="moments-title" className="home-section-title">Khoảnh khắc sáng tạo</h2>
+          <p className="home-section-eyebrow"><HomeText field="momentsEyebrow">Hoạt động CLB</HomeText></p>
+          <h2 id="moments-title" className="home-section-title"><HomeText field="momentsTitle">Khoảnh khắc sáng tạo</HomeText></h2>
         </div>
         <div className="moments-heading-actions">
           {initialGallery.isAdmin && !editing && <button ref={editButton} type="button" className="moments-edit-button" aria-label="Chỉnh sửa ảnh khoảnh khắc" title="Chỉnh sửa ảnh" disabled={opening} onClick={() => void startEditing()}>{opening ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}</button>}
