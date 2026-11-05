@@ -75,7 +75,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
         </header>
         <ConferenceDetails value={state.data.conference} />
         <ArticleTableOfContents content={content} />
-        <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{state.data.summary || 'Chưa có tóm tắt.'}</p></section>
+        <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{state.data.summary || 'Chưa có tóm tắt.'}</p></section>
         <ArticleContent content={content} />
         <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">Tài nguyên</h2><ResourceLinks resources={(state.data.resources ?? []).filter(resource => submissionResourceSchema.safeParse(resource).success)} /></section>
       </div> : <fieldset disabled={busy} className="min-w-0 disabled:opacity-70">
