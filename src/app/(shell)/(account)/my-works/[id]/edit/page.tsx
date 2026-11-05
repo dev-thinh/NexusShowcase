@@ -56,7 +56,7 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
       <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/my-works" }, { label: "Chỉnh sửa công trình" }]} />
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
-            <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">{item.status === 'PUBLISHED' ? 'Soạn bản cập nhật' : item.status === 'REVISION_REQUESTED' ? 'Chỉnh sửa theo phản hồi' : 'Chỉnh sửa bản nháp'}</h1>
+            <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">{item.status === 'PUBLISHED' ? 'Soạn bản cập nhật' : item.status === 'REVISION_REQUESTED' ? 'Chỉnh sửa theo phản hồi' : 'Soạn thảo công trình'}</h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[#1F2937]">Nội dung được tự động lưu khi soạn thảo. Bản cập nhật bài đã xuất bản chỉ xuất hiện công khai sau khi được Admin duyệt.</p>
           </header>
           <SubmissionEditor key={`${user.id}:${item.id}`} initialData={{ ...(draft ?? mapShowcaseItemToSubmission(item)), id: item.id, reviewVersion: item.reviewVersion, draftSnapshot: Boolean(draft) }} currentUser={{ id: user.id, fullName: user.fullName, role: user.role }} clubMembers={members} categories={categories} mode="edit" reviewComments={item.reviewComments} />

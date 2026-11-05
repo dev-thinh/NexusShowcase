@@ -23,8 +23,8 @@ export default async function NewItemPage() {
       <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/my-works" }, { label: "Đăng công trình mới" }]} />
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
-            <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">Đăng công trình mới</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#1F2937]">Bản nháp được tạo ngay và tự động lưu khi bạn soạn thảo.</p>
+            <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">Soạn thảo công trình</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#1F2937]">Nội dung được tự động lưu khi bạn soạn thảo.</p>
           </header>
           <NewDraft accountId={user.id} />
         </div>
