@@ -12,7 +12,7 @@ it('plans local registered orphans but protects references and quarantine', () =
  expect(planOrphanAssets([asset],{urls:new Set([asset.url]),incompleteSources:[]},new Date('2026-11-01'))).toEqual([]);
  expect(planOrphanAssets([{...asset,deletionStartedAt:new Date()}],{urls:new Set(),incompleteSources:[]},new Date('2026-11-01'))).toEqual([]);
 });
-it('deletes only canonical registered local files and refuses symlinks',async()=>{
+it.runIf(process.platform === 'linux')('deletes only canonical registered local files and refuses symlinks',async()=>{
  const root=await mkdtemp(path.join(tmpdir(),'nexus-cleanup-'));roots.push(root);
  await mkdir(path.join(root,'storage/resources'),{recursive:true});
  const target=path.join(root,'storage/resources/a.zip');await writeFile(target,'asset');
@@ -25,4 +25,17 @@ it('deletes only canonical registered local files and refuses symlinks',async()=
  expect(await readFile(path.join(root,'retained.zip'),'utf8')).toBe('retained');
  await rm(target);await rm(path.join(root,'storage/resources'),{recursive:true});await symlink(root,path.join(root,'storage/resources'));
  await expect(deleteRegisteredLocalAsset(root,'/uploads/resources/retained.zip')).rejects.toThrow('symlink');
+});
+
+it('refuses unsupported-platform cleanup without touching the file', async () => {
+ const root = await mkdtemp(path.join(tmpdir(), 'nexus-cleanup-platform-')); roots.push(root);
+ await mkdir(path.join(root, 'storage/resources'), { recursive: true });
+ const target = path.join(root, 'storage/resources/retained.zip');
+ await writeFile(target, 'retained');
+ const descriptor = Object.getOwnPropertyDescriptor(process, 'platform')!;
+ try {
+  Object.defineProperty(process, 'platform', { value: 'win32', configurable: true });
+  await expect(deleteRegisteredLocalAsset(root, '/uploads/resources/retained.zip')).rejects.toThrow('Safe local cleanup requires Linux proc descriptors');
+ } finally { Object.defineProperty(process, 'platform', descriptor); }
+ expect(await readFile(target, 'utf8')).toBe('retained');
 });
