@@ -71,6 +71,7 @@ test('both editors share uploaded photos without changing each other’s placeme
     await expect(research.locator('[data-moment-slot="0"] img')).toHaveAttribute('src', `${original[0].src}?w=256`);
     const buffer = fixtureImage;
     const upload = async (modal: typeof research, name: string) => {
+      const previousTitle = await modal.getByLabel('Tiêu đề', { exact: true }).inputValue();
       const pending = page.waitForResponse(response => response.url().endsWith('/api/upload') && response.request().method() === 'POST');
       await modal.getByLabel('Tải ảnh mới vào thư viện').setInputFiles({ name: `${name}.png`, mimeType: 'image/png', buffer });
       const result = await pending;
@@ -78,6 +79,11 @@ test('both editors share uploaded photos without changing each other’s placeme
       const src = (await result.json()).url as string;
       uploads.push(src);
       await acknowledgeSuccess(page, 'Đã tải 1 ảnh vào thư viện chỉnh sửa.');
+      await modal.getByRole('button', { name: 'Chọn ảnh: Ảnh chưa có tiêu đề', exact: true }).click();
+      await expect(modal.getByLabel('Tiêu đề', { exact: true })).toHaveValue('');
+      await modal.getByLabel('Tiêu đề', { exact: true }).fill(name);
+      await modal.getByRole('button', { name: 'Gỡ ảnh', exact: true }).click();
+      await modal.getByRole('button', { name: `Chọn ảnh: ${previousTitle}`, exact: true }).click();
       await expect(modal.getByRole('button', { name: `Chọn ảnh: ${name}`, exact: true })).toBeVisible();
       return src;
     };
