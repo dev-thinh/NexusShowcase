@@ -125,14 +125,14 @@ describe('author list filters', () => {
   });
 });
 
-it('renders visible selected post filters like the admin role filters and preserves search', () => {
+it('uses the shared dropdown for post status while preserving the selected filter and search', () => {
   const html = renderToStaticMarkup(<MyPosts query="robot" filter="DRAFT" counts={{ ALL: 2, DRAFT: 1, PENDING_REVIEW: 1, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader />);
-  const group = html.split('aria-label="Lọc trạng thái bài đăng"')[1].split('</div>')[0];
-  expect(group).toContain('flex-wrap');
-  expect(group).toContain('bg-[#153D67]');
-  expect(group).toContain('text-white');
-  expect(group).toContain('aria-current="page"');
-  expect(group).toContain('q=robot');
+  expect(html).toContain('role="combobox"');
+  expect(html).toContain('aria-label="Lọc trạng thái bài đăng"');
+  expect(html).toContain('name="filter" value="DRAFT"');
+  expect(html).toContain('value="robot"');
+  expect(html).not.toContain('aria-current="page"');
+  expect(html).not.toContain('href="/my-works?filter=');
 });
 
 it('does not offer editing or withdrawal for a contributed work owned by someone else', () => {

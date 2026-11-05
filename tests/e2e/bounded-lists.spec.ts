@@ -39,7 +39,9 @@ test('author lookup pages keep selected names after changing the search', async 
 
 test('author and admin filters preserve bounded server pages', async ({ page, fixture }) => {
   await login(page, fixture.users[1]);
-  await page.getByRole('link', { name: /^Đã xuất bản/ }).click();
+  await page.getByRole('combobox', { name: 'Lọc trạng thái bài đăng' }).click();
+  await page.getByRole('option', { name: /^Đã xuất bản/ }).click();
+  await page.getByRole('search').getByRole('button', { name: 'Áp dụng', exact: true }).click();
   await expect(page).toHaveURL(/filter=PUBLISHED/);
   await page.getByLabel('Tìm công trình', { exact: true }).fill('Research 0000');
   await page.getByLabel('Tìm công trình', { exact: true }).press('Enter');

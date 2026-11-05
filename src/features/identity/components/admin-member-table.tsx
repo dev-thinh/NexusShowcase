@@ -1,7 +1,7 @@
 'use client';
 
 import { AdminMemberActions } from '@/features/identity/components/admin-member-actions';
-import { SearchForm } from '@/shared/ui/validated-form';
+import { ManagementFilters } from '@/shared/ui/management-filters';
 import { MEMBER_ROLE_LABELS, getMemberRoleLabel } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
 import type { Role } from '@prisma/client';
@@ -22,15 +22,9 @@ export function AdminMemberTable({ members, currentUserId, query: searchQuery, r
     { value: 'ADMIN' as const, label: MEMBER_ROLE_LABELS.ADMIN, count: counts.ADMIN },
   ];
   return <div className="min-w-0">
-    <div className="mb-4 space-y-3">
-      <SearchForm action="/admin/members" role="search" aria-label="Tìm kiếm và lọc" className="management-filter-panel flex flex-wrap items-end gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
-        <label className="flex-1 text-sm">Tìm thành viên theo họ tên<input id="admin-member-search" name="q" type="search" maxLength={200} defaultValue={searchQuery} placeholder="Tìm theo họ tên…" className="mt-1 block h-11 w-full rounded-lg border border-slate-200 px-3" /></label>
-        <label className="text-sm">Vai trò<select name="role" defaultValue={roleFilter} className="mt-1 block h-11 rounded-lg border border-slate-200 px-3">{filters.map(filter => <option key={filter.value} value={filter.value}>{filter.label} ({filter.count})</option>)}</select></label>
-        <label className="text-sm">Trạng thái<select name="status" defaultValue={statusFilter} className="mt-1 block h-11 rounded-lg border border-slate-200 px-3"><option value="ALL">Tất cả trạng thái</option><option value="ACTIVE">Đang hoạt động</option><option value="DISABLED">Đã vô hiệu hóa</option></select></label>
-        <button type="submit" className="action-primary-detail min-h-11">Áp dụng</button>
-      </SearchForm>
-      {actions && <div role="group" aria-label="Thao tác quản lý" className="management-filter-actions flex justify-end">{actions}</div>}
-    </div>
+    <ManagementFilters action="/admin/members" query={searchQuery} searchId="admin-member-search" searchLabel="Tìm thành viên theo họ tên" placeholder="Tìm theo họ tên…" filterName="role" filterValue={roleFilter} filterLabel="Vai trò" options={filters} additionalFilters={[{ name: 'status', value: statusFilter, label: 'Trạng thái', options: [
+      { value: 'ALL', label: 'Tất cả trạng thái' }, { value: 'ACTIVE', label: 'Đang hoạt động' }, { value: 'DISABLED', label: 'Đã vô hiệu hóa' },
+    ] }]} actions={actions} />
     <p className="mb-3 text-sm text-slate-500">{total} thành viên{searchQuery ? ` phù hợp với “${searchQuery}”` : ''}</p>
     <section className="panel-operational min-w-0 !p-0 !shadow-none" aria-label="Danh sách thành viên">
 

@@ -32,6 +32,7 @@ for (const width of [320, 390, 1440]) test(`member rows balance identity with da
   await expect(menu).toBeVisible();
   await expect(menu.getByRole('button', { name: /Cấp quyền đăng bài|Thu quyền đăng bài/ })).toBeVisible();
   await expect(menu.getByRole('button', { name: /^Xóa tài khoản / })).toBeVisible();
+  await expect(menu.getByRole('button', { name: 'Đặt lại mật khẩu', exact: true }).locator('svg.lucide-key-round')).toBeVisible();
   const menuBox = (await menu.boundingBox())!;
   expect(menuBox.x).toBeGreaterThanOrEqual(0);
   expect(menuBox.x + menuBox.width).toBeLessThanOrEqual(width);

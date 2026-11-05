@@ -78,7 +78,7 @@ test('small phone pagination stays on one row and dashboard uses shared filters'
   const toggle = form.getByRole('button', { name: /Bộ lọc/ });
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await toggle.click();
-  await expect(form.getByRole('group', { name: 'Lọc trạng thái bài đăng' })).toBeVisible();
+  await expect(form.getByRole('combobox', { name: 'Lọc trạng thái bài đăng' })).toBeVisible();
 });
 
 test('phone dialogs and review details keep controls reachable', async ({ page, fixture, database }) => {

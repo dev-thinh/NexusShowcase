@@ -1,5 +1,6 @@
 'use client';
 
+import { KeyRound, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Modal } from '@/shared/ui/modal';
@@ -38,7 +39,7 @@ export function AdminRecoverMemberModal({ member }: { member: { id: string; full
   }
   if (!member.sessionVersion) return null;
   return <>
-    <button type="button" className="action-secondary-detail min-h-11 text-xs" onClick={() => setOpen(true)}>{disabled ? 'Khôi phục' : 'Đặt lại mật khẩu'}</button>
+    <button type="button" className="action-secondary-detail min-h-11 text-xs" onClick={() => setOpen(true)}>{disabled ? <RotateCcw aria-hidden="true" className="h-4 w-4 shrink-0" /> : <KeyRound aria-hidden="true" className="h-4 w-4 shrink-0" />}{disabled ? 'Khôi phục' : 'Đặt lại mật khẩu'}</button>
     <Modal isOpen={open} closeDisabled={busy} onClose={close} title={disabled ? 'Khôi phục tài khoản' : 'Đặt lại mật khẩu'} description={member.fullName} className="!max-w-md">
       <p className="mb-4 text-sm">{disabled ? 'Khôi phục quyền đăng nhập và giữ nguyên công trình, lịch sử của thành viên. Các phiên đăng nhập cũ tiếp tục bị thu hồi.' : 'Mật khẩu hiện tại sẽ bị thay thế và mọi phiên đăng nhập bị thu hồi. Gửi mật khẩu tạm qua kênh riêng sau khi xác minh thành viên. Thành viên phải đổi mật khẩu sau lần đăng nhập đầu tiên.'}</p>
       {password && <div className="mb-4 space-y-3">
