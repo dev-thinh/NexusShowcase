@@ -1,7 +1,8 @@
 'use client';
 
 import { SubmissionField } from './submission-field';
-import { uploadFileAction } from '@/features/assets/server/actions';
+import { uploadFile } from '@/shared/lib/upload-file';
+import type { UploadedAsset } from '@/features/assets/model/contracts';
 import { ArticleBlockView } from '@/features/submissions/components/article-content';
 import { articleFromLegacy, serializeArticle, type ArticleBlock, type ArticleSection } from '@/features/submissions/model/article';
 import type { SubmissionResource } from '@/features/submissions/model/snapshot';
@@ -48,7 +49,7 @@ function BlockEditor({ block, onChange, onBusy, errors = {}, path = '' }: { erro
     setUploading(true); onBusy(true); setMessage('Đang tải lên…');
     try {
       const data = new FormData(); data.append('file', file); data.append('type', block.kind === 'IMAGE' ? 'thumbnail' : 'pdf');
-      const result = await uploadFileAction(data);
+      const result = await uploadFile<UploadedAsset>(data);
       if (!result.success) { setMessage(result.error || 'Không tải được tệp.'); return; }
       onChange({ ...block, url: result.data.url, fileName: result.data.fileName || file.name, fileSize: result.data.fileSize, mimeType: result.data.mimeType, alt: block.alt });
       setMessage('');

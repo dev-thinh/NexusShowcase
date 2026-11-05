@@ -12,7 +12,7 @@ function refreshAvatar() {
   revalidatePath('/members/[id]', 'page');
   revalidatePath('/members');
   revalidatePath('/members/all');
-  revalidatePath('/', 'layout');
+  revalidatePath('/');
 }
 
 export async function uploadAvatarAction(formData: FormData): Promise<UploadResult> {

@@ -2,6 +2,7 @@ import { MediaImage } from '@/shared/ui/media-image';
 import type { ArticleBlock } from '@/features/submissions/model/article';
 import { isGithubUrl, parseArticleContent } from '@/features/submissions/model/article';
 import { VideoPlayer } from '@/shared/ui/video-player';
+import { ResourceCard } from './resource-card';
 import React from 'react';
 
 function inline(text: string): React.ReactNode[] {
@@ -16,10 +17,10 @@ function inline(text: string): React.ReactNode[] {
 export function FormattedText({ text }: { text: string }) {
   return <div className="space-y-4 break-words text-base leading-8 text-[#1F2937] [overflow-wrap:anywhere]">{text.split(/\n\s*\n/).filter(p => p.trim()).map((part, index) => {
     const lines = part.split('\n');
-    if (lines.every(line => /^[-*] /.test(line))) return <ul key={index} className="list-disc space-y-1 pl-6">{lines.map((line, i) => <li key={i}>{inline(line.slice(2))}</li>)}</ul>;
-    if (lines.every(line => /^\d+\. /.test(line))) return <ol key={index} className="list-decimal space-y-1 pl-6">{lines.map((line, i) => <li key={i}>{inline(line.replace(/^\d+\. /, ''))}</li>)}</ol>;
+    if (lines.every(line => /^[-*] /.test(line))) return <ul key={index} className="list-disc space-y-1 pl-6 text-justify">{lines.map((line, i) => <li key={i}>{inline(line.slice(2))}</li>)}</ul>;
+    if (lines.every(line => /^\d+\. /.test(line))) return <ol key={index} className="list-decimal space-y-1 pl-6 text-justify">{lines.map((line, i) => <li key={i}>{inline(line.replace(/^\d+\. /, ''))}</li>)}</ol>;
     if (/^###? /.test(part) && lines.length === 1) return <h3 key={index} className="pt-2 text-lg font-semibold text-[#1F2937]">{inline(part.replace(/^###? /, ''))}</h3>;
-    return <p key={index} className="whitespace-pre-line">{inline(part)}</p>;
+    return <p key={index} className="whitespace-pre-line text-justify">{inline(part)}</p>;
   })}</div>;
 }
 export function ArticleBlockView({ block }: { block: ArticleBlock }) {
@@ -32,9 +33,7 @@ export function ArticleBlockView({ block }: { block: ArticleBlock }) {
   </figure>;
   if (block.kind === 'VIDEO') return <figure className="space-y-3"><VideoPlayer url={block.url} title={block.caption || 'Video minh họa'} />{block.caption && <figcaption className="text-center text-sm text-[#1F2937]">{block.caption}</figcaption>}</figure>;
   const github = isGithubUrl(block.url);
-  return <a href={block.url} target="_blank" rel="noopener noreferrer" className="flex min-w-0 items-center justify-center text-center gap-4 rounded-lg border border-slate-200 bg-[#FFFFFF] p-4 transition-colors hover:border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]">
-    <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-[#1F2937]">{block.caption || block.fileName || (github ? 'Xem mã nguồn GitHub' : 'Mở liên kết')}</span><span className="mt-1 block truncate text-xs text-[#1F2937]">{block.kind === 'DOCUMENT' ? 'PDF · Xem / tải tài liệu' : block.url}</span></span>
-  </a>;
+  return <ResourceCard href={block.url} title={block.caption || block.fileName || (block.kind === 'DOCUMENT' ? 'Tài liệu PDF' : github ? 'Mã nguồn GitHub' : 'Mở liên kết')} kind={block.kind === 'DOCUMENT' ? 'document' : github ? 'github' : 'link'} fileSize={block.fileSize} />;
 }
 export function ArticleContent({ content }: { content: string }) {
   const doc = parseArticleContent(content);

@@ -21,3 +21,12 @@ it('reveals committed content without remounting the content wrapper', () => {
   expect(html).not.toContain('hidden=""');
   expect(html).toContain('Current page');
 });
+
+it.each(['/my-works/new', '/my-works/item/edit'])('shows the editor loading skeleton while opening %s', destination => {
+  state.pathname = destination;
+  const html = renderToStaticMarkup(<NavigationContent><main>Previous page</main></NavigationContent>);
+  expect(html).toContain('data-submission-workspace-loading');
+  expect(html).toContain('aria-busy="true"');
+  expect(html).toContain('hidden=""');
+  expect(html).not.toContain('aspect-video');
+});

@@ -20,7 +20,7 @@ export function SubmissionPreview({ snapshot }: { snapshot: SubmissionSnapshot }
     </header>
     <ConferenceDetails value={snapshot.conference} />
     <ArticleTableOfContents content={content} />
-    <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{snapshot.summary}</p></section>
+    <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{snapshot.summary}</p></section>
     <ArticleContent content={content} />
     <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">Tài nguyên</h2><ResourceLinks resources={standaloneResources(snapshot.content, snapshot.resources)} /></section>
   </article>;

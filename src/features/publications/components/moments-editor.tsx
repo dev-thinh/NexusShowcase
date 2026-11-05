@@ -88,8 +88,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
           const response = await fetch('/api/upload', { method: 'POST', body: form });
           const result = await response.json();
           if (!response.ok || typeof result.url !== 'string') throw new Error(result.error || 'Không tải được ảnh.');
-          const name = file.name.replace(/\.[^.]+$/, '').slice(0, 160).trim() || 'Khoảnh khắc mới';
-          setPhotos(current => [...current, { id: crypto.randomUUID(), src: result.url, title: name, alt: name, shape: 'wide', tilt: '-2deg', visible: false, slot: null }]);
+          setPhotos(current => [...current, { id: crypto.randomUUID(), src: result.url, title: '', alt: '', shape: 'wide', tilt: '-2deg', visible: false, slot: null }]);
           uploadedCount += 1;
         } catch (cause) {
           errors.push(`${file.name}: ${cause instanceof Error ? cause.message : 'Không tải được ảnh. Vui lòng thử lại.'}`);
@@ -186,13 +185,13 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
               </div>
               {library.length === 0 ? <p className="py-6 text-center text-sm text-slate-500">{unusedOnly ? 'Không có ảnh chưa sử dụng.' : 'Thư viện chưa có ảnh.'}</p> : <div className="moments-editor__library-grid">
                 {library.map(photo => <div key={photo.id} className="moments-editor__asset">
-                  <button type="button" className="moments-editor__asset-select" data-moment-drag={photo.id} data-drag-source={drag?.photoId === photo.id ? 'true' : undefined} aria-label={`Chọn ảnh: ${photo.title}`} onDragStart={event => event.preventDefault()} onClick={() => choose(photo)}>
+                  <button type="button" className="moments-editor__asset-select" data-moment-drag={photo.id} data-drag-source={drag?.photoId === photo.id ? 'true' : undefined} aria-label={`Chọn ảnh: ${photo.title || 'Ảnh chưa có tiêu đề'}`} onDragStart={event => event.preventDefault()} onClick={() => choose(photo)}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={120} sizes="(max-width: 767px) 30vw, 200px" loading="lazy" draggable={false} />
                     {photo.slot !== null && <span className="moments-editor__used"><Check size={12} aria-hidden="true" />{research ? 'Ảnh' : photo.slot < 6 ? 'Trên' : 'Dưới'} {photo.slot % 6 + 1}</span>}
-                    <span className="moments-editor__asset-title">{photo.title}</span>
+                    <span className="moments-editor__asset-title">{photo.title || 'Ảnh chưa có tiêu đề'}</span>
                   </button>
-                  <button type="button" className="action-secondary-detail moments-editor__asset-delete" disabled={photo.slot !== null || protectedAssets.has(photo.src)} aria-label={`Xóa khỏi thư viện: ${photo.title}`} title={protectedAssets.has(photo.src) ? 'Ảnh đang được sử dụng ở mục khác' : photo.slot !== null ? 'Gỡ ảnh khỏi hàng trước khi xóa' : 'Xóa khỏi thư viện'} onClick={() => setPhotos(current => current.filter(item => item.id !== photo.id))}><Trash2 size={16} aria-hidden="true" /></button>
+                  <button type="button" className="action-secondary-detail moments-editor__asset-delete" disabled={photo.slot !== null || protectedAssets.has(photo.src)} aria-label={`Xóa khỏi thư viện: ${photo.title || 'Ảnh chưa có tiêu đề'}`} title={protectedAssets.has(photo.src) ? 'Ảnh đang được sử dụng ở mục khác' : photo.slot !== null ? 'Gỡ ảnh khỏi hàng trước khi xóa' : 'Xóa khỏi thư viện'} onClick={() => setPhotos(current => current.filter(item => item.id !== photo.id))}><Trash2 size={16} aria-hidden="true" /></button>
                 </div>)}
               </div>}
             </section>

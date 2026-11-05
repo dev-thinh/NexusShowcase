@@ -46,7 +46,7 @@ describe('Upload File Action Unit Tests', () => {
     data.append('file', new File(['bytes'], 'test.txt'));
     expect(await uploadFileAction(data)).toMatchObject({ success: false, code: 'UNAUTHORIZED' });
     const { POST } = await import('@/app/api/upload/route');
-    const response = await POST({ formData: async () => data } as never);
+    const response = await POST({ nextUrl: new URL('http://localhost/api/upload'), formData: async () => data } as never);
     expect(response.status).toBe(403);
     expect(filesystem.writeFile).not.toHaveBeenCalled();
   });

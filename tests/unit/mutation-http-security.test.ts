@@ -5,6 +5,7 @@ const mocks = vi.hoisted(() => ({ actor: vi.fn(), read: vi.fn(), save: vi.fn(), 
 vi.mock('@/features/identity/server/actor', () => ({ getActor: mocks.actor }));
 vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: mocks.rate }));
 vi.mock('@/features/publications/server/photo-library', () => ({ readSharedLibrary: mocks.read, saveSharedGallery: mocks.save }));
+vi.mock('@/features/assets/server/avatar-actions', () => ({ uploadAvatarAction: vi.fn() }));
 vi.mock('@/features/assets/server/actions', () => ({ uploadFileAction: mocks.upload }));
 vi.mock('@/server/observability/errors', () => ({ reportServerError: vi.fn() }));
 import { PUT as moments } from '@/app/api/home/moments/route';

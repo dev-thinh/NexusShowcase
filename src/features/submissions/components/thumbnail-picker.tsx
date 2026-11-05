@@ -3,7 +3,8 @@
 import { MediaImage } from '@/shared/ui/media-image';
 import { FilePicker } from '@/shared/ui/file-picker';
 
-import { uploadFileAction } from '@/features/assets/server/actions';
+import { uploadFile } from '@/shared/lib/upload-file';
+import type { UploadedAsset } from '@/features/assets/model/contracts';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 
@@ -27,7 +28,7 @@ export function ThumbnailPicker({ value, images = [], errors = [], onChange, onB
       const data = new FormData();
       data.append('file', file);
       data.append('type', 'thumbnail');
-      const result = await uploadFileAction(data);
+      const result = await uploadFile<UploadedAsset>(data);
       if (!result.success) { setError(result.error || 'Không tải được ảnh.'); return; }
       onChange(result.data.url);
     } catch { setError('Tải ảnh thất bại. Vui lòng thử lại.'); }

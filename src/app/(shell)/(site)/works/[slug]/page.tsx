@@ -188,7 +188,7 @@ export default async function ShowcaseDetailPage({
             <ConferenceDetails value={item.conference} />
             <section id="abstract" aria-labelledby="abstract-title" className="scroll-mt-24">
               <h2 id="abstract-title" className="mb-3 text-base font-semibold text-[#1F2937]">Tóm tắt</h2>
-              <p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{item.summary}</p>
+              <p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{item.summary}</p>
             </section>
 
             <div className="space-y-4 lg:hidden">

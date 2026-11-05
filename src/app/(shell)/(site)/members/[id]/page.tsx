@@ -7,7 +7,7 @@ import { ProfileBio } from '@/features/identity/components/profile-bio';
 import { ChangePasswordModal } from '@/features/identity/components/change-password-modal';
 import { getProfileLinks } from '@/features/identity/model/profile-input';
 import { TypeBadge } from '@/features/publications/components/badges';
-import { uploadAvatarAction, removeAvatarAction } from '@/features/assets/server/avatar-actions';
+import { removeAvatarAction } from '@/features/assets/server/avatar-actions';
 import { getSession as auth } from '@/features/identity/server/session';
 import { MediaImage } from '@/shared/ui/media-image';
 import { listMemberPublications } from '@/features/publications/server/queries';
@@ -59,7 +59,7 @@ export default async function MemberProfilePage({
 
       <section aria-label="Thông tin thành viên" className="rounded-2xl border border-slate-200 bg-white p-5 shadow-xs sm:p-7">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:gap-6">
-          <ProfileAvatar fullName={user.fullName} avatarUrl={user.avatarUrl} uploadAction={isOwnProfile ? uploadAvatarAction : undefined} removeAction={isOwnProfile ? removeAvatarAction : undefined} />
+          <ProfileAvatar userId={user.id} fullName={user.fullName} avatarUrl={user.avatarUrl} removeAction={isOwnProfile ? removeAvatarAction : undefined} />
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <h1 className="break-words font-serif text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">{user.fullName}</h1>

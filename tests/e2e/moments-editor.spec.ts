@@ -49,6 +49,11 @@ test('admin uses modal slots and a reusable library without repeating photos bet
     await modal.getByRole('combobox', { name: 'Lọc thư viện ảnh' }).click();
     await page.getByRole('option', { name: 'Chưa sử dụng', exact: true }).click();
     await expect(modal.locator('.moments-editor__asset')).toHaveCount(1);
+    await modal.getByRole('button', { name: 'Chọn ảnh: Ảnh chưa có tiêu đề', exact: true }).click();
+    await expect(modal.getByLabel('Tiêu đề', { exact: true })).toHaveValue('');
+    await modal.getByLabel('Tiêu đề', { exact: true }).fill('Ảnh tải lên');
+    await modal.getByRole('button', { name: 'Gỡ ảnh', exact: true }).click();
+    await modal.getByRole('button', { name: 'Chọn ảnh: Khoảnh khắc đã cập nhật', exact: true }).click();
     await modal.getByRole('button', { name: 'Lưu thay đổi', exact: true }).click();
     await acknowledgeSuccess(page, 'Đã lưu ảnh khoảnh khắc.');
     await expect(modal).toHaveCount(0);
@@ -70,7 +75,7 @@ test('admin uses modal slots and a reusable library without repeating photos bet
     await pencil.click();
     await expect(modal.locator('.moments-editor__asset')).toHaveCount(7);
     await modal.getByRole('button', { name: 'Hàng trên, ô 1: Trống', exact: true }).click();
-    await modal.getByRole('button', { name: 'Chọn ảnh: collaboration', exact: true }).click();
+    await modal.getByRole('button', { name: 'Chọn ảnh: Ảnh tải lên', exact: true }).click();
     await modal.getByLabel('Tiêu đề', { exact: true }).fill('Ảnh mới được tái sử dụng');
     const preview = modal.getByRole('figure', { name: 'Xem trước ảnh', exact: true });
     const shape = modal.getByRole('combobox', { name: 'Khung ảnh', exact: true });
