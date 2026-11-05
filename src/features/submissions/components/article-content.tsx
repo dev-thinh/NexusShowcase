@@ -2,6 +2,7 @@ import { MediaImage } from '@/shared/ui/media-image';
 import type { ArticleBlock } from '@/features/submissions/model/article';
 import { isGithubUrl, parseArticleContent } from '@/features/submissions/model/article';
 import { VideoPlayer } from '@/shared/ui/video-player';
+import { ResourceCard } from './resource-card';
 import React from 'react';
 
 function inline(text: string): React.ReactNode[] {
@@ -32,9 +33,7 @@ export function ArticleBlockView({ block }: { block: ArticleBlock }) {
   </figure>;
   if (block.kind === 'VIDEO') return <figure className="space-y-3"><VideoPlayer url={block.url} title={block.caption || 'Video minh họa'} />{block.caption && <figcaption className="text-center text-sm text-[#1F2937]">{block.caption}</figcaption>}</figure>;
   const github = isGithubUrl(block.url);
-  return <a href={block.url} target="_blank" rel="noopener noreferrer" className="flex min-w-0 items-center justify-center text-center gap-4 rounded-lg border border-slate-200 bg-[#FFFFFF] p-4 transition-colors hover:border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]">
-    <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold text-[#1F2937]">{block.caption || block.fileName || (github ? 'Xem mã nguồn GitHub' : 'Mở liên kết')}</span><span className="mt-1 block truncate text-xs text-[#1F2937]">{block.kind === 'DOCUMENT' ? 'PDF · Xem / tải tài liệu' : block.url}</span></span>
-  </a>;
+  return <ResourceCard href={block.url} title={block.caption || block.fileName || (block.kind === 'DOCUMENT' ? 'Tài liệu PDF' : github ? 'Mã nguồn GitHub' : 'Mở liên kết')} kind={block.kind === 'DOCUMENT' ? 'document' : github ? 'github' : 'link'} fileSize={block.fileSize} />;
 }
 export function ArticleContent({ content }: { content: string }) {
   const doc = parseArticleContent(content);
