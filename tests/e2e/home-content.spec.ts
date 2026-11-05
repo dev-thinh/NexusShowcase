@@ -8,7 +8,7 @@ test.afterEach(async ({ database }) => { await database.homePageContent.deleteMa
 test('admin edits copy in place and visitors see saved content while photo editors remain available', async ({ page, fixture, database, browser }) => {
   await seedPhotoGalleries(database);
   await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/');
-  await expect(page).toHaveTitle('Hoạt động | Robotics & IoT HCMUS');
+  await expect(page).toHaveTitle('Trang chủ | Robotics & IoT HCMUS');
   await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', '/logo.svg');
   const homePadding = await page.locator('#home-content').evaluate(element => getComputedStyle(element).paddingBottom);
   const memberActionColor = await page.locator('.members-band .home-section-heading + a[href="/members"]').evaluate(element => getComputedStyle(element).color);
@@ -133,4 +133,48 @@ test('the data migration preserves custom first-card titles and removes retired 
   expect(saved.text).not.toHaveProperty('researchThreeSubtitle');
   expect(saved.text).not.toHaveProperty('researchOneSubtitle');
   expect(saved.text).not.toHaveProperty('membersDescription');
+});
+
+
+test('saved copy is in server HTML and stays intact throughout hydration and deferred sections', async ({ page, database, browser }) => {
+  await seedPhotoGalleries(database);
+  const text = Object.fromEntries(Object.keys(defaultHomeText).map(key => [key, `Nội dung riêng ${key}`]));
+  await database.homePageContent.create({ data: { id: 'home', version: 8, text } });
+
+  const noScript = await browser.newContext({ javaScriptEnabled: false, baseURL: process.env.HARNESS_BASE_URL });
+  try {
+    const guest = await noScript.newPage();
+    await guest.goto('/');
+    for (const field of ['heroTitle', 'heroAccent', 'heroAction', 'featuredTitle', 'featuredAction', 'membersTitle', 'membersAction']) {
+      await expect(guest.getByText(text[field], { exact: true })).toHaveCount(1);
+    }
+    await expect(guest.getByText(defaultHomeText.heroAction, { exact: true })).toHaveCount(0);
+  } finally { await noScript.close(); }
+
+  let backgroundReads = 0;
+  await page.route('**/api/home/content', async route => {
+    backgroundReads++;
+    await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ version: 0, text: defaultHomeText, isAdmin: false }) });
+  });
+  await page.addInitScript(defaults => {
+    const observed: string[] = [];
+    Object.assign(window, { observedDefaultHomeText: observed });
+    const check = () => {
+      for (const element of document.querySelectorAll('.home-hero span.whitespace-pre-line, #home-content span.whitespace-pre-line')) {
+        const value = element.textContent ?? '';
+        if (defaults.includes(value)) observed.push(value);
+      }
+    };
+    new MutationObserver(check).observe(document, { subtree: true, childList: true, characterData: true });
+    document.addEventListener('DOMContentLoaded', check);
+  }, Object.values(defaultHomeText));
+  await page.goto('/');
+  await page.locator('[data-deferred-section="research"]').scrollIntoViewIfNeeded();
+  await expect(page.locator('.research-direction__title')).toHaveCount(3);
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  await expect(page.getByText(text.momentsTitle, { exact: true })).toBeVisible();
+  for (const value of Object.values(text)) await expect(page.getByText(value, { exact: true })).toHaveCount(1);
+  expect(await page.evaluate(() => (window as unknown as { observedDefaultHomeText: string[] }).observedDefaultHomeText)).toEqual([]);
+  expect(backgroundReads).toBe(0);
+  expect(await database.homePageContent.findUniqueOrThrow({ where: { id: 'home' } })).toMatchObject({ version: 8, text });
 });

@@ -1,3 +1,5 @@
+import { getActor } from '@/features/identity/server/actor';
+import { readHomeContent } from '@/features/publications/server/home-content';
 export const metadata = { title: 'Trang chủ' };
 
 import { HomeContentProvider, HomeText, HomeContentLink as Link } from '@/features/publications/components/home-content-provider';
@@ -18,8 +20,10 @@ export default async function HomePage({ searchParams }: {
     redirect('/research' + (query.size ? '?' + query : ''));
   }
 
+  const [content, actor] = await Promise.all([readHomeContent(), getActor(['ADMIN'])]);
+
   return (
-    <HomeContentProvider>
+    <HomeContentProvider initialContent={{ ...content, isAdmin: !!actor }}>
       <HomeHero />
       <main className="w-full pt-10 sm:pt-14 flex-1 space-y-14 sm:space-y-16" id="home-content">
         <section className="home-featured" aria-labelledby="featured-works-title">
