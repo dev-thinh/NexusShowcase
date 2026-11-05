@@ -53,7 +53,7 @@ const showcaseWorkflowShape = {
   resources: z.array(submissionResourceSchema).max(200).default([]),
 };
 
-const normalizeConference = <T extends { conference?: z.output<typeof conferenceSchema> | null }>(value: T) => ({ ...value, conference: value.conference ?? null });
+const normalizeConference = <T extends { conference?: z.output<typeof conferenceSchema> | null }>(value: T) => ({ ...value, conference: value.conference ?? null, citationEnabled: value.conference?.status === 'PUBLISHED' && safeHttpUrlSchema.safeParse(value.conference.paperUrl).success });
 
 // Editing accepts unfinished strings; publication validation is intentionally separate.
 const draftText = (max: number) => z.string().max(max);
@@ -74,7 +74,7 @@ export const showcaseDraftInputSchema = z.object({
   customProjectType: draftText(100).default(''),
   conference: z.object({
     name: draftText(240), status: z.enum(['ACCEPTED', 'PUBLISHED']).default('ACCEPTED'),
-    publicationDate: draftDate, eventDate: draftDate, acceptedDate: draftDate,
+    paperUrl: draftUrl.nullish(), publicationDate: draftDate, eventDate: draftDate, acceptedDate: draftDate,
     rankings: z.array(z.object({ system: draftText(80), rank: draftText(40) }).strict()).max(8).default([]),
   }).strict().nullish(),
   contributors: z.array(contributorInputSchema.extend({
@@ -87,10 +87,13 @@ export const showcaseDraftInputSchema = z.object({
 }).strict().transform(normalizeConference);
 
 export const showcaseSubmissionInputSchema = z.object(showcaseWorkflowShape).strict().superRefine((value, context) => {
+  if (value.conference?.status === 'PUBLISHED' && !value.conference.paperUrl) {
+    context.addIssue({ code: 'custom', path: ['conference', 'paperUrl'], message: 'Vui lòng nhập link bài báo đã công bố.' });
+  }
   for (const issue of articleSubmissionIssues(value.content)) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['content', ...issue.path], message: issue.message });
   }
-  if (value.type === 'RESEARCH_PAPER' && !hasDetailedContent(value.content) && !value.resources.some(r => r.kind === 'DOCUMENT' || r.linkType === 'PAPER_URL')) {
+  if (value.type === 'RESEARCH_PAPER' && !value.conference?.paperUrl && !hasDetailedContent(value.content) && !value.resources.some(r => r.kind === 'DOCUMENT' || r.linkType === 'PAPER_URL')) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['content'], message: 'Bài nghiên cứu cần nội dung chi tiết hoặc PDF/liên kết toàn văn.' });
   }
   if (!value.summary) {

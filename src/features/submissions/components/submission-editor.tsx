@@ -88,7 +88,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
             <section className="mt-7 border-t border-slate-200 pt-6" aria-labelledby="submission-resources-title">
               <h2 id="submission-resources-title" className="text-lg font-semibold text-[#1F2937]">Tài nguyên đính kèm</h2>
               <ReviewComments comments={reviewComments} fieldKey="resources" />
-              <ResourceEditor errors={state.fieldErrors} citationEnabled={state.data.citationEnabled} onCitationChange={enabled => updateField('citationEnabled', enabled)} value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} />
+              <ResourceEditor errors={state.fieldErrors} value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} />
             </section>
           </div>
         </div>

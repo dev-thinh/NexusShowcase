@@ -1,5 +1,8 @@
+import { readConference } from './conference';
+
 export interface CitationItem {
   citationEnabled?: boolean;
+  conference?: unknown;
   title: string;
   slug: string;
   publishedYear?: number | null;
@@ -38,7 +41,7 @@ export function getCitationKey(item: CitationItem): string {
   const firstAuthor = authors[0] || 'robotics';
   const firstWord = firstAuthor.split(' ')[0] || 'author';
   const cleanFirstWord = removeDiacritics(firstWord).toLowerCase().replace(/[^a-z0-9]/g, '');
-  const year = item.publishedYear ?? new Date().getFullYear();
+  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
 
   const titleWord = removeDiacritics(item.title.split(' ')[0] || 'paper')
     .toLowerCase()
@@ -51,8 +54,8 @@ export function generateBibTeX(item: CitationItem): string {
   const key = getCitationKey(item);
   const authors = normalizeAuthorNames(item);
   const authorsBib = authors.join(' and ');
-  const venue = item.issuer || 'CLB Robotics & IoT - HCMUS';
-  const year = item.publishedYear ?? new Date().getFullYear();
+  const venue = readConference(item.conference)?.name || item.issuer || 'CLB Robotics & IoT - HCMUS';
+  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
 
   return `@inproceedings{${key},
   title = {{${item.title}}},
@@ -60,7 +63,7 @@ export function generateBibTeX(item: CitationItem): string {
   booktitle = {${venue}},
   year = {${year}},
   organization = {Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM},
-  url = {https://robotics-iot.hcmus.edu.vn/works/${item.slug}}
+  url = {${readConference(item.conference)?.paperUrl || `https://robotics-iot.hcmus.edu.vn/works/${item.slug}`}}
 }`;
 }
 
@@ -83,9 +86,9 @@ export function generateAPA(item: CitationItem): string {
     authorString = `${formattedAuthors.slice(0, -1).join(', ')}, & ${formattedAuthors[formattedAuthors.length - 1]}`;
   }
 
-  const venue = item.issuer || 'CLB Robotics & IoT - HCMUS';
-  const year = item.publishedYear ?? new Date().getFullYear();
-  return `${authorString} (${year}). ${item.title}. ${venue}. https://robotics-iot.hcmus.edu.vn/works/${item.slug}`;
+  const venue = readConference(item.conference)?.name || item.issuer || 'CLB Robotics & IoT - HCMUS';
+  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
+  return `${authorString} (${year}). ${item.title}. ${venue}. ${readConference(item.conference)?.paperUrl || `https://robotics-iot.hcmus.edu.vn/works/${item.slug}`}`;
 }
 
 export function generateIEEE(item: CitationItem): string {
@@ -101,7 +104,7 @@ export function generateIEEE(item: CitationItem): string {
     ? formattedAuthors[0]
     : formattedAuthors.slice(0, -1).join(', ') + ' and ' + formattedAuthors[formattedAuthors.length - 1];
 
-  const venue = item.issuer || 'CLB Robotics & IoT - HCMUS';
-  const year = item.publishedYear ?? new Date().getFullYear();
+  const venue = readConference(item.conference)?.name || item.issuer || 'CLB Robotics & IoT - HCMUS';
+  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
   return `${authorStr}, "${item.title}," ${venue}, ${year}.`;
 }

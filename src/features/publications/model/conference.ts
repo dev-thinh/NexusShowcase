@@ -1,10 +1,12 @@
+import { safeHttpUrlSchema } from '@/shared/lib/validation';
 import { z } from 'zod';
 
 export const MAX_CONFERENCE_RANKINGS = 8;
 const optionalDate = z.iso.date({ error: 'Vui lòng chọn ngày hợp lệ.' }).nullish();
 export const conferenceSchema = z.object({
-  name: z.string().trim().min(1, 'Vui lòng nhập tên hội nghị.').max(240, 'Tên hội nghị tối đa 240 ký tự.'),
+  name: z.string().trim().min(1, 'Vui lòng nhập tên hội nghị / tạp chí.').max(240, 'Tên hội nghị / tạp chí tối đa 240 ký tự.'),
   status: z.enum(['ACCEPTED', 'PUBLISHED']).default('ACCEPTED'),
+  paperUrl: z.union([safeHttpUrlSchema, z.literal('')]).nullish(),
   publicationDate: optionalDate,
   eventDate: optionalDate,
   acceptedDate: optionalDate,

@@ -37,3 +37,20 @@ describe('optional conference metadata', () => {
     expect(snapshot.conference).toEqual(conference);
   });
 });
+
+const publishedSubmission = { title: 'Paper', summary: 'Abstract', type: 'RESEARCH_PAPER', contributors: [{ externalName: 'Author', role: 'CONTRIBUTOR', displayOrder: 0 }], resources: [{ kind: 'LINK', label: 'Paper', url: 'https://example.org', linkType: 'PAPER_URL' }], conference: { name: 'Journal', status: 'PUBLISHED', rankings: [] } };
+it('requires an HTTP(S) paper link for published submissions but allows unfinished drafts', () => {
+  expect(showcaseDraftInputSchema.safeParse(publishedSubmission).success).toBe(true);
+  expect(showcaseSubmissionInputSchema.safeParse(publishedSubmission).success).toBe(false);
+  expect(showcaseSubmissionInputSchema.safeParse({ ...publishedSubmission, conference: { ...publishedSubmission.conference, paperUrl: 'javascript:alert(1)' } }).success).toBe(false);
+});
+it('enables citation automatically for a published paper and ignores a manual override', () => {
+  const result = showcaseSubmissionInputSchema.parse({ ...publishedSubmission, citationEnabled: false, conference: { ...publishedSubmission.conference, paperUrl: 'https://doi.org/10.1234/paper' } });
+  expect(result.citationEnabled).toBe(true);
+  expect(result.conference?.paperUrl).toBe('https://doi.org/10.1234/paper');
+  expect(showcaseDraftInputSchema.parse({ title: 'Project', citationEnabled: true }).citationEnabled).toBe(false);
+});
+
+it('accepts the published paper link as the full-text link without a duplicate resource', () => {
+  expect(showcaseSubmissionInputSchema.safeParse({ ...publishedSubmission, resources: [], conference: { ...publishedSubmission.conference, paperUrl: 'https://doi.org/10.1234/paper' } }).success).toBe(true);
+});

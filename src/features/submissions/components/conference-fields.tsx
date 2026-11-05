@@ -15,16 +15,16 @@ export function ConferenceFields({ value, errors, onChange }: {
   const rankings = value?.rankings ?? [];
   const published = value?.status === 'PUBLISHED';
   const patch = (update: Partial<ConferenceInput>) => onChange({ ...value!, ...update });
-  return <section className="min-w-0 border-t border-slate-200 pt-6" aria-label="Thông tin hội nghị">
+  return <section className="min-w-0 border-t border-slate-200 pt-6" aria-label="Thông tin hội nghị / tạp chí">
     <label className="flex min-h-11 cursor-pointer items-center gap-3 text-sm font-semibold text-[#1F2937]">
       <input type="checkbox" checked={!!value} onChange={event => onChange(event.target.checked ? { name: '', status: 'ACCEPTED', rankings: [] } : null)} className="h-4 w-4 shrink-0 accent-[#153D67]" aria-controls="conference-fields" aria-expanded={!!value} />
-      Bài có thông tin hội nghị
+      Bài có thông tin hội nghị / tạp chí
     </label>
     <p className="mt-1 text-sm leading-6 text-slate-500">Không bắt buộc. Có thể bổ sung ngày và xếp hạng sau khi có thông tin.</p>
     {value && <div id="conference-fields" className="mt-5 min-w-0 space-y-5">
       <SubmissionField name="conference" errors={errors}>
         <SubmissionField name="conference.name" errors={errors}>
-          <label htmlFor="conference-name" className="block text-sm font-semibold">Tên hội nghị <span aria-hidden="true">*</span></label>
+          <label htmlFor="conference-name" className="block text-sm font-semibold">Tên hội nghị / tạp chí <span aria-hidden="true">*</span></label>
           <input id="conference-name" value={value.name} onChange={event => patch({ name: event.target.value })} maxLength={240} required aria-required="true" className={inputClass} />
         </SubmissionField>
       </SubmissionField>
@@ -32,6 +32,11 @@ export function ConferenceFields({ value, errors, onChange }: {
         <label htmlFor="conference-status" className="block text-sm font-semibold">Trạng thái công bố</label>
         <CustomSelect id="conference-status" className="mt-2" value={value.status ?? 'ACCEPTED'} options={[{ value: 'ACCEPTED', label: 'Đã chấp nhận' }, { value: 'PUBLISHED', label: 'Đã công bố' }]} onChange={status => patch({ status: status === 'PUBLISHED' ? 'PUBLISHED' : 'ACCEPTED' })} />
       </SubmissionField>
+      {published && <SubmissionField name="conference.paperUrl" errors={errors}>
+        <label htmlFor="conference-paper-url" className="block text-sm font-semibold">Link bài báo <span aria-hidden="true">*</span></label>
+        <input id="conference-paper-url" type="url" required aria-required="true" value={value.paperUrl ?? ''} onChange={event => patch({ paperUrl: event.target.value })} maxLength={2048} placeholder="https://doi.org/..." className={inputClass} />
+        <p className="mt-1 text-xs leading-5 text-slate-500">Trích dẫn (Cite) được tạo tự động từ thông tin bài báo và liên kết này.</p>
+      </SubmissionField>}
       <div className="grid min-w-0 gap-4 sm:grid-cols-2">
         <SubmissionField name="conference.eventDate" errors={errors} className="min-w-0">
           <label htmlFor="conference-date" className="block text-sm font-semibold">Ngày diễn ra hội nghị</label>

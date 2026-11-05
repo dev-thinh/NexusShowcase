@@ -44,7 +44,7 @@ it.each(['RESEARCH_PAPER', 'PROJECT'] as const)('preserves conference informatio
   expect((await listMemberPublications({ memberId: author.id, authenticated: false, page: 1 })).total).toBe(0);
   expect((await listMemberPublications({ memberId: contributorId, authenticated: false, page: 1 })).items.map(item => item.id)).toContain(id);
 
-  const changedConference = { ...conference, status: 'PUBLISHED', publicationDate: '2027-03-01' };
+  const changedConference = { ...conference, status: 'PUBLISHED', publicationDate: '2027-03-01', paperUrl: 'https://doi.org/10.1234/paper' };
   const changed = await saveDraftCommand(author, { itemId: id, expectedReviewVersion: published.reviewVersion, draft: { ...draft, conference: changedConference } });
   if (!changed.success) throw Error(changed.error);
   expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id } })).conference).toEqual(conference);
@@ -53,6 +53,7 @@ it.each(['RESEARCH_PAPER', 'PROJECT'] as const)('preserves conference informatio
   expect(await decideSubmissionCommand(reviewer, { itemId: id, reviewVersion: changedSubmission.data.reviewVersion, action: 'PUBLISH', visibility: 'PUBLIC' })).toMatchObject({ success: true });
   const updatedPublication = await prisma.showcaseItem.findUniqueOrThrow({ where: { id } });
   expect(updatedPublication.conference).toEqual(changedConference);
+  expect(updatedPublication.citationEnabled).toBe(true);
 
   const updated = await saveDraftCommand(author, { itemId: id, expectedReviewVersion: updatedPublication.reviewVersion, draft: { ...draft, conference: null } });
   expect(updated.success).toBe(true);
