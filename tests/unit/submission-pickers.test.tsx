@@ -107,8 +107,8 @@ describe('submission add controls', () => {
   it('starts with a resource action and keeps its custom menu collapsed', () => {
     const html = renderToStaticMarkup(<ResourceEditor value={[]} onChange={() => undefined} />);
 
-    expect(html).toContain('<span>Cite</span>');
-    expect(html.match(/type="checkbox"/g)).toHaveLength(2);
+    expect(html).not.toContain('<span>Cite</span>');
+    expect(html.match(/type="checkbox"/g)).toHaveLength(1);
     expect(html).not.toContain('checked=""');
     expect(html).toContain('<span>GitHub</span>');
     expect(html).not.toContain('github.com/owner/repository');
@@ -131,8 +131,8 @@ describe('submission add controls', () => {
 });
 
 it('shows saved resource selections with neutral cards and checked boxes', () => {
-  const html = renderToStaticMarkup(<ResourceEditor citationEnabled value={[{ kind: 'LINK', linkType: 'GITHUB', label: 'Mã nguồn GitHub', url: 'https://github.com/lab/repo' }]} onChange={() => undefined} />);
-  expect(html.match(/checked=""/g)).toHaveLength(2);
+  const html = renderToStaticMarkup(<ResourceEditor value={[{ kind: 'LINK', linkType: 'GITHUB', label: 'Mã nguồn GitHub', url: 'https://github.com/lab/repo' }]} onChange={() => undefined} />);
+  expect(html.match(/checked=""/g)).toHaveLength(1);
   expect(html).toContain('https://github.com/lab/repo');
   expect(html).toContain('accent-[#153D67]');
   expect(html).not.toContain('!bg-[#153D67]');

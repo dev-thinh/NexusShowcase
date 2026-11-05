@@ -7,16 +7,16 @@ vi.mock('next-auth/react', () => ({ signOut: mocks.signOut }));
 import { loginAction } from '@/features/identity/server/login-actions';
 beforeEach(() => { vi.clearAllMocks(); vi.stubGlobal('window', { location: { assign: mocks.assign } }); });
 it('keeps login on the current host instead of following the configured auth origin', async () => {
- mocks.signIn.mockResolvedValue('http://127.0.0.1:3002/dashboard');
- const data = new FormData(); data.set('email', 'member1@gmail.com'); data.set('password', 'demo'); data.set('redirectTo', '/dashboard?filter=PUBLISHED');
+ mocks.signIn.mockResolvedValue('http://127.0.0.1:3002/my-works');
+ const data = new FormData(); data.set('email', 'member1@gmail.com'); data.set('password', 'demo'); data.set('redirectTo', '/my-works?filter=PUBLISHED');
  await loginAction(null, data);
  expect(mocks.signIn).toHaveBeenCalledWith('credentials', expect.objectContaining({ redirect: false }));
- expect(mocks.redirect).toHaveBeenCalledWith('/dashboard?filter=PUBLISHED');
+ expect(mocks.redirect).toHaveBeenCalledWith('/my-works?filter=PUBLISHED');
 });
 it.each(['https://other.test/', '//other.test/', '/\\other.test/'])('rejects an external login destination %s', async destination => {
  const data = new FormData(); data.set('email', 'member1@gmail.com'); data.set('password', 'demo'); data.set('redirectTo', destination);
  await loginAction(null, data);
- expect(mocks.redirect).toHaveBeenCalledWith('/dashboard');
+ expect(mocks.redirect).toHaveBeenCalledWith('/my-works');
 });
 it('clears the current host session before reloading that same host on sign out', async () => {
  mocks.signOut.mockResolvedValue({ url: 'http://localhost:3002/' });

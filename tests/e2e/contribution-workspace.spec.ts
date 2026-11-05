@@ -19,7 +19,7 @@ test('contributed works appear read-only and author presentation is consistent i
   await expect(author).toHaveCSS('font-weight', '400');
   await author.hover();await expect(author).toHaveCSS('font-weight', '600');
   await expect(page.locator('p [title="Tác giả ngoài CLB"]').first()).toBeVisible();
-  await page.goto(`${item.type === 'PROJECT' ? '/category/robotics-iot' : '/category/bai-bao-khoa-hoc'}?q=${encodeURIComponent(item.title)}`);
+  await page.goto(`${item.type === 'PROJECT' ? '/projects' : '/research'}?q=${encodeURIComponent(item.title)}`);
   const card = page.locator('article').filter({ hasText: item.title });
   const external = card.locator('[title="Tác giả ngoài CLB"]');
   await expect(external).toBeVisible();
@@ -44,7 +44,7 @@ for (const width of [390, 1440]) {
     await login(page, participant);
     for (const [status, label] of [['DRAFT', 'Bản nháp'], ['PENDING_REVIEW', 'Chờ duyệt']] as const) {
       await database.showcaseItem.update({ where: { id: item.id }, data: { status } });
-      await page.goto(`/dashboard?filter=${status}&q=${encodeURIComponent(item.title)}`);
+      await page.goto(`/my-works?filter=${status}&q=${encodeURIComponent(item.title)}`);
       const work = page.locator('article').filter({ hasText: item.title });
       await expect(work).toBeVisible();
       await expect(work.getByText(label, { exact: true })).toBeVisible();
@@ -53,7 +53,7 @@ for (const width of [390, 1440]) {
       await expect(work.getByRole('button', { name: /Rút bài/ })).toHaveCount(0);
     }
     await database.showcaseItem.update({ where: { id: item.id }, data: { status: 'PUBLISHED' } });
-    await page.goto(`/dashboard?filter=PUBLISHED&q=${encodeURIComponent(item.title)}`);
+    await page.goto(`/my-works?filter=PUBLISHED&q=${encodeURIComponent(item.title)}`);
     const work = page.locator('article').filter({ hasText: item.title });
     await expect(work.getByRole('link', { name: 'Xem bài', exact: true })).toBeVisible();
   });

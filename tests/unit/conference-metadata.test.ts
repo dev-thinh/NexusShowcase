@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { showcaseDraftInputSchema } from '@/features/submissions/model/input';
+import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
 import { buildSubmissionSnapshot } from '@/features/submissions/model/snapshot-mapper';
 
 const conference = { name: 'Hội nghị Robotics quốc tế', status: 'ACCEPTED', eventDate: '2027-02-18', acceptedDate: '2026-12-01', rankings: [{ system: 'Hệ thống A', rank: 'Hạng 1' }, { system: 'Hệ thống B', rank: 'Hạng 2' }] };
@@ -23,7 +23,7 @@ describe('optional conference metadata', () => {
     { ...conference, rankings: Array.from({ length: 9 }, () => ({ system: 'A', rank: 'B' })) },
     { ...conference, rankings: [{ system: 'A', rank: 'B' }, { system: ' a ', rank: ' b ' }] },
   ])('rejects malformed or unbounded conference information: %j', value => {
-    expect(showcaseDraftInputSchema.safeParse({ ...draft, conference: value }).success).toBe(false);
+    expect(showcaseSubmissionInputSchema.safeParse({ ...draft, summary: 'Summary', contributors: [{ externalName: 'Author', role: 'CONTRIBUTOR', displayOrder: 0 }], resources: [{ kind: 'LINK', label: 'Paper', url: 'https://example.org', linkType: 'PAPER_URL' }], conference: value }).success).toBe(false);
   });
   it('preserves conference data on project submissions', () => {
     expect(showcaseDraftInputSchema.parse({ ...draft, type: 'PROJECT' }).conference).toEqual(conference);
@@ -36,4 +36,21 @@ describe('optional conference metadata', () => {
     const snapshot = buildSubmissionSnapshot({ ...draft, type: 'RESEARCH_PAPER', summary: 'Summary', contributors: [] });
     expect(snapshot.conference).toEqual(conference);
   });
+});
+
+const publishedSubmission = { title: 'Paper', summary: 'Abstract', type: 'RESEARCH_PAPER', contributors: [{ externalName: 'Author', role: 'CONTRIBUTOR', displayOrder: 0 }], resources: [{ kind: 'LINK', label: 'Paper', url: 'https://example.org', linkType: 'PAPER_URL' }], conference: { name: 'Journal', status: 'PUBLISHED', rankings: [] } };
+it('requires an HTTP(S) paper link for published submissions but allows unfinished drafts', () => {
+  expect(showcaseDraftInputSchema.safeParse(publishedSubmission).success).toBe(true);
+  expect(showcaseSubmissionInputSchema.safeParse(publishedSubmission).success).toBe(false);
+  expect(showcaseSubmissionInputSchema.safeParse({ ...publishedSubmission, conference: { ...publishedSubmission.conference, paperUrl: 'javascript:alert(1)' } }).success).toBe(false);
+});
+it('enables citation automatically for a published paper and ignores a manual override', () => {
+  const result = showcaseSubmissionInputSchema.parse({ ...publishedSubmission, citationEnabled: false, conference: { ...publishedSubmission.conference, paperUrl: 'https://doi.org/10.1234/paper' } });
+  expect(result.citationEnabled).toBe(true);
+  expect(result.conference?.paperUrl).toBe('https://doi.org/10.1234/paper');
+  expect(showcaseDraftInputSchema.parse({ title: 'Project', citationEnabled: true }).citationEnabled).toBe(false);
+});
+
+it('accepts the published paper link as the full-text link without a duplicate resource', () => {
+  expect(showcaseSubmissionInputSchema.safeParse({ ...publishedSubmission, resources: [], conference: { ...publishedSubmission.conference, paperUrl: 'https://doi.org/10.1234/paper' } }).success).toBe(true);
 });

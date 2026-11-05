@@ -1,5 +1,6 @@
+import { categoryPagePath } from '../../src/shared/lib/page-urls';
 import { Prisma } from '@prisma/client';
-import { acknowledgeSuccess, expect, login, test } from './fixtures';
+import { expect, login, test } from './fixtures';
 
 const conference = { name: 'Hội nghị Robotics và Hệ thống nhúng quốc tế với tên dài để kiểm tra hiển thị', status: 'ACCEPTED', eventDate: '2027-03-08', acceptedDate: '2026-12-20', rankings: Array.from({ length: 4 }, (_, index) => ({ system: `Hệ thống đánh giá ${index + 1}`, rank: `Hạng ${index + 1}` })) };
 
@@ -10,16 +11,16 @@ test('conference editor preserves both milestone dates and supports research pap
   const researchCategory = await database.category.findUniqueOrThrow({ where: { slug: 'bai-bao-khoa-hoc' } });
   const projectCategory = await database.category.findUniqueOrThrow({ where: { slug: 'robotics-iot' } });
   let itemId: string | undefined;
-  await login(page, fixture.users[1], '/dashboard/items/new');
+  await login(page, fixture.users[1], '/my-works/new');
   try {
-    await expect(page.getByLabel('Bài có thông tin hội nghị')).not.toBeChecked();
+    await expect(page.getByLabel('Bài có thông tin hội nghị / tạp chí')).not.toBeChecked();
     await page.locator('#submission-title').fill(title);
     await page.getByRole('combobox', { name: 'Chuyên mục', exact: true }).click();
     await page.getByRole('option', { name: researchCategory.name, exact: true }).click();
-    await page.getByLabel('Bài có thông tin hội nghị').check();
+    await page.getByLabel('Bài có thông tin hội nghị / tạp chí').check();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await expect(page.getByRole('alert').filter({ hasText: 'Vui lòng nhập tên hội nghị.' })).toBeVisible();
-    await expect(page.locator('#conference-name')).toBeFocused();
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
+    await expect(page.locator('#conference-name')).toHaveValue('');
     await page.locator('#conference-name').fill(conference.name);
     await page.locator('#conference-date').fill(conference.eventDate);
     await page.locator('#conference-accepted-date').fill(conference.acceptedDate);
@@ -32,24 +33,26 @@ test('conference editor preserves both milestone dates and supports research pap
     const fields = page.locator('#conference-fields');
     await fields.screenshot({ path: '/tmp/nexus-conference-editor-320.png' });
     await page.locator('[data-submission-actions]').getByRole('button', { name: 'Xem trước', exact: true }).click();
-    const info = page.getByRole('region', { name: 'Thông tin hội nghị', exact: true });
+    const info = page.getByRole('region', { name: 'Thông tin hội nghị / tạp chí', exact: true });
     await expect(info).toContainText(conference.name);
     await expect(info).toContainText('08/03/2027');
     await page.getByRole('button', { name: 'Soạn thảo', exact: true }).click();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
     const item = await database.showcaseItem.findFirstOrThrow({ where: { title, creatorId: fixture.users[1].id } });
     itemId = item.id;
     expect(item.conference).toEqual({ ...conference, rankings: conference.rankings.slice(0, 2) });
-    await page.goto(`/dashboard/items/${item.id}/edit`);
+    await page.goto(`/my-works/${item.id}/edit`);
     await expect(page.locator('#conference-name')).toHaveValue(conference.name);
     await page.getByRole('button', { name: 'Xóa xếp hạng 2', exact: true }).click();
     await expect(page.locator('#conference-ranking-system-1')).toHaveCount(0);
     await page.getByRole('combobox', { name: 'Chuyên mục', exact: true }).click();
     await page.getByRole('option', { name: projectCategory.name, exact: true }).click();
-    await expect(page.getByLabel('Bài có thông tin hội nghị')).toBeChecked();
+    await expect(page.getByLabel('Bài có thông tin hội nghị / tạp chí')).toBeChecked();
     await page.getByRole('combobox', { name: 'Trạng thái công bố', exact: true }).click();
     await page.getByRole('option', { name: 'Đã công bố', exact: true }).click();
+    await expect(page.locator('#conference-paper-url')).toHaveAttribute('required', '');
+    await page.locator('#conference-paper-url').fill('https://doi.org/10.1234/conference-fixture');
     await page.locator('#conference-publication-date').fill('2027-03-01');
     await page.locator('[data-submission-actions]').getByRole('button', { name: 'Xem trước', exact: true }).click();
     await expect(info).toContainText('Đã công bố');
@@ -57,16 +60,17 @@ test('conference editor preserves both milestone dates and supports research pap
     await expect(info).not.toContainText('20/12/2026');
     await page.getByRole('button', { name: 'Soạn thảo', exact: true }).click();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
-    expect((await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id } })).conference).toMatchObject({ status: 'PUBLISHED', acceptedDate: conference.acceptedDate, publicationDate: '2027-03-01' });
-    await page.goto(`/dashboard/items/${item.id}/edit`);
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
+    expect((await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id } })).conference).toMatchObject({ status: 'PUBLISHED', acceptedDate: conference.acceptedDate, publicationDate: '2027-03-01', paperUrl: 'https://doi.org/10.1234/conference-fixture' });
+    await page.goto(`/my-works/${item.id}/edit`);
     await expect(page.locator('#conference-publication-date')).toHaveValue('2027-03-01');
+    await expect(page.locator('#conference-paper-url')).toHaveValue('https://doi.org/10.1234/conference-fixture');
     await page.getByRole('combobox', { name: 'Trạng thái công bố', exact: true }).click();
     await page.getByRole('option', { name: 'Đã chấp nhận', exact: true }).click();
     await expect(page.locator('#conference-accepted-date')).toHaveValue(conference.acceptedDate);
-    await page.getByLabel('Bài có thông tin hội nghị').uncheck();
+    await page.getByLabel('Bài có thông tin hội nghị / tạp chí').uncheck();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
     expect((await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id } })).conference).toBeNull();
   } finally {
     await database.showcaseItem.deleteMany({ where: itemId ? { id: itemId } : { title, creatorId: fixture.users[1].id } });
@@ -89,7 +93,7 @@ for (const type of ['RESEARCH_PAPER', 'PROJECT'] as const) test(`conference meta
     } });
     for (const width of [320, 390, 640, 700, 768, 900, 1024, 1100, 1280, 1440]) {
       await page.setViewportSize({ width, height: 1000 });
-      for (const path of ['/', `/category/${slug}?q=Conference%20alignment`]) {
+      for (const path of ['/', `${categoryPagePath(slug)}?q=Conference%20alignment`]) {
         await page.goto(path);
         if (path === '/') {
           const section = page.locator('[data-deferred-section="featured"]');
@@ -140,20 +144,20 @@ for (const type of ['RESEARCH_PAPER', 'PROJECT'] as const) test(`conference meta
       }
     }
     await database.showcaseItem.update({ where: { id: originals[0].id }, data: { conference: { ...conference, status: 'PUBLISHED', publicationDate: '2027-03-01' } } });
-    await page.goto(`/category/${slug}?q=Conference%20alignment`);
+    await page.goto(`${categoryPagePath(slug)}?q=Conference%20alignment`);
     const metadata = page.locator('[data-card-conference]').filter({ hasText: conference.name });
     await expect(metadata).toContainText('Đã công bố');
     await expect(metadata).toContainText('01/03/2027');
     await expect(metadata).not.toContainText('20/12/2026');
-    await page.goto(`/showcase/${originals[0].slug}`);
-    const detail = page.getByRole('region', { name: 'Thông tin hội nghị', exact: true });
+    await page.goto(`/works/${originals[0].slug}`);
+    const detail = page.getByRole('region', { name: 'Thông tin hội nghị / tạp chí', exact: true });
     await expect(detail).toContainText(conference.name);
     await expect(detail).toContainText(conference.rankings[3].system);
     await expect(detail).toContainText('01/03/2027');
     await expect(detail).not.toContainText('20/12/2026');
-    await page.goto(`/showcase/${originals[1].slug}`);
+    await page.goto(`/works/${originals[1].slug}`);
     await expect(page.getByRole('heading', { name: titles[1], exact: true })).toBeVisible();
-    await expect(page.getByRole('region', { name: 'Thông tin hội nghị', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('region', { name: 'Thông tin hội nghị / tạp chí', exact: true })).toHaveCount(0);
   } finally {
     for (const item of originals) await database.showcaseItem.update({ where: { id: item.id }, data: {
       title: item.title, type: item.type, categoryId: item.categoryId, summary: item.summary, conference: item.conference ?? Prisma.DbNull,

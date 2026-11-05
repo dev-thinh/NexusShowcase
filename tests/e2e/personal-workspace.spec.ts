@@ -6,12 +6,13 @@ for(const width of [390,1440])test(`personal tabs, filters and breadcrumbs are v
  const tabs=page.getByRole('navigation',{name:'Điều hướng quản lý',exact:true});
  await expect(tabs).toHaveCount(0);
  await expect(page.locator('[data-breadcrumbs]')).toContainText('Công trình của tôi');
- const filters=page.getByRole('group',{name:'Lọc trạng thái bài đăng'});
+ const filters=page.getByRole('combobox',{name:'Lọc trạng thái bài đăng'});
  if(width<768)await page.getByRole('button',{name:/Bộ lọc/}).click();
- const draft=filters.locator('a[href*="filter=DRAFT"]');await draft.click();
- await expect(draft).toHaveAttribute('aria-current','page');
- await expect(draft).toHaveCSS('background-color','rgb(21, 61, 103)');
- await expect(draft).toHaveCSS('color','rgb(255, 255, 255)');
+ await filters.click();
+ await page.getByRole('option',{name:/^Bản nháp/}).click();
+ await page.getByRole('search').getByRole('button',{name:'Áp dụng',exact:true}).click();
+ await expect(page).toHaveURL(/filter=DRAFT/);
+ await expect(page.getByRole('search').locator('input[name="filter"]')).toHaveValue('DRAFT');
  await page.locator('#my-post-search').fill('Benchmark');await page.locator('#my-post-search').press('Enter');
  await expect(page).toHaveURL(url=>url.searchParams.get('filter')==='DRAFT'&&url.searchParams.get('q')==='Benchmark');
  await page.getByRole('button',{name:/Menu tài khoản:/}).click();
@@ -41,8 +42,10 @@ test('admin member directory has ten rows per page and retains filters in pagina
 
  await page.getByRole('navigation',{name:'Phân trang thành viên'}).getByRole('link',{name:'Trang sau',exact:true}).click();
  await expect(page).toHaveURL(/page=2/);await expect(rows).toHaveCount(10);
- await page.getByRole('group',{name:'Lọc theo vai trò'}).locator('a[href*="role=MEMBER"]').click();
- await expect(page).toHaveURL(/role=MEMBER$/);await expect(rows).toHaveCount(10);
+ await page.getByRole('combobox',{name:'Vai trò',exact:true}).click();
+ await page.getByRole('option',{name:/^Thành viên/}).click();
+ await page.getByRole('search').getByRole('button',{name:'Áp dụng',exact:true}).click();
+ await expect(page).toHaveURL(url=>url.searchParams.get('role')==='MEMBER');await expect(rows).toHaveCount(10);
  await page.locator('#admin-member-search').fill('Benchmark');await page.locator('#admin-member-search').press('Enter');
  await expect(page).toHaveURL(url => url.searchParams.get('role') === 'MEMBER' && url.searchParams.get('q') === 'Benchmark');await expect(rows).toHaveCount(10);
  await page.getByRole('navigation',{name:'Phân trang thành viên'}).getByRole('link',{name:'Trang sau',exact:true}).click();

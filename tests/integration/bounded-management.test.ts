@@ -38,7 +38,7 @@ it('keeps selected contributor names available independently of a search page', 
   expect(await selectedContributors([authorId])).toEqual([{ id: authorId, fullName: 'Nguyễn Văn An' }]);
   const result = await listAdminMembers({ q: 'nguyen van', role: 'CORE_MEMBER', page: '2oops' });
   expect(result).toMatchObject({ total: 1, page: 1 });
-  expect(Object.keys(result.items[0]).sort()).toEqual(['createdAt', 'fullName', 'id', 'publicSlug', 'role']);
+  expect(Object.keys(result.items[0]).sort()).toEqual(['createdAt', 'deletedAt', 'fullName', 'id', 'publicSlug', 'role', 'sessionVersion', 'status']);
 });
 
 it('tracks contributions from draft without granting management rights or exposing private feedback', async () => {

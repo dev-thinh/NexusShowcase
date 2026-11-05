@@ -19,6 +19,8 @@ describe('public user data boundary', () => {
 
   it('does not select credentials or direct identifiers for public queries', () => {
     expect(publicUserSelect).not.toHaveProperty('passwordHash');
+    expect(publicUserSelect).not.toHaveProperty('temporaryPasswordConsumed');
+    expect(publicUserSelect).not.toHaveProperty('sessionVersion');
     expect(publicUserSelect).not.toHaveProperty('email');
     expect(publicUserSelect).not.toHaveProperty('studentId');
   });
@@ -30,6 +32,9 @@ describe('public user data boundary', () => {
       fullName: true,
       role: true,
       createdAt: true,
+      status: true,
+      deletedAt: true,
+      sessionVersion: true,
     });
   });
 

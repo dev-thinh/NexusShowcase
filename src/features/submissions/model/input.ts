@@ -1,6 +1,6 @@
 import { conferenceSchema } from '@/features/publications/model/conference';
 import { isGithubUrl } from '@/shared/lib/github-url';
-import { articleSubmissionIssues, hasDetailedContent, articleContentIssues } from '@/features/submissions/model/article';
+import { articleSubmissionIssues, hasDetailedContent, articleContentIssues, draftArticleIssues } from '@/features/submissions/model/article';
 import { cuidSchema, MAX_CURRENT_YEAR, safeHttpUrlSchema, storedFileUrlSchema, trimmedText } from '@/shared/lib/validation';
 import { z } from 'zod';
 const storedResourceUrlSchema = z.string().regex(/^\/uploads\/resources\/[a-zA-Z0-9_-]+\.[a-z0-9]{1,16}$/);
@@ -53,15 +53,47 @@ const showcaseWorkflowShape = {
   resources: z.array(submissionResourceSchema).max(200).default([]),
 };
 
-const normalizeConference = <T extends { conference?: z.output<typeof conferenceSchema> | null }>(value: T) => ({ ...value, conference: value.conference ?? null });
+const normalizeConference = <T extends { conference?: z.output<typeof conferenceSchema> | null }>(value: T) => ({ ...value, conference: value.conference ?? null, citationEnabled: value.conference?.status === 'PUBLISHED' && safeHttpUrlSchema.safeParse(value.conference.paperUrl).success });
 
-export const showcaseDraftInputSchema = z.object(showcaseWorkflowShape).strict().transform(normalizeConference);
+// Editing accepts unfinished strings; publication validation is intentionally separate.
+const draftText = (max: number) => z.string().max(max);
+const draftUrl = draftText(2048).refine(value => {
+  const text = value.trim();
+  if (text.startsWith('/')) return resourceUrlSchema.safeParse(text).success;
+  return !/^[a-z][a-z\d+.-]*:/i.test(text) || /^https?:/i.test(text);
+}, 'Chỉ chấp nhận liên kết HTTP(S) hoặc tệp đã tải lên.');
+const draftDate = z.union([z.iso.date(), z.literal('')]).nullish();
+export const showcaseDraftInputSchema = z.object({
+  ...showcaseWorkflowShape,
+  title: draftText(200),
+  summary: draftText(2_000).default(''),
+  content: draftText(200_000).default('').superRefine((content, context) => {
+    for (const issue of draftArticleIssues(content)) context.addIssue({ code: 'custom', ...issue });
+  }),
+  suggestedField: draftText(100).default(''),
+  customProjectType: draftText(100).default(''),
+  conference: z.object({
+    name: draftText(240), status: z.enum(['ACCEPTED', 'PUBLISHED']).default('ACCEPTED'),
+    paperUrl: draftUrl.nullish(), publicationDate: draftDate, eventDate: draftDate, acceptedDate: draftDate,
+    rankings: z.array(z.object({ system: draftText(80), rank: draftText(40) }).strict()).max(8).default([]),
+  }).strict().nullish(),
+  contributors: z.array(contributorInputSchema.extend({
+    externalName: draftText(200).nullish(), externalAffiliation: draftText(200).nullish(),
+    externalLink: draftUrl.nullish(), customRoleTitle: draftText(100).nullish(),
+  })).max(20).default([]),
+  resources: z.array(z.object({ ...submissionResourceSchema.shape,
+    label: draftText(160), url: draftUrl, fileName: draftText(160).optional(), mimeType: draftText(120).optional(),
+  }).strict()).max(200).default([]),
+}).strict().transform(normalizeConference);
 
 export const showcaseSubmissionInputSchema = z.object(showcaseWorkflowShape).strict().superRefine((value, context) => {
+  if (value.conference?.status === 'PUBLISHED' && !value.conference.paperUrl) {
+    context.addIssue({ code: 'custom', path: ['conference', 'paperUrl'], message: 'Vui lòng nhập link bài báo đã công bố.' });
+  }
   for (const issue of articleSubmissionIssues(value.content)) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['content', ...issue.path], message: issue.message });
   }
-  if (value.type === 'RESEARCH_PAPER' && !hasDetailedContent(value.content) && !value.resources.some(r => r.kind === 'DOCUMENT' || r.linkType === 'PAPER_URL')) {
+  if (value.type === 'RESEARCH_PAPER' && !value.conference?.paperUrl && !hasDetailedContent(value.content) && !value.resources.some(r => r.kind === 'DOCUMENT' || r.linkType === 'PAPER_URL')) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['content'], message: 'Bài nghiên cứu cần nội dung chi tiết hoặc PDF/liên kết toàn văn.' });
   }
   if (!value.summary) {

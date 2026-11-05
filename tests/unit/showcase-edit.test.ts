@@ -2,12 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { describe, expect, it } from 'vitest';
 
-const source = fs.readFileSync(path.resolve(process.cwd(), 'src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx'), 'utf8');
+const source = fs.readFileSync(path.resolve(process.cwd(), 'src/app/(shell)/(account)/my-works/[id]/edit/page.tsx'), 'utf8');
 
 describe('member edit route guards', () => {
   it('allows only draft and revision-requested records into the member editor', () => {
     expect(source).toContain("['DRAFT', 'REVISION_REQUESTED'].includes(item.status)");
-    expect(source).toContain("redirect('/dashboard')");
+    expect(source).toContain("redirect('/my-works')");
   });
 
   it('preserves ownership and forced-password checks', () => {

@@ -20,7 +20,7 @@ import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
 export function LoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard';
+  const callbackUrl = searchParams.get('callbackUrl') || '/my-works';
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
@@ -172,6 +172,7 @@ export function LoginForm() {
         </ValidatedForm>
 
         <div className="mt-6 pt-4 border-t border-slate-200 text-center text-xs sm:text-sm text-[#1F2937]">
+          <p className="mb-2">Quên mật khẩu hoặc tài khoản bị khóa? Liên hệ Ban chủ nhiệm qua <Link href="/contact" className="font-semibold underline">trang liên hệ</Link> và cung cấp tên đăng nhập để được hỗ trợ đặt lại mật khẩu.</p>
           <span>Chưa có tài khoản? </span>
           <Link
             href="/contact"

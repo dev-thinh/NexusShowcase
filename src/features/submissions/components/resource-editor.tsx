@@ -3,11 +3,11 @@
 import { SubmissionField } from './submission-field';
 import { uploadFileAction } from '@/features/assets/server/actions';
 import type { SubmissionResource } from '@/features/submissions/model/snapshot';
-import { Github, Quote, Trash2 } from 'lucide-react';
+import { Github, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { FilePicker } from '@/shared/ui/file-picker';
 
-export function ResourceEditor({ value, onChange, onBusy, citationEnabled = false, onCitationChange, errors = {} }: { errors?: Record<string, string[]>; citationEnabled?: boolean; onCitationChange?: (enabled: boolean) => void; value: SubmissionResource[]; onChange: (value: SubmissionResource[]) => void; onBusy?: (busy: boolean) => void }) {
+export function ResourceEditor({ value, onChange, onBusy, errors = {} }: { errors?: Record<string, string[]>; value: SubmissionResource[]; onChange: (value: SubmissionResource[]) => void; onBusy?: (busy: boolean) => void }) {
   const githubEnabled = value.some(resource => resource.linkType === 'GITHUB');
   const savedGithub = useRef<SubmissionResource[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -47,12 +47,6 @@ export function ResourceEditor({ value, onChange, onBusy, citationEnabled = fals
   return (
     <div className="mt-5" aria-busy={uploading}>
       <div className="grid gap-3">
-        <label className="flex cursor-pointer items-center gap-4">
-          <span className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#1F2937]">
-            <Quote aria-hidden="true" className="h-5 w-5" /><span>Cite</span>
-          </span>
-          <input type="checkbox" checked={citationEnabled} onChange={event => onCitationChange?.(event.target.checked)} className="h-6 w-6 shrink-0 cursor-pointer accent-[#153D67] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/30 focus-visible:ring-offset-2" />
-        </label>
         <label className="flex cursor-pointer items-center gap-4">
           <span className="flex min-h-14 min-w-0 flex-1 items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-[#1F2937]">
             <Github aria-hidden="true" className="h-5 w-5" /><span>GitHub</span>

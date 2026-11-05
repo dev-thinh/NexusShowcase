@@ -7,7 +7,7 @@ import { expect, it } from 'vitest';
 
 it('shows a direct GitHub icon only for valid source URLs and deduplicates links', () => {
   const link = { type: 'GITHUB', url: 'https://github.com/lab/project', label: 'Mã nguồn' };
-  const html = renderToStaticMarkup(<CardResourceLink detailHref="/showcase/work" links={[link, link]} />);
+  const html = renderToStaticMarkup(<CardResourceLink detailHref="/works/work" links={[link, link]} />);
   expect(html).toContain('href="https://github.com/lab/project"');
   expect(html).toContain('aria-label="Mã nguồn GitHub: Mã nguồn"');
   expect(html).toContain('<svg');
@@ -15,7 +15,7 @@ it('shows a direct GitHub icon only for valid source URLs and deduplicates links
 });
 
 it.each(['https://example.com/repo', 'https://github.com.evil.com/lab/repo', 'https://github.com', 'javascript://github.com/lab/repo', 'https://evil@github.com/lab/repo'])('omits non-source or misleading URLs: %s', url => {
-  expect(renderToStaticMarkup(<CardResourceLink detailHref="/showcase/work" links={[{ type: 'GITHUB', url }]} />)).toBe('');
+  expect(renderToStaticMarkup(<CardResourceLink detailHref="/works/work" links={[{ type: 'GITHUB', url }]} />)).toBe('');
 });
 
 it('centers resource button labels and preserves download names without icons', () => {
@@ -42,5 +42,5 @@ it('omits every citation trigger when citation is disabled', () => {
 
 it('shows visible text beside quick access icons', () => {
   expect(renderToStaticMarkup(<CitationModal item={{ title: 'Test', slug: 'test', contributors: [] }} triggerVariant="icon" />)).toContain('<span>Cite</span>');
-  expect(renderToStaticMarkup(<CardResourceLink detailHref="/showcase/test" links={[{ type: 'GITHUB', url: 'https://github.com/lab/repo' }]} />)).toContain('<span>GitHub</span>');
+  expect(renderToStaticMarkup(<CardResourceLink detailHref="/works/test" links={[{ type: 'GITHUB', url: 'https://github.com/lab/repo' }]} />)).toContain('<span>GitHub</span>');
 });

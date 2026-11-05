@@ -1,4 +1,5 @@
 import { prisma } from '@/server/db/prisma';
+import { literalSearchPattern } from '@/shared/lib/search-text';
 import { pageBounds } from '@/shared/lib/pagination';
 import { Prisma, type ItemStatus } from '@prisma/client';
 import 'server-only';
@@ -15,10 +16,10 @@ export async function listReviewQueue(rawPage: unknown, query = '') {
     FROM showcase_items i JOIN users u ON u.id = i."creatorId"
     LEFT JOIN LATERAL (SELECT snapshot FROM submission_revisions WHERE "itemId" = i.id ORDER BY "revisionNumber" DESC LIMIT 1) r ON TRUE
     LEFT JOIN editorial_drafts e ON e."itemId" = i.id
-    WHERE i.status::text IN ('PENDING_REVIEW', 'READY_FOR_APPROVAL') OR (i.status = 'PUBLISHED' AND i."reviewStatus" = 'PENDING_REVIEW')`;
+    WHERE i.status::text IN ('PENDING_REVIEW', 'READY_FOR_APPROVAL') OR (i.status = 'PUBLISHED' AND i."reviewStatus"::text IN ('PENDING_REVIEW', 'READY_FOR_APPROVAL'))`;
   const q = query.trim().slice(0, 200);
-  const pattern = `%${q.replace(/[\\%_]/g, '\\$&')}%`;
-  const matches = q ? Prisma.sql`WHERE title ILIKE ${pattern} OR "creatorName" ILIKE ${pattern}` : Prisma.empty;
+  const pattern = literalSearchPattern(q);
+  const matches = q ? Prisma.sql`WHERE regexp_replace(translate(normalize(lower(title || ' ' || "creatorName"), NFD), 'đ', 'd'), ${'[\u0300-\u036f]'}, '', 'g') LIKE ${pattern}` : Prisma.empty;
   const total = q
     ? (await prisma.$queryRaw<Array<{ total: number }>>(Prisma.sql`SELECT count(*)::integer AS total FROM (${source}) queue ${matches}`))[0].total
     : await prisma.showcaseItem.count({ where: pendingReviewWhere });

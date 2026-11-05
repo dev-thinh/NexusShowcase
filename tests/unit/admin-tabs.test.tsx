@@ -18,7 +18,7 @@ it('keeps the reviews tab selected while viewing a submitted article', () => {
   expect(html).toMatch(/aria-current="page"[^>]*href="\/admin\/reviews"/);
 });
 it('selects content independently of the other tabs', () => {
-  route.pathname = '/admin/content';
+  route.pathname = '/admin/works';
   const html = renderToStaticMarkup(<AdminTabs />);
-  expect(html).toMatch(/aria-current="page"[^>]*href="\/admin\/content"/);
+  expect(html).toMatch(/aria-current="page"[^>]*href="\/admin\/works"/);
 });

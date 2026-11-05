@@ -1,5 +1,7 @@
 'use client';
 
+import { DraftRecoveryPanel } from './draft-recovery-panel';
+import { submissionResourceSchema } from '../model/input';
 import { ConferenceDetails } from '@/features/publications/components/conference-details';
 
 import { focusFirstSubmissionError } from './submission-field';
@@ -19,10 +21,9 @@ import { ReviewComments, type AuthorReviewComment } from './review-comments';
 import { SectionEditor } from './section-editor';
 import { SubmissionActionBar } from './submission-action-bar';
 import { useSubmissionEditor } from './use-submission-editor';
-import { notifySuccess } from '@/shared/dialogs/success';
 
 export interface SubmissionEditorProps {
-  initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number };
+  initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number; draftSnapshot?: boolean };
   currentUser: { id: string; fullName: string; role: Role };
   clubMembers: Array<{ id: string; fullName: string }>;
   categories?: Array<{ id: string; name: string; slug: string }>;
@@ -32,15 +33,16 @@ export interface SubmissionEditorProps {
 
 export function SubmissionEditor({ initialData, currentUser, clubMembers, categories = [], reviewComments = [] }: SubmissionEditorProps) {
   const dialog = useDialog();
-  const dataWithAuthor = initialData.contributors?.length ? initialData : {
+  const dataWithAuthor = initialData.contributors !== undefined ? initialData : {
     ...initialData,
     contributors: [{ userId: currentUser.id, role: 'CONTRIBUTOR' as const, displayOrder: 0 }],
   };
-  const { state, updateField, saveDraft, submitForReview } = useSubmissionEditor(dataWithAuthor);
+  const { state, updateField, saveDraft, submitForReview, ready, submitting, submissionPending, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice, activeRecovery } = useSubmissionEditor(dataWithAuthor, currentUser.id);
   const [preview, setPreview] = useState(false);
   const [uploads, setUploads] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
-  const busy = state.saveState === 'saving' || uploads > 0;
+  const actionDisabled = !ready || submitting || recoveries.length > 0 || uploads > 0;
+  const busy = actionDisabled || submissionPending;
   useEffect(() => {
     if (!state.formError) return;
     setPreview(false);
@@ -57,8 +59,12 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
   const images = articleFromLegacy(content, state.data.resources ?? []).sections.flatMap(section => section.blocks).filter((block): block is Extract<ArticleBlock, { kind: 'IMAGE' }> => block.kind === 'IMAGE' && !!block.url);
   return (
     <form ref={formRef} className="submission-form panel-detail w-full !p-0" onSubmit={event => event.preventDefault()} noValidate>
+      {recoveries.length > 0 && <div className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm sm:px-8"><p>Bài đã được sửa ở tab khác. Nội dung chưa lưu vẫn được giữ lại.</p><details className="mt-2"><summary className="cursor-pointer">Xem nội dung đang giữ</summary><DraftRecoveryPanel records={recoveries} serverVersion={initialData.reviewVersion ?? 0} onRestore={restoreRecovery} onDiscard={discardRecovery} /></details></div>}
+      {activeRecovery && <><details className="px-4 py-3 text-sm sm:px-8"><summary className="cursor-pointer">Xem nội dung chưa lưu</summary><DraftRecoveryPanel records={[activeRecovery]} serverVersion={-1} /></details><p className="px-4 py-3 text-sm sm:px-8">Giữ bản sao trước khi <button type="button" className="underline" onClick={() => window.location.reload()}>tải bản mới từ máy chủ</button>.</p></>}
+      {storageError && <p role="status" className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm sm:px-8">Chưa giữ được nội dung trên thiết bị. Vui lòng giữ trang mở cho đến khi hiện “Đã lưu”.</p>}
+      {saveNotice && <p role="status" className="px-4 py-3 text-sm text-red-700 sm:px-8">{saveNotice}</p>}
       {reviewComments.length > 0 && <aside aria-label="Yêu cầu chỉnh sửa" className="border-b border-slate-200 bg-[#FFFFFF] px-4 py-4 text-sm text-[#1F2937] sm:px-8"><h2 className="font-semibold">Phản hồi cần xử lý</h2><ul className="mt-2 list-disc space-y-1 pl-5">{reviewComments.filter(comment => comment.audience === 'AUTHOR').map(comment => <li key={comment.id}>{comment.body}</li>)}</ul></aside>}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-8"><p className="text-sm font-semibold text-[#1F2937]">{preview ? 'Bản xem trước · Chưa xuất bản' : 'Workspace soạn thảo'}</p><button type="button" className="action-secondary-detail min-h-10" onClick={() => setPreview(value => !value)}>{preview ? 'Quay lại soạn thảo' : 'Xem trước'}</button></div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-8"><p className="text-sm font-semibold text-[#1F2937]">{preview ? 'Bản xem trước · Chưa xuất bản' : 'Workspace soạn thảo'}</p></div>
       {preview ? <div className="space-y-8 p-4 sm:p-8">
         <header className={state.data.thumbnailUrl ? 'grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-8' : ''}>
           <div className="min-w-0">
@@ -71,7 +77,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
         <ArticleTableOfContents content={content} />
         <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">Abstract / Tóm tắt</h2><p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{state.data.summary || 'Chưa có tóm tắt.'}</p></section>
         <ArticleContent content={content} />
-        <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">Tài nguyên</h2><ResourceLinks resources={state.data.resources ?? []} /></section>
+        <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">Tài nguyên</h2><ResourceLinks resources={(state.data.resources ?? []).filter(resource => submissionResourceSchema.safeParse(resource).success)} /></section>
       </div> : <fieldset disabled={busy} className="min-w-0 disabled:opacity-70">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(18rem,4fr)] lg:divide-x lg:divide-[#153D67]">
           <section className="p-4 sm:p-8"><h2 className="text-xl font-semibold text-[#1F2937]">Thông tin công trình</h2><div className="mt-6"><BasicInformationFields value={state.data} errors={state.fieldErrors} onChange={updateField} reviewComments={reviewComments} categories={categories} thumbnailImages={images} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} /></div>
@@ -82,7 +88,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
             <section className="mt-7 border-t border-slate-200 pt-6" aria-labelledby="submission-resources-title">
               <h2 id="submission-resources-title" className="text-lg font-semibold text-[#1F2937]">Tài nguyên đính kèm</h2>
               <ReviewComments comments={reviewComments} fieldKey="resources" />
-              <ResourceEditor errors={state.fieldErrors} citationEnabled={state.data.citationEnabled} onCitationChange={enabled => updateField('citationEnabled', enabled)} value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} />
+              <ResourceEditor errors={state.fieldErrors} value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} />
             </section>
           </div>
         </div>
@@ -94,7 +100,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
 
       </fieldset>}
       {state.formError && !Object.values(state.fieldErrors).some(messages => messages.length) && <p role="alert" tabIndex={-1} data-submit-error className="mx-6 my-3 rounded-md border border-red-500 p-3 text-sm text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">{state.formError}</p>}
-      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={uploads > 0} onSave={async () => { if (await saveDraft()) await notifySuccess('Đã lưu bản nháp công trình.'); }} onSubmit={async () => { if (await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
+      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={actionDisabled} saveDisabled={submissionPending} submitLabel={submissionPending ? 'Thử gửi lại' : 'Gửi duyệt'} onSave={async () => { await saveDraft(); }} onSubmit={async () => { if (submissionPending || await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
     </form>
   );
 }

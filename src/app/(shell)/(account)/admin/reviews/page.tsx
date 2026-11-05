@@ -1,3 +1,5 @@
+export const metadata = { title: 'Phê duyệt bài đăng' };
+
 import { getActor } from '@/features/identity/server/actor';
 import { ManagementFilters } from '@/shared/ui/management-filters';
 import { listReviewQueue } from '@/features/review/server/queries';

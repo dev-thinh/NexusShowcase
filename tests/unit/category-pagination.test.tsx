@@ -1,14 +1,14 @@
 vi.mock('server-only', () => ({}));
-import CategoryPageShell from '@/app/(shell)/(site)/category/[slug]/page';
+import CategoryPageShell from '@/features/publications/components/category-page';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   session: null as null | { user: { id: string; role?: string } },
-  category: vi.fn(), count: vi.fn(), findMany: vi.fn(),
+  raw: vi.fn(), category: vi.fn(), count: vi.fn(), findMany: vi.fn(),
 }));
-vi.mock('@/server/db/prisma', () => ({ prisma: { category: { findUnique: mocks.category }, showcaseItem: { count: mocks.count, findMany: mocks.findMany } } }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { $queryRaw: mocks.raw, category: { findUnique: mocks.category }, showcaseItem: { count: mocks.count, findMany: mocks.findMany } } }));
 vi.mock('@/features/publications/server/actions', () => ({ setShowcasePinAction: vi.fn(), setShowcaseVisibilityAction: vi.fn() }));
 vi.mock('@/features/identity/server/auth', () => ({ auth: () => mocks.session }));
 vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => null }));
@@ -48,6 +48,7 @@ beforeEach(() => {
   mocks.session = null;
   mocks.category.mockResolvedValue({ id: 'category-1', name: 'Research' });
   mocks.count.mockResolvedValue(25);
+  mocks.raw.mockImplementation(async (query: { text: string }) => query.text.startsWith('SELECT count') ? [{ total: 25n }] : [{ id: 'matched-id' }]);
   mocks.findMany.mockResolvedValue([]);
 });
 
@@ -86,12 +87,24 @@ describe('category search and filters', () => {
     await CategoryPage({ params: Promise.resolve({ slug }), searchParams: Promise.resolve({ q: '  robot  ', year: '2026', sort: 'newest', page: '2' }) });
     const args = mocks.findMany.mock.calls[0][0];
     expect(args.where).toMatchObject({ categoryId: 'category-1', status: 'PUBLISHED', visibility: 'PUBLIC', publishedYear: 2026 });
-    expect(args.where.OR).toContainEqual({ title: { contains: 'robot', mode: 'insensitive' } });
-    expect(args.where.OR).toContainEqual({ summary: { contains: 'robot', mode: 'insensitive' } });
-    expect(args.where.OR.some((condition: object) => 'tags' in condition)).toBe(false);
-    expect(args.where).toEqual(mocks.count.mock.calls[0][0].where);
+    const [count, page] = mocks.raw.mock.calls.map(call => call[0]);
+    expect(count.text).toContain("status = 'PUBLISHED'");
+    expect(count.text).toContain("visibility = 'PUBLIC'");
+    expect(count.text).toContain('"categoryId" =');
+    expect(count.text).toContain('"publishedYear" =');
+    expect(count.text).toContain("title || ' ' || summary");
+    expect(count.text).not.toContain('tags');
+    expect(count.values).toContain('category-1');
+    expect(count.values).toContain(2026);
+    expect(count.values).toContain('%robot%');
+    expect(page.values.slice(0, -2)).toEqual(count.values);
+    expect(page.text.split(' ORDER BY ')[0].replace('SELECT id', 'SELECT count(*) AS total')).toBe(count.text);
+    expect(args.where.id).toEqual({ in: ['matched-id'] });
     expect(args.orderBy).toEqual([{ publishedYear: 'desc' }, { createdAt: 'desc' }, { id: 'asc' }]);
-    expect(args.skip).toBe(slug === 'robotics-iot' ? 9 : 10);
+    const size = slug === 'robotics-iot' ? 9 : 10;
+    expect(page.values.slice(-2)).toEqual([size, size]);
+    expect(args.skip).toBe(0);
+    expect(args.take).toBe(size);
   });
   it('ignores invalid years and sort options', async () => {
     await CategoryPage({ params: Promise.resolve({ slug: 'robotics-iot' }), searchParams: Promise.resolve({ year: 'oops', sort: 'invalid' }) });

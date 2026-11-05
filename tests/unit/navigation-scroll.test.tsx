@@ -84,7 +84,7 @@ it('only scrolls for the latest destination when tabs are clicked rapidly', () =
 });
 
 it.each(['/login', '/members'])('releases the loading shell when navigation redirects to %s', redirectedPath => {
-  render().navigate('/dashboard', {});
+  render().navigate('/my-works', {});
   expect(renderProvider().props.children[1].props.style).toEqual({ minHeight: 2100 });
   render(); state.effects[0]();
   state.pathname = redirectedPath;
@@ -100,7 +100,7 @@ it.each(['/login', '/members'])('releases the loading shell when navigation redi
 });
 
 it('does not let completion of an older transition clear a newer navigation', () => {
-  render().navigate('/dashboard', {});
+  render().navigate('/my-works', {});
   render(); state.effects[0]();
   state.pending = false;
   render();
@@ -113,8 +113,8 @@ it('does not let completion of an older transition clear a newer navigation', ()
 
 it('uses instant destination scrolling after a redirect when reduced motion is requested', () => {
   vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: true }) as MediaQueryList);
-  render().navigate('/dashboard', { replace: true });
-  expect(state.replace).toHaveBeenCalledWith('/dashboard', { scroll: false });
+  render().navigate('/my-works', { replace: true });
+  expect(state.replace).toHaveBeenCalledWith('/my-works', { scroll: false });
   render(); state.effects[0]();
   state.pathname = '/login'; state.pending = false;
   render(); state.effects[0]();

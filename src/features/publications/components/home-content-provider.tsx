@@ -46,18 +46,16 @@ export function HomeContentLink({ href, className, children }: { href: string; c
   return editing ? <div data-home-content-link className={className}>{children}</div> : <NavigationLink href={href} className={className}>{children}</NavigationLink>;
 }
 
-export function HomeContentProvider({ children }: { children: ReactNode }) {
+export function HomeContentProvider({ children, initialContent }: { children: ReactNode; initialContent: HomeContentPayload }) {
   const editButton = useRef<HTMLButtonElement>(null);
-  const [content, setContent] = useState<HomeContentPayload>({ version: 0, text: defaultHomeText, isAdmin: false });
-  const [draft, setDraft] = useState<HomeText>(defaultHomeText);
+  const [content, setContent] = useState<HomeContentPayload>(initialContent);
+  const [draft, setDraft] = useState<HomeText>(initialContent.text);
   const [editing, setEditing] = useState(false);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState('');
   const [errors, setErrors] = useState<Partial<Record<HomeTextKey, string>>>({});
   const [conflict, setConflict] = useState(false);
   const [confirmAction, setConfirmAction] = useState<'discard' | 'reload' | null>(null);
-  const [loadFailed, setLoadFailed] = useState(false);
-  const [attempt, setAttempt] = useState(0);
   const dirty = editing && JSON.stringify(draft) !== JSON.stringify(content.text);
 
   useEffect(() => {
@@ -65,13 +63,6 @@ export function HomeContentProvider({ children }: { children: ReactNode }) {
     const timeout = window.setTimeout(() => setNotice(''), 3000);
     return () => window.clearTimeout(timeout);
   }, [editing, notice]);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    void fetchHomeContent(controller.signal).then(data => { setContent(data); setLoadFailed(false); })
-      .catch(() => { if (!controller.signal.aborted) setLoadFailed(true); });
-    return () => controller.abort();
-  }, [attempt]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -163,7 +154,6 @@ export function HomeContentProvider({ children }: { children: ReactNode }) {
       setErrors(current => ({ ...current, [field]: undefined }));
     } }}>
       {children}
-      {loadFailed && <div role="alert" className="container mx-auto px-4 py-3 text-sm text-slate-600">Chưa tải được nội dung cập nhật. <button type="button" className="underline" onClick={() => setAttempt(value => value + 1)}>Thử lại</button></div>}
       {content.isAdmin && <div role="region" aria-label="Chỉnh sửa nội dung Trang chủ" className={`home-content-toolbar fixed bottom-5 right-4 z-40 flex max-w-[calc(100vw-2rem)] flex-col items-end gap-2 sm:right-6 ${editing ? 'rounded-2xl border border-slate-200 bg-white p-1.5 text-slate-900 shadow-lg' : ''}`}>
         {notice && <p role={notice === 'Đã cập nhật nội dung Trang chủ.' ? 'status' : 'alert'} className={`max-w-sm text-sm ${editing ? '' : 'rounded-lg border bg-white p-3 text-slate-700 shadow'}`}>{notice}</p>}
         {editing ? <>
@@ -179,8 +169,8 @@ export function HomeContentProvider({ children }: { children: ReactNode }) {
             <button type="button" disabled={busy} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-50 px-4 text-sm font-semibold text-slate-600 transition-colors hover:bg-slate-100 disabled:opacity-50" onClick={() => { if (dirty) setConfirmAction('discard'); else finishEditing(); }}><X size={16} aria-hidden="true" />Hủy</button>
             <button type="button" disabled={busy || !dirty || conflict} onClick={() => void save()} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-slate-700 disabled:opacity-50">{busy ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Save size={16} aria-hidden="true" />} {busy ? 'Đang xử lý…' : 'Lưu nội dung'}</button>
           </div>
-        </> : <button ref={editButton} type="button" onClick={() => void openEditor()} disabled={busy} className="inline-flex min-h-11 items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-slate-700 disabled:opacity-60">
-          {busy ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Pencil size={16} aria-hidden="true" />} Chỉnh sửa nội dung
+        </> : <button ref={editButton} type="button" aria-label="Chỉnh sửa nội dung" title="Chỉnh sửa nội dung" onClick={() => void openEditor()} disabled={busy} className="inline-flex h-12 w-12 items-center justify-center gap-2 rounded-full bg-slate-900 sm:h-auto sm:w-auto sm:px-5 sm:py-3 text-sm font-semibold text-white shadow-lg transition-colors hover:bg-slate-700 disabled:opacity-60">
+          {busy ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Pencil size={16} aria-hidden="true" />}<span className="hidden sm:inline">Chỉnh sửa nội dung</span>
         </button>}
       </div>}
     </HomeEditingContext.Provider>

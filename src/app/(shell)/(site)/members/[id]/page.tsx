@@ -19,6 +19,14 @@ import { notFound, permanentRedirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const user = await prisma.user.findUnique({ where: { id, status: 'ACTIVE', deletedAt: null }, select: { fullName: true } })
+    ?? await prisma.user.findUnique({ where: { publicSlug: id, status: 'ACTIVE', deletedAt: null }, select: { fullName: true } });
+  if (!user) notFound();
+  return { title: user.fullName };
+}
+
 export default async function MemberProfilePage({
   params, searchParams,
 }: {
@@ -72,7 +80,7 @@ export default async function MemberProfilePage({
       <section className="mt-7" aria-label="Công trình của thành viên">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="flex items-center gap-2 text-lg font-semibold text-slate-900">Công trình<span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-sm tabular-nums text-slate-600">{publications.total}</span></h2>{publications.total > 0 && <p className="text-sm text-slate-500">Hiển thị {(publications.page - 1) * 6 + 1}–{Math.min(publications.page * 6, publications.total)} / {publications.total}</p>}</div>
         {publications.items.length ? <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
-          {publications.items.map(item => <Link key={item.id} href={`/showcase/${item.slug}`} className="group flex items-center gap-3 p-4 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#153D67]/30 sm:gap-4 sm:px-5">
+          {publications.items.map(item => <Link key={item.id} href={`/works/${item.slug}`} className="group flex items-center gap-3 p-4 transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#153D67]/30 sm:gap-4 sm:px-5">
             <span className="hidden h-16 w-16 shrink-0 sm:block"><MediaImage showPlaceholderLabel={false} src={item.thumbnailUrl} alt="" width={64} height={64} loading="lazy" className="h-full w-full rounded-lg border border-slate-100 object-cover" /></span>
             <div className="min-w-0 flex-1">
               <div className="mb-1"><TypeBadge type={item.type} size="sm" /></div>

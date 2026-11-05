@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, expect, it, vi } from 'vitest';
-import MemberProfilePage from '@/app/(shell)/(site)/members/[id]/page';
+import MemberProfilePage, { generateMetadata } from '@/app/(shell)/(site)/members/[id]/page';
 
 const mocks = vi.hoisted(() => ({ session: vi.fn(), user: vi.fn(), publications: vi.fn() }));
 vi.mock('next/navigation', async original => ({ ...await original<typeof import('next/navigation')>(), useRouter: () => ({ refresh: vi.fn(), replace: vi.fn() }), usePathname: () => '/members/member' }));
@@ -91,4 +91,13 @@ it('renders a centered missing-image placeholder for every publication without a
   expect(html).toContain('aria-label="Chưa có ảnh"');
   expect(html).not.toContain('>Chưa có ảnh</span>');
   expect(html).toContain('items-center justify-center');
+});
+
+it('uses only active visible member names in profile metadata', async () => {
+  expect(await generateMetadata({ params: Promise.resolve({ id: 'member' }) })).toEqual({ title: 'Nguyễn An' });
+  expect(mocks.user).toHaveBeenCalledWith(expect.objectContaining({ where: { id: 'member', status: 'ACTIVE', deletedAt: null } }));
+});
+it('does not expose disabled or missing member names in metadata', async () => {
+  mocks.user.mockResolvedValue(null);
+  await expect(generateMetadata({ params: Promise.resolve({ id: 'disabled-member' }) })).rejects.toThrow();
 });

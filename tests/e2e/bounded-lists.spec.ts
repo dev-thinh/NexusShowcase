@@ -5,7 +5,7 @@ test('search pages retain their query and detail return destination', async ({ p
   await expect(page.locator('main article')).toHaveCount(10);
   const title = page.getByRole('link', { name: 'Benchmark Research 0010', exact: true });
   await title.click();
-  await expect(page).toHaveURL(/\/showcase\/benchmark-10\?/);
+  await expect(page).toHaveURL(/\/works\/benchmark-10\?/);
   const returnLink = page.getByRole('navigation', { name: 'Đường dẫn', exact: true }).getByRole('link').last();
   await returnLink.click();
   await expect(page).toHaveURL(/q=Benchmark/);
@@ -13,7 +13,7 @@ test('search pages retain their query and detail return destination', async ({ p
 });
 
 test('author lookup pages keep selected names after changing the search', async ({ page, fixture }) => {
-  await login(page, fixture.users[1], '/dashboard/items/new');
+  await login(page, fixture.users[1], '/my-works/new');
   await page.getByRole('button', { name: 'Thành viên', exact: true }).click();
   const options = page.getByRole('listbox');
   await expect(options).toHaveAttribute('aria-busy', 'false');
@@ -39,7 +39,9 @@ test('author lookup pages keep selected names after changing the search', async 
 
 test('author and admin filters preserve bounded server pages', async ({ page, fixture }) => {
   await login(page, fixture.users[1]);
-  await page.getByRole('link', { name: /^Đã xuất bản/ }).click();
+  await page.getByRole('combobox', { name: 'Lọc trạng thái bài đăng' }).click();
+  await page.getByRole('option', { name: /^Đã xuất bản/ }).click();
+  await page.getByRole('search').getByRole('button', { name: 'Áp dụng', exact: true }).click();
   await expect(page).toHaveURL(/filter=PUBLISHED/);
   await page.getByLabel('Tìm công trình', { exact: true }).fill('Research 0000');
   await page.getByLabel('Tìm công trình', { exact: true }).press('Enter');

@@ -1,5 +1,7 @@
 'use client';
 
+import { publicNavigationSection } from '@/shared/navigation/public-section';
+import { usePublicSectionContext } from '@/shared/navigation/public-section-context';
 import { SignOutButton } from '@/features/identity/components/sign-out-button';
 import { getMemberRoleLabel } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
@@ -65,7 +67,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
     setIsProfileMenuOpen(false);
   }, [pathname]);
 
-  const isDashboardActive = pathname.startsWith('/dashboard');
+  const isDashboardActive = pathname.startsWith('/my-works');
   const isAdminActive = pathname === '/admin' || pathname.startsWith('/admin/');
   const isProfileActive = user ? pathname === `/members/${user.id}` : false;
   const isLoginActive = pathname === '/login';
@@ -115,8 +117,8 @@ export function NavbarNav({ user }: NavbarNavProps) {
               >
                 {[
                   ...(canUserReview(user) ? [{ href: '/admin', label: 'Quản trị', icon: ShieldCheck }] : []),
-                  { href: '/dashboard', label: 'Công trình của tôi', icon: LayoutDashboard },
-                  ...(canUserUpload(user) ? [{ href: '/dashboard/items/new', label: 'Đăng bài mới', icon: Plus }] : []),
+                  { href: '/my-works', label: 'Công trình của tôi', icon: LayoutDashboard },
+                  ...(canUserUpload(user) ? [{ href: '/my-works/new', label: 'Đăng bài mới', icon: Plus }] : []),
                   { href: `/members/${user.id}`, label: 'Hồ sơ của tôi', icon: User },
                 ].map(({ href, label, icon: Icon }) => {
                   const active = href === '/admin' ? isAdminActive : pathname === href;
@@ -165,8 +167,8 @@ const inactiveTabClass =
 
 const publicLinks = [
   { href: '/', label: 'Trang chủ' },
-  { href: '/category/bai-bao-khoa-hoc', label: 'Nghiên cứu khoa học' },
-  { href: '/category/robotics-iot', label: 'Dự án & Sản phẩm' },
+  { href: '/research', label: 'Nghiên cứu khoa học' },
+  { href: '/projects', label: 'Dự án & Sản phẩm' },
   { href: '/members', label: 'Thành viên' },
   { href: '/contact', label: 'Liên hệ' },
 ];
@@ -174,6 +176,9 @@ const publicLinks = [
 export function PublicNavigation() {
   const pathname = usePathname();
   const visualPathname = useNavigationVisualPathname();
+  const detail = usePublicSectionContext();
+  const activeSection = publicNavigationSection(pathname, detail);
+  const visualSection = publicNavigationSection(visualPathname, detail);
   const [menuOpen, setMenuOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -213,7 +218,7 @@ export function PublicNavigation() {
     <nav id="public-navigation" aria-label="Điều hướng chính" data-open={menuOpen ? 'true' : 'false'} className="site-public-navigation flex flex-nowrap col-start-2 row-start-1 justify-self-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto" onClick={event => {
       if ((event.target as Element).closest('a')) setMenuOpen(false);
     }}>
-      {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualPathname === href ? activeTabClass : inactiveTabClass} aria-current={pathname === href ? 'page' : undefined}><span>{label}</span></Link>)}
+      {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualSection === href ? activeTabClass : inactiveTabClass} aria-current={activeSection === href ? (pathname === href ? 'page' : 'location') : undefined}><span>{label}</span></Link>)}
     </nav>
   </div>;
 }

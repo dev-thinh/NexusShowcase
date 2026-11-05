@@ -4,17 +4,17 @@ import { describe, expect, it } from 'vitest';
 
 describe('Showcase Detail Page Visibility Protection', () => {
   it('protects private items from unauthenticated guests and contains toggle button', () => {
-    const detailPath = path.resolve(process.cwd(), 'src/app/(shell)/(site)/showcase/[slug]/page.tsx');
+    const detailPath = path.resolve(process.cwd(), 'src/app/(shell)/(site)/works/[slug]/page.tsx');
     const content = fs.readFileSync(detailPath, 'utf-8');
 
     expect(content).toContain('visibility');
     expect(content).toContain('CardAdminControls');
-    expect(content).toContain("redirect(`/login?callbackUrl=/showcase/${slug}`)");
+    expect(content).toContain("redirect(`/login?callbackUrl=/works/${slug}`)");
     expect(content).not.toContain("item.visibility === 'PUBLIC' ? 'Công khai' : 'Nội bộ'");
   });
 
   it('uses a continuous article layout with a resource sidebar', () => {
-    const detailPath = path.resolve(process.cwd(), 'src/app/(shell)/(site)/showcase/[slug]/page.tsx');
+    const detailPath = path.resolve(process.cwd(), 'src/app/(shell)/(site)/works/[slug]/page.tsx');
     const content = fs.readFileSync(detailPath, 'utf-8');
 
     expect(content).not.toContain('panel-detail');

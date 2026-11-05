@@ -4,7 +4,7 @@ vi.mock('@/shared/lib/deferred-fetch', () => ({ fetchDeferredJson: async (url: s
 } }));
 vi.mock('@/features/members/server/queries', () => ({ getHomeMembers: mocks.members }));
 vi.mock('server-only', () => ({}));
-import CategoryPage from '@/app/(shell)/(site)/category/[slug]/page';
+import CategoryPage from '@/features/publications/components/category-page';
 import { loadHomeFeatured } from '@/app/(shell)/(site)/home-sections';
 import { CitationModal } from '@/features/publications/components/citation-modal';
 import React from 'react';
@@ -57,7 +57,7 @@ describe('rendered citation action grouping', () => {
     expect(groups.length).toBeGreaterThan(0);
     for (const group of groups) {
       const html = renderToStaticMarkup(group);
-      expect(html).toMatch(/<a[^>]+href="[^"]*\/showcase\/paper-one[^"]*"[^>]*>Xem công trình/);
+      expect(html).toMatch(/<a[^>]+href="[^"]*\/works\/paper-one[^"]*"[^>]*>Xem công trình/);
       expect(html).toContain('aria-label="Trích dẫn công trình (Cite)"');
       expect(html).toContain('lucide-quote');
       expect(html).not.toContain('#resources');

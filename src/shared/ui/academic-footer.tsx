@@ -20,8 +20,8 @@ export function AcademicFooter() {
           <nav aria-label="Khám phá CLB" className="min-w-0 w-full justify-self-start text-left sm:w-auto sm:justify-self-end">
             <h2 className="mb-3 text-sm font-semibold text-[#1F2937]">Khám phá</h2>
             <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:block">
-              <li><Link href="/category/bai-bao-khoa-hoc" className={footerLink}>Nghiên cứu khoa học</Link></li>
-              <li><Link href="/category/robotics-iot" className={footerLink}>Dự án &amp; Sản phẩm</Link></li>
+              <li><Link href="/research" className={footerLink}>Nghiên cứu khoa học</Link></li>
+              <li><Link href="/projects" className={footerLink}>Dự án &amp; Sản phẩm</Link></li>
               <li><Link href="/members" className={footerLink}>Thành viên</Link></li>
               <li><Link href="/contact" className={footerLink}>Liên hệ</Link></li>
             </ul>

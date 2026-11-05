@@ -7,7 +7,7 @@ describe('HomeHero', () => {
     const markup = renderToStaticMarkup(<HomeHero />);
 
     expect(markup).toContain('id="home-hero-title"');
-    expect(markup).toContain('href="/category/bai-bao-khoa-hoc"');
+    expect(markup).toContain('href="/research"');
     expect(markup).not.toContain('href="#home-search"');
     expect(markup).not.toContain('home-hero__secondary-action');
   });

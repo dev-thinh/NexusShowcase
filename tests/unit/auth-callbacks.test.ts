@@ -3,14 +3,14 @@ import type { NextAuthConfig } from 'next-auth';
 import type { CredentialsConfig } from 'next-auth/providers/credentials';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-const mocks = vi.hoisted(() => ({ config: null as NextAuthConfig | null, findUnique: vi.fn(), findMany: vi.fn(), throttle: vi.fn(async (_input: { key: string }) => ({ allowed: true, retryAfterSeconds: 0 })) }));
+const mocks = vi.hoisted(() => ({ config: null as NextAuthConfig | null, updateMany: vi.fn(), findUnique: vi.fn(), findMany: vi.fn(), throttle: vi.fn(async (_input: { key: string }) => ({ allowed: true, retryAfterSeconds: 0 })) }));
 vi.mock('next-auth', () => ({ CredentialsSignin: class extends Error { code = 'credentials'; }, default: (config: NextAuthConfig) => { mocks.config = config; return {}; } }));
-vi.mock('@/server/db/prisma', () => ({ prisma: { $queryRaw: mocks.findMany, user: { findUnique: mocks.findUnique } } }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { $queryRaw: mocks.findMany, user: { findUnique: mocks.findUnique, updateMany: mocks.updateMany } } }));
 vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: mocks.throttle }));
 vi.stubEnv('AUTH_SECRET', 'unit-test-config-only');
 await import('@/features/identity/server/auth');
 
-beforeEach(() => { vi.clearAllMocks(); mocks.throttle.mockResolvedValue({ allowed: true, retryAfterSeconds: 0 }); });
+beforeEach(() => { vi.clearAllMocks(); mocks.updateMany.mockResolvedValue({ count: 1 }); mocks.throttle.mockResolvedValue({ allowed: true, retryAfterSeconds: 0 }); });
 
 describe('installed auth callbacks', () => {
   it.each([null, { status: 'SUSPENDED', sessionVersion: 1 }, { status: 'ACTIVE', deletedAt: new Date(), sessionVersion: 1 }, { status: 'ACTIVE', sessionVersion: 2 }])('revokes invalid database identity %j', async row => {
@@ -34,7 +34,7 @@ describe('installed auth callbacks', () => {
     const authorize = provider.options.authorize!;
     const passwordHash = await bcrypt.hash('correct-password', 4);
     mocks.findMany.mockResolvedValue([{ id: 'user', role: 'MEMBER', fullName: 'Test', status: 'ACTIVE', passwordHash, mustChangePassword: true, sessionVersion: 1 }]);
-    expect(await authorize({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).toMatchObject({ id: 'user', mustChangePassword: true, sessionVersion: 1 });
+    expect(await authorize({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).toMatchObject({ id: 'user', mustChangePassword: true, sessionVersion: 2 });
     expect(await authorize({ email: 'member', password: 'wrong-password' }, new Request('http://localhost'))).toBeNull();
     mocks.findMany.mockResolvedValue([{ status: 'SUSPENDED', passwordHash }]);
     expect(await authorize({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).toBeNull();
@@ -92,4 +92,22 @@ it('reports account throttling distinctly from incorrect credentials', async () 
  mocks.throttle.mockResolvedValueOnce({ allowed: true, retryAfterSeconds: 0 }).mockResolvedValueOnce({ allowed: false, retryAfterSeconds: 300 });
  await expect(provider.options.authorize!({ email: 'member', password: 'correct-password' }, new Request('http://localhost'))).rejects.toMatchObject({ code: 'rate_limited' });
  expect(mocks.findMany).not.toHaveBeenCalled();
+});
+
+it('allows only one concurrent login and rejects replay of a temporary password', async () => {
+ const provider = mocks.config!.providers[0] as CredentialsConfig & { options: Partial<CredentialsConfig> };
+ const passwordHash = await bcrypt.hash('temporary-password', 4);
+ const row = { id: 'once', email: 'once', fullName: 'Once', role: 'MEMBER', status: 'ACTIVE', deletedAt: null, passwordHash, mustChangePassword: true, temporaryPasswordConsumed: false, sessionVersion: 4 };
+ mocks.findMany.mockImplementation(async () => [{ ...row }]);
+ mocks.updateMany.mockImplementation(async ({ where, data }) => {
+   if (row.temporaryPasswordConsumed || where.sessionVersion !== row.sessionVersion) return { count: 0 };
+   row.temporaryPasswordConsumed = data.temporaryPasswordConsumed;
+   row.sessionVersion += 1;
+   return { count: 1 };
+ });
+ const login = () => provider.options.authorize!({ email: 'once', password: 'temporary-password' }, new Request('http://localhost'));
+ const results = await Promise.all([login(), login()]);
+ expect(results.filter(Boolean)).toHaveLength(1);
+ expect(results.find(Boolean)).toMatchObject({ sessionVersion: 5, mustChangePassword: true });
+ expect(await login()).toBeNull();
 });

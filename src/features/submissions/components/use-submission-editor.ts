@@ -4,13 +4,16 @@ import { submissionValidationMessage, submissionFieldErrors } from '@/features/s
 
 import { articleFromLegacy, serializeArticle, standaloneResources } from '@/features/submissions/model/article';
 import type { ShowcaseDraftInput } from '@/features/submissions/model/input';
-import { showcaseDraftInputSchema, showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
-import { saveShowcaseDraftAction, submitShowcaseForReviewAction } from '@/features/submissions/server/actions';
+import { showcaseSubmissionInputSchema } from '@/features/submissions/model/input';
+import { getShowcaseSubmissionStateAction, saveShowcaseDraftAction, submitShowcaseForReviewAction } from '@/features/submissions/server/actions';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer, useRef, useState, startTransition } from 'react';
 import { notifySuccess } from '@/shared/dialogs/success';
 
-export type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+import { readSubmissionAttempt, writeSubmissionAttempt, clearSubmissionAttempt, mayResumeAfterSubmissionRejection, type SubmissionAttempt } from './submission-attempt';
+import { DraftSaveCoordinator, type SaveSnapshot, type SaveState } from './draft-save-coordinator';
+import { chooseDraftRecovery, listRecoveries, removeRecovery, writeRecovery, type DraftRecovery } from './draft-recovery';
+export type { SaveState } from './draft-save-coordinator';
 
 export interface SubmissionEditorState {
   itemId: string | null;
@@ -24,6 +27,7 @@ export interface SubmissionEditorState {
 }
 
 export type SubmissionEditorAction =
+  | { type: 'snapshot'; snapshot: SaveSnapshot }
   | { type: 'field'; field: keyof ShowcaseDraftInput; value: ShowcaseDraftInput[keyof ShowcaseDraftInput] }
   | { type: 'saving' }
   | { type: 'saved'; itemId: string; reviewVersion: number; editSequence: number }
@@ -31,7 +35,7 @@ export type SubmissionEditorAction =
   | { type: 'errors'; error: string; fieldErrors?: Record<string, string[]> };
 
 export function createInitialSubmissionState(
-  initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number }
+  initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number; draftSnapshot?: boolean }
 ): SubmissionEditorState {
   return {
     itemId: initialData.id ?? null,
@@ -42,7 +46,7 @@ export function createInitialSubmissionState(
       conference: initialData.conference ?? null,
       title: initialData.title ?? '',
       summary: initialData.summary ?? '',
-      content: serializeArticle(articleFromLegacy(initialData.content ?? '')),
+      content: initialData.draftSnapshot ? (initialData.content ?? '') : serializeArticle(articleFromLegacy(initialData.content ?? '')),
       type: initialData.type ?? 'PROJECT',
       categoryId: initialData.categoryId ?? null,
       thumbnailUrl: initialData.thumbnailUrl ?? null,
@@ -50,10 +54,10 @@ export function createInitialSubmissionState(
       suggestedField: initialData.suggestedField ?? '',
       customProjectType: initialData.customProjectType ?? '',
       contributors: initialData.contributors ?? [],
-      resources: standaloneResources(initialData.content ?? '', initialData.resources ?? []),
+      resources: initialData.draftSnapshot ? (initialData.resources ?? []) : standaloneResources(initialData.content ?? '', initialData.resources ?? []),
     },
     fieldErrors: {},
-    saveState: 'idle',
+    saveState: initialData.id ? 'saved' : 'idle',
     isDirty: false,
     formError: null,
   };
@@ -64,6 +68,8 @@ export function submissionEditorReducer(
   action: SubmissionEditorAction
 ): SubmissionEditorState {
   switch (action.type) {
+    case 'snapshot':
+      return { ...state, data: action.snapshot.data, reviewVersion: action.snapshot.reviewVersion, editSequence: action.snapshot.editSequence, isDirty: action.snapshot.isDirty, saveState: action.snapshot.status };
     case 'field':
       return {
         ...state,
@@ -87,79 +93,170 @@ export function submissionEditorReducer(
   }
 }
 
-export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number }) {
+export function useSubmissionEditor(initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number; draftSnapshot?: boolean }, accountId: string) {
   const router = useRouter();
-  const busyRef = useRef(false);
-  const savingRef = useRef(false);
-  const editSequenceRef = useRef(0);
   const [state, dispatch] = useReducer(submissionEditorReducer, initialData, createInitialSubmissionState);
+  const [ready, setReady] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submissionPending, setSubmissionPending] = useState(false);
+  const submissionAttemptRef = useRef<SubmissionAttempt | null>(null);
+  const attemptDurableRef = useRef(true);
+  const [recoveries, setRecoveries] = useState<DraftRecovery[]>([]);
+  const [storageError, setStorageError] = useState(false);
+  const [saveNotice, setSaveNotice] = useState<string | null>(null);
+  const coordinatorRef = useRef<DraftSaveCoordinator | null>(null);
+  const activeRecordRef = useRef<DraftRecovery | null>(null);
+  const initialRef = useRef({ data: state.data, itemId: initialData.id, version: initialData.reviewVersion ?? 0, accountId });
+  const busyRef = useRef(false);
+  const recoveryPendingRef = useRef(false);
 
   useEffect(() => {
-    if (!state.isDirty) return;
-    const guard = (event: BeforeUnloadEvent) => event.preventDefault();
-    window.addEventListener('beforeunload', guard);
-    return () => window.removeEventListener('beforeunload', guard);
-  }, [state.isDirty]);
+    const initial = initialRef.current;
+    if (!initial.itemId) return;
+    try {
+      submissionAttemptRef.current = readSubmissionAttempt(window.localStorage, initial.accountId, initial.itemId, initial.version);
+      setSubmissionPending(Boolean(submissionAttemptRef.current));
+    } catch {}
+    let existing: DraftRecovery[] = [];
+    try {
+      const result = listRecoveries(window.localStorage, initial.accountId, initial.itemId);
+      existing = result.records; setStorageError(result.error);
+    } catch { setStorageError(true); }
+    const recovery = submissionAttemptRef.current
+      ? { resume: undefined, obsolete: [], conflicts: [] }
+      : chooseDraftRecovery(existing, initial.data, initial.version);
+    for (const obsolete of recovery.obsolete) {
+      try { removeRecovery(window.localStorage, obsolete); } catch {}
+    }
+    recoveryPendingRef.current = recovery.conflicts.length > 0;
+    setRecoveries(recovery.conflicts);
+    const sessionId = crypto.randomUUID();
+    const coordinator = new DraftSaveCoordinator({
+      itemId: initial.itemId, reviewVersion: initial.version, data: initial.data,
+      save: input => new Promise((resolve, reject) => {
+        startTransition(async () => { try { resolve(await saveShowcaseDraftAction(input)); } catch (error) { reject(error); } });
+      }),
+      persist: snapshot => {
+        try {
+          if (!snapshot.isDirty) {
+            const previous = activeRecordRef.current;
+            if (previous && !removeRecovery(window.localStorage, previous)) return false;
+            activeRecordRef.current = null; return true;
+          }
+          const record: DraftRecovery = { format: 1, accountId: initial.accountId, itemId: initial.itemId!, sessionId,
+            expectedReviewVersion: snapshot.reviewVersion, editSequence: snapshot.editSequence, updatedAt: Date.now(), data: snapshot.data, pendingMutation: snapshot.pendingMutation };
+          activeRecordRef.current = record;
+          return writeRecovery(window.localStorage, record);
+        } catch { return false; }
+      },
+      onChange: snapshot => {
+        dispatch({ type: 'snapshot', snapshot });
+        setStorageError(!snapshot.locallySaved); setSaveNotice(snapshot.error);
+      },
+    });
+    coordinatorRef.current = coordinator;
+    const online = () => coordinator.setOnline(navigator.onLine);
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if ((coordinator.snapshot.isDirty && !coordinator.snapshot.locallySaved) || (submissionAttemptRef.current && !attemptDurableRef.current)) event.preventDefault();
+    };
+    // Set connectivity before restoring so offline recovery never depends on a request.
+    online();
+    if (recovery.resume && !submissionAttemptRef.current) {
+      const record = recovery.resume;
+      coordinator.restore(record.data, record.expectedReviewVersion, record.editSequence, record.pendingMutation);
+      if (coordinator.snapshot.locallySaved) {
+        try { removeRecovery(window.localStorage, record); } catch {}
+      }
+    }
+    window.addEventListener('online', online); window.addEventListener('offline', online);
+    window.addEventListener('beforeunload', beforeUnload);
+    setReady(true);
+    return () => {
+      coordinator.dispose(); coordinatorRef.current = null;
+      window.removeEventListener('online', online); window.removeEventListener('offline', online); window.removeEventListener('beforeunload', beforeUnload);
+    };
+  }, []);
 
   const updateField = useCallback(<K extends keyof ShowcaseDraftInput>(field: K, value: ShowcaseDraftInput[K]) => {
-    editSequenceRef.current += 1;
+    const coordinator = coordinatorRef.current;
+    if (!coordinator || busyRef.current || recoveryPendingRef.current || submissionAttemptRef.current) return;
+    const data = { ...coordinator.snapshot.data, [field]: value };
     dispatch({ type: 'field', field, value });
+    coordinator.update(data);
   }, []);
 
   const saveDraft = useCallback(async () => {
-    if (savingRef.current) return null;
-    const parsed = showcaseDraftInputSchema.safeParse(state.data);
-    if (!parsed.success) {
-      dispatch({ type: 'errors', error: submissionValidationMessage(parsed.error), fieldErrors: submissionFieldErrors(parsed.error) });
-      return null;
+    if (recoveryPendingRef.current || submissionAttemptRef.current) return null;
+    return coordinatorRef.current?.retry() ?? null;
+  }, []);
+
+  const discardRecovery = useCallback((record: DraftRecovery) => {
+    let removed = false;
+    try { removed = removeRecovery(window.localStorage, record); } catch {}
+    if (!removed) { setStorageError(true); return; }
+    setRecoveries(current => {
+      const next = current.filter(entry => entry.sessionId !== record.sessionId);
+      recoveryPendingRef.current = next.length > 0;
+      return next;
+    });
+  }, []);
+
+  const restoreRecovery = useCallback((record: DraftRecovery) => {
+    const coordinator = coordinatorRef.current;
+    if (!coordinator || (record.expectedReviewVersion !== initialRef.current.version && !record.pendingMutation)) return;
+    coordinator.restore(record.data, record.expectedReviewVersion, record.editSequence, record.pendingMutation);
+    // Copy into this tab's own durable record before removing the old session.
+    if (coordinator.snapshot.locallySaved) {
+      try { removeRecovery(window.localStorage, record); } catch {}
     }
-    savingRef.current = true;
-    const editSequence = state.editSequence;
-    dispatch({ type: 'saving' });
-    let result;
-    try {
-      result = await saveShowcaseDraftAction({ itemId: state.itemId, expectedReviewVersion: state.reviewVersion, draft: state.data });
-    } catch {
-      dispatch({ type: 'failed', error: 'Không lưu được. Kiểm tra kết nối và thử lại.' });
-      return null;
-    } finally { savingRef.current = false; }
-    if (!result.success) {
-      dispatch({ type: 'failed', error: result.error, fieldErrors: result.fieldErrors });
-      return null;
-    }
-    dispatch({ type: 'saved', itemId: result.data.id, reviewVersion: result.data.reviewVersion, editSequence });
-    return { ...result.data, editSequence };
-  }, [state.data, state.itemId, state.reviewVersion, state.editSequence]);
+    recoveryPendingRef.current = false;
+    setRecoveries([]);
+  }, []);
 
   const submitForReview = useCallback(async () => {
-    if (busyRef.current) return false;
-    const parsed = showcaseSubmissionInputSchema.safeParse(state.data);
-    if (!parsed.success) {
-      dispatch({ type: 'errors', error: submissionValidationMessage(parsed.error), fieldErrors: submissionFieldErrors(parsed.error) });
-      return false;
+    const coordinator = coordinatorRef.current;
+    if (!coordinator || busyRef.current || recoveryPendingRef.current) return false;
+    if (!submissionAttemptRef.current) {
+      const parsed = showcaseSubmissionInputSchema.safeParse(coordinator.snapshot.data);
+      if (!parsed.success) {
+        dispatch({ type: 'errors', error: submissionValidationMessage(parsed.error), fieldErrors: submissionFieldErrors(parsed.error) });
+        return false;
+      }
     }
-    busyRef.current = true;
+    busyRef.current = true; setSubmitting(true);
     try {
-      const saved = await saveDraft();
-      if (!saved) return false;
-      if (editSequenceRef.current !== saved.editSequence) {
-        dispatch({ type: 'errors', error: 'Nội dung vừa thay đổi. Vui lòng lưu lại trước khi gửi duyệt.' });
-        return false;
+      if (!submissionAttemptRef.current) {
+        const saved = await coordinator.retry();
+        if (!saved || coordinator.snapshot.isDirty || saved.editSequence !== coordinator.snapshot.editSequence) return false;
+        let attempt: SubmissionAttempt | null = null;
+        try { attempt = readSubmissionAttempt(window.localStorage, accountId, saved.id, saved.reviewVersion); } catch {}
+        attempt ??= { itemId: saved.id, expectedReviewVersion: saved.reviewVersion, mutationId: crypto.randomUUID() };
+        submissionAttemptRef.current = attempt; setSubmissionPending(true);
+        try { attemptDurableRef.current = writeSubmissionAttempt(window.localStorage, accountId, attempt); }
+        catch { attemptDurableRef.current = false; }
       }
-      dispatch({ type: 'saving' });
-      const result = await submitShowcaseForReviewAction({ itemId: saved.id, expectedReviewVersion: saved.reviewVersion });
+      const attempt = submissionAttemptRef.current;
+      const result = await submitShowcaseForReviewAction(attempt);
       if (!result.success) {
-        dispatch({ type: 'failed', error: result.error, fieldErrors: result.fieldErrors });
-        return false;
+        // Auth/permission/conflict errors on a retry cannot tell us whether the
+        // earlier request committed. Confirm the current workflow before unlocking.
+        const current = await getShowcaseSubmissionStateAction(attempt.itemId).catch(() => null);
+        if (mayResumeAfterSubmissionRejection(result.code, attempt, current)) {
+          try { clearSubmissionAttempt(window.localStorage, accountId, attempt); } catch {}
+          submissionAttemptRef.current = null; setSubmissionPending(false);
+        }
+        dispatch({ type: 'failed', error: result.error, fieldErrors: result.fieldErrors }); return false;
       }
+      try { clearSubmissionAttempt(window.localStorage, accountId, attempt); } catch {}
+      submissionAttemptRef.current = null; setSubmissionPending(false);
+      coordinator.dispose();
       await notifySuccess('Đã gửi công trình để xét duyệt.');
-      router.replace('/dashboard');
-      return true;
+      router.replace('/my-works'); return true;
     } catch {
-      dispatch({ type: 'failed', error: 'Không gửi được bài. Bản nháp đã lưu vẫn được giữ lại.' });
-      return false;
-    } finally { busyRef.current = false; }
-  }, [saveDraft, router, state.data]);
+      dispatch({ type: 'failed', error: 'Chưa xác nhận được kết quả gửi bài. Bấm “Thử gửi lại” để kiểm tra; bản nháp đã lưu vẫn được giữ.' }); return false;
+    } finally { busyRef.current = false; setSubmitting(false); }
+  }, [router, accountId]);
 
-  return { state, updateField, saveDraft, submitForReview };
+  return { state, updateField, saveDraft, submitForReview, ready, submitting, submissionPending, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice,
+    activeRecovery: state.saveState === 'conflict' || storageError ? activeRecordRef.current : null };
 }

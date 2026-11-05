@@ -1,3 +1,5 @@
+export const metadata = { title: 'Liên hệ' };
+
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import {
 ExternalLink,

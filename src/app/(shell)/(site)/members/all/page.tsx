@@ -5,7 +5,7 @@ import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 
 
 export const metadata = {
-  title: 'Tất cả thành viên - CLB Robotics & IoT - HCMUS',
+  title: 'Tất cả thành viên',
   description: 'Danh sách thành viên CLB Robotics & IoT - HCMUS.',
 };
 

@@ -10,13 +10,13 @@ const budgetMs = Number(process.env.PERF_PAGE_BUDGET_MS ?? 2000);
 if (!Number.isFinite(budgetMs) || budgetMs <= 0) throw Error('Invalid page budget.');
 const adminLogin = process.argv.includes('--admin');
 const prisma = new PrismaClient({ log: [] });
-const routes = ['/', '/category/bai-bao-khoa-hoc', '/category/robotics-iot', '/members', '/members/all', '/contact', '/login'];
+const routes = ['/', '/research', '/projects', '/members', '/members/all', '/contact', '/login'];
 const skipped = [];
 let browser;
 try {
   const item = await prisma.showcaseItem.findFirst({ where: { status: 'PUBLISHED', visibility: 'PUBLIC' }, select: { id: true, slug: true } });
   const member = await prisma.user.findFirst({ where: { status: 'ACTIVE', deletedAt: null, role: { in: ['ADMIN', 'CORE_MEMBER', 'MEMBER'] } }, select: { id: true } });
-  if (item) routes.push(`/showcase/${item.slug}`);
+  if (item) routes.push(`/works/${item.slug}`);
   else skipped.push('Publication detail: no public sample.');
   if (member) routes.push(`/members/${member.id}`);
   else skipped.push('Member detail: no active sample.');
@@ -34,10 +34,10 @@ try {
       await page.waitForURL(url => url.pathname !== '/login', { timeout: 15000 });
       storageState = await login.storageState();
     } finally { await login.close(); }
-    routes.push('/account/change-password', '/dashboard', '/dashboard/items/new', '/admin', '/admin/members', '/admin/reviews');
+    routes.push('/account/change-password', '/my-works', '/my-works/new', '/admin', '/admin/members', '/admin/reviews');
     if (item) routes.push(`/admin/reviews/${item.id}`, `/admin/reviews/${item.id}/preview`);
     const draft = await prisma.showcaseItem.findFirst({ where: { creator: { role: 'ADMIN', email: process.env.BOOTSTRAP_ADMIN_EMAIL }, status: { in: ['DRAFT', 'REVISION_REQUESTED'] } }, select: { id: true } });
-    if (draft) routes.push(`/dashboard/items/${draft.id}/edit`);
+    if (draft) routes.push(`/my-works/${draft.id}/edit`);
     else skipped.push('Editor: no editable draft owned by configured admin; no data created.');
   } else skipped.push('Authenticated pages: rerun with --admin using configured local admin.');
   const samples = [];

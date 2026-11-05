@@ -190,6 +190,7 @@ model User {
   role               Role       @default(GUEST)
   status             UserStatus @default(PENDING)
   mustChangePassword Boolean    @default(false)
+  temporaryPasswordConsumed Boolean @default(false)
   hiddenFromDirectory Boolean   @default(false)
   sessionVersion     Int        @default(1)
   deletedAt          DateTime?
@@ -369,4 +370,17 @@ model ItemAttachment {
   item ShowcaseItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@map("item_attachments")
+}
+
+// Receipts carry no media-bearing snapshot: asset references stay in authorDraft.
+model DraftMutation {
+  actorId String
+  mutationId String
+  operation String
+  payloadHash String
+  response Json
+  createdAt DateTime @default(now())
+
+  @@id([actorId, mutationId])
+  @@map("draft_mutations")
 }

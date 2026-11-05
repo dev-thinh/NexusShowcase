@@ -46,6 +46,25 @@ const editingBlock = z.discriminatedUnion('kind', [
 ]);
 const editingDocument = z.object({ version: z.literal(1), sections: z.array(z.object({ id: z.string(), title: z.string(), blocks: z.array(editingBlock) }).strict()) }).strict();
 
+/** Validate the editing structure, without normalizing unfinished text or URLs. */
+export function draftArticleIssues(content: string): { path: (string | number)[]; message: string }[] {
+  if (!content.startsWith(ARTICLE_PREFIX)) return [];
+  try {
+    const result = editingDocument.safeParse(JSON.parse(content.slice(ARTICLE_PREFIX.length)));
+    if (result.success) return articleContentIssues(content).filter(issue => {
+      if (issue.path.at(-1) !== 'url') return true;
+      const block = result.data.sections[Number(issue.path[1])]?.blocks[Number(issue.path[3])];
+      if (!block || block.kind === 'TEXT') return true;
+      const url = String(block.url).trim();
+      // Incomplete HTTP input is fine. Dangerous schemes, ambiguous local
+      // references and the existing URL length bound still reject persistence.
+      return String(block.url).length > 2048 || (url.startsWith('/') ? !assetUrl.safeParse(url).success
+        : /^[a-z][a-z\d+.-]*:/i.test(url) && !/^https?:/i.test(url));
+    });
+    return result.error.issues.map(issue => ({ path: issue.path as (string | number)[], message: 'Cấu trúc nội dung không hợp lệ.' }));
+  } catch { return [{ path: [], message: 'Không đọc được nội dung bản nháp.' }]; }
+}
+
 export function parseArticleContent(content?: string | null): ArticleDocument | null {
   if (!content?.startsWith(ARTICLE_PREFIX)) return null;
   try {

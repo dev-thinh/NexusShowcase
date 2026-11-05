@@ -31,9 +31,9 @@ for (const width of [320, 375, 390, 768, 900]) {
     expect(art!.y + art!.height).toBeLessThanOrEqual(844);
 
     await page.screenshot({ path: `test-results/home-mobile-${width}.png` });
-    for (const route of ['/', '/explore', '/members', '/contact', '/login', '/category/robotics-iot']) {
+    for (const route of ['/', '/explore', '/members', '/contact', '/login', '/projects']) {
       if (route !== '/') await page.goto(route);
-      const destination = route === '/explore' ? '/category/bai-bao-khoa-hoc' : route;
+      const destination = route === '/explore' ? '/research' : route;
       await expect(page).toHaveURL(url => url.pathname === destination);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       const brandElement = page.locator('.site-brand');

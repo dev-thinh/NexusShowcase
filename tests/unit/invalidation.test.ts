@@ -6,8 +6,8 @@ beforeEach(() => vi.clearAllMocks());
 it('invalidates affected publication and member pages without duplicates', () => {
   invalidatePublicationChange({ kind: 'PUBLICATION', slugs: ['paper', 'paper'], memberIds: ['member-1'] });
   const paths = cache.revalidatePath.mock.calls.map(([value]) => value);
-  expect(paths).toEqual(expect.arrayContaining(['/showcase/paper', '/members/member-1', '/', '/members', '/admin/reviews']));
-  expect(paths.filter(path => path === '/showcase/paper')).toHaveLength(1);
+  expect(paths).toEqual(expect.arrayContaining(['/works/paper', '/members/member-1', '/', '/members', '/admin/reviews']));
+  expect(paths.filter(path => path === '/works/paper')).toHaveLength(1);
 });
 it('reports cache errors without converting a committed command into failure', () => {
   const log = vi.spyOn(console, 'error').mockImplementation(() => {});

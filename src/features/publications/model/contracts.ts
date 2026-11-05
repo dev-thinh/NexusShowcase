@@ -7,6 +7,7 @@ export type CitationDto = CitationItem;
 export function toCitationDto(item: CitationDto): CitationDto {
   return {
     citationEnabled: item.citationEnabled,
+    conference: item.conference,
     title: item.title,
     slug: item.slug,
     publishedYear: item.publishedYear,

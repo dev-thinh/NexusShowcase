@@ -37,6 +37,7 @@ export async function changePassword(actor: Actor, input: ChangePasswordInput) {
     data: {
       passwordHash: newHash,
       mustChangePassword: false,
+      temporaryPasswordConsumed: false,
       sessionVersion: { increment: 1 },
     },
   });

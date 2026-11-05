@@ -18,7 +18,7 @@ describe('member workflow dashboard', () => {
   });
 
   it('loads only author-facing comments for the edit route', () => {
-    const route = read('src/app/(shell)/(account)/dashboard/items/[id]/edit/page.tsx');
+    const route = read('src/app/(shell)/(account)/my-works/[id]/edit/page.tsx');
     expect(route).toContain("audience: 'AUTHOR'");
     expect(route).not.toContain("audience: 'EDITORIAL'");
     expect(route).toContain('reviewComments');

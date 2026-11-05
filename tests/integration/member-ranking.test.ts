@@ -1,4 +1,5 @@
 import { searchContributors } from '@/features/identity/server/member-search-action';
+import { selectedContributors } from '@/features/identity/server/selected-contributors';
 import { listDirectory } from '@/features/members/server/queries';
 import { beforeAll, expect, it, vi } from 'vitest';
 import { prisma } from '../fixtures/database';
@@ -8,6 +9,7 @@ let expected: string[];
 beforeAll(async () => {
   const names = ['An', 'Án', 'Anh', 'Ân', 'Bình', 'Dang', 'Đặng', 'Nguyễn', 'Nguyễn'];
   const users = await Promise.all(names.map((fullName, index) => prisma.user.create({ data: { email: `ranking-${index}@nexus.test`, fullName, role: 'MEMBER', status: 'ACTIVE', studentId: 'secret-student', passwordHash: 'secret-hash' } })));
+  await prisma.user.create({ data: { email: 'hidden-ranking@nexus.test', fullName: 'Nguyễn Hidden Admin', role: 'ADMIN', status: 'ACTIVE', hiddenFromDirectory: true } });
   await prisma.user.create({ data: { email: 'deleted-ranking@nexus.test', fullName: 'Excluded', role: 'MEMBER', status: 'ACTIVE', deletedAt: new Date() } });
   for (const [index, count, visibility] of [[0, 1, 'PUBLIC'], [1, 2, 'PRIVATE']] as const) {
     for (let run = 0; run < count; run++) await prisma.showcaseItem.create({ data: { title: 'Ranking item', slug: `${index}-${run}`, summary: '', creatorId: users[index].id, status: 'PUBLISHED', visibility, contributors: { create: { userId: users[index].id, role: 'CONTRIBUTOR' } } } });
@@ -42,4 +44,16 @@ it('returns the complete public role directory without honoring stale page param
   expect(result.page).toBe(1);
   expect(result.totalPages).toBe(1);
   expect(JSON.stringify(result.items)).not.toContain('secret-');
+});
+
+it('excludes hidden admins from empty/name searches, counts and selected contributor hydration', async () => {
+  session.allowed = true;
+  const hidden = await prisma.user.findUniqueOrThrow({ where: { email: 'hidden-ranking@nexus.test' } });
+  for (const q of ['', 'nguyen', 'Hidden Admin']) {
+    const result = await searchContributors({ q, page: 1 });
+    if (!result.success) throw Error(result.error);
+    expect(result.data.items.some(member => member.id === hidden.id)).toBe(false);
+    expect(result.data.total).toBe(q === '' ? 9 : q === 'nguyen' ? 2 : 0);
+  }
+  expect(await selectedContributors([hidden.id])).toEqual([]);
 });

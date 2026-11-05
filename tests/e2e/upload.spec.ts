@@ -7,7 +7,7 @@ test('uploads a PDF through a content section and serves the exact bytes only to
   const bytes = Buffer.from(`%PDF-1.4\n% Nexus browser fixture ${randomUUID()}\n%%EOF\n`);
   let storedPath: string | undefined;
   try {
-    await login(page, fixture.users[1], '/dashboard/items/new');
+    await login(page, fixture.users[1], '/my-works/new');
     await page.getByRole('button', { name: 'Thêm section', exact: true }).click();
     const section = page.getByRole('region', { name: 'Section 1', exact: true });
     await section.getByRole('button', { name: 'PDF', exact: true }).click();

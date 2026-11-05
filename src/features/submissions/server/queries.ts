@@ -14,7 +14,7 @@ const authorSelect = {
 
 function workflowWhere(filter: PostFilter): Prisma.ShowcaseItemWhereInput {
   if (filter === 'ALL') return {};
-  if (filter === 'PENDING_REVIEW') return { OR: [{ status: { in: ['PENDING_REVIEW', 'READY_FOR_APPROVAL'] } }, { status: 'PUBLISHED', reviewStatus: 'PENDING_REVIEW' }] };
+  if (filter === 'PENDING_REVIEW') return { OR: [{ status: { in: ['PENDING_REVIEW', 'READY_FOR_APPROVAL'] } }, { status: 'PUBLISHED', reviewStatus: { in: ['PENDING_REVIEW', 'READY_FOR_APPROVAL'] } }] };
   if (filter === 'REVISION_REQUESTED' || filter === 'REJECTED') return { OR: [{ status: filter }, { reviewStatus: filter }] };
   return { status: filter };
 }
@@ -29,7 +29,7 @@ export async function listAuthorItems(input: { actor: Actor; filter: PostFilter;
   // Accent folding happens in PostgreSQL; only IDs for the requested page are hydrated.
   if (input.q.trim()) {
     const workflow = input.filter === 'ALL' ? Prisma.sql`TRUE`
-      : input.filter === 'PENDING_REVIEW' ? Prisma.sql`(status::text IN ('PENDING_REVIEW', 'READY_FOR_APPROVAL') OR (status = 'PUBLISHED' AND "reviewStatus" = 'PENDING_REVIEW'))`
+      : input.filter === 'PENDING_REVIEW' ? Prisma.sql`(status::text IN ('PENDING_REVIEW', 'READY_FOR_APPROVAL') OR (status = 'PUBLISHED' AND "reviewStatus"::text IN ('PENDING_REVIEW', 'READY_FOR_APPROVAL')))`
       : input.filter === 'REVISION_REQUESTED' || input.filter === 'REJECTED' ? Prisma.sql`(status::text = ${input.filter} OR "reviewStatus"::text = ${input.filter})`
       : Prisma.sql`status::text = ${input.filter}`;
     const actorScope = Prisma.sql`("creatorId" = ${input.actor.id} OR EXISTS (SELECT 1 FROM item_contributors c WHERE c."itemId" = showcase_items.id AND c."userId" = ${input.actor.id}))`;

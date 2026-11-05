@@ -69,6 +69,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const isPasswordMatch = await bcrypt.compare(parsed.data.password, user.passwordHash);
         if (!isPasswordMatch) return null;
 
+        // Atomically spend temporary credentials before issuing a session. Keep
+        // the hash solely so the authenticated owner can change that password.
+        if (user.mustChangePassword) {
+          const claimed = await prisma.user.updateMany({
+            where: { id: user.id, passwordHash: user.passwordHash, sessionVersion: user.sessionVersion, status: 'ACTIVE', deletedAt: null, mustChangePassword: true, temporaryPasswordConsumed: false },
+            data: { temporaryPasswordConsumed: true, sessionVersion: { increment: 1 } },
+          });
+          if (claimed.count !== 1) return null;
+          user.sessionVersion += 1;
+        }
+
         return {
           id: user.id,
           email: user.email,

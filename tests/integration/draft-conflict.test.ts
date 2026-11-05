@@ -23,3 +23,66 @@ it('allows only one concurrent save for the same observed version', async () => 
   expect(results.filter(result => result.success)).toHaveLength(1);
   expect(results.find(result => !result.success)).toMatchObject({ code: 'CONFLICT' });
 });
+
+it('creates once and replays acknowledged saves without a second version increment', async () => {
+  const { createShowcaseDraftAction } = await import('@/features/submissions/server/actions');
+  const mutationId = crypto.randomUUID();
+  const first = await createShowcaseDraftAction({ mutationId });
+  expect(first.success).toBe(true);
+  expect(await createShowcaseDraftAction({ mutationId })).toEqual(first);
+  if (!first.success) throw Error('Creation failed');
+  const input = { itemId: first.data.id, expectedReviewVersion: 0, mutationId: crypto.randomUUID(), draft: { title: '', summary: '  unfinished  ', resources: [{ kind: 'LINK', label: '', url: 'https://', linkType: 'GITHUB' }] } };
+  const saved = await saveShowcaseDraftAction(input);
+  expect(saved).toMatchObject({ success: true, data: { reviewVersion: 1 } });
+  expect(await saveShowcaseDraftAction(input)).toEqual(saved);
+  expect(await saveShowcaseDraftAction({ ...input, draft: { title: 'Different payload' } })).toMatchObject({ success: false, code: 'CONFLICT' });
+  const row = await prisma.showcaseItem.findUniqueOrThrow({ where: { id: first.data.id } });
+  expect(row.authorDraft).toMatchObject(input.draft);
+  expect(row.reviewVersion).toBe(1);
+  expect(await submitShowcaseForReviewAction({ itemId: row.id, expectedReviewVersion: 1 })).toMatchObject({ success: false, code: 'VALIDATION' });
+});
+
+it('serializes duplicate creation requests and isolates receipts by actor', async () => {
+ const {createShowcaseDraftAction}=await import('@/features/submissions/server/actions');
+ const mutationId=crypto.randomUUID();
+ const [first,second]=await Promise.all([createShowcaseDraftAction({mutationId}),createShowcaseDraftAction({mutationId})]);
+ expect(first).toEqual(second); if(!first.success) throw Error('Creation failed');
+ const originalActor=session.id;
+ const other=await prisma.user.create({data:{email:'other-versioned@nexus.test',fullName:'Other',role:'CORE_MEMBER',status:'ACTIVE'}});
+ try {
+  session.id=other.id;
+  const own=await createShowcaseDraftAction({mutationId});
+  expect(own.success).toBe(true); if(!own.success) throw Error(own.error);
+  expect(own.data.id).not.toBe(first.data.id);
+  expect(await saveShowcaseDraftAction({itemId:first.data.id,expectedReviewVersion:0,mutationId:crypto.randomUUID(),draft:{title:'Forged'}})).toMatchObject({success:false,code:'FORBIDDEN'});
+ } finally {session.id=originalActor;}
+ const item=await prisma.showcaseItem.findUniqueOrThrow({where:{id:first.data.id}});
+ expect(item.authorDraft).toMatchObject({title:'',citationEnabled:false,contributors:[{userId:originalActor,role:'CONTRIBUTOR',displayOrder:0}]});
+});
+
+it('submits a legacy draft with no author snapshot using its existing fields and relations', async () => {
+ const category=await prisma.category.create({data:{slug:'robotics-iot',name:'Project'}});
+ const item=await prisma.showcaseItem.create({data:{creatorId:session.id,slug:'legacy-versioned',title:'Legacy',summary:'Legacy summary',categoryId:category.id,contributors:{create:{userId:session.id,role:'CONTRIBUTOR'}}}});
+ expect(await submitShowcaseForReviewAction({itemId:item.id,expectedReviewVersion:0})).toMatchObject({success:true});
+ expect((await prisma.submissionRevision.findFirstOrThrow({where:{itemId:item.id}})).snapshot).toMatchObject({title:'Legacy',summary:'Legacy summary'});
+});
+it('replays a committed submission without duplicating review history',async()=>{
+ const category=await prisma.category.findUniqueOrThrow({where:{slug:'robotics-iot'}});
+ const item=await prisma.showcaseItem.create({data:{creatorId:session.id,slug:'idempotent-submit',title:'Ready',summary:'Summary',categoryId:category.id,contributors:{create:{userId:session.id,role:'CONTRIBUTOR'}}}});
+ const input={itemId:item.id,expectedReviewVersion:0,mutationId:crypto.randomUUID()};
+ const submitted=await submitShowcaseForReviewAction(input);
+ expect(submitted.success).toBe(true);
+ expect(await submitShowcaseForReviewAction(input)).toEqual(submitted);
+ expect(await prisma.submissionRevision.count({where:{itemId:item.id}})).toBe(1);
+ expect(await prisma.auditEvent.count({where:{itemId:item.id,action:'SUBMITTED_FOR_REVIEW'}})).toBe(1);
+});
+it('shows and allows withdrawal of legacy published updates ready for approval',async()=>{
+ const item=await prisma.showcaseItem.create({data:{creatorId:session.id,slug:'legacy-ready-published',title:'Đề tài Legacy',summary:'Summary',status:'PUBLISHED',reviewStatus:'READY_FOR_APPROVAL'}});
+ const {listReviewQueue}=await import('@/features/review/server/queries');
+ const {listAuthorItems}=await import('@/features/submissions/server/queries');
+ expect((await listReviewQueue(1,'de tai')).items.some(row=>row.id===item.id)).toBe(true);
+ expect((await listAuthorItems({actor:{id:session.id,fullName:'Author',status:'ACTIVE',role:'CORE_MEMBER',mustChangePassword:false},filter:'PENDING_REVIEW',q:'',page:1})).items.some(row=>row.id===item.id)).toBe(true);
+ const {withdrawSubmissionAction}=await import('@/features/submissions/server/actions');
+ expect(await withdrawSubmissionAction(item.id,0)).toMatchObject({success:true});
+ expect((await prisma.showcaseItem.findUniqueOrThrow({where:{id:item.id}})).reviewStatus).toBe('DRAFT');
+});

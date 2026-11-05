@@ -40,3 +40,9 @@ describe('Academic Citation Generator', () => {
     expect(ieee).toContain('IEEE International Conference on Research 2026, 2026.');
   });
 });
+
+it('cites the published paper URL and venue instead of the showcase URL', () => {
+  const paper = { title: 'Research', slug: 'research', contributors: [], conference: { name: 'Journal of Robotics', status: 'PUBLISHED', publicationDate: '2025-01-01', rankings: [], paperUrl: 'https://doi.org/10.1234/paper' } };
+  expect(generateBibTeX(paper)).toContain('url = {https://doi.org/10.1234/paper}');
+  expect(generateAPA(paper)).toContain('(2025). Research. Journal of Robotics. https://doi.org/10.1234/paper');
+});

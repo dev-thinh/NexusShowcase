@@ -3,7 +3,7 @@ import { expect, openPublicNavigation, test } from './fixtures';
 for (const width of [320, 390, 1440]) {
   test(`publication tabs are removed and contact details are updated at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
-    for (const path of ['/category/bai-bao-khoa-hoc', '/category/robotics-iot']) {
+    for (const path of ['/research', '/projects']) {
       await page.goto(path);
       await expect(page.getByRole('search')).toBeVisible();
       await expect(page.getByRole('navigation', { name: 'Chuyên mục công trình', exact: true })).toHaveCount(0);
@@ -13,8 +13,8 @@ for (const width of [320, 390, 1440]) {
     }
     await openPublicNavigation(page);
     const menu = page.getByRole('navigation', { name: 'Điều hướng chính', exact: true });
-    await expect(menu.getByRole('link', { name: 'Nghiên cứu khoa học', exact: true })).toHaveAttribute('href', '/category/bai-bao-khoa-hoc');
-    await expect(menu.getByRole('link', { name: 'Dự án & Sản phẩm', exact: true })).toHaveAttribute('href', '/category/robotics-iot');
+    await expect(menu.getByRole('link', { name: 'Nghiên cứu khoa học', exact: true })).toHaveAttribute('href', '/research');
+    await expect(menu.getByRole('link', { name: 'Dự án & Sản phẩm', exact: true })).toHaveAttribute('href', '/projects');
     await page.goto('/contact');
     await expect(page.getByRole('heading', { name: 'CLB Robotics - IoT, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM', exact: true })).toBeVisible();
     await expect(page.getByText('Phòng i86, Tòa nhà i, 227 Nguyễn Văn Cừ, Phường Chợ Quán, TP.HCM', { exact: true })).toBeVisible();

@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, expect, it, vi } from 'vitest';
-import AdminContentPage from '@/app/(shell)/(account)/admin/content/page';
+import AdminContentPage from '@/app/(shell)/(account)/admin/works/page';
 const mocks = vi.hoisted(() => ({ actor: vi.fn(), search: vi.fn() }));
 vi.mock('@/features/identity/server/actor', () => ({ getActor: mocks.actor }));
 vi.mock('@/features/publications/server/bulk-actions', () => ({ searchBulkPostsAction: mocks.search }));

@@ -13,7 +13,7 @@ describe('data loading boundaries', () => {
     expect(fs.readFileSync('src/app/(shell)/loading.tsx', 'utf8')).not.toContain('Navbar');
     expect(fs.existsSync('src/app/category/loading.tsx')).toBe(false);
     expect(fs.existsSync('src/app/members/loading.tsx')).toBe(false);
-    const category = fs.readFileSync('src/app/(shell)/(site)/category/[slug]/page.tsx', 'utf8');
+    const category = fs.readFileSync('src/features/publications/components/category-page.tsx', 'utf8');
     const members = fs.readFileSync('src/app/(shell)/(site)/members/page.tsx', 'utf8');
     expect(category).toContain('fallback={<LoadingCards />}><CategoryResults />');
     expect(members).toContain('<Suspense fallback=');
