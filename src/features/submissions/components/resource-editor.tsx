@@ -1,7 +1,8 @@
 'use client';
 
 import { SubmissionField } from './submission-field';
-import { uploadFileAction } from '@/features/assets/server/actions';
+import { uploadFile } from '@/shared/lib/upload-file';
+import type { UploadedAsset } from '@/features/assets/model/contracts';
 import type { SubmissionResource } from '@/features/submissions/model/snapshot';
 import { Github, Trash2 } from 'lucide-react';
 import { useRef, useState } from 'react';
@@ -31,7 +32,7 @@ export function ResourceEditor({ value, onChange, onBusy, errors = {} }: { error
       const data = new FormData();
       data.append('file', file);
       data.append('type', 'resource');
-      const result = await uploadFileAction(data);
+      const result = await uploadFile<UploadedAsset>(data);
       if (!result.success) { setMessage(result.error ?? 'Tải lên thất bại.'); return; }
       const label = value[index].label.trim() || result.data.fileName || file.name;
       update(index, { url: result.data.url, label, fileName: label, fileSize: result.data.fileSize, mimeType: result.data.mimeType });

@@ -2,6 +2,7 @@ import { beforeEach, expect, it, vi } from 'vitest';
 import { NextRequest } from 'next/server';
 const mocks = vi.hoisted(() => ({ actor: vi.fn(), upload: vi.fn(), rate: vi.fn() }));
 vi.mock('@/features/identity/server/actor', () => ({ getActor: mocks.actor }));
+vi.mock('@/features/assets/server/avatar-actions', () => ({ uploadAvatarAction: vi.fn() }));
 vi.mock('@/features/assets/server/actions', () => ({ uploadFileAction: mocks.upload }));
 vi.mock('@/features/identity/server/rate-limit', () => ({ consumeRateLimit: mocks.rate }));
 import { POST } from '@/app/api/upload/route';
@@ -10,7 +11,7 @@ beforeEach(() => { vi.clearAllMocks(); mocks.rate.mockResolvedValue({ allowed: t
 it('rejects excessive uploads before parsing and provides Retry-After', async () => {
   mocks.rate.mockResolvedValue({ allowed: false, retryAfterSeconds: 30 });
   const parse = vi.fn();
-  const response = await POST({ formData: parse } as never);
+  const response = await POST({ nextUrl: new URL('http://localhost/api/upload'), formData: parse } as never);
   expect(response.status).toBe(429);
   expect(response.headers.get('Retry-After')).toBe('30');
   expect(parse).not.toHaveBeenCalled();
@@ -19,7 +20,7 @@ it('rejects excessive uploads before parsing and provides Retry-After', async ()
 it('rejects anonymous requests before reading multipart data', async () => {
   mocks.actor.mockResolvedValue(null);
   const parse = vi.fn(async () => new FormData());
-  const response = await POST({ formData: parse } as never);
+  const response = await POST({ nextUrl: new URL('http://localhost/api/upload'), formData: parse } as never);
   expect(response.status).toBe(403);
   expect(parse).not.toHaveBeenCalled();
   expect(mocks.upload).not.toHaveBeenCalled();
@@ -47,4 +48,23 @@ it('accepts valid authenticated multipart uploads through the existing validatio
   expect(response.status).toBe(200);
   expect(mocks.upload).toHaveBeenCalledOnce();
   expect(mocks.upload.mock.calls[0][0].get('file').size).toBe(4);
+});
+
+it('accepts member avatar uploads without granting general file upload permission', async () => {
+  mocks.actor.mockResolvedValue({ id: 'member', role: 'MEMBER' });
+  const { uploadAvatarAction } = await import('@/features/assets/server/avatar-actions');
+  vi.mocked(uploadAvatarAction).mockResolvedValue({ success: true, data: { url: '/uploads/thumbnails/avatar.png', fileName: 'avatar.png', fileSize: 5, mimeType: 'image/png' } });
+  const data = new FormData(); data.set('file', new File(['image'], 'avatar.png', { type: 'image/png' }));
+  const response = await POST(new NextRequest('http://localhost/api/upload?target=avatar', { method: 'POST', body: data, headers: { Origin: 'http://localhost' } }));
+  expect(response.status).toBe(200);
+  expect(mocks.actor).toHaveBeenCalledWith();
+  expect(uploadAvatarAction).toHaveBeenCalledOnce();
+  expect(mocks.upload).not.toHaveBeenCalled();
+});
+
+it('rejects a cross-origin avatar request before uploading', async () => {
+  const response = await POST(new NextRequest('http://localhost/api/upload?target=avatar', { method: 'POST', headers: { Origin: 'https://other.example' } }));
+  expect(response.status).toBe(403);
+  const { uploadAvatarAction } = await import('@/features/assets/server/avatar-actions');
+  expect(uploadAvatarAction).not.toHaveBeenCalled();
 });

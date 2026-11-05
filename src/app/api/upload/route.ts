@@ -1,4 +1,5 @@
 import { uploadFileAction } from '@/features/assets/server/actions';
+import { uploadAvatarAction } from '@/features/assets/server/avatar-actions';
 import { getActor } from '@/features/identity/server/actor';
 import { consumeRateLimit } from '@/features/identity/server/rate-limit';
 import { NextRequest, NextResponse } from 'next/server';
@@ -10,9 +11,10 @@ const tooLarge = () => NextResponse.json({ error: 'Dữ liệu tải lên quá l
 
 export async function POST(req: NextRequest) {
   try {
-    const actor = await getActor(['CORE_MEMBER', 'ADMIN']);
+    const avatar = req.nextUrl.searchParams.get('target') === 'avatar';
+    const actor = avatar ? await getActor() : await getActor(['CORE_MEMBER', 'ADMIN']);
     if (!actor) {
-      return NextResponse.json({ error: 'Chỉ Trưởng nhóm và Ban chủ nhiệm được tải tệp.', code: 'UNAUTHORIZED' }, { status: 403 });
+      return NextResponse.json({ error: avatar ? 'Vui lòng đăng nhập để đổi ảnh đại diện.' : 'Chỉ Trưởng nhóm và Ban chủ nhiệm được tải tệp.', code: 'UNAUTHORIZED' }, { status: 403 });
     }
     const throttle = await consumeRateLimit({ scope: 'upload-request', key: actor.id, limit: 60, windowMs: 60_000 });
     if (!throttle.allowed) return NextResponse.json({ error: 'Bạn tải tệp quá nhanh. Vui lòng thử lại sau.', code: 'RATE_LIMITED' }, { status: 429, headers: { 'Retry-After': String(throttle.retryAfterSeconds) } });
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest) {
       if (oversized) return tooLarge();
       return NextResponse.json({ error: 'Dữ liệu tải lên không hợp lệ.', code: 'VALIDATION' }, { status: 400 });
     }
-    const result = await uploadFileAction(formData);
+    const result = avatar ? await uploadAvatarAction(formData) : await uploadFileAction(formData);
 
     if (!result.success) {
       const status =

@@ -41,8 +41,8 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
   const [preview, setPreview] = useState(false);
   const [uploads, setUploads] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
+  const busy = !ready || submitting || recoveries.length > 0 || submissionPending;
   const actionDisabled = !ready || submitting || recoveries.length > 0 || uploads > 0;
-  const busy = actionDisabled || submissionPending;
   useEffect(() => {
     if (!state.formError) return;
     setPreview(false);
@@ -63,6 +63,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
       {activeRecovery && <><details className="px-4 py-3 text-sm sm:px-8"><summary className="cursor-pointer">Xem nội dung chưa lưu</summary><DraftRecoveryPanel records={[activeRecovery]} serverVersion={-1} /></details><p className="px-4 py-3 text-sm sm:px-8">Giữ bản sao trước khi <button type="button" className="underline" onClick={() => window.location.reload()}>tải bản mới từ máy chủ</button>.</p></>}
       {storageError && <p role="status" className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm sm:px-8">Chưa giữ được nội dung trên thiết bị. Vui lòng giữ trang mở cho đến khi hiện “Đã lưu”.</p>}
       {saveNotice && <p role="status" className="px-4 py-3 text-sm text-red-700 sm:px-8">{saveNotice}</p>}
+      {uploads > 0 && <p role="status" className="border-b border-slate-200 px-4 py-3 text-sm sm:px-8">Đang tải tệp lên… Bạn có thể tiếp tục nhập thông tin; chờ tải xong trước khi xem trước hoặc gửi duyệt.</p>}
       {reviewComments.length > 0 && <aside aria-label="Yêu cầu chỉnh sửa" className="border-b border-slate-200 bg-[#FFFFFF] px-4 py-4 text-sm text-[#1F2937] sm:px-8"><h2 className="font-semibold">Phản hồi cần xử lý</h2><ul className="mt-2 list-disc space-y-1 pl-5">{reviewComments.filter(comment => comment.audience === 'AUTHOR').map(comment => <li key={comment.id}>{comment.body}</li>)}</ul></aside>}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-8"><p className="text-sm font-semibold text-[#1F2937]">{preview ? 'Bản xem trước · Chưa xuất bản' : 'Workspace soạn thảo'}</p></div>
       {preview ? <div className="space-y-8 p-4 sm:p-8">
@@ -88,15 +89,15 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
             <section className="mt-7 border-t border-slate-200 pt-6" aria-labelledby="submission-resources-title">
               <h2 id="submission-resources-title" className="text-lg font-semibold text-[#1F2937]">Tài nguyên đính kèm</h2>
               <ReviewComments comments={reviewComments} fieldKey="resources" />
-              <ResourceEditor errors={state.fieldErrors} value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} />
+              <fieldset disabled={uploads > 0} className="min-w-0"><ResourceEditor errors={state.fieldErrors} value={state.data.resources ?? []} onChange={value => updateField('resources', value)} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} /></fieldset>
             </section>
           </div>
         </div>
-        <div className="space-y-5 border-t border-slate-200 p-4 sm:p-8">
+        <fieldset disabled={uploads > 0} className="min-w-0 space-y-5 border-t border-slate-200 p-4 sm:p-8">
           <ReviewComments comments={reviewComments} fieldKey="content" />
           <SectionEditor errors={state.fieldErrors} content={content} resources={[]} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} onChange={value => updateField('content', value)} />
 
-        </div>
+        </fieldset>
 
       </fieldset>}
       {state.formError && !Object.values(state.fieldErrors).some(messages => messages.length) && <p role="alert" tabIndex={-1} data-submit-error className="mx-6 my-3 rounded-md border border-red-500 p-3 text-sm text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">{state.formError}</p>}

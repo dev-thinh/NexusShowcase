@@ -5,6 +5,7 @@ import { usePublicSectionContext } from '@/shared/navigation/public-section-cont
 import { SignOutButton } from '@/features/identity/components/sign-out-button';
 import { getMemberRoleLabel } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
+import { AVATAR_UPDATED_EVENT, type AvatarUpdate } from '@/shared/lib/avatar-update';
 import { canUserReview, canUserUpload } from '@/features/identity/model/permissions';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { useNavigationPathname as usePathname, useNavigationVisualPathname } from '@/shared/navigation/navigation-transition';
@@ -31,6 +32,16 @@ interface NavbarNavProps {
 
 export function NavbarNav({ user }: NavbarNavProps) {
   const pathname = usePathname();
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl);
+  useEffect(() => { setAvatarUrl(user?.avatarUrl); }, [user?.id, user?.avatarUrl]);
+  useEffect(() => {
+    const update = (event: Event) => {
+      const detail = (event as CustomEvent<AvatarUpdate>).detail;
+      if (detail.userId === user?.id) setAvatarUrl(detail.url);
+    };
+    window.addEventListener(AVATAR_UPDATED_EVENT, update);
+    return () => window.removeEventListener(AVATAR_UPDATED_EVENT, update);
+  }, [user?.id]);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -94,7 +105,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
                   : 'bg-white hover:bg-[#FFFFFF] text-[#1F2937] border-slate-200'
               }`}
             >
-              <MemberAvatar fullName={user.name || 'Thành viên'} src={user.avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
+              <MemberAvatar fullName={user.name || 'Thành viên'} src={avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
               <span className="hidden xl:block truncate xl:max-w-[110px] font-semibold">
                 {user.name || 'Thành viên'}
               </span>

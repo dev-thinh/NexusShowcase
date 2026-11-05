@@ -50,3 +50,9 @@ it('does not allow anonymous avatar removal', async () => {
   expect(await removeAvatarAction()).toMatchObject({ success: false, code: 'UNAUTHORIZED' });
   expect(mocks.updateMany).not.toHaveBeenCalled();
 });
+
+it('invalidates avatar pages without invalidating the entire application layout', async () => {
+  await removeAvatarAction();
+  expect(mocks.revalidatePath).not.toHaveBeenCalledWith('/', 'layout');
+  expect(mocks.revalidatePath).toHaveBeenCalledWith('/');
+});
