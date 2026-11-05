@@ -75,6 +75,10 @@ test('admin edits copy in place and visitors see saved content while photo edito
 test('mobile inline editing validates fields, retains failed drafts, resolves conflicts and cancels safely', async ({ page, fixture }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/');
+  const editButton = page.getByRole('button', { name: 'Chỉnh sửa nội dung', exact: true });
+  await expect(editButton).toHaveCSS('width', '48px');
+  await expect(editButton).toHaveCSS('height', '48px');
+  await expect(editButton.locator('span')).toBeHidden();
   await page.getByRole('button', { name: 'Chỉnh sửa nội dung', exact: true }).click();
   const toolbar = page.getByRole('region', { name: 'Chỉnh sửa nội dung Trang chủ', exact: true });
   const title = page.getByRole('textbox', { name: 'Banner — Tiêu đề dòng 1', exact: true });

@@ -1,3 +1,4 @@
+import { MobileArticleContents } from '@/features/submissions/components/mobile-article-contents';
 import { cache } from 'react';
 import type { Metadata } from 'next';
 import { PublicSectionMarker } from '@/shared/navigation/public-section-context';
@@ -182,6 +183,7 @@ export default async function ShowcaseDetailPage({
         </header>
 
         <div className="container mx-auto grid max-w-7xl items-start gap-10 px-4 py-9 sm:px-6 sm:py-10 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-14 lg:px-8">
+          {structured?.sections.length ? <MobileArticleContents><ArticleTableOfContents content={item.content ?? ''} /></MobileArticleContents> : null}
           <article className="min-w-0 space-y-8 sm:space-y-10">
             <ConferenceDetails value={item.conference} />
             <section id="abstract" aria-labelledby="abstract-title" className="scroll-mt-24">
@@ -190,10 +192,6 @@ export default async function ShowcaseDetailPage({
             </section>
 
             <div className="space-y-4 lg:hidden">
-              {structured?.sections.length ? <details className="rounded-lg border border-slate-200 px-4 py-2">
-                <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">Mục lục bài viết</summary>
-                <div className="pb-3"><ArticleTableOfContents content={item.content ?? ''} /></div>
-              </details> : null}
               {mobileResources.length > 0 && <section aria-label="Tài nguyên công trình" className="space-y-2">
                 <ResourceLinks resources={mobileResources} />
               </section>}
