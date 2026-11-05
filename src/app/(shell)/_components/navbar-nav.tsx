@@ -1,5 +1,7 @@
 'use client';
 
+import { publicNavigationSection } from '@/shared/navigation/public-section';
+import { usePublicSectionContext } from '@/shared/navigation/public-section-context';
 import { SignOutButton } from '@/features/identity/components/sign-out-button';
 import { getMemberRoleLabel } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
@@ -174,6 +176,9 @@ const publicLinks = [
 export function PublicNavigation() {
   const pathname = usePathname();
   const visualPathname = useNavigationVisualPathname();
+  const detail = usePublicSectionContext();
+  const activeSection = publicNavigationSection(pathname, detail);
+  const visualSection = publicNavigationSection(visualPathname, detail);
   const [menuOpen, setMenuOpen] = useState(false);
   const shellRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -213,7 +218,7 @@ export function PublicNavigation() {
     <nav id="public-navigation" aria-label="Điều hướng chính" data-open={menuOpen ? 'true' : 'false'} className="site-public-navigation flex flex-nowrap col-start-2 row-start-1 justify-self-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto" onClick={event => {
       if ((event.target as Element).closest('a')) setMenuOpen(false);
     }}>
-      {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualPathname === href ? activeTabClass : inactiveTabClass} aria-current={pathname === href ? 'page' : undefined}><span>{label}</span></Link>)}
+      {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualSection === href ? activeTabClass : inactiveTabClass} aria-current={activeSection === href ? (pathname === href ? 'page' : 'location') : undefined}><span>{label}</span></Link>)}
     </nav>
   </div>;
 }

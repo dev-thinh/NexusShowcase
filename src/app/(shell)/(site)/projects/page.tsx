@@ -1,3 +1,5 @@
+export const metadata = { title: 'Dự án & Sản phẩm' };
+
 import CategoryPage from '@/features/publications/components/category-page';
 
 export const dynamic = 'force-dynamic';

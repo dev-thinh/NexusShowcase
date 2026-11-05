@@ -1,3 +1,7 @@
+import { canReviewItem } from '@/features/submissions/model/workflow-state';
+import { StorageUsage } from '@/features/assets/components/storage-usage';
+export const metadata = { title: 'Quản trị' };
+
 import { ManagementStat } from '@/app/(shell)/_components/management-layout';
 import { getSession as auth } from '@/features/identity/server/session';
 import { StatusBadge } from '@/features/publications/components/badges';
@@ -25,10 +29,11 @@ export default async function AdminDashboardPage() {
       <ManagementStat label="Thành viên hoạt động" value={totalMembers} icon={Users} href="/admin/members" />
       <ManagementStat label="Công trình đang ghim" value={pinnedCount} icon={Pin} href="/admin/works?filter=PINNED" />
     </div>
+    <StorageUsage />
     <h3 className="mb-3 text-base font-semibold text-slate-900">Hoạt động gần đây</h3>
     <div className="panel-operational divide-y divide-slate-100 overflow-hidden !rounded-xl !p-0 !shadow-none">
       {!recent.length ? <p className="p-6 text-sm text-slate-500">Chưa có hoạt động nào.</p> : recent.map(item => {
-        const reviewing = item.status !== 'PUBLISHED' || item.reviewStatus === 'PENDING_REVIEW';
+        const reviewing = canReviewItem(item);
         return <Link key={item.id} href={reviewing ? `/admin/reviews/${item.id}` : `/admin/works?${new URLSearchParams({ q: item.title })}`} scroll={false} className="flex flex-col justify-between gap-2 p-4 hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#153D67]/30 sm:flex-row sm:items-center sm:px-5">
           <span className="min-w-0 flex-1 truncate text-sm font-semibold text-slate-800">{item.title}</span>
           <span className="flex shrink-0 items-center gap-3"><StatusBadge status={item.reviewStatus ?? item.status} size="sm" /><time dateTime={item.updatedAt.toISOString()} className="text-xs text-slate-500">{item.updatedAt.toLocaleDateString('vi-VN')}</time></span>

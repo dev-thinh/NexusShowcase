@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import { SUCCESS_EVENT, type SuccessRequest } from './success';
-import { SuccessNotice } from './success-notice';
+import { CheckCircle2, X } from 'lucide-react';
 
 type DialogApi = {
   confirm: (options: DialogOptions) => Promise<boolean>;
@@ -15,6 +15,8 @@ type DialogApi = {
 const DialogContext = createContext<DialogApi | null>(null);
 
 export function DialogProvider({ children }: { children: ReactNode }) {
+  const [notices, setNotices] = useState<Array<{ id: number; message: string }>>([]);
+  const noticeId = useRef(0);
   const [request, setRequest] = useState<DialogRequest | null>(null);
   const controllerRef = useRef<ReturnType<typeof createDialogController> | null>(null);
   if (!controllerRef.current) controllerRef.current = createDialogController(setRequest);
@@ -25,19 +27,32 @@ export function DialogProvider({ children }: { children: ReactNode }) {
     const success = (event: Event) => {
       event.preventDefault();
       const { message, resolve } = (event as CustomEvent<SuccessRequest>).detail;
-      void controller.open({ mode: 'success', title: 'Thành công', message, confirmLabel: 'Đã hiểu' }).then(resolve);
+      const id = ++noticeId.current;
+      setNotices(current => [...current.slice(-2), { id, message }]);
+      resolve();
     };
     window.addEventListener(SUCCESS_EVENT, success);
     return () => window.removeEventListener(SUCCESS_EVENT, success);
-  }, [controller]);
+  }, []);
+  useEffect(() => {
+    if (!notices.length) return;
+    const timer = setTimeout(() => setNotices(current => current.slice(1)), 8000);
+    return () => clearTimeout(timer);
+  }, [notices]);
   const confirm = useCallback((options: DialogOptions) => controller.open({ ...options, mode: 'confirm' }), [controller]);
   const alert = useCallback(async (options: DialogOptions) => { await controller.open({ ...options, mode: 'alert' }); }, [controller]);
   const api = useMemo(() => ({ confirm, alert }), [confirm, alert]);
 
   return <DialogContext.Provider value={api}>
     {children}
-    {request && createPortal(<Modal isOpen title={request.title} description={request.mode === 'success' ? undefined : request.message} onClose={() => controller.settle(false)} className="!rounded-2xl">
-      {request.mode === 'success' && <SuccessNotice message={request.message} />}
+    {notices.length > 0 && createPortal(<div className="pointer-events-none fixed inset-x-4 bottom-4 z-[100] flex flex-col items-center gap-2 sm:left-auto sm:right-6 sm:max-w-md" aria-live="polite" aria-relevant="additions">
+      {notices.map(notice => <div key={notice.id} role="status" data-success-notice="true" data-success-id={notice.id} className="pointer-events-auto flex w-full items-start gap-3 rounded-xl border border-emerald-200 bg-white p-4 text-sm text-slate-700 shadow-lg">
+        <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-700" aria-hidden="true" />
+        <p className="min-w-0 flex-1 break-words leading-6">{notice.message}</p>
+        <button type="button" aria-label="Đóng thông báo thành công" className="-m-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]" onClick={() => setNotices(current => current.filter(item => item.id !== notice.id))}><X className="h-4 w-4" aria-hidden="true" /></button>
+      </div>)}
+    </div>, document.body)}
+    {request && createPortal(<Modal isOpen title={request.title} description={request.message} onClose={() => controller.settle(false)} className="!rounded-2xl">
       <div className="flex flex-wrap justify-center gap-3">
         {request.mode === 'confirm' && <button type="button" className="action-secondary-detail min-h-11" onClick={() => controller.settle(false)}>{request.cancelLabel ?? 'Hủy'}</button>}
         <button type="button" className={request.destructive

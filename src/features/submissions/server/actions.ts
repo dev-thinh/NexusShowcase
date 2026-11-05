@@ -1,4 +1,6 @@
 'use server';
+import { prisma } from '@/server/db/prisma';
+import { cuidSchema } from '@/shared/lib/validation';
 import { z } from 'zod';
 import { getActor } from '@/features/identity/server/actor';
 import { invalidatePublicationChange } from '@/features/publications/server/invalidation';
@@ -41,4 +43,14 @@ export async function createShowcaseDraftAction(input: { mutationId: string }) {
     title: '', citationEnabled: false,
     contributors: [{ userId: actor.id, role: 'CONTRIBUTOR', displayOrder: 0 }],
   } });
+}
+
+/** Authoritative status only for the authenticated owner; no draft payload returned. */
+export async function getShowcaseSubmissionStateAction(itemId: string) {
+  const actor = await getActor(['CORE_MEMBER', 'ADMIN']);
+  if (!actor || !cuidSchema.safeParse(itemId).success) return null;
+  const item = await prisma.showcaseItem.findUnique({ where: { id: itemId }, select: { creatorId: true, status: true, reviewStatus: true, reviewVersion: true } });
+  if (!item || item.creatorId !== actor.id) return null;
+  const editable = item.status === 'PUBLISHED' ? !['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.reviewStatus ?? '') : ['DRAFT', 'REVISION_REQUESTED'].includes(item.status);
+  return { editable, reviewVersion: item.reviewVersion };
 }

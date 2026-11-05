@@ -18,3 +18,9 @@ export const deleteMemberInputSchema = z.object({ targetUserId: cuidSchema });
 
 
 export type CreateMemberInput = z.input<typeof createMemberInputSchema>;
+
+export const recoverMemberInputSchema = z.object({
+  targetUserId: z.string().trim().min(1).max(200),
+  expectedVersion: z.number().int().positive(),
+});
+export type RecoverMemberInput = z.infer<typeof recoverMemberInputSchema>;

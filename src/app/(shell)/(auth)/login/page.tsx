@@ -14,7 +14,7 @@ function LoginFormFallback() {
 }
 
 export const metadata = {
-  title: 'Đăng nhập - CLB Robotics & IoT - HCMUS',
+  title: 'Đăng nhập',
   description: 'Đăng nhập để chia sẻ công trình và kết nối cùng CLB Robotics & IoT - HCMUS.',
 };
 

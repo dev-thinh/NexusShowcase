@@ -15,7 +15,8 @@ it('searches submitted titles and authors with bound parameters and counts the s
   expect(result).toMatchObject({ total: 1, page: 1, totalPages: 1 });
   expect(db.count).not.toHaveBeenCalled();
   const count = db.raw.mock.calls[0][0], items = db.raw.mock.calls[1][0];
-  expect(count.sql).toContain('title ILIKE'); expect(count.sql).toContain('"creatorName" ILIKE');
-  expect(count.values).toEqual(['%Robot%', '%Robot%']);
-  expect(items.values).toEqual(['%Robot%', '%Robot%', 20, 0]);
+  expect(count.sql).toContain('normalize(lower(title'); expect(count.sql).toContain('"creatorName"');
+  expect(count.sql).toContain('LIKE');
+  expect(count.values.at(-1)).toBe('%robot%');
+  expect(items.values).toEqual([...count.values, 20, 0]);
 });

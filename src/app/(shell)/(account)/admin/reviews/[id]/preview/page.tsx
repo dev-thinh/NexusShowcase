@@ -1,3 +1,5 @@
+export const metadata = { title: 'Xem trước bài duyệt' };
+
 import { getActor } from '@/features/identity/server/actor';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getReviewSnapshot } from '@/features/review/server/review-snapshot';

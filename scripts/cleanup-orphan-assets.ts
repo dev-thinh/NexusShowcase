@@ -4,6 +4,7 @@ import { loadEnvConfig } from '@next/env';
 import { inventoryAssetReferences } from '../src/features/assets/server/references';
 import { planOrphanAssets } from '../src/features/assets/server/orphans';
 import { deleteRegisteredImageKitAsset, getImageKitConfig } from '../src/features/assets/server/imagekit';
+import { deleteRegisteredLocalAsset } from '../src/features/assets/server/local-cleanup';
 import { staticAssetReferences } from './static-asset-references';
 
 /** Dry run by default; --apply requires installed reference guards and claims before deletion. */
@@ -22,8 +23,8 @@ async function main() {
     if (args.includes('--apply')) {
       const guards = await db.$queryRaw<Array<{ count: bigint }>>`SELECT count(*) AS count FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace JOIN pg_proc p ON p.oid=t.tgfoid JOIN pg_namespace pn ON pn.oid=p.pronamespace WHERE n.nspname=current_schema() AND pn.nspname=current_schema() AND p.proname='guard_asset_references' AND tgname IN ('users_asset_guard','showcase_items_asset_guard','item_links_asset_guard','item_attachments_asset_guard','submission_revisions_asset_guard','editorial_drafts_asset_guard','home_moments_gallery_asset_guard') AND tgenabled = 'O' AND NOT tgisinternal`;
       if (Number(guards[0]?.count) !== 7) throw new Error('Reference-write guard migration must be installed before cleanup');
-      const config = getImageKitConfig(true);
-      if (!config) throw new Error('ImageKit configuration required');
+      const config = candidates.some(asset => asset.provider === 'imagekit') ? getImageKitConfig(true) : null;
+      if (candidates.some(asset => asset.provider === 'imagekit') && !config) throw new Error('ImageKit configuration required');
       for (const candidate of candidates) {
         const token = randomUUID();
         const claimed = await db.$transaction(async tx => {
@@ -42,8 +43,9 @@ async function main() {
         (await staticAssetReferences(process.cwd())).forEach(url => recheck.urls.add(url));
         if (recheck.incompleteSources.length || recheck.urls.has(candidate.url)) throw new Error('Claimed asset gained references; retained in quarantine');
         const current = await db.asset.findUnique({ where: { id: candidate.id } });
-        if (!current || current.deletionToken !== token || current.fileId !== candidate.fileId || current.deletedAt) throw new Error('Asset claim changed; deletion refused');
-        await deleteRegisteredImageKitAsset(candidate.fileId!, config);
+        if (!current || current.deletionToken !== token || current.fileId !== candidate.fileId || current.provider !== candidate.provider || current.url !== candidate.url || current.deletedAt) throw new Error('Asset claim changed; deletion refused');
+        if (candidate.provider === 'local') await deleteRegisteredLocalAsset(process.cwd(), candidate.url);
+        else await deleteRegisteredImageKitAsset(candidate.fileId!, config!);
         await db.asset.updateMany({ where: { id: candidate.id, deletionToken: token }, data: { deletedAt: new Date() } });
         deleted++;
       }

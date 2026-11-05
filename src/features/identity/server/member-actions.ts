@@ -1,9 +1,9 @@
 'use server';
 import type { Role } from '@prisma/client';
-import { createMemberInputSchema, deleteMemberInputSchema, userRoleUpdateInputSchema, type CreateMemberInput } from '../model/member-input';
+import { recoverMemberInputSchema, type RecoverMemberInput, createMemberInputSchema, deleteMemberInputSchema, userRoleUpdateInputSchema, type CreateMemberInput } from '../model/member-input';
 import { getActor } from './actor';
 import { invalidateIdentityChange } from './invalidation';
-import { createMember, disableMember, updateMemberRole } from './member-commands';
+import { restoreMember, resetMemberPassword, createMember, disableMember, updateMemberRole } from './member-commands';
 export type { CreateMemberInput } from '../model/member-input';
 const unauthorized = () => ({ success: false as const, code: 'UNAUTHORIZED' as const, error: 'Chỉ Ban chủ nhiệm mới có quyền quản lý tài khoản.' });
 const invalid = () => ({ success: false as const, code: 'VALIDATION' as const, error: 'Thông tin tài khoản không hợp lệ.' });
@@ -32,5 +32,24 @@ export async function deleteMemberAction(targetUserId: string) {
   if (!parsed.success) return invalid();
   const result = await disableMember(actor, targetUserId);
   if (result.success) invalidateIdentityChange([targetUserId]);
+  return result;
+}
+
+export async function restoreMemberAction(input: RecoverMemberInput) {
+  const actor = await getActor(['ADMIN']);
+  if (!actor) return unauthorized();
+  const parsed = recoverMemberInputSchema.safeParse(input);
+  if (!parsed.success) return invalid();
+  const result = await restoreMember(actor, parsed.data);
+  if (result.success) invalidateIdentityChange([parsed.data.targetUserId]);
+  return result;
+}
+export async function resetMemberPasswordAction(input: RecoverMemberInput) {
+  const actor = await getActor(['ADMIN']);
+  if (!actor) return unauthorized();
+  const parsed = recoverMemberInputSchema.safeParse(input);
+  if (!parsed.success) return invalid();
+  const result = await resetMemberPassword(actor, parsed.data);
+  if (result.success) invalidateIdentityChange([parsed.data.targetUserId]);
   return result;
 }

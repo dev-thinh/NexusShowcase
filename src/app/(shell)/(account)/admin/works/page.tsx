@@ -1,3 +1,5 @@
+export const metadata = { title: 'Quản lý công trình' };
+
 import { getActor } from '@/features/identity/server/actor';
 import { ManagementFilters } from '@/shared/ui/management-filters';
 import { AdminBulkPosts } from '@/features/publications/components/admin-bulk-posts';

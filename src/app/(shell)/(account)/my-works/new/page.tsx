@@ -1,3 +1,5 @@
+export const metadata = { title: 'Đăng bài mới' };
+
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { canUserUpload } from '@/features/identity/model/permissions';
 import { getSession as auth } from '@/features/identity/server/session';

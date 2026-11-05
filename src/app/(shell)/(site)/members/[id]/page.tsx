@@ -19,6 +19,14 @@ import { notFound, permanentRedirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const user = await prisma.user.findUnique({ where: { id, status: 'ACTIVE', deletedAt: null }, select: { fullName: true } })
+    ?? await prisma.user.findUnique({ where: { publicSlug: id, status: 'ACTIVE', deletedAt: null }, select: { fullName: true } });
+  if (!user) notFound();
+  return { title: user.fullName };
+}
+
 export default async function MemberProfilePage({
   params, searchParams,
 }: {

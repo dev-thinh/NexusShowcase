@@ -66,3 +66,23 @@ it('submits a legacy draft with no author snapshot using its existing fields and
  expect(await submitShowcaseForReviewAction({itemId:item.id,expectedReviewVersion:0})).toMatchObject({success:true});
  expect((await prisma.submissionRevision.findFirstOrThrow({where:{itemId:item.id}})).snapshot).toMatchObject({title:'Legacy',summary:'Legacy summary'});
 });
+it('replays a committed submission without duplicating review history',async()=>{
+ const category=await prisma.category.findUniqueOrThrow({where:{slug:'robotics-iot'}});
+ const item=await prisma.showcaseItem.create({data:{creatorId:session.id,slug:'idempotent-submit',title:'Ready',summary:'Summary',categoryId:category.id,contributors:{create:{userId:session.id,role:'CONTRIBUTOR'}}}});
+ const input={itemId:item.id,expectedReviewVersion:0,mutationId:crypto.randomUUID()};
+ const submitted=await submitShowcaseForReviewAction(input);
+ expect(submitted.success).toBe(true);
+ expect(await submitShowcaseForReviewAction(input)).toEqual(submitted);
+ expect(await prisma.submissionRevision.count({where:{itemId:item.id}})).toBe(1);
+ expect(await prisma.auditEvent.count({where:{itemId:item.id,action:'SUBMITTED_FOR_REVIEW'}})).toBe(1);
+});
+it('shows and allows withdrawal of legacy published updates ready for approval',async()=>{
+ const item=await prisma.showcaseItem.create({data:{creatorId:session.id,slug:'legacy-ready-published',title:'Đề tài Legacy',summary:'Summary',status:'PUBLISHED',reviewStatus:'READY_FOR_APPROVAL'}});
+ const {listReviewQueue}=await import('@/features/review/server/queries');
+ const {listAuthorItems}=await import('@/features/submissions/server/queries');
+ expect((await listReviewQueue(1,'de tai')).items.some(row=>row.id===item.id)).toBe(true);
+ expect((await listAuthorItems({actor:{id:session.id,fullName:'Author',status:'ACTIVE',role:'CORE_MEMBER',mustChangePassword:false},filter:'PENDING_REVIEW',q:'',page:1})).items.some(row=>row.id===item.id)).toBe(true);
+ const {withdrawSubmissionAction}=await import('@/features/submissions/server/actions');
+ expect(await withdrawSubmissionAction(item.id,0)).toMatchObject({success:true});
+ expect((await prisma.showcaseItem.findUniqueOrThrow({where:{id:item.id}})).reviewStatus).toBe('DRAFT');
+});

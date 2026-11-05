@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({ auth: vi.fn(), userFind: vi.fn(), members: vi.fn(), items: vi.fn(), itemCount: vi.fn(), memberCount: vi.fn(), groups: vi.fn() }));
 vi.mock('server-only', () => ({}));
+vi.mock('@/features/assets/components/storage-usage', () => ({ StorageUsage: () => null }));
 vi.mock('@/features/identity/server/auth', () => ({ auth: mocks.auth }));
 vi.mock('@/server/db/prisma', () => ({ prisma: { user: { groupBy: mocks.groups, findUnique: mocks.userFind, findMany: mocks.members, count: mocks.memberCount }, showcaseItem: { groupBy: mocks.groups, findMany: mocks.items, count: mocks.itemCount } } }));
 vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => <header>CLB Robotics &amp; IoT</header> }));

@@ -70,9 +70,9 @@ async function saveDraftInternal(
 async function submitDraftInternal(user: Actor, input: SubmissionInput): Promise<ActionResult<{ status: string; revisionNumber: number; reviewVersion: number }>> {
   const envelope = submissionEnvelopeSchema.safeParse(input);
   if (!envelope.success) return validationFailure(envelope.error);
-  const { itemId, expectedReviewVersion } = envelope.data;
+  const { itemId, expectedReviewVersion, mutationId } = envelope.data;
   try {
-    const result = await prisma.$transaction(async tx => {
+    const result = await withDraftMutation(user.id, mutationId, 'submit', envelope.data, async tx => {
       const item = await tx.showcaseItem.findUnique({ where: { id: itemId }, include: {
         contributors: { include: { user: { select: { fullName: true } } }, orderBy: { displayOrder: 'asc' } }, links: true, attachments: true,
       } });
@@ -110,7 +110,7 @@ async function submitDraftInternal(user: Actor, input: SubmissionInput): Promise
       await tx.reviewComment.updateMany({ where: { itemId: item.id, status: 'OPEN', audience: 'AUTHOR' }, data: { status: 'RESOLVED', resolvedAt: new Date(), resolvedById: user.id } });
       await tx.auditEvent.create({ data: { itemId: item.id, actorId: user.id, action: 'SUBMITTED_FOR_REVIEW', metadata: { revisionNumber, update: published } } });
       return { success: true, data: { status: 'PENDING_REVIEW', revisionNumber, reviewVersion: item.reviewVersion + 1 } } as const;
-    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+    });
     return result;
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2034') return { success: false, code: 'CONFLICT', error: 'Bài vừa thay đổi. Vui lòng tải lại trang.' };

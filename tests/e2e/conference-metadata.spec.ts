@@ -1,6 +1,6 @@
 import { categoryPagePath } from '../../src/shared/lib/page-urls';
 import { Prisma } from '@prisma/client';
-import { acknowledgeSuccess, expect, login, test } from './fixtures';
+import { expect, login, test } from './fixtures';
 
 const conference = { name: 'Hội nghị Robotics và Hệ thống nhúng quốc tế với tên dài để kiểm tra hiển thị', status: 'ACCEPTED', eventDate: '2027-03-08', acceptedDate: '2026-12-20', rankings: Array.from({ length: 4 }, (_, index) => ({ system: `Hệ thống đánh giá ${index + 1}`, rank: `Hạng ${index + 1}` })) };
 
@@ -19,7 +19,7 @@ test('conference editor preserves both milestone dates and supports research pap
     await page.getByRole('option', { name: researchCategory.name, exact: true }).click();
     await page.getByLabel('Bài có thông tin hội nghị').check();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
     await expect(page.locator('#conference-name')).toHaveValue('');
     await page.locator('#conference-name').fill(conference.name);
     await page.locator('#conference-date').fill(conference.eventDate);
@@ -38,7 +38,7 @@ test('conference editor preserves both milestone dates and supports research pap
     await expect(info).toContainText('08/03/2027');
     await page.getByRole('button', { name: 'Soạn thảo', exact: true }).click();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
     const item = await database.showcaseItem.findFirstOrThrow({ where: { title, creatorId: fixture.users[1].id } });
     itemId = item.id;
     expect(item.conference).toEqual({ ...conference, rankings: conference.rankings.slice(0, 2) });
@@ -58,7 +58,7 @@ test('conference editor preserves both milestone dates and supports research pap
     await expect(info).not.toContainText('20/12/2026');
     await page.getByRole('button', { name: 'Soạn thảo', exact: true }).click();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
     expect((await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id } })).conference).toMatchObject({ status: 'PUBLISHED', acceptedDate: conference.acceptedDate, publicationDate: '2027-03-01' });
     await page.goto(`/my-works/${item.id}/edit`);
     await expect(page.locator('#conference-publication-date')).toHaveValue('2027-03-01');
@@ -67,7 +67,7 @@ test('conference editor preserves both milestone dates and supports research pap
     await expect(page.locator('#conference-accepted-date')).toHaveValue(conference.acceptedDate);
     await page.getByLabel('Bài có thông tin hội nghị').uncheck();
     await page.getByRole('button', { name: 'Lưu bản nháp', exact: true }).click();
-    await acknowledgeSuccess(page, 'Đã lưu bản nháp công trình.');
+    await expect(page.locator('[data-submission-actions]')).toContainText('Đã lưu');
     expect((await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id } })).conference).toBeNull();
   } finally {
     await database.showcaseItem.deleteMany({ where: itemId ? { id: itemId } : { title, creatorId: fixture.users[1].id } });

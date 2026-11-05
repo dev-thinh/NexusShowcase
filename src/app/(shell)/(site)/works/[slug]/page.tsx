@@ -1,3 +1,6 @@
+import { cache } from 'react';
+import type { Metadata } from 'next';
+import { PublicSectionMarker } from '@/shared/navigation/public-section-context';
 import { categoryPagePath } from '@/shared/lib/page-urls';
 import { ConferenceDetails } from '@/features/publications/components/conference-details';
 import { ContributorNames, ContributorName } from '@/features/publications/components/contributor-names';
@@ -12,7 +15,7 @@ import { showcaseReturnTarget } from '@/features/publications/model/navigation';
 import { publicationDetailSelect } from '@/features/publications/server/selects';
 import { ArticleContent, ArticleTableOfContents } from '@/features/submissions/components/article-content';
 import { ResourceLinks } from '@/features/submissions/components/resource-links';
-import { parseArticleContent, standaloneResources } from '@/features/submissions/model/article';
+import { parseArticleContent, publicationResources, standaloneResources } from '@/features/submissions/model/article';
 import { buildSubmissionSnapshot } from '@/features/submissions/model/snapshot-mapper';
 import { prisma } from '@/server/db/prisma';
 import { VideoPlayer } from '@/shared/ui/video-player';
@@ -28,14 +31,7 @@ import { notFound, redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ShowcaseDetailPage({
-  params,
-  searchParams,
-}: {
-  params: Promise<{ slug: string }>;
-  searchParams?: Promise<{ returnTo?: string }>;
-}) {
-  const { slug } = await params;
+const getAuthorizedDetail = cache(async (slug: string) => {
   const session = await auth();
   const currentUser = session?.user;
 
@@ -56,9 +52,30 @@ export default async function ShowcaseDetailPage({
     redirect(`/login?callbackUrl=/works/${slug}`);
   }
 
+  return { item, currentUser };
+});
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { item } = await getAuthorizedDetail((await params).slug);
+  return { title: item.title };
+}
+
+export default async function ShowcaseDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ returnTo?: string }>;
+}) {
+  const { slug } = await params;
+  const { item, currentUser } = await getAuthorizedDetail(slug);
+
   const structured = parseArticleContent(item.content);
   const videoLink = item.links.find((l) => l.type === 'VIDEO_EMBED');
   const sidebarResources = standaloneResources(item.content ?? '', buildSubmissionSnapshot(item).resources);
+
+  const mobileResources = publicationResources(item.content ?? '', buildSubmissionSnapshot(item).resources)
+    .filter(resource => resource.kind === 'DOCUMENT' || (resource.kind === 'LINK' && resource.linkType !== 'VIDEO_EMBED'));
 
   const categorySlug = item.type === 'PROJECT' ? 'robotics-iot' : 'bai-bao-khoa-hoc';
   const categoryName = item.type === 'PROJECT' ? 'Dự án & Sản phẩm' : 'Nghiên cứu khoa học';
@@ -82,6 +99,7 @@ export default async function ShowcaseDetailPage({
 
   return (
     <>
+      <PublicSectionMarker pathname={`/works/${slug}`} section={item.type === 'PROJECT' ? '/projects' : '/research'} />
 
       <main className="flex-1">
         <header className="border-b border-slate-200 bg-gradient-to-br from-[#FFFFFF] via-[#FFFFFF] to-white">
@@ -171,6 +189,16 @@ export default async function ShowcaseDetailPage({
               <p className="whitespace-pre-line break-words text-base leading-8 text-[#1F2937]">{item.summary}</p>
             </section>
 
+            <div className="space-y-4 lg:hidden">
+              {structured?.sections.length ? <details className="rounded-lg border border-slate-200 px-4 py-2">
+                <summary className="min-h-11 cursor-pointer py-2 text-sm font-semibold">Mục lục bài viết</summary>
+                <div className="pb-3"><ArticleTableOfContents content={item.content ?? ''} /></div>
+              </details> : null}
+              {mobileResources.length > 0 && <section aria-label="Tài nguyên công trình" className="space-y-2">
+                <ResourceLinks resources={mobileResources} />
+              </section>}
+            </div>
+
             {item.content && <ArticleContent content={item.content} />}
 
             {!structured && figures.length > 0 && (
@@ -220,7 +248,7 @@ export default async function ShowcaseDetailPage({
           </article>
 
           <aside className="min-w-0 space-y-7 border-t border-slate-200 pt-6 lg:sticky lg:top-24 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0" aria-label="Tài nguyên và nhóm thực hiện">
-            <ArticleTableOfContents content={item.content ?? ''} />
+            <div className="hidden lg:block"><ArticleTableOfContents content={item.content ?? ''} /></div>
             <section id="resources" className="scroll-mt-28" aria-labelledby="resources-title">
               <h2 id="resources-title" className="mb-4 text-base font-semibold text-[#1F2937]">Tài nguyên</h2>
               <div className="flex flex-col items-stretch gap-2">

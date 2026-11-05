@@ -1,3 +1,5 @@
+export const metadata = { title: 'Thành viên' };
+
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getSession } from '@/features/identity/server/session';
 import { HomeMemberWall } from '@/features/members/components/home-member-wall';

@@ -7,7 +7,9 @@ import { Role } from '@prisma/client';
 
 import { redirect } from 'next/navigation';
 
-export default async function AdminMembersPage({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; role?: string }> }) {
+export const metadata = { title: 'Quản lý thành viên' };
+
+export default async function AdminMembersPage({ searchParams }: { searchParams: Promise<{ page?: string; q?: string; role?: string; status?: string }> }) {
   const session = await auth();
   if (!session?.user || !session.user.id) {
     redirect('/login');
@@ -22,8 +24,9 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
   const params = await searchParams;
   const query = (params.q ?? '').trim().slice(0, 200);
   const role = Object.values(Role).find(value => value === params.role) ?? 'ALL';
-  const result = await listAdminMembers({ q: query, role, page: params.page });
-  const basePath = '/admin/members?' + new URLSearchParams({ role, ...(query ? { q: query } : {}) });
+  const status = params.status === 'ACTIVE' || params.status === 'DISABLED' ? params.status : 'ALL';
+  const result = await listAdminMembers({ q: query, role, status, page: params.page });
+  const basePath = '/admin/members?' + new URLSearchParams({ role, status, ...(query ? { q: query } : {}) });
 
   return (
     <>
@@ -35,7 +38,7 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
         </div>
 
         {/* Member Table with Search and Filters */}
-        <AdminMemberTable members={result.items} query={query} roleFilter={role} counts={result.counts} total={result.total} actions={<AdminCreateMemberModal />} /><PaginationFooter itemLabel="thành viên" page={result.page} totalPages={result.totalPages} pageSize={10} basePath={basePath} ariaLabel="Phân trang thành viên" />
+        <AdminMemberTable members={result.items} currentUserId={session.user.id} query={query} roleFilter={role} statusFilter={status} counts={result.counts} total={result.total} actions={<AdminCreateMemberModal />} /><PaginationFooter itemLabel="thành viên" page={result.page} totalPages={result.totalPages} pageSize={10} basePath={basePath} ariaLabel="Phân trang thành viên" />
       </section>
 
 

@@ -147,3 +147,41 @@ export async function createMember(actor: Actor, input: CreateMemberInput) {
 export async function disableMember(actor: Actor, targetUserId: string) {
   try { return await disableMemberInternal(actor, targetUserId); } catch (error) { return commandFailure('member.disable', error, { actorId: actor.id }); }
 }
+
+import { recoverMemberInputSchema, type RecoverMemberInput } from '../model/member-input';
+
+async function recoverMember(actor: Actor, input: RecoverMemberInput, operation: 'restore' | 'reset') {
+  const parsed = recoverMemberInputSchema.safeParse(input);
+  if (!parsed.success) return { success: false as const, code: 'VALIDATION' as const, error: INVALID_ACTION_INPUT_ERROR };
+  if (actor.role !== 'ADMIN' || actor.mustChangePassword) return { success: false as const, code: 'FORBIDDEN' as const, error: 'Bạn không còn quyền quản trị.' };
+  const { targetUserId, expectedVersion } = parsed.data;
+  if (operation === 'reset' && targetUserId === actor.id) return { success: false as const, code: 'FORBIDDEN' as const, error: 'Hãy dùng chức năng đổi mật khẩu cho tài khoản của chính bạn.' };
+  // Never accept or return an existing credential. Plaintext lives only in this
+  // admin response; errors contain no credential or hash metadata.
+  const temporaryPassword = operation === 'reset' ? crypto.randomBytes(24).toString('base64url') : undefined;
+  const passwordHash = temporaryPassword ? await bcrypt.hash(temporaryPassword, 12) : undefined;
+  return prisma.$transaction(async tx => {
+    const admin = await tx.user.findUnique({ where: { id: actor.id }, select: { role: true, status: true, deletedAt: true, mustChangePassword: true } });
+    if (!admin || admin.role !== 'ADMIN' || admin.status !== 'ACTIVE' || admin.deletedAt || admin.mustChangePassword) return { success: false as const, code: 'FORBIDDEN' as const, error: 'Bạn không còn quyền quản trị.' };
+    const target = await tx.user.findUnique({ where: { id: targetUserId }, select: { status: true, deletedAt: true, sessionVersion: true } });
+    if (!target) return { success: false as const, code: 'NOT_FOUND' as const, error: 'Không tìm thấy tài khoản.' };
+    if (target.sessionVersion !== expectedVersion) return { success: false as const, code: 'CONFLICT' as const, error: 'Tài khoản vừa thay đổi. Vui lòng tải lại trước khi thử lại.' };
+    const active = target.status === 'ACTIVE' && !target.deletedAt;
+    if ((operation === 'restore' && active) || (operation === 'reset' && !active)) return { success: false as const, code: 'VALIDATION' as const, error: operation === 'reset' ? 'Hãy khôi phục tài khoản trước khi đặt lại mật khẩu.' : 'Tài khoản đã hoạt động.' };
+    const changed = await tx.user.updateMany({
+      where: { id: targetUserId, sessionVersion: expectedVersion, status: target.status, deletedAt: target.deletedAt },
+      data: operation === 'restore'
+        ? { status: 'ACTIVE', deletedAt: null, sessionVersion: { increment: 1 } }
+        : { passwordHash, mustChangePassword: true, temporaryPasswordConsumed: false, sessionVersion: { increment: 1 } },
+    });
+    if (changed.count !== 1) return { success: false as const, code: 'CONFLICT' as const, error: 'Tài khoản vừa thay đổi. Vui lòng tải lại trước khi thử lại.' };
+    return { success: true as const, data: temporaryPassword ? { temporaryPassword } : {} };
+  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+}
+
+export async function restoreMember(actor: Actor, input: RecoverMemberInput) {
+  try { return await recoverMember(actor, input, 'restore'); } catch (error) { return commandFailure('member.restore', error, { actorId: actor.id }); }
+}
+export async function resetMemberPassword(actor: Actor, input: RecoverMemberInput) {
+  try { return await recoverMember(actor, input, 'reset'); } catch (error) { return commandFailure('member.reset-password', error, { actorId: actor.id }); }
+}

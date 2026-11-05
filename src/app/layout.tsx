@@ -22,7 +22,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Hoạt động | Robotics & IoT HCMUS',
+  title: { default: 'Robotics & IoT HCMUS', template: '%s | Robotics & IoT HCMUS' },
   icons: {
     icon: { url: '/logo.svg', type: 'image/svg+xml' },
     shortcut: '/logo.svg',

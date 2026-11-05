@@ -1,3 +1,5 @@
+export const metadata = { title: 'Chỉnh sửa công trình' };
+
 import { ReadOnlyDraftRecoveries } from '@/features/submissions/components/read-only-draft-recoveries';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { canUserUpload } from '@/features/identity/model/permissions';

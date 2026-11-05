@@ -1,3 +1,5 @@
+export const metadata = { title: 'Nghiên cứu khoa học' };
+
 import CategoryPage from '@/features/publications/components/category-page';
 
 export const dynamic = 'force-dynamic';

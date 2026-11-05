@@ -5,14 +5,15 @@ import { Prisma, type Role } from '@prisma/client';
 import 'server-only';
 import { adminMemberClientSelect } from '../model/public-user';
 
-export async function listAdminMembers(input: { q: string; role: Role | 'ALL'; page: unknown }) {
-  const where: Prisma.UserWhereInput = { hiddenFromDirectory: false, ...(input.role === 'ALL' ? {} : { role: input.role }) };
+export async function listAdminMembers(input: { q: string; role: Role | 'ALL'; page: unknown; status?: 'ALL' | 'ACTIVE' | 'DISABLED' }) {
+  const where: Prisma.UserWhereInput = { hiddenFromDirectory: false, ...(input.status === 'ACTIVE' ? { status: 'ACTIVE', deletedAt: null } : input.status === 'DISABLED' ? { OR: [{ status: { not: 'ACTIVE' } }, { deletedAt: { not: null } }] } : {}), ...(input.role === 'ALL' ? {} : { role: input.role }) };
   let total: number;
   let ids: string[] | undefined;
   let bounds;
   if (input.q.trim()) {
     const role = input.role === 'ALL' ? Prisma.sql`TRUE` : Prisma.sql`role::text = ${input.role}`;
-    const predicate = Prisma.sql`"hiddenFromDirectory" = false AND ${role} AND regexp_replace(translate(normalize(lower("fullName"), NFD), 'đ', 'd'), ${'[\u0300-\u036f]'}, '', 'g') LIKE ${literalSearchPattern(input.q.trim())}`;
+    const status = input.status === 'ACTIVE' ? Prisma.sql`status = 'ACTIVE' AND "deletedAt" IS NULL` : input.status === 'DISABLED' ? Prisma.sql`(status <> 'ACTIVE' OR "deletedAt" IS NOT NULL)` : Prisma.sql`TRUE`;
+    const predicate = Prisma.sql`"hiddenFromDirectory" = false AND ${role} AND ${status} AND regexp_replace(translate(normalize(lower("fullName"), NFD), 'đ', 'd'), ${'[\u0300-\u036f]'}, '', 'g') LIKE ${literalSearchPattern(input.q.trim())}`;
     const [count] = await prisma.$queryRaw<Array<{ total: bigint }>>(Prisma.sql`SELECT count(*) AS total FROM users WHERE ${predicate}`);
     total = Number(count.total);
     bounds = pageBounds(input.page, total, 10);

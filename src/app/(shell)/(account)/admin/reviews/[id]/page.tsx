@@ -1,3 +1,5 @@
+export const metadata = { title: 'Chi tiết phê duyệt' };
+
 import { getActor } from '@/features/identity/server/actor';
 import { ApprovalControls } from '@/features/review/components/approval-controls';
 import { getReviewSnapshot } from '@/features/review/server/review-snapshot';

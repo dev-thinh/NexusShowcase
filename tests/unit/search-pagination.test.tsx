@@ -15,9 +15,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const mocks = vi.hoisted(() => ({
   session: null as null | { user: { id: string; role?: string } },
-  count: vi.fn(), findMany: vi.fn(), members: vi.fn(), category: vi.fn(),
+  raw: vi.fn(), count: vi.fn(), findMany: vi.fn(), members: vi.fn(), category: vi.fn(),
 }));
-vi.mock('@/server/db/prisma', () => ({ prisma: { showcaseItem: { count: mocks.count, findMany: mocks.findMany }, category: { findUnique: mocks.category }, user: { findMany: mocks.members } } }));
+vi.mock('@/server/db/prisma', () => ({ prisma: { $queryRaw: mocks.raw, showcaseItem: { count: mocks.count, findMany: mocks.findMany }, category: { findUnique: mocks.category }, user: { findMany: mocks.members } } }));
 vi.mock('@/features/publications/server/actions', () => ({ setShowcasePinAction: vi.fn(), setShowcaseVisibilityAction: vi.fn() }));
 vi.mock('@/features/identity/server/auth', () => ({ auth: () => mocks.session }));
 vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => null }));
@@ -29,6 +29,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   mocks.session = null;
   mocks.count.mockResolvedValue(25);
+  mocks.raw.mockImplementation(async (query: { text: string }) => query.text.startsWith('SELECT count') ? [{ total: BigInt(await mocks.count()) }] : [{ id: 'matched-id' }]);
   mocks.findMany.mockResolvedValue([]);
   mocks.members.mockResolvedValue([]);
   mocks.category.mockResolvedValue({ id: 'papers', name: 'Nghiên cứu khoa học', slug: 'bai-bao-khoa-hoc' });
@@ -85,19 +86,23 @@ describe('search pagination', () => {
   });
   it('fetches ten results on page two with matching count and visibility filters', async () => {
     await load('2');
-    expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 10, take: 10 }));
-    const where = mocks.findMany.mock.calls[0][0].where;
-    expect(where).toEqual(mocks.count.mock.calls[0][0].where);
-    expect(where).toMatchObject({ status: 'PUBLISHED', visibility: 'PUBLIC' });
-    expect(where.OR).toContainEqual({ title: { contains: 'robot', mode: 'insensitive' } });
+    const [count, page] = mocks.raw.mock.calls.map(call => call[0]);
+    expect(page.text.split(' ORDER BY ')[0].replace('SELECT id', 'SELECT count(*) AS total')).toBe(count.text);
+    expect(page.values.slice(0, -2)).toEqual(count.values);
+    expect(count.text).toContain("status = 'PUBLISHED'");
+    expect(count.text).toContain("visibility = 'PUBLIC'");
+    expect(count.values).toContain('%robot%');
+    expect(page.values.slice(-2)).toEqual([10, 10]);
+    expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 0, take: 10, where: expect.objectContaining({ status: 'PUBLISHED', visibility: 'PUBLIC', id: { in: ['matched-id'] } }) }));
   });
   it.each(['-1', 'abc', '2.5', 'Infinity', undefined])('defaults invalid page %s to one', async page => {
     await load(page);
     expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 0, take: 10 }));
+    expect(mocks.raw.mock.calls[1][0].values.slice(-2)).toEqual([10, 0]);
   });
   it('clamps requests to the last page', async () => {
     await load('999');
-    expect(mocks.findMany).toHaveBeenCalledWith(expect.objectContaining({ skip: 20 }));
+    expect(mocks.raw.mock.calls[1][0].values.slice(-2)).toEqual([10, 20]);
   });
   it('renders an empty state without pagination when nothing matches', async () => {
     mocks.count.mockResolvedValue(0);
@@ -110,6 +115,7 @@ describe('search pagination', () => {
     mocks.session = { user: { id: 'member' } };
     await load();
     expect(mocks.findMany.mock.calls[0][0].where).not.toHaveProperty('visibility');
+    expect(mocks.raw.mock.calls[0][0].text).not.toContain("visibility = 'PUBLIC'");
   });
   it('preserves Unicode keywords and reserved characters in page links', () => {
     const q = 'robot & thị giác';

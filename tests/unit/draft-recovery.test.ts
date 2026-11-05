@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { listRecoveries, writeRecovery, removeRecovery, type DraftRecovery } from '@/features/submissions/components/draft-recovery';
+import { chooseDraftRecovery, listRecoveries, writeRecovery, removeRecovery, type DraftRecovery } from '@/features/submissions/components/draft-recovery';
 function memory() {
  const map = new Map<string,string>();
  return { get length() { return map.size; }, key: (n:number) => [...map.keys()][n] ?? null, getItem:(k:string)=>map.get(k) ?? null, setItem:(k:string,v:string)=> {map.set(k,v);}, removeItem:(k:string)=> {map.delete(k);} };
@@ -46,4 +46,9 @@ it('never automatically overwrites a newer server draft with a stale browser cop
  const { chooseDraftRecovery }=await import('@/features/submissions/components/draft-recovery');
  const result=chooseDraftRecovery([record],{title:'Changed elsewhere'},2);
  expect(result.resume).toBeUndefined(); expect(result.conflicts).toEqual([record]);
+});
+it('prefers a compatible local draft over a newer stale pending request',()=>{
+ const compatible={...record,expectedReviewVersion:3,sessionId:'compatible',updatedAt:1};
+ const stale={...record,updatedAt:2,pendingMutation:{input:{itemId:'item',expectedReviewVersion:0,mutationId:crypto.randomUUID(),draft:{title:'older'}},editSequence:1}};
+ expect(chooseDraftRecovery([compatible,stale],{title:'Server'},3).resume).toEqual(compatible);
 });

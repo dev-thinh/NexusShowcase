@@ -2,8 +2,11 @@ import fs from 'fs';
 import path from 'path';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
-vi.mock('@/shared/navigation/navigation-transition', () => ({ useNavigationPathname: () => '/', useNavigationVisualPathname: () => '/' }));
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+const navigation = vi.hoisted(() => ({ pathname: '/', visual: '/', detail: null as null | { pathname: string; section: '/research' | '/projects' } }));
+vi.mock('@/shared/navigation/navigation-transition', () => ({ useNavigationPathname: () => navigation.pathname, useNavigationVisualPathname: () => navigation.visual }));
+vi.mock('@/shared/navigation/public-section-context', () => ({ usePublicSectionContext: () => navigation.detail }));
+beforeEach(() => { navigation.pathname = '/'; navigation.visual = '/'; navigation.detail = null; });
 vi.mock('@/shared/navigation/navigation-link', () => ({ NavigationLink: ({ children, prefetch: _prefetch, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement> & { prefetch?: boolean }) => React.createElement('a', props, children) }));
 import { PublicNavigation } from '@/app/(shell)/_components/navbar-nav';
 
@@ -63,4 +66,18 @@ describe('Navbar Nav Component Structure', () => {
     expect(navContent).not.toContain("href: '/admin/members'");
     expect(navContent).toContain("href: '/my-works'");
   });
+});
+
+it.each(['/research', '/projects'] as const)('marks the authorized %s parent current for work detail', section => {
+  navigation.pathname = navigation.visual = '/works/example';
+  navigation.detail = { pathname: '/works/example', section };
+  const html = renderToStaticMarkup(React.createElement(PublicNavigation));
+  expect(html).toMatch(new RegExp(`<a[^>]*href="${section}"[^>]*aria-current="location"`));
+  expect(html.match(/aria-current=/g)).toHaveLength(1);
+});
+it('keeps current location separate from a pending destination highlight', () => {
+  navigation.pathname = '/members/member'; navigation.visual = '/research';
+  const html = renderToStaticMarkup(React.createElement(PublicNavigation));
+  expect(html).toMatch(/<a[^>]*href="\/members"[^>]*aria-current="location"/);
+  expect(html).toMatch(/<a[^>]*href="\/research"[^>]*class="[^"]*bg-brand-button/);
 });

@@ -16,6 +16,7 @@ export const saveDraftEnvelopeSchema = z.object({
 });
 export const submissionEnvelopeSchema = z.object({
   itemId: cuidSchema,
+  mutationId: z.uuid().optional(),
   expectedReviewVersion: z.number().int().nonnegative(),
 }).strict();
 export type SaveDraftInput = z.input<typeof saveDraftEnvelopeSchema>;

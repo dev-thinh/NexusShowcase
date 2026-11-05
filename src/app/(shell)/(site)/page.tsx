@@ -1,3 +1,5 @@
+export const metadata = { title: 'Trang chủ' };
+
 import { HomeContentProvider, HomeText, HomeContentLink as Link } from '@/features/publications/components/home-content-provider';
 import { HomeFeaturedSection, HomeMembersSection, HomeMomentsSection, HomeResearchSection } from './home-sections';
 import { HomeHero } from '@/features/publications/components/home-hero';

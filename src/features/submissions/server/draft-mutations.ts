@@ -3,7 +3,6 @@ import { Prisma } from '@prisma/client';
 import { prisma } from '@/server/db/prisma';
 import type { ActionResult } from '@/shared/lib/action-result';
 
-export type DraftReceipt = { id: string; slug: string; status: string; reviewVersion: number };
 function canonical(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonical);
   if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).sort(([a], [b]) => a.localeCompare(b)).map(([key, entry]) => [key, canonical(entry)]));
@@ -11,10 +10,10 @@ function canonical(value: unknown): unknown {
 }
 
 /** Receipt and state change commit together; a lost response can be retried verbatim. */
-export async function withDraftMutation(
+export async function withDraftMutation<T extends object>(
   actorId: string, mutationId: string | undefined, operation: string, payload: unknown,
-  run: (tx: Prisma.TransactionClient) => Promise<ActionResult<DraftReceipt>>,
-): Promise<ActionResult<DraftReceipt>> {
+  run: (tx: Prisma.TransactionClient) => Promise<ActionResult<T>>,
+): Promise<ActionResult<T>> {
   const payloadHash = createHash('sha256').update(JSON.stringify(canonical(payload))).digest('hex');
   for (let attempt = 0; ; attempt++) {
     try {
@@ -26,11 +25,11 @@ export async function withDraftMutation(
           const receipt = await tx.draftMutation.findUnique({ where: { actorId_mutationId: { actorId, mutationId } } });
           if (receipt) {
             if (receipt.operation !== operation || receipt.payloadHash !== payloadHash) return { success: false, code: 'CONFLICT', error: 'Mã lần lưu đã được dùng cho nội dung khác.' };
-            return { success: true, data: receipt.response as unknown as DraftReceipt };
+            return { success: true, data: receipt.response as unknown as T };
           }
         }
         const result = await run(tx);
-        if (result.success && mutationId) await tx.draftMutation.create({ data: { actorId, mutationId, operation, payloadHash, response: result.data } });
+        if (result.success && mutationId) await tx.draftMutation.create({ data: { actorId, mutationId, operation, payloadHash, response: JSON.parse(JSON.stringify(result.data)) } });
         return result;
       }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
     } catch (error) {

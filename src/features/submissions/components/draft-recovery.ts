@@ -67,7 +67,8 @@ export function chooseDraftRecovery(records: DraftRecovery[], serverData: Showca
   const saved = normalized(serverData);
   const obsolete = records.filter(record => normalized(record.data) === saved);
   const remaining = records.filter(record => !obsolete.includes(record)).sort((a, b) => b.updatedAt - a.updatedAt);
-  const resume = remaining.find(record => record.expectedReviewVersion === serverVersion || Boolean(record.pendingMutation));
+  const resume = remaining.find(record => record.expectedReviewVersion === serverVersion)
+    ?? remaining.find(record => Boolean(record.pendingMutation));
   const conflicts = resume ? [] : remaining;
   return { resume, obsolete, conflicts };
 }

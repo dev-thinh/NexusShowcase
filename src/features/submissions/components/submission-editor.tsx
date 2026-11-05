@@ -21,7 +21,6 @@ import { ReviewComments, type AuthorReviewComment } from './review-comments';
 import { SectionEditor } from './section-editor';
 import { SubmissionActionBar } from './submission-action-bar';
 import { useSubmissionEditor } from './use-submission-editor';
-import { notifySuccess } from '@/shared/dialogs/success';
 
 export interface SubmissionEditorProps {
   initialData: Partial<ShowcaseDraftInput> & { id?: string; reviewVersion?: number; draftSnapshot?: boolean };
@@ -38,11 +37,12 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
     ...initialData,
     contributors: [{ userId: currentUser.id, role: 'CONTRIBUTOR' as const, displayOrder: 0 }],
   };
-  const { state, updateField, saveDraft, submitForReview, ready, submitting, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice, activeRecovery } = useSubmissionEditor(dataWithAuthor, currentUser.id);
+  const { state, updateField, saveDraft, submitForReview, ready, submitting, submissionPending, recoveries, restoreRecovery, discardRecovery, storageError, saveNotice, activeRecovery } = useSubmissionEditor(dataWithAuthor, currentUser.id);
   const [preview, setPreview] = useState(false);
   const [uploads, setUploads] = useState(0);
   const formRef = useRef<HTMLFormElement>(null);
-  const busy = !ready || submitting || recoveries.length > 0 || uploads > 0;
+  const actionDisabled = !ready || submitting || recoveries.length > 0 || uploads > 0;
+  const busy = actionDisabled || submissionPending;
   useEffect(() => {
     if (!state.formError) return;
     setPreview(false);
@@ -100,7 +100,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
 
       </fieldset>}
       {state.formError && !Object.values(state.fieldErrors).some(messages => messages.length) && <p role="alert" tabIndex={-1} data-submit-error className="mx-6 my-3 rounded-md border border-red-500 p-3 text-sm text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500">{state.formError}</p>}
-      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={busy} onSave={async () => { if (await saveDraft()) await notifySuccess('Đã lưu bản nháp công trình.'); }} onSubmit={async () => { if (await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
+      <SubmissionActionBar preview={preview} onPreview={() => setPreview(value => !value)} saveState={state.saveState} disabled={actionDisabled} saveDisabled={submissionPending} submitLabel={submissionPending ? 'Thử gửi lại' : 'Gửi duyệt'} onSave={async () => { await saveDraft(); }} onSubmit={async () => { if (submissionPending || await dialog.confirm({ title: 'Gửi bài duyệt', message: 'Bạn sẽ không thể chỉnh sửa trong khi bài chờ duyệt.', confirmLabel: 'Gửi duyệt' })) await submitForReview(); }} />
     </form>
   );
 }

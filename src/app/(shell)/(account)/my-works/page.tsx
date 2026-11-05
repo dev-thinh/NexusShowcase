@@ -1,3 +1,5 @@
+export const metadata = { title: 'Công trình của tôi' };
+
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { ManagementHeader, ManagementStat } from '@/app/(shell)/_components/management-layout';
 import { canUserUpload } from '@/features/identity/model/permissions';
