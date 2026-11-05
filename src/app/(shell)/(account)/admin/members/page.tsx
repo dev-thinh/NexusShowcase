@@ -1,4 +1,5 @@
 import { AdminImportMembersModal } from '@/features/identity/components/admin-import-members-modal';
+import { AdminGrantMembersModal } from '@/features/identity/components/admin-grant-members-modal';
 import { AdminCreateMemberModal } from '@/features/identity/components/admin-create-member-modal';
 import { AdminMemberTable } from '@/features/identity/components/admin-member-table';
 import { listAdminMembers } from '@/features/identity/server/member-queries';
@@ -39,7 +40,7 @@ export default async function AdminMembersPage({ searchParams }: { searchParams:
         </div>
 
         {/* Member Table with Search and Filters */}
-        <AdminMemberTable members={result.items} currentUserId={session.user.id} query={query} roleFilter={role} statusFilter={status} counts={result.counts} total={result.total} actions={<div className="flex min-w-0 flex-wrap justify-end gap-2"><AdminCreateMemberModal /><AdminImportMembersModal /></div>} /><PaginationFooter itemLabel="thành viên" page={result.page} totalPages={result.totalPages} pageSize={10} basePath={basePath} ariaLabel="Phân trang thành viên" />
+        <AdminMemberTable members={result.items} currentUserId={session.user.id} query={query} roleFilter={role} statusFilter={status} counts={result.counts} total={result.total} actions={<div className="flex min-w-0 flex-wrap justify-end gap-2"><AdminCreateMemberModal /><AdminImportMembersModal /><AdminGrantMembersModal /></div>} /><PaginationFooter itemLabel="thành viên" page={result.page} totalPages={result.totalPages} pageSize={10} basePath={basePath} ariaLabel="Phân trang thành viên" />
       </section>
 
 

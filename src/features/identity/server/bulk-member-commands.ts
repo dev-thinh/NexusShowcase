@@ -2,10 +2,10 @@ import 'server-only';
 import { randomBytes } from 'node:crypto';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/server/db/prisma';
-import { commandFailure } from '@/server/db/command-error';
+import { commandFailure, StateConflict } from '@/server/db/command-error';
 import type { ActionResult } from '@/shared/lib/action-result';
 import type { Actor } from '../model/session';
-import { bulkMemberCsvSchema, memberLoginKey, type BulkMemberRow, type BulkMemberResult } from '../model/bulk-members';
+import { bulkMemberCsvSchema, memberGrantSchema, memberLoginKey, type BulkMemberRow, type BulkMemberResult } from '../model/bulk-members';
 import { parseMemberCsv } from '../model/member-csv';
 import { createMember } from './member-commands';
 
@@ -51,4 +51,25 @@ export async function createBulkMembers(actor: Actor, input: unknown): Promise<A
       : { ...row, status: 'FAILED', message: result.error });
   }
   return { success: true, data: results };
+}
+
+export async function grantBulkMembers(actor: Actor, input: unknown): Promise<ActionResult<{ ids: string[] }>> {
+  const parsed = memberGrantSchema.safeParse(input);
+  if (!parsed.success) return { success: false, code: 'VALIDATION', error: 'Chọn từ 1 đến 50 thành viên, không trùng nhau.' };
+  if (actor.role !== 'ADMIN' || actor.mustChangePassword) return forbidden();
+  try {
+    return await prisma.$transaction(async tx => {
+      const admin = await tx.user.findUnique({ where: { id: actor.id }, select: { role: true, status: true, deletedAt: true, mustChangePassword: true } });
+      if (!admin || admin.role !== 'ADMIN' || admin.status !== 'ACTIVE' || admin.deletedAt || admin.mustChangePassword) return forbidden();
+      const members = parsed.data.members;
+      const eligible = { role: 'MEMBER' as const, status: 'ACTIVE' as const, deletedAt: null, hiddenFromDirectory: false };
+      const current = await tx.user.findMany({ where: { ...eligible, id: { in: members.map(member => member.id) } }, select: { id: true, sessionVersion: true } });
+      if (current.length !== members.length || members.some(member => !current.some(user => user.id === member.id && user.sessionVersion === member.expectedVersion))) {
+        return { success: false, code: 'CONFLICT', error: 'Có tài khoản đã thay đổi hoặc không còn đủ điều kiện. Chưa cấp quyền cho ai; hãy tải lại danh sách và chọn lại.' } as const;
+      }
+      const changed = await tx.user.updateMany({ where: { ...eligible, OR: members.map(member => ({ id: member.id, sessionVersion: member.expectedVersion })) }, data: { role: 'CORE_MEMBER', sessionVersion: { increment: 1 } } });
+      if (changed.count !== members.length) throw new StateConflict();
+      return { success: true, data: { ids: members.map(member => member.id) } } as const;
+    }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
+  } catch (error) { return commandFailure('member.bulk-grant', error, { actorId: actor.id }); }
 }
