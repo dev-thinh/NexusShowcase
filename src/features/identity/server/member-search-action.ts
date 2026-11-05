@@ -14,7 +14,7 @@ export async function searchContributors(input: { q: string; page: number }): Pr
   if (!actor) return { success: false, code: 'UNAUTHORIZED', error: 'Bạn không có quyền tìm người đóng góp.' };
   const parsed = inputSchema.safeParse(input);
   if (!parsed.success) return { success: false, code: 'VALIDATION', error: 'Từ khóa tối đa 200 ký tự và trang phải hợp lệ.' };
-  const where = Prisma.sql`status = 'ACTIVE' AND "deletedAt" IS NULL AND role::text IN ('ADMIN', 'CORE_MEMBER', 'MEMBER')
+  const where = Prisma.sql`status = 'ACTIVE' AND "hiddenFromDirectory" = false AND "deletedAt" IS NULL AND role::text IN ('ADMIN', 'CORE_MEMBER', 'MEMBER')
     AND regexp_replace(translate(normalize(lower("fullName"), NFD), 'đ', 'd'), ${'[\u0300-\u036f]'}, '', 'g') LIKE ${literalSearchPattern(parsed.data.q)}`;
   try {
     const [count] = await prisma.$queryRaw<Array<{ total: bigint }>>(Prisma.sql`SELECT count(*) AS total FROM users WHERE ${where}`);

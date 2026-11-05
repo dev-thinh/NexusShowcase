@@ -10,7 +10,7 @@ export function publicationSearchPredicate(input: { authenticated: boolean; q: s
     AND ${input.categoryId ? Prisma.sql`"categoryId" = ${input.categoryId}` : input.categorySlug ? Prisma.sql`EXISTS (SELECT 1 FROM categories category WHERE category.id = showcase_items."categoryId" AND category.slug = ${input.categorySlug})` : Prisma.sql`TRUE`}
     AND ${input.year ? Prisma.sql`"publishedYear" = ${input.year}` : Prisma.sql`TRUE`}
     AND (${folded(Prisma.sql`title || ' ' || summary`)} LIKE ${pattern}
-      OR EXISTS (SELECT 1 FROM item_contributors contributor LEFT JOIN users author ON author.id = contributor."userId"
+      OR EXISTS (SELECT 1 FROM item_contributors contributor LEFT JOIN users author ON author.id = contributor."userId" AND author."hiddenFromDirectory" = false
         WHERE contributor."itemId" = showcase_items.id
           AND ${folded(Prisma.sql`coalesce(author."fullName", '') || ' ' || coalesce(contributor."externalName", '')`)} LIKE ${pattern}))`;
 }

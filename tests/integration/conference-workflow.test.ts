@@ -64,3 +64,9 @@ it.each(['RESEARCH_PAPER', 'PROJECT'] as const)('preserves conference informatio
   expect(await decideSubmissionCommand(reviewer, { itemId: id, reviewVersion: resubmitted.data.reviewVersion, action: 'PUBLISH', visibility: 'PUBLIC' })).toMatchObject({ success: true });
   expect((await prisma.showcaseItem.findUniqueOrThrow({ where: { id } })).conference).toBeNull();
 });
+
+it('rejects a hidden admin supplied directly as a contributor when saving', async () => {
+  const hidden = await prisma.user.create({ data: { email: 'hidden@conference.test', fullName: 'Hidden admin', role: 'ADMIN', status: 'ACTIVE', hiddenFromDirectory: true } });
+  const result = await saveDraftCommand(author, { itemId: null, draft: { title: 'Hidden contributor', contributors: [{ userId: hidden.id, role: 'CONTRIBUTOR', displayOrder: 0 }] } });
+  expect(result).toMatchObject({ success: false, code: 'VALIDATION', fieldErrors: { contributors: [expect.any(String)] } });
+});

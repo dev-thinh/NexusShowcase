@@ -15,3 +15,7 @@ it('preserves deterministic ordering for all supported sorts',()=>{
  for(const sort of ['title','newest','oldest','featured'] as const) expect(publicationSearchOrder(sort).text).toMatch(/id ASC$/);
  expect(publicationSearchOrder('featured').text).toContain('"isPinned" DESC');
 });
+
+it('does not match hidden user identities when searching publication contributors', () => {
+  expect(publicationSearchPredicate({ authenticated: true, q: 'hidden' }).text).toContain('author."hiddenFromDirectory" = false');
+});

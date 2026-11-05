@@ -27,6 +27,11 @@ async function saveDraftInternal(
   const draft = showcaseDraftInputSchema.safeParse(envelope.data.draft);
   if (!draft.success) return validationFailure(draft.error);
   const values = draft.data;
+  const contributorIds = [...new Set(values.contributors.flatMap(c => c.userId ? [c.userId] : []))];
+  if (contributorIds.length) {
+    const available = await prisma.user.count({ where: { id: { in: contributorIds }, hiddenFromDirectory: false } });
+    if (available !== contributorIds.length) return { success: false, code: 'VALIDATION', error: 'Một thành viên đóng góp không khả dụng.', fieldErrors: { contributors: ['Vui lòng chọn lại thành viên đóng góp.'] } };
+  }
   if (!(await canReferenceAssets(user, values))) return { success: false, code: 'FORBIDDEN', error: 'Bạn không có quyền sử dụng một tệp trong bản nháp.' };
   if (values.categoryId) {
     const category = await prisma.category.findUnique({ where: { id: values.categoryId }, select: { slug: true } });
@@ -88,8 +93,8 @@ async function submitDraftInternal(user: Actor, input: SubmissionInput): Promise
       if (!values.categoryId) return { success: false, code: 'VALIDATION', error: 'Vui lòng chọn chuyên mục trước khi gửi duyệt.', fieldErrors: { categoryId: ['Chọn chuyên mục.'] as string[] } } as const;
       const category = await tx.category.findUnique({ where: { id: values.categoryId }, select: { slug: true } });
       if (!category || category.slug !== (values.type === 'RESEARCH_PAPER' ? 'bai-bao-khoa-hoc' : 'robotics-iot')) return { success: false, code: 'VALIDATION', error: 'Chuyên mục không khớp với loại công trình.' } as const;
-      const members = await tx.user.findMany({ where: { id: { in: values.contributors.flatMap(c => c.userId ? [c.userId] : []) } }, select: { id: true, fullName: true } });
-      if (values.contributors.some(c => c.userId && !members.some(m => m.id === c.userId))) return { success: false, code: 'VALIDATION', error: 'Một thành viên đóng góp không còn tồn tại.' } as const;
+      const members = await tx.user.findMany({ where: { hiddenFromDirectory: false, id: { in: values.contributors.flatMap(c => c.userId ? [c.userId] : []) } }, select: { id: true, fullName: true } });
+      if (values.contributors.some(c => c.userId && !members.some(m => m.id === c.userId))) return { success: false, code: 'VALIDATION', error: 'Một thành viên đóng góp không khả dụng.' } as const;
       if (!published) {
         const relations = snapshotRelations({ ...values, publishedYear: values.publishedYear ?? new Date().getFullYear() });
         await tx.itemContributor.deleteMany({ where: { itemId: item.id } });
