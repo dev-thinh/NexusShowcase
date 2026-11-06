@@ -1,5 +1,5 @@
-import { defaultHomeText } from '@/features/publications/model/home-content';
-vi.mock('@/features/publications/server/home-content', () => ({ readHomeContent: async () => ({ version: 0, text: defaultHomeText }) }));
+import { defaultHomeText, defaultEnglishHomeText } from '@/features/publications/model/home-content';
+vi.mock('@/features/publications/server/home-content', () => ({ readHomeContent: async () => ({ version: 0, englishText: defaultEnglishHomeText, text: defaultHomeText }) }));
 vi.mock('@/shared/lib/deferred-fetch', () => ({ fetchDeferredJson: async (url: string) => {
   const { GET } = await import('@/app/api/home/route');
   return (await GET(new Request('http://localhost' + url))).json();

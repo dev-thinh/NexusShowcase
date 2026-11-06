@@ -10,7 +10,10 @@ for (const width of [320, 390]) test(`home cards stay compact and section action
   const card = section.locator('article').first();
   await expect(card).toBeVisible();
   const photo = card.getByRole('link', { name: /^Xem công trình:/ });
-  expect((await photo.boundingBox())!.height).toBeLessThan(200);
+  const frame = (await photo.locator('.home-featured-image-frame').boundingBox())!;
+  expect(Math.abs(frame.width / frame.height - 4 / 3)).toBeLessThan(0.02);
+  const imageBox = (await photo.boundingBox())!;
+  expect(frame.x - imageBox.x).toBeGreaterThanOrEqual(12);
   const admin = card.locator('.publication-card-meta__controls');
   const metadata = card.locator('.publication-card-meta');
   const metaBox = (await metadata.boundingBox())!;

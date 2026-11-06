@@ -1,10 +1,14 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { ArrowRight } from 'lucide-react';
 import React from 'react';
 import { HomeText, HomeContentLink as Link } from './home-content-provider';
 
 export function HomeHero() {
+  const { t: tr } = useI18n();
+
   const heroRef = React.useRef<HTMLElement>(null);
   const artRef = React.useRef<HTMLDivElement>(null);
 
@@ -88,15 +92,15 @@ export function HomeHero() {
         <div className="home-hero__intro relative z-10 max-w-3xl py-12 sm:py-16 lg:py-20">
           <p className="home-hero__eyebrow"><HomeText field="heroEyebrow">CLB Robotics &amp; IoT - HCMUS</HomeText></p>
           <h1 id="home-hero-title" className="home-hero__title">
-            <span className="home-hero__title-line"><HomeText field="heroTitle">Cùng nghiên cứu.</HomeText></span>
-            <span className="home-hero__title-line home-hero__title-accent"><HomeText field="heroAccent">Cùng sáng tạo.</HomeText></span>
+            <span className="home-hero__title-line"><HomeText field="heroTitle">{tr("Cùng nghiên cứu.")}</HomeText></span>
+            <span className="home-hero__title-line home-hero__title-accent"><HomeText field="heroAccent">{tr("Cùng sáng tạo.")}</HomeText></span>
           </h1>
           <p className="home-hero__copy">
-            <HomeText field="heroDescription">Khám phá Robotics, IoT và hệ thống nhúng qua những dự án thực tế.</HomeText>
+            <HomeText field="heroDescription">{tr("Khám phá Robotics, IoT và hệ thống nhúng qua những dự án thực tế.")}</HomeText>
           </p>
           <div className="home-hero__actions mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
             <Link href="/research" className="home-hero__primary-action">
-              <span><HomeText field="heroAction">Khám phá công trình</HomeText></span>
+              <span><HomeText field="heroAction">{tr("Khám phá công trình")}</HomeText></span>
               <ArrowRight className="h-5 w-5" aria-hidden="true" />
             </Link>
           </div>

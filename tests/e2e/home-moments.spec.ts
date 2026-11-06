@@ -96,3 +96,104 @@ test('keyboard browsing remains available and ends when the viewer closes', asyn
   await expect(wall).not.toHaveAttribute('data-keyboard-browsing', 'true');
   await expect(wall.locator('.moments-track').first()).toHaveCSS('animation-name', 'moments-drift');
 });
+
+for (const reducedMotion of ['no-preference', 'reduce'] as const) {
+  test(`mobile lanes scroll and retain position after closing photos (${reducedMotion})`, async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.emulateMedia({ reducedMotion });
+    await page.goto('/');
+    await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+    const lane = page.locator('.moments-lane').first();
+    await expect(lane).toHaveCSS('overflow-x', 'auto');
+    await expect(lane.locator('.moments-track')).toHaveCSS('animation-name', 'none');
+    await lane.evaluate(element => { element.scrollLeft = 150; });
+    await expect.poll(() => lane.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+    await lane.locator('.moments-group:not([aria-hidden]) .moment-photo').nth(1).click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('button', { name: 'Đóng hộp thoại' }).click();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect.poll(() => lane.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  });
+}
+
+test('centers a single moment on mobile', async ({ page, database }) => {
+  const gallery = await database.homeMomentsGallery.findUniqueOrThrow({ where: { id: 'home' } });
+  const photos = gallery.photos as Array<Record<string, import('@prisma/client').Prisma.JsonValue>>;
+  await database.homeMomentsGallery.update({ where: { id: 'home' }, data: { photos: [{ ...photos[0], visible: true, slot: 0 }] } });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  const lane = page.locator('.moments-lane[data-photo-count="1"]');
+  const group = lane.locator('.moments-group');
+  await expect(group).toHaveCSS('justify-content', 'center');
+  const centers = await lane.evaluate(element => {
+    const lane = element.getBoundingClientRect();
+    const photo = element.querySelector('.moment-photo')!.getBoundingClientRect();
+    return { lane: lane.left + lane.width / 2, photo: photo.left + photo.width / 2 };
+  });
+  expect(Math.abs(centers.lane - centers.photo)).toBeLessThan(2);
+});
+
+test('research photos fill consistent 4:3 frames on mobile and glow on desktop hover', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/');
+  await page.locator('[data-deferred-section="research"]').scrollIntoViewIfNeeded();
+  const images = page.locator('.research-direction__photo img');
+  await expect(images).toHaveCount(3);
+  for (const image of await images.all()) {
+    await expect(image).toHaveCSS('object-fit', 'cover');
+    await expect.poll(() => image.evaluate((element: HTMLImageElement) => element.naturalWidth)).toBeGreaterThan(0);
+    const ratio = await image.evaluate(element => { const frame = element.closest('.research-direction__photo')!; return frame.clientWidth / frame.clientHeight; });
+    expect(Math.abs(ratio - 4 / 3)).toBeLessThan(0.02);
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const card = page.locator('.research-direction').first();
+  await card.hover();
+  const orbit = () => card.locator('.research-direction__photo').evaluate(element => getComputedStyle(element, '::before').animationName);
+  await expect.poll(orbit).toBe('research-border-orbit');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect.poll(orbit).toBe('none');
+});
+
+
+test('blocks native image and button dragging while preserving text selection', async ({ page }) => {
+  await page.goto('/');
+  const logo = page.locator('.home-hero__art img');
+  const action = page.locator('.home-hero__primary-action');
+  for (const element of [logo, action]) {
+    expect(await element.evaluate(element => element.dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true })))).toBe(false);
+  }
+  const copy = page.locator('.home-hero__copy');
+  expect(await copy.evaluate(element => element.dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true })))).toBe(true);
+  await expect(action).toBeVisible();
+  const selectionResult = await action.evaluate(element => {
+    const range = document.createRange();
+    range.selectNodeContents(element);
+    const selection = window.getSelection()!;
+    selection.removeAllRanges(); selection.addRange(range);
+    return { selected: selection.toString().trim(), text: element.textContent, range: range.toString(), select: getComputedStyle(element).userSelect, visibility: getComputedStyle(element).visibility };
+  });
+  expect(selectionResult.selected, JSON.stringify(selectionResult)).not.toBe('');
+  expect(await action.evaluate(element => getComputedStyle(element).userSelect)).not.toBe('none');
+});
+
+
+test('cover frames keep their width in grid and flex cards on desktop and mobile', async ({ page }) => {
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    for (const route of ['/projects', '/research', '/']) {
+      await page.goto(route);
+      if (route === '/') await page.locator('[data-deferred-section="featured"]').scrollIntoViewIfNeeded();
+      const media = page.locator('.publication-card__media').first();
+      await expect(media).toBeVisible();
+      const dimensions = () => media.evaluate(element => {
+        const frame = element.querySelector('.publication-cover-frame, .home-featured-image-frame') ?? element;
+        return { width: frame.clientWidth, height: frame.clientHeight };
+      });
+      await expect.poll(async () => (await dimensions()).width, { message: `${route} at ${width}px` }).toBeGreaterThan(100);
+      await expect.poll(async () => (await dimensions()).height, { message: `${route} at ${width}px` }).toBeGreaterThan(50);
+      await expect.poll(async () => { const size = await dimensions(); return Math.abs(size.width / size.height - 4 / 3); }).toBeLessThan(0.03);
+    }
+  }
+});

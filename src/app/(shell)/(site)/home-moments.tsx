@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { ErrorNotice } from '@/shared/ui/error-notice';
 
@@ -15,6 +17,8 @@ import { MomentsEditor } from '@/features/publications/components/moments-editor
 import { notifySuccess } from '@/shared/dialogs/success';
 
 export function HomeMoments({ initialGallery = { photos: defaultMoments, version: 0, isAdmin: false } }: { initialGallery?: MomentsPayload }) {
+  const { t: tr } = useI18n();
+
   const [gallery, setGallery] = useState<MomentsGallery>(initialGallery);
   const [protectedSources, setProtectedSources] = useState(initialGallery.protectedSources ?? []);
   const [editing, setEditing] = useState(false);
@@ -87,7 +91,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
   }, [selected, editing]);
 
   useEffect(() => {
-    if (!keyboardBrowsing && window.matchMedia('(prefers-reduced-motion: no-preference)').matches) {
+    if (!keyboardBrowsing && window.matchMedia('(min-width: 768px) and (prefers-reduced-motion: no-preference)').matches) {
       wallRef.current?.querySelectorAll('.moments-lane').forEach(lane => { lane.scrollLeft = 0; });
     }
   }, [keyboardBrowsing, selected]);
@@ -113,31 +117,31 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
     <section ref={wallRef} className="moments-wall" aria-labelledby="moments-title" data-keyboard-browsing={keyboardBrowsing ? 'true' : undefined} data-paused={paused || selected !== null || editing ? 'true' : undefined}>
       <div className="moments-heading container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="home-section-heading">
-          <p className="home-section-eyebrow"><HomeText field="momentsEyebrow">Hoạt động CLB</HomeText></p>
-          <h2 id="moments-title" className="home-section-title"><HomeText field="momentsTitle">Khoảnh khắc sáng tạo</HomeText></h2>
+          <p className="home-section-eyebrow"><HomeText field="momentsEyebrow">{tr("Hoạt động CLB")}</HomeText></p>
+          <h2 id="moments-title" className="home-section-title"><HomeText field="momentsTitle">{tr("Khoảnh khắc sáng tạo")}</HomeText></h2>
         </div>
         <div className="moments-heading-actions">
-          {initialGallery.isAdmin && !editing && <button ref={editButton} type="button" className="moments-edit-button" aria-label="Chỉnh sửa ảnh khoảnh khắc" title="Chỉnh sửa ảnh" disabled={opening} onClick={() => void startEditing()}>{opening ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}</button>}
+          {initialGallery.isAdmin && !editing && <button ref={editButton} type="button" className="moments-edit-button" aria-label={tr("Chỉnh sửa ảnh khoảnh khắc")} title={tr("Chỉnh sửa ảnh")} disabled={opening} onClick={() => void startEditing()}>{opening ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}</button>}
         {!editing && hasMotion && <div className="moments-controls">
-          <button type="button" className="moments-pause" aria-label={paused ? 'Tiếp tục chuyển động' : 'Tạm dừng chuyển động'} aria-pressed={paused} onClick={() => setPaused(value => !value)}>
+          <button type="button" className="moments-pause" aria-label={paused ? tr("Tiếp tục chuyển động") : tr("Tạm dừng chuyển động")} aria-pressed={paused} onClick={() => setPaused(value => !value)}>
             {paused ? <Play size={17} aria-hidden="true" /> : <Pause size={17} aria-hidden="true" />}
           </button>
         </div>}
         </div>
       </div>
 
-      {notice && <div className="container mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8"><ErrorNotice message={notice} /></div>}
+      {notice && <div className="container mx-auto mt-4 max-w-7xl px-4 sm:px-6 lg:px-8"><ErrorNotice message={tr(notice)} /></div>}
       {editing && <MomentsEditor gallery={gallery} protectedSources={protectedSources} onSave={finishEditing} onCancel={() => finishEditing()} />}
-      {photos.length === 0 ? <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><MediaImage alt="Khoảnh khắc CLB" className="h-64 w-full rounded-lg" /></div> : <div className="moments-strips">
+      {photos.length === 0 ? <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8"><MediaImage alt={tr("Khoảnh khắc CLB")} className="h-64 w-full rounded-lg" /></div> : <div className="moments-strips">
         {rows.map((row, laneIndex) => row.length > 0 && (
-          <div className={`moments-lane${row.length < 3 ? ' moments-lane--static' : ''}`} key={laneIndex} data-row={laneIndex} data-motion={row.length >= 3 ? 'true' : 'false'}>
+          <div className={`moments-lane${row.length < 3 ? ' moments-lane--static' : ''}`} key={laneIndex} data-row={laneIndex} data-motion={row.length >= 3 ? 'true' : 'false'} data-photo-count={row.length}>
             <div className={`moments-track${laneIndex === 1 ? ' moments-track--reverse' : ''}`}>
               {(row.length >= 3 ? [false, true] : [false]).map(copy => (
                 <div className="moments-group" aria-hidden={copy || undefined} key={String(copy)}>
                   {row.map((photo, index) => {
                     const photoIndex = photos.findIndex(item => item.id === photo.id);
                     return (
-                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': photo.tilt, '--photo-offset': index % 2 ? '0.75rem' : '-0.5rem' } as CSSProperties} tabIndex={copy ? -1 : undefined} data-photo-id={photo.id} aria-label={`Xem ảnh: ${photo.title}`} onPointerEnter={() => prefetchMomentPhoto(photo.src)} onFocus={() => prefetchMomentPhoto(photo.src)} onClick={event => openViewer(photoIndex, event.currentTarget)}>
+                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': photo.tilt, '--photo-offset': index % 2 ? '0.75rem' : '-0.5rem' } as CSSProperties} tabIndex={copy ? -1 : undefined} data-photo-id={photo.id} aria-label={tr("Xem ảnh: {0}", photo.title)} onPointerEnter={() => prefetchMomentPhoto(photo.src)} onFocus={() => prefetchMomentPhoto(photo.src)} onClick={event => openViewer(photoIndex, event.currentTarget)}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <MediaImage optimized src={photo.src} alt={copy ? '' : photo.alt} width={1000} height={750} sizes="(max-width: 767px) 240px, 304px" loading="eager" decoding="async" />
                         <span className="moment-photo__caption"><span>{photo.title}</span><Expand size={16} aria-hidden="true" /></span>
@@ -159,9 +163,9 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
             prefetchMomentPhoto(photos[(selected - 1 + photos.length) % photos.length].src);
           }} />
           <div className="moments-viewer__controls">
-            <button type="button" className="action-secondary-detail" aria-label="Ảnh trước" onClick={() => moveViewer(-1)}><ArrowLeft size={18} aria-hidden="true" /></button>
+            <button type="button" className="action-secondary-detail" aria-label={tr("Ảnh trước")} onClick={() => moveViewer(-1)}><ArrowLeft size={18} aria-hidden="true" /></button>
             <span aria-live="polite">{selected! + 1} / {photos.length}</span>
-            <button type="button" className="action-secondary-detail" aria-label="Ảnh tiếp theo" onClick={() => moveViewer(1)}><ArrowRight size={18} aria-hidden="true" /></button>
+            <button type="button" className="action-secondary-detail" aria-label={tr("Ảnh tiếp theo")} onClick={() => moveViewer(1)}><ArrowRight size={18} aria-hidden="true" /></button>
           </div>
         </Modal>, document.body,
       )}

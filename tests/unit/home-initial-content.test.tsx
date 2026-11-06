@@ -1,7 +1,7 @@
 import { beforeEach, expect, it, vi } from 'vitest';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { HomeContentProvider, HomeText } from '@/features/publications/components/home-content-provider';
-import { defaultHomeText, type HomeContentPayload, type HomeText as HomeTextValues, type HomeTextKey } from '@/features/publications/model/home-content';
+import { defaultHomeText, defaultEnglishHomeText, type HomeContentPayload, type HomeText as HomeTextValues, type HomeTextKey } from '@/features/publications/model/home-content';
 
 const mocks = vi.hoisted(() => ({ read: vi.fn(), actor: vi.fn() }));
 vi.mock('server-only', () => ({}));
@@ -10,10 +10,10 @@ vi.mock('@/features/identity/server/actor', () => ({ getActor: mocks.actor }));
 import HomePage from '@/app/(shell)/(site)/page';
 
 const text = Object.fromEntries(Object.keys(defaultHomeText).map(key => [key, `Nội dung đã lưu ${key}`])) as HomeTextValues;
-const initialContent: HomeContentPayload = { version: 7, text, isAdmin: false };
+const initialContent: HomeContentPayload = { version: 7, englishText: defaultEnglishHomeText, text, isAdmin: false };
 beforeEach(() => {
   vi.clearAllMocks();
-  mocks.read.mockResolvedValue({ version: 7, text });
+  mocks.read.mockResolvedValue({ version: 7, englishText: defaultEnglishHomeText, text });
   mocks.actor.mockResolvedValue(null);
 });
 

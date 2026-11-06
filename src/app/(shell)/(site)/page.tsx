@@ -1,6 +1,9 @@
+import { localizedMetadata } from '@/shared/i18n/metadata';
+
+import { getServerI18n } from '@/shared/i18n/server';
 import { getActor } from '@/features/identity/server/actor';
 import { readHomeContent } from '@/features/publications/server/home-content';
-export const metadata = { title: 'Trang chủ' };
+export const generateMetadata = localizedMetadata({ title: 'Trang chủ' });
 
 import { HomeContentProvider, HomeText, HomeContentLink as Link } from '@/features/publications/components/home-content-provider';
 import { HomeFeaturedSection, HomeMembersSection, HomeMomentsSection, HomeResearchSection } from './home-sections';
@@ -11,6 +14,8 @@ import { redirect } from 'next/navigation';
 export default async function HomePage({ searchParams }: {
   searchParams: Promise<{ q?: string; page?: string }>;
 }) {
+  const { t: tr } = await getServerI18n();
+
   const params = await searchParams;
   // Keep bookmarked search URLs working after moving the library.
   if (params.q !== undefined) {
@@ -30,11 +35,11 @@ export default async function HomePage({ searchParams }: {
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-wrap items-end justify-between gap-4">
               <div className="home-section-heading">
-                <p className="home-section-eyebrow"><HomeText field="featuredEyebrow">Dấu ấn nghiên cứu</HomeText></p>
-                <h2 id="featured-works-title" className="home-section-title"><HomeText field="featuredTitle">Công trình nổi bật</HomeText></h2>
+                <p className="home-section-eyebrow"><HomeText field="featuredEyebrow">{tr("Dấu ấn nghiên cứu")}</HomeText></p>
+                <h2 id="featured-works-title" className="home-section-title"><HomeText field="featuredTitle">{tr("Công trình nổi bật")}</HomeText></h2>
               </div>
               <Link href="/research" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
-                <HomeText field="featuredAction">Xem nghiên cứu khoa học</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <HomeText field="featuredAction">{tr("Xem nghiên cứu khoa học")}</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
             <div className="mt-6 grid gap-5">
@@ -55,11 +60,11 @@ export default async function HomePage({ searchParams }: {
           <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
               <div className="home-section-heading">
-                <p className="home-section-eyebrow"><HomeText field="membersEyebrow">Đội ngũ CLB</HomeText></p>
-                <h2 id="home-members-title" className="home-section-title"><HomeText field="membersTitle">Thành viên</HomeText></h2>
+                <p className="home-section-eyebrow"><HomeText field="membersEyebrow">{tr("Đội ngũ CLB")}</HomeText></p>
+                <h2 id="home-members-title" className="home-section-title"><HomeText field="membersTitle">{tr("Thành viên")}</HomeText></h2>
               </div>
               <Link href="/members" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
-                <HomeText field="membersAction">Xem tất cả thành viên</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <HomeText field="membersAction">{tr("Xem tất cả thành viên")}</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
             <HomeMembersSection />

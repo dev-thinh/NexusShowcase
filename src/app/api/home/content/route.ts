@@ -22,7 +22,7 @@ export async function PUT(request: Request) {
   if (!isSameOriginMutation(request)) return reply({ error: 'Yêu cầu không hợp lệ.' }, 403);
   try {
     if (!await getActor(['ADMIN'])) return reply({ error: 'Chỉ Admin được chỉnh sửa nội dung Trang chủ.' }, 403);
-    const parsed = homeContentSchema.safeParse(await readMutationJson(request, 64_000));
+    const parsed = homeContentSchema.safeParse(await readMutationJson(request, 128_000));
     if (!parsed.success) return reply({ error: 'Vui lòng điền đầy đủ nội dung và kiểm tra độ dài các trường.' }, 400);
     const saved = await saveHomeContent(parsed.data);
     if (!saved) return reply({ error: 'Nội dung đã được Admin khác cập nhật. Hãy sao chép phần cần giữ rồi tải lại bản mới trước khi sửa.' }, 409);

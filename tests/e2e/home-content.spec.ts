@@ -90,6 +90,8 @@ test('mobile inline editing validates fields, retains failed drafts, resolves co
   await page.locator('.home-hero').screenshot({ path: 'test-results/home-inline-mobile.png' });
   await toolbar.getByRole('button', { name: 'Hủy', exact: true }).click();
   await expect(toolbar.getByRole('button', { name: 'Bỏ thay đổi', exact: true })).toBeVisible();
+  await expect(toolbar.getByRole('button', { name: 'Lưu nội dung', exact: true })).toHaveCount(0);
+  await toolbar.getByRole('button', { name: 'Tiếp tục sửa', exact: true }).click();
   let releaseSave!: () => void;
   const saveGate = new Promise<void>(resolve => { releaseSave = resolve; });
   await page.route('**/api/home/content', async route => {
@@ -99,14 +101,13 @@ test('mobile inline editing validates fields, retains failed drafts, resolves co
     } else await route.continue();
   });
   await toolbar.getByRole('button', { name: 'Lưu nội dung', exact: true }).click();
-  await expect(toolbar.getByRole('button', { name: 'Bỏ thay đổi', exact: true })).toBeDisabled();
+  await expect(toolbar.getByRole('button', { name: 'Hủy', exact: true })).toBeDisabled();
   releaseSave();
   await expect(toolbar.getByRole('alert')).toContainText('Lưu thất bại');
-  await toolbar.getByRole('button', { name: 'Tiếp tục sửa', exact: true }).click();
   await expect(title).toHaveValue('Bản đang nhập');
   await page.unroute('**/api/home/content');
   const latest = await (await page.request.get('/api/home/content')).json();
-  const otherEdit = await page.request.put('/api/home/content', { headers: { origin: new URL(page.url()).origin }, data: { version: latest.version, text: { ...latest.text, heroTitle: 'Bản của admin khác' } } });
+  const otherEdit = await page.request.put('/api/home/content', { headers: { origin: new URL(page.url()).origin }, data: { version: latest.version, englishText: latest.englishText, text: { ...latest.text, heroTitle: 'Bản của admin khác' } } });
   expect(otherEdit.status()).toBe(200);
   await toolbar.getByRole('button', { name: 'Lưu nội dung', exact: true }).click();
   await expect(toolbar.getByRole('alert')).toContainText('Admin khác');
@@ -181,4 +182,77 @@ test('saved copy is in server HTML and stays intact throughout hydration and def
   expect(await page.evaluate(() => (window as unknown as { observedDefaultHomeText: string[] }).observedDefaultHomeText)).toEqual([]);
   expect(backgroundReads).toBe(0);
   expect(await database.homePageContent.findUniqueOrThrow({ where: { id: 'home' } })).toMatchObject({ version: 8, text });
+});
+
+test('edits and persists Vietnamese and English independently without losing unsaved changes', async ({ page, fixture }) => {
+  await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/');
+  await page.getByRole('button', { name: 'Chỉnh sửa nội dung', exact: true }).click();
+  const field = page.locator('[data-home-field="heroAction"]');
+  await field.fill('Khám phá');
+  await page.getByRole('switch', { name: /Switch language/ }).click();
+  await expect(field).toHaveValue('Explore works');
+  await field.fill(' ');
+  await page.getByRole('switch', { name: /Switch language/ }).click();
+  await page.getByRole('button', { name: 'Lưu nội dung', exact: true }).click();
+  await expect(page.getByRole('switch', { name: /Switch language/ })).toHaveAttribute('aria-checked', 'true');
+  await expect(field).toHaveAttribute('aria-invalid', 'true');
+  await field.fill('Explore more');
+  await page.getByRole('switch', { name: /Switch language/ }).click();
+  await expect(field).toHaveValue('Khám phá');
+  await page.getByRole('switch', { name: /Switch language/ }).click();
+  await expect(field).toHaveValue('Explore more');
+  await page.getByRole('button', { name: 'Save content', exact: true }).click();
+  await expect(field).toHaveCount(0);
+  await page.reload();
+  await expect(page.locator('.home-hero__primary-action')).toContainText('Explore more');
+  const saved = await (await page.request.get('/api/home/content')).json();
+  expect(saved.text.heroAction).toBe('Khám phá');
+  expect(saved.englishText.heroAction).toBe('Explore more');
+  await page.getByRole('switch', { name: /Switch language/ }).click();
+  await expect(page.locator('.home-hero__primary-action')).toContainText('Khám phá');
+  await expect(page.locator('.home-hero__primary-action')).not.toContainText('Explore more');
+});
+
+test('opens the home editor from its snapshot without waiting for a content request', async ({ page, fixture }) => {
+  await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/');
+  let reads = 0;
+  await page.route('**/api/home/content', async route => {
+    if (route.request().method() === 'GET') {
+      reads++;
+      await route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ error: 'Read unavailable' }) });
+    } else await route.continue();
+  });
+  await page.getByRole('button', { name: 'Chỉnh sửa nội dung', exact: true }).click();
+  const title = page.locator('[data-home-field="heroTitle"]');
+  await expect(title).toHaveValue(defaultHomeText.heroTitle);
+  expect(reads).toBe(0);
+  await title.fill('Chỉnh sửa ngay từ nội dung hiện tại');
+  await page.getByRole('button', { name: 'Lưu nội dung', exact: true }).click();
+  await expect(title).toHaveCount(0);
+  await expect(page.locator('#home-hero-title')).toContainText('Chỉnh sửa ngay từ nội dung hiện tại');
+  expect(reads).toBe(0);
+});
+
+test('discard confirmation replaces editing actions and keeps the safe action first in English', async ({ page, fixture }) => {
+  await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/');
+  await page.getByRole('switch', { name: /Switch language/ }).click();
+  await page.getByRole('button', { name: 'Edit content', exact: true }).click();
+  const title = page.locator('[data-home-field="heroTitle"]');
+  await title.fill('An unsaved English title');
+  const toolbar = page.locator('.home-content-toolbar');
+  await toolbar.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await expect(toolbar.getByRole('button')).toHaveCount(2);
+  await expect(toolbar.getByRole('button', { name: 'Continue editing', exact: true })).toBeFocused();
+  await expect(toolbar.getByRole('button', { name: 'Save content', exact: true })).toHaveCount(0);
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    await toolbar.screenshot({ path: `/tmp/home-discard-confirmation-${width}.png` });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+  await toolbar.getByRole('button', { name: 'Continue editing', exact: true }).click();
+  await expect(title).toHaveValue('An unsaved English title');
+  await toolbar.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await toolbar.getByRole('button', { name: 'Discard changes', exact: true }).click();
+  await expect(title).toHaveCount(0);
+  await expect(page.locator('#home-hero-title')).not.toContainText('An unsaved English title');
 });

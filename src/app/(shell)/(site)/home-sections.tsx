@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { ConferenceCardBanner } from '@/features/publications/components/conference-card-banner';
 
@@ -15,7 +17,7 @@ import { MediaImage } from '@/shared/ui/media-image';
 import { fetchDeferredJson } from '@/shared/lib/deferred-fetch';
 import { ResearchSectionHeading } from './research-section-heading';
 import { DeferredSection } from '@/shared/ui/deferred-section';
-import { LoadingCards } from '@/shared/ui/loading-content';
+import { GallerySkeleton, MemberWallSkeleton, PublicationSkeleton } from '@/shared/ui/content-skeletons';
 import type { PublicationCardDto } from '@/features/publications/model/contracts';
 import type { HomeMembersPayload } from '@/features/members/model/home';
 import type { MomentsPayload } from '@/features/publications/model/moments';
@@ -32,9 +34,15 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
   export async function loadHomeFeatured(signal: AbortSignal) {
     const { items: featuredItems, isAdmin } = await fetchDeferredJson<{ items: PublicationCardDto[]; isAdmin: boolean }>('/api/home?section=featured', signal);
+    return <HomeFeaturedWorks items={featuredItems} isAdmin={isAdmin} />;
+  }
+
+  function HomeFeaturedWorks({ items: featuredItems, isAdmin }: { items: PublicationCardDto[]; isAdmin: boolean }) {
+  const { t: tr } = useI18n();
+
     const returnTo = '/';
     return <div className="grid items-start gap-5">{featuredItems.length === 0 ? (
-              <EmptyState title="Chưa có công trình nổi bật" description="Các công trình đã công bố sẽ xuất hiện tại đây." />
+              <EmptyState title={tr("Chưa có công trình nổi bật")} description={tr("Các công trình đã công bố sẽ xuất hiện tại đây.")} />
             ) : featuredItems.map(item => {
 
 
@@ -43,8 +51,8 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
                   <CardLink slug={item.slug} returnTo={returnTo} />
                   <ConferenceCardBanner value={item.conference} />
                   <div className="publication-card__content grid min-w-0 md:grid-cols-[minmax(0,1fr)_minmax(0,3fr)]">
-                    <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[2/1] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:aspect-auto md:border-b-0 md:border-r">
-                      <div className="absolute inset-0 flex items-center justify-center md:inset-4"><MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={`Hình minh họa: ${item.title}`} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="home-featured-thumbnail" /></div>
+                    <Link href={showcaseHref(item.slug, returnTo)} aria-label={tr("Xem công trình: {0}", item.title)} className="publication-card__media relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden border-b border-slate-200 bg-[#FFFFFF] md:border-b-0 md:border-r">
+                      <div className="home-featured-image-frame relative flex items-center justify-center"><MediaImage optimized={item.thumbnailUrl?.startsWith('/')} src={item.thumbnailUrl} alt={tr("Hình minh họa: {0}", item.title)} width={640} height={480} sizes="(max-width: 767px) 90vw, 320px" loading="eager" decoding="async" className="home-featured-thumbnail" /></div>
                     </Link>
                     <div className="relative flex min-w-0 flex-col px-3 pt-3 sm:px-6 sm:pt-5">
                       <header>
@@ -63,8 +71,7 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
                       <footer className="publication-card__footer flex flex-wrap items-center justify-between gap-x-4 gap-y-1 border-t border-slate-200 py-2">
                         <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 shrink-0 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:text-[#1F2937] hover:underline" />
                         <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
-                        <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:underline">
-                          Xem công trình <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                        <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-2 text-sm font-semibold text-[#1F2937] hover:underline">{tr("Xem công trình ")}<ArrowRight className="h-4 w-4" aria-hidden="true" />
                         </Link>
                       </footer>
 
@@ -100,16 +107,16 @@ async function loadHomeMoments(signal: AbortSignal) {
 }
 
 export function HomeResearchSection() {
-  return <DeferredSection name="research" load={loadHomeResearch} fallback={<><ResearchSectionHeading /><div className="home-research-placeholder" role="status" aria-label="Đang tải hướng nghiên cứu"><span /><span /><span /></div></>} />;
+  return <DeferredSection name="research" load={loadHomeResearch} fallback={<><ResearchSectionHeading /><GallerySkeleton research /></>} />;
 }
 
 export function HomeMomentsSection() {
-  return <DeferredSection name="moments" load={loadHomeMoments} fallback={<div className="home-moments-placeholder" role="status" aria-label="Đang tải hình ảnh hoạt động"><div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><span className="block h-3 w-40 rounded bg-slate-100" /><span className="mt-5 block h-20 max-w-xl rounded bg-slate-100" /></div><div className="home-moments-placeholder__photos" aria-hidden="true">{[0, 1, 2, 3, 4, 5].map(index => <span key={index} />)}</div></div>} />;
+  return <DeferredSection name="moments" load={loadHomeMoments} fallback={<GallerySkeleton />} />;
 }
 
 export function HomeFeaturedSection() {
-  return <DeferredSection name="featured" load={loadHomeFeatured} fallback={<LoadingCards />} />;
+  return <DeferredSection name="featured" load={loadHomeFeatured} fallback={<PublicationSkeleton variant="featured" count={2} />} />;
 }
 export function HomeMembersSection() {
-  return <DeferredSection name="members" load={loadHomeMembers} fallback={<div className="home-member-grid" role="status" aria-label="Đang tải thành viên">{Array.from({ length: 10 }, (_, index) => <span key={index} className="home-member-avatar home-member-avatar--loading" aria-hidden="true" />)}</div>} />;
+  return <DeferredSection name="members" load={loadHomeMembers} fallback={<MemberWallSkeleton dark meta />} />;
 }
