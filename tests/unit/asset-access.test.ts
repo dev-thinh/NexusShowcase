@@ -8,6 +8,21 @@ import { getAssetAccess } from '@/features/assets/server/access';
 const url = '/uploads/resources/file.zip';
 beforeEach(() => { vi.clearAllMocks(); mocks.actor.mockResolvedValue(null); mocks.registry.mockResolvedValue(null); mocks.rows.mockResolvedValue([]); mocks.galleries.mockResolvedValue([]); mocks.avatar.mockResolvedValue(null); });
 
+it('serves active public avatars without hydrating publication history or galleries', async () => {
+  mocks.avatar.mockResolvedValue({ id: 'member' });
+  expect(await getAssetAccess('/uploads/thumbnails/avatar.jpg')).toEqual({ allowed: true, public: true });
+  expect(mocks.rows).not.toHaveBeenCalled();
+  expect(mocks.galleries).not.toHaveBeenCalled();
+  expect(mocks.actor).not.toHaveBeenCalled();
+});
+
+it('denies quarantined avatars before using the public avatar shortcut', async () => {
+  mocks.registry.mockResolvedValue({ deletionToken: 'quarantine' });
+  mocks.avatar.mockResolvedValue({ id: 'member' });
+  expect(await getAssetAccess('/uploads/thumbnails/avatar.jpg')).toEqual({ allowed: false, public: false });
+  expect(mocks.avatar).not.toHaveBeenCalled();
+});
+
 it('denies anonymous access to a file referenced only by a private publication', async () => {
   mocks.rows.mockResolvedValue([{ creatorId: 'author', status: 'PUBLISHED', visibility: 'PRIVATE', live: [url], drafts: [] }]);
   expect(await getAssetAccess(url)).toEqual({ allowed: false, public: false });
