@@ -24,7 +24,7 @@ it('adds a hidden admin without changing existing accounts or public member coun
     }
   }
   for (const authenticated of [false, true]) {
-    const directory = await listDirectory({ authenticated, role: 'ADMIN', page: 1, pageSize: 'all' });
+    const directory = await listDirectory({ authenticated, role: 'ADMIN', page: 1, pageSize: 12 });
     expect(directory.total).toBe(1);
     expect(directory.items.map(user => user.id)).toEqual([existing.id]);
   }

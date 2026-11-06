@@ -1571,3 +1571,10 @@ nav a.inline-flex { white-space: nowrap; }
 
 /* Translated labels must never squeeze an action icon out of view. */
 :is(.action-primary-detail, .action-secondary-detail, .action-secondary-card, .action-toggle-detail) > svg { flex-shrink: 0; }
+
+/* Reserve one of eight phone slots for the full directory without a hydration flash. */
+.home-member-more--mobile { display: none; }
+@media (max-width: 767px) {
+  .home-member-slot--desktop-only, .home-member-more--desktop { display: none; }
+  .home-member-more--mobile { display: flex; }
+}

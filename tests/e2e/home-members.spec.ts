@@ -6,6 +6,7 @@ async function assertCenteredRows(grid: import('@playwright/test').Locator) {
     const rows = new Map<number, DOMRect[]>();
     for (const child of element.children) {
       const box = child.getBoundingClientRect();
+      if (!box.width || !box.height) continue;
       const top = Math.round(box.top);
       rows.set(top, [...(rows.get(top) ?? []), box]);
     }
@@ -38,7 +39,7 @@ test('homepage samples thirty positions and preserves the selection while intera
   await expect(page).toHaveURL(/\/members$/);
 });
 
-for (const count of [2, 13, 30]) test(`centers every row for ${count} members on desktop and mobile`, async ({ page }) => {
+for (const count of [2, 8, 9, 13, 30]) test(`centers every row for ${count} members on desktop and mobile`, async ({ page }) => {
   await page.route('**/api/home?section=members', route => route.fulfill({ json: {
     total: count,
     members: Array.from({ length: count }, (_, index) => ({ id: `m${index}`, publicSlug: `thanh-vien-${index}`, fullName: `Thành viên ${index}`, avatarUrl: null, role: index === 0 ? 'ADMIN' : index < 4 ? 'CORE_MEMBER' : 'MEMBER' })),
@@ -47,10 +48,13 @@ for (const count of [2, 13, 30]) test(`centers every row for ${count} members on
   const section = page.locator('[data-deferred-section="members"]');
   await section.scrollIntoViewIfNeeded();
   await expect(section.locator('[data-home-member-avatar]')).toHaveCount(count);
-  await expect(section.locator('.home-member-more')).toHaveCount(0);
+  await expect(section.locator('.home-member-more:visible')).toHaveCount(0);
   await assertCenteredRows(section.locator('.home-member-grid'));
   await page.setViewportSize({ width: 390, height: 844 });
   await section.scrollIntoViewIfNeeded();
+  await expect(section.locator('[data-home-member-avatar]:visible')).toHaveCount(count > 8 ? 7 : count);
+  await expect(section.locator('.home-member-more:visible')).toHaveCount(count > 8 ? 1 : 0);
+  if (count > 8) await expect(section.locator('.home-member-more:visible')).toContainText(`+${count - 7}`);
   await assertCenteredRows(section.locator('.home-member-grid'));
   const avatar = section.locator('[data-home-member-avatar]').first();
   await avatar.focus();

@@ -9,17 +9,19 @@ import { useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { UserRound } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
-import type { HomeMember, HomeMembersPayload } from '../model/home';
+import { HOME_MEMBER_MOBILE_LIMIT, type HomeMember, type HomeMembersPayload } from '../model/home';
 import type { PublicMemberRole } from '../model/directory';
 
 const labels: Record<PublicMemberRole, string> = MEMBER_ROLE_LABELS;
 
-export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersPayload & { showMeta?: boolean }) {
+export function HomeMemberWall({ members, total, showMeta = true, limitOnMobile = true }: HomeMembersPayload & { showMeta?: boolean; limitOnMobile?: boolean }) {
   const { t: tr } = useI18n();
 
   const [active, setActive] = useState<{ member: HomeMember; x: number; y: number; below: boolean; viewport: number[] } | null>(null);
   const tooltipId = useId();
   const remaining = Math.max(0, total - members.length);
+  const mobileVisibleCount = limitOnMobile ? Math.min(members.length, total > HOME_MEMBER_MOBILE_LIMIT ? HOME_MEMBER_MOBILE_LIMIT - 1 : HOME_MEMBER_MOBILE_LIMIT) : members.length;
+  const mobileRemaining = Math.max(0, total - mobileVisibleCount);
 
   useEffect(() => {
     if (!active) return;
@@ -63,9 +65,9 @@ export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersP
         </div>
       </div>}
       <div className="home-member-grid">
-        {members.map(member => {
+        {members.map((member, index) => {
           return (
-            <div className="home-member-slot" key={member.id}>
+            <div className={`home-member-slot${index >= mobileVisibleCount ? ' home-member-slot--desktop-only' : ''}`} key={member.id}>
               <Link
                 href={`/members/${member.id}`}
                 data-home-member-avatar="true"
@@ -80,15 +82,18 @@ export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersP
                 onBlur={() => setActive(null)}
                 onClick={() => setActive(null)}
               >
-                <MemberAvatar fullName={member.fullName} optimized={member.avatarUrl?.startsWith('/')} src={member.avatarUrl} alt="" width={76} height={76} sizes="76px" className="h-full w-full rounded-full object-cover" loading="eager" decoding="async" />
+                <MemberAvatar fullName={member.fullName} optimized={member.avatarUrl?.startsWith('/')} src={member.avatarUrl} alt="" width={76} height={76} sizes="76px" className="h-full w-full rounded-full object-cover" loading={limitOnMobile && index < mobileVisibleCount ? 'eager' : 'lazy'} decoding="async" />
               </Link>
             </div>
           );
         })}
-        {remaining > 0 && <Link href="/members" className="home-member-slot home-member-more" aria-label={tr("Xem tất cả {0} thành viên, còn {1} thành viên", total, remaining)}>
-          <span className="home-member-more__circle"><UserRound size={22} aria-hidden="true" /><strong>+{remaining}</strong></span>
+        {[
+          { count: remaining, variant: 'desktop' },
+          { count: mobileRemaining, variant: 'mobile' },
+        ].map(({ count, variant }) => count > 0 && <Link key={variant} href="/members" className={`home-member-slot home-member-more home-member-more--${variant}`} aria-label={tr("Xem tất cả {0} thành viên, còn {1} thành viên", total, count)}>
+          <span className="home-member-more__circle"><UserRound size={22} aria-hidden="true" /><strong>+{count}</strong></span>
           <span className="home-member-more__label">{tr("Xem tất cả")}</span>
-        </Link>}
+        </Link>)}
       </div>
       {active && createPortal(
         <div id={tooltipId} role="tooltip" className={`home-member-tooltip${active.below ? ' home-member-tooltip--below' : ''}`} style={{ left: active.x, top: active.y }}>

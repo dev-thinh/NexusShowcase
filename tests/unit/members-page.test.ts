@@ -18,9 +18,9 @@ describe('Members Directory Page', () => {
     expect(content).toContain('title={tr("Ban chủ nhiệm")}');
     expect(content).toContain('title={tr("Trưởng nhóm")}');
     expect(content).toContain('title={tr("Thành viên")}');
-    expect(content).toContain('<HomeMemberWall');
+    expect(content).toContain('<MemberDirectoryList');
     expect(content).toContain(
-      "pageSize: 'all'",
+      "pageSize: MEMBER_DIRECTORY_PAGE_SIZE",
     );
     expect(content).not.toContain('href="/members/all"');
     expect(content).not.toContain('Xem tất cả thành viên');
@@ -53,7 +53,7 @@ describe('Members Directory Page', () => {
     expect(pagination).toContain('Trang sau');
   });
 
-  it('provides a MEMBER-only full directory without pagination', () => {
+  it('provides a bounded MEMBER-only directory with progressive loading', () => {
     const fullPagePath = path.resolve(
       process.cwd(),
       'src/app/(shell)/(site)/members/all/page.tsx',
@@ -63,7 +63,7 @@ describe('Members Directory Page', () => {
     const content = fs.readFileSync(fullPagePath, 'utf-8');
     expect(content).toContain("role: 'MEMBER'");
     expect(content).toContain(
-      "pageSize: 'all'",
+      "pageSize: MEMBER_DIRECTORY_PAGE_SIZE",
     );
     expect(content).toContain('Tất cả thành viên');
     expect(content).not.toContain("role: 'ADMIN'");
