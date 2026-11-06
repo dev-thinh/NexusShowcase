@@ -49,8 +49,21 @@ export function auditUnused(root) {
         usedNames.set(dependency.target, names);
       }
       if (!statement.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.ExportKeyword) || statement.modifiers.some(modifier => modifier.kind === ts.SyntaxKind.DefaultKeyword)) continue;
-      const names = ts.isFunctionDeclaration(statement) ? [statement.name?.text] : ts.isVariableStatement(statement) ? statement.declarationList.declarations.map(declaration => declaration.name.getText(sf)) : [];
-      for (const name of names.filter(Boolean)) if ((identifiers.get(name) ?? 0) === 1) exported.push({ file, name });
+      const namedDeclaration = ts.isFunctionDeclaration(statement) || ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement) || ts.isClassDeclaration(statement) || ts.isEnumDeclaration(statement);
+      const names = namedDeclaration ? [statement.name?.text] : ts.isVariableStatement(statement) ? statement.declarationList.declarations.map(declaration => declaration.name.getText(sf)) : [];
+      for (const name of names.filter(Boolean)) {
+        let declarationReferences = 1;
+        if (ts.isTypeAliasDeclaration(statement) || ts.isInterfaceDeclaration(statement)) {
+          // Recursive references inside a type are not consumers of its export.
+          declarationReferences = 0;
+          function countInternalReferences(node) {
+            if (ts.isIdentifier(node) && node.text === name) declarationReferences++;
+            ts.forEachChild(node, countInternalReferences);
+          }
+          countInternalReferences(statement);
+        }
+        if ((identifiers.get(name) ?? 0) === declarationReferences) exported.push({ file, name });
+      }
     }
   }
   return {

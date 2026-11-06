@@ -29,6 +29,27 @@ it('recognizes named exports consumed by deferred module imports', () => {
   });
   expect(auditUnused(root).unusedExports).toEqual([]);
 });
+it('finds unused exported types while retaining type-only imports and re-exports', () => {
+  const root = fixture({
+    'src/app/page.tsx': "import type { Input } from '../barrel'; import type { Settings } from '../types'; const value: Input = {}; const settings: Settings = {}; export default function Page() { return [value, settings]; }",
+    'src/barrel.ts': "export type { Input } from './types';",
+    'src/types.ts': 'export type Input = {}; export interface Settings {} export type AbandonedInput = {}; export interface AbandonedSettings {}',
+  });
+  expect(auditUnused(root).unusedExports).toEqual([
+    { file: 'src/types.ts', name: 'AbandonedInput' },
+    { file: 'src/types.ts', name: 'AbandonedSettings' },
+  ]);
+});
+it('does not mistake a recursive type declaration for a consumer of its own export', () => {
+  const root = fixture({
+    'src/app/page.tsx': "import { read } from '../types'; export default function Page() { return read({}); }",
+    'src/types.ts': 'export interface UnusedNode { next?: UnusedNode } export type UnusedTree = { children: UnusedTree[] }; export interface UsedNode { next?: UsedNode } export function read(node: UsedNode) { return node.next; }',
+  });
+  expect(auditUnused(root).unusedExports).toEqual([
+    { file: 'src/types.ts', name: 'UnusedNode' },
+    { file: 'src/types.ts', name: 'UnusedTree' },
+  ]);
+});
 it('retains files referenced only by revision history, drafts, overrides, avatars or galleries', async () => {
   const root = fixture(Object.fromEntries(['history.png', 'draft.png', 'editor.png', 'avatar.png', 'home.png', 'research.png', 'orphan.png'].map(name => [`public/uploads/thumbnails/${name}`, 'asset'])));
   const db = {
