@@ -23,8 +23,8 @@ describe('homepage photo wall', () => {
   it('renders the existing six images once in the top row with decorative loop copies', () => {
     const html = renderToStaticMarkup(<HomeMoments initialGallery={{ version: 0, isAdmin: false, photos: defaultMoments }} />);
     expect(html.match(/class="moments-lane"/g)).toHaveLength(1);
-    expect(html.match(/class="moments-group" aria-hidden="true"/g)).toHaveLength(1);
-    expect(html.match(/tabindex="-1"/g)).toHaveLength(6);
+    expect(html.match(/class="moments-group" aria-hidden="true"/g)).toHaveLength(2);
+    expect(html.match(/tabindex="-1"/g)).toHaveLength(12);
     expect(html).toContain('Tạm dừng chuyển động');
     expect(html).not.toContain('Rê chuột để dừng.');
     expect(html).not.toContain('Vuốt để khám phá.');
@@ -32,14 +32,16 @@ describe('homepage photo wall', () => {
     expect(html).toContain(defaultMoments[0].title);
     expect(html).not.toContain('role="dialog"');
     const images = [...html.matchAll(/<img[^>]+>/g)].map(match => match[0]);
-    expect(images).toHaveLength(12);
-    expect(images.every(img => img.includes('loading="eager"') && img.includes('?w=') && img.includes('width=') && img.includes('height='))).toBe(true);
+    expect(images).toHaveLength(18);
+    expect(images.filter(img => img.includes('loading="eager"'))).toHaveLength(6);
+    expect(images.filter(img => img.includes('loading="lazy"'))).toHaveLength(12);
+    expect(images.every(img => img.includes('?w=') && img.includes('width=') && img.includes('height='))).toBe(true);
   });
   it.each([0, 1, 2, 3, 6])('applies the per-row animation threshold with %i photos', count => {
     const html = renderToStaticMarkup(<HomeMoments initialGallery={{ version: 0, isAdmin: false, photos: defaultMoments.slice(0, count) }} />);
     if (!count) { expect(html).not.toContain('data-motion='); return; }
     expect(html).toContain(`data-motion="${count >= 3}"`);
-    expect(html.match(/class="moments-group" aria-hidden="true"/g)?.length ?? 0).toBe(count >= 3 ? 1 : 0);
+    expect(html.match(/class="moments-group" aria-hidden="true"/g)?.length ?? 0).toBe(count >= 3 ? 2 : 0);
     expect(html.includes('aria-label="Tạm dừng chuyển động"')).toBe(count >= 3);
   });
   it('renders different photos in each row with independent motion', () => {

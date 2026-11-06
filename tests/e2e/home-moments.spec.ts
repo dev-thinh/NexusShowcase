@@ -108,7 +108,7 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
     await expect(lane.locator('.moments-track')).toHaveCSS('animation-name', 'none');
     await lane.evaluate(element => { element.scrollLeft = 150; });
     await expect.poll(() => lane.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
-    await lane.locator('.moments-group:not([aria-hidden]) .moment-photo').nth(1).click();
+    await lane.locator(reducedMotion === 'reduce' ? '.moments-group:not([aria-hidden]) .moment-photo' : '.moments-group:nth-child(2) .moment-photo').nth(1).click();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('button', { name: 'Đóng hộp thoại' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -195,5 +195,79 @@ test('cover frames keep their width in grid and flex cards on desktop and mobile
       await expect.poll(async () => (await dimensions()).height, { message: `${route} at ${width}px` }).toBeGreaterThan(50);
       await expect.poll(async () => { const size = await dimensions(); return Math.abs(size.width / size.height - 4 / 3); }).toBeLessThan(0.03);
     }
+  }
+});
+
+
+test('mobile lanes keep drifting and wrap manual scrolling in both directions', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  const lane = page.locator('.moments-lane[data-motion="true"]').first();
+  await expect(lane).toBeVisible();
+  const initial = await lane.evaluate(element => element.scrollLeft);
+  await expect.poll(() => lane.evaluate(element => element.scrollLeft)).toBeGreaterThan(initial + 5);
+  await page.getByRole('button', { name: 'Tạm dừng chuyển động', exact: true }).click();
+  const paused = await lane.evaluate(element => element.scrollLeft);
+  await page.waitForTimeout(200);
+  expect(await lane.evaluate(element => element.scrollLeft)).toBe(paused);
+  for (const edge of ['start', 'end']) {
+    await lane.evaluate((element, edge) => { element.scrollLeft = edge === 'start' ? 0 : element.scrollWidth; }, edge);
+    await expect.poll(() => lane.evaluate(element => {
+      const period = element.querySelector('.moments-group')!.getBoundingClientRect().width;
+      return element.scrollLeft >= period / 2 && element.scrollLeft <= period * 1.5;
+    })).toBe(true);
+  }
+  await page.getByRole('button', { name: 'Tiếp tục chuyển động', exact: true }).click();
+  const resumed = await lane.evaluate(element => element.scrollLeft);
+  await expect.poll(() => lane.evaluate(element => element.scrollLeft)).toBeGreaterThan(resumed + 5);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
+test('enlarges desktop moment frames while retaining the current mobile dimensions', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  for (const [viewport, expected] of [[390, '264px'], [1440, '336px']] as const) {
+    await page.setViewportSize({ width: viewport, height: 900 });
+    await expect(page.locator('.moment-photo--wide').first()).toHaveCSS('width', expected);
+  }
+});
+
+test('uniformly uploaded moments have stable mixed paper-photo poses across loop copies', async ({ page, database }) => {
+  const gallery = await database.homeMomentsGallery.findUniqueOrThrow({ where: { id: 'home' } });
+  const photos = gallery.photos as Array<Record<string, import('@prisma/client').Prisma.JsonValue>>;
+  await database.homeMomentsGallery.update({ where: { id: 'home' }, data: { photos: photos.map(photo => ({ ...photo, tilt: '-2deg' })) } });
+  await page.goto('/');
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  const lane = page.locator('.moments-lane').first();
+  const poses = await lane.locator('.moments-group').first().locator('.moment-photo').evaluateAll(elements => elements.map(element => ({ id: (element as HTMLElement).dataset.photoId, tilt: (element as HTMLElement).style.getPropertyValue('--photo-tilt'), offset: (element as HTMLElement).style.getPropertyValue('--photo-offset') })));
+  expect(poses.some(pose => parseFloat(pose.tilt) > 0)).toBe(true);
+  expect(poses.some(pose => parseFloat(pose.tilt) < 0)).toBe(true);
+  expect(new Set(poses.map(pose => pose.tilt)).size).toBeGreaterThan(2);
+  const copy = await lane.locator('.moments-group').nth(1).locator('.moment-photo').evaluateAll(elements => elements.map(element => ({ id: (element as HTMLElement).dataset.photoId, tilt: (element as HTMLElement).style.getPropertyValue('--photo-tilt'), offset: (element as HTMLElement).style.getPropertyValue('--photo-offset') })));
+  expect(copy).toEqual(poses);
+});
+
+test('sparse moment rows distribute the same horizontal spacing within a group and across its loop seam', async ({ page, database }) => {
+  const gallery = await database.homeMomentsGallery.findUniqueOrThrow({ where: { id: 'home' } });
+  const photos = gallery.photos as Array<Record<string, import('@prisma/client').Prisma.JsonValue>>;
+  await database.homeMomentsGallery.update({ where: { id: 'home' }, data: { photos: photos.slice(0, 3).map((photo, index) => ({ ...photo, slot: index })) } });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({ width, height: 900 });
+    const gaps = await page.locator('.moments-lane').first().evaluate(element => {
+      const photos = [...element.querySelectorAll<HTMLElement>('.moments-group:first-child .moment-photo')];
+      const next = element.querySelector<HTMLElement>('.moments-group:nth-child(2) .moment-photo')!;
+      return photos.map((photo, index) => {
+        const following = photos[index + 1] ?? next;
+        return following.offsetLeft - photo.offsetLeft - photo.offsetWidth;
+      });
+    });
+    expect(Math.max(...gaps) - Math.min(...gaps)).toBeLessThanOrEqual(2);
+    expect(Math.min(...gaps)).toBeGreaterThanOrEqual(15);
   }
 });
