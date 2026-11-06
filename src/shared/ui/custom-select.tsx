@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { Check, ChevronDown } from 'lucide-react';
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
@@ -18,10 +20,13 @@ export interface CustomSelectProps {
   ariaLabel?: string;
   className?: string;
   onChange?: (value: string) => void;
+  submitOnChange?: boolean;
 }
 
 /** Shared single-choice dropdown for forms and filters. */
-export function CustomSelect({ id, name, value, defaultValue = '', options, placeholder = 'Chọn…', invalid, describedBy, disabled, required, ariaLabel, className = '', onChange }: CustomSelectProps) {
+export function CustomSelect({ id, name, value, defaultValue = '', options, placeholder = 'Chọn…', invalid, describedBy, disabled, required, ariaLabel, className = '', onChange, submitOnChange = false }: CustomSelectProps) {
+  const { t: tr } = useI18n();
+
   const generatedId = useId();
   const triggerId = id ?? `select-${generatedId}`;
   const listId = `${triggerId}-options`;
@@ -80,10 +85,17 @@ export function CustomSelect({ id, name, value, defaultValue = '', options, plac
 
   const choose = (index: number) => {
     if (disabled || triggerRef.current?.matches(':disabled') || !options[index]) return;
-    setInternalValue(options[index].value);
+    const next = options[index].value;
+    if (next === currentValue) { setOpen(false); triggerRef.current?.focus(); return; }
+    setInternalValue(next);
     onChange?.(options[index].value);
     setOpen(false);
     triggerRef.current?.focus();
+    if (submitOnChange && inputRef.current?.form) {
+      // React commits state after this event; submit the newly chosen value now.
+      inputRef.current.value = next;
+      inputRef.current.form.requestSubmit();
+    }
   };
 
   return (
@@ -92,7 +104,7 @@ export function CustomSelect({ id, name, value, defaultValue = '', options, plac
     }}>
       {name && <input ref={inputRef} type="hidden" name={name} value={currentValue} disabled={disabled} />}
       <button ref={triggerRef} id={triggerId} type="button" role="combobox" disabled={disabled}
-        aria-label={ariaLabel} aria-haspopup="listbox" aria-expanded={open && !disabled} aria-controls={listId}
+        aria-label={ariaLabel ? tr(ariaLabel) : undefined} aria-haspopup="listbox" aria-expanded={open && !disabled} aria-controls={listId}
         aria-activedescendant={open && !disabled && options[active] ? `${listId}-${active}` : undefined}
         aria-invalid={invalid} aria-required={required} aria-describedby={describedBy}
         onClick={() => { setActive(Math.max(selected, 0)); setOpen(current => !current); }}
@@ -113,12 +125,12 @@ export function CustomSelect({ id, name, value, defaultValue = '', options, plac
             const now = Date.now();
             const text = (now - searchRef.current.time < 700 ? searchRef.current.text : '') + event.key.toLocaleLowerCase('vi');
             searchRef.current = { text, time: now };
-            const index = options.findIndex(option => option.label.toLocaleLowerCase('vi').startsWith(text));
+            const index = options.findIndex(option => tr(option.label).toLocaleLowerCase().startsWith(text));
             if (index >= 0) { event.preventDefault(); setOpen(true); setActive(index); }
           }
         }}
         className={`flex min-h-11 w-full items-center justify-between gap-2 rounded-md border bg-white px-3 py-2.5 text-left text-sm font-normal text-[#1F2937] outline-none transition-colors hover:border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-[#153D67]/15 disabled:cursor-not-allowed disabled:opacity-50 ${invalid ? 'border-slate-200' : 'border-slate-200'}`}>
-        <span className="truncate">{selected >= 0 ? options[selected].label : placeholder}</span>
+        <span className="truncate">{selected >= 0 ? tr(options[selected].label) : tr(placeholder)}</span>
         <ChevronDown aria-hidden="true" className={`h-4 w-4 shrink-0 text-[#1F2937] transition-transform motion-reduce:transition-none ${open && !disabled ? 'rotate-180' : ''}`} />
       </button>
       {open && !disabled && createPortal(<div ref={listRef} id={listId} role="listbox" aria-labelledby={triggerId} style={position} className="fixed z-[60] overflow-y-auto overscroll-contain rounded-md border border-slate-200 bg-white p-1.5 shadow-lg">
@@ -126,9 +138,9 @@ export function CustomSelect({ id, name, value, defaultValue = '', options, plac
           <div key={option.value} id={`${listId}-${index}`} role="option" aria-selected={option.value === currentValue}
             onMouseDown={event => event.preventDefault()} onMouseEnter={() => setActive(index)} onClick={() => choose(index)}
             className={`flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 text-left text-sm font-normal ${index === active ? 'bg-[#FFFFFF] text-[#1F2937]' : 'text-[#1F2937] hover:bg-[#FFFFFF]'}`}>
-            <span>{option.label}</span>{option.value === currentValue && <Check aria-hidden="true" className="h-4 w-4 shrink-0" />}
+            <span>{tr(option.label)}</span>{option.value === currentValue && <Check aria-hidden="true" className="h-4 w-4 shrink-0" />}
           </div>
-        )) : <p className="px-3 py-2 text-sm text-[#1F2937]">Chưa có lựa chọn</p>}
+        )) : <p className="px-3 py-2 text-sm text-[#1F2937]">{tr("Chưa có lựa chọn")}</p>}
       </div>, document.body)}
     </div>
   );

@@ -9,7 +9,8 @@ it('uses the shared dropdown for both member filters and preserves URL-derived v
   expect(html).not.toContain('<select');
   expect(html).toContain('name="role" value="CORE_MEMBER"');
   expect(html).toContain('name="status" value="DISABLED"');
-  expect(html).toContain('Trưởng nhóm (2)');
+  expect(html).toContain('Trưởng nhóm');
+  expect(html).not.toContain('Trưởng nhóm (2)');
   expect(html).toContain('Đã vô hiệu hóa');
   expect(html).toContain('value="Nguyễn"');
   expect(html).toContain('Bộ lọc');
