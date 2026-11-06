@@ -19,13 +19,14 @@ export function PageReveal() {
     const pressed = new Set<Animation>();
     let pointerActive = false;
     let resumeFrame = 0;
+    let touchRelease: ReturnType<typeof setTimeout> | undefined;
     const entryInset = Math.min(120, Math.round(window.innerHeight * 0.15));
     const reveal = (element: HTMLElement) => {
       if (tracked.has(element) || settled.has(element)) return;
       const animation = element.animate([
         { opacity: 0.35, translate: '0 24px' },
         { opacity: 1, translate: '0 0' },
-      ], { delay: 100, duration: 600, fill: 'backwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
+      ], { delay: 100 + Math.min(500, Math.max(0, Number(element.dataset.revealDelay) || 0)), duration: 600, fill: 'backwards', easing: 'cubic-bezier(0.16, 1, 0.3, 1)' });
       animation.onfinish = () => {
         settled.add(element);
         tracked.delete(element);
@@ -96,7 +97,14 @@ export function PageReveal() {
       }
       settleAncestors(event.target as Element);
     };
-    const onPointerEnd = () => {
+    const onPointerEnd = (event?: PointerEvent | MouseEvent) => {
+      clearTimeout(touchRelease);
+      // Touch focus is dispatched after pointerup and before the synthesized click.
+      // Keep the target frozen through that focus event so the tap cannot move it.
+      if (event?.type === 'pointerup' && (event as PointerEvent).pointerType === 'touch') {
+        touchRelease = setTimeout(() => onPointerEnd(), 400);
+        return;
+      }
       pointerActive = false;
       cancelAnimationFrame(resumeFrame);
       resumeFrame = requestAnimationFrame(() => {
@@ -122,6 +130,7 @@ export function PageReveal() {
     document.addEventListener('pointerdown', onPointerDown, true);
     document.addEventListener('pointerup', onPointerEnd, true);
     document.addEventListener('pointercancel', onPointerEnd, true);
+    document.addEventListener('click', onPointerEnd, true);
     window.addEventListener('hashchange', onHash);
     motion.addEventListener('change', onMotionChange);
     onHash();
@@ -133,6 +142,8 @@ export function PageReveal() {
       document.removeEventListener('pointerdown', onPointerDown, true);
       document.removeEventListener('pointerup', onPointerEnd, true);
       document.removeEventListener('pointercancel', onPointerEnd, true);
+      document.removeEventListener('click', onPointerEnd, true);
+      clearTimeout(touchRelease);
       cancelAnimationFrame(resumeFrame);
       window.removeEventListener('hashchange', onHash);
       motion.removeEventListener('change', onMotionChange);

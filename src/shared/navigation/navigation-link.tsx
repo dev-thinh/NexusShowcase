@@ -1,10 +1,14 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { useNavigationTransition } from '@/shared/navigation/navigation-transition';
 import Link, { useLinkStatus } from 'next/link';
 import { useEffect, useRef, type ComponentProps } from 'react';
 
 function PendingNavigation({ requestId }: { requestId: { current: number | null } }) {
+  const { t: tr } = useI18n();
+
   const { pending } = useLinkStatus();
   const navigation = useNavigationTransition();
   const finish = navigation?.finish;
@@ -27,7 +31,7 @@ function PendingNavigation({ requestId }: { requestId: { current: number | null 
   }, [pending, navigation, requestId]);
   if (!pending) return null;
   return <>
-    <span role="status" className="sr-only">Đang chuyển trang…</span>
+    <span role="status" className="sr-only">{tr("Đang chuyển trang…")}</span>
   </>;
 }
 

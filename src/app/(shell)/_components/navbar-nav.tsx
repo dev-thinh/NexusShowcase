@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { publicNavigationSection } from '@/shared/navigation/public-section';
 import { usePublicSectionContext } from '@/shared/navigation/public-section-context';
@@ -31,6 +33,8 @@ interface NavbarNavProps {
 }
 
 export function NavbarNav({ user }: NavbarNavProps) {
+  const { t: tr } = useI18n();
+
   const pathname = usePathname();
   const [avatarUrl, setAvatarUrl] = useState(user?.avatarUrl);
   useEffect(() => { setAvatarUrl(user?.avatarUrl); }, [user?.id, user?.avatarUrl]);
@@ -98,19 +102,19 @@ export function NavbarNav({ user }: NavbarNavProps) {
               onClick={() => setIsProfileMenuOpen((open) => !open)}
               aria-expanded={isProfileMenuOpen}
               aria-controls="profile-navigation"
-              aria-label={`Menu tài khoản: ${user.name || 'Thành viên'}`}
+              aria-label={tr("Menu tài khoản: {0}", user.name || 'Thành viên')}
               className={`h-10 px-2.5 sm:px-3 rounded-lg inline-flex items-center gap-2 text-sm border shadow-2xs cursor-pointer transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] focus-visible:ring-offset-2 ${
                 isAdminActive || isProfileActive || isDashboardActive
                   ? 'bg-brand-button text-white border-transparent'
                   : 'bg-white hover:bg-[#FFFFFF] text-[#1F2937] border-slate-200'
               }`}
             >
-              <MemberAvatar fullName={user.name || 'Thành viên'} src={avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
+              <MemberAvatar fullName={user.name || tr("Thành viên")} src={avatarUrl} alt="" width={24} height={24} className="h-6 w-6 shrink-0 rounded-full object-cover text-xs" />
               <span className="hidden xl:block truncate xl:max-w-[110px] font-semibold">
-                {user.name || 'Thành viên'}
+                {user.name || tr("Thành viên")}
               </span>
               <span className="hidden xl:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
-                {getMemberRoleLabel(user.role)}
+                {tr(getMemberRoleLabel(user.role))}
               </span>
               <ChevronDown aria-hidden="true" className={`hidden xl:block w-3.5 h-3.5 shrink-0 transition-transform motion-reduce:transition-none ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -120,7 +124,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
               <nav
                 id="profile-navigation"
                 hidden={!isProfileMenuOpen}
-                aria-label="Chức năng tài khoản"
+                aria-label={tr("Chức năng tài khoản")}
                 onClick={(event) => {
                   if ((event.target as HTMLElement).closest('a')) setIsProfileMenuOpen(false);
                 }}
@@ -141,7 +145,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
                       className={`flex items-center gap-2.5 min-h-11 px-3 py-2 rounded-lg text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#153D67] ${active ? 'bg-[#153D67]/10 text-[#153D67]' : 'text-foreground-muted hover:text-[#1F2937] hover:bg-slate-50'}`}
                     >
                       <Icon aria-hidden="true" className="w-4 h-4 shrink-0" />
-                      <span>{label}</span>
+                      <span>{tr(label)}</span>
                     </Link>
                   );
                 })}
@@ -154,7 +158,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
           /* Khách: Nút Đăng nhập */
           <Link
             href="/login"
-            aria-label="Đăng nhập"
+            aria-label={tr("Đăng nhập")}
             className={
               isLoginActive
                 ? activeTabClass
@@ -163,7 +167,7 @@ export function NavbarNav({ user }: NavbarNavProps) {
             aria-current={isLoginActive ? 'page' : undefined}
           >
             <User className="h-5 w-5 xl:hidden" aria-hidden="true" />
-            <span className="hidden xl:inline">Đăng nhập</span>
+            <span className="hidden xl:inline">{tr("Đăng nhập")}</span>
           </Link>
         )}
       </div>
@@ -185,6 +189,8 @@ const publicLinks = [
 ];
 
 export function PublicNavigation() {
+  const { t: tr } = useI18n();
+
   const pathname = usePathname();
   const visualPathname = useNavigationVisualPathname();
   const detail = usePublicSectionContext();
@@ -223,13 +229,13 @@ export function PublicNavigation() {
   }, [menuOpen]);
 
   return <div ref={shellRef} className="site-public-navigation-shell">
-    <button ref={toggleRef} type="button" className="site-mobile-menu-toggle" aria-expanded={menuOpen} aria-controls="public-navigation" aria-label={menuOpen ? 'Đóng menu điều hướng' : 'Mở menu điều hướng'} onClick={() => setMenuOpen(open => !open)}>
+    <button ref={toggleRef} type="button" className="site-mobile-menu-toggle" aria-expanded={menuOpen} aria-controls="public-navigation" aria-label={menuOpen ? tr("Đóng menu điều hướng") : tr("Mở menu điều hướng")} onClick={() => setMenuOpen(open => !open)}>
       {menuOpen ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
     </button>
-    <nav id="public-navigation" aria-label="Điều hướng chính" data-open={menuOpen ? 'true' : 'false'} className="site-public-navigation flex flex-nowrap col-start-2 row-start-1 justify-self-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto" onClick={event => {
+    <nav id="public-navigation" aria-label={tr("Điều hướng chính")} data-open={menuOpen ? 'true' : 'false'} className="site-public-navigation flex flex-nowrap col-start-2 row-start-1 justify-self-center items-center gap-1.5 sm:gap-2 z-10 pointer-events-auto" onClick={event => {
       if ((event.target as Element).closest('a')) setMenuOpen(false);
     }}>
-      {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualSection === href ? activeTabClass : inactiveTabClass} aria-current={activeSection === href ? (pathname === href ? 'page' : 'location') : undefined}><span>{label}</span></Link>)}
+      {publicLinks.map(({ href, label }) => <Link key={href} href={href} prefetch={false} className={visualSection === href ? activeTabClass : inactiveTabClass} aria-current={activeSection === href ? (pathname === href ? 'page' : 'location') : undefined}><span>{tr(label)}</span></Link>)}
     </nav>
   </div>;
 }

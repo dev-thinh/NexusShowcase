@@ -60,6 +60,11 @@ afterEach(() => vi.unstubAllGlobals());
 const mount = () => { PageReveal(); return hooks.effect?.(); };
 
 describe('page content reveal', () => {
+  it('staggers cards using their explicit reveal delay', () => {
+    elements[0].dataset.revealDelay = '280';
+    mount();
+    expect(elements[0].animate).toHaveBeenCalledWith(expect.any(Array), expect.objectContaining({ delay: 380 }));
+  });
   it('freezes a moving click target through pointer focus and resumes after pointerup', () => {
     mount();
     const listener = (type: string) => vi.mocked(document.addEventListener).mock.calls.find(([name]) => name === type)![1] as (event: unknown) => void;
@@ -71,6 +76,17 @@ describe('page content reveal', () => {
     expect(elements[0].animation.play).not.toHaveBeenCalled();
     (vi.mocked(requestAnimationFrame).mock.calls[0][0] as () => void)();
     expect(elements[0].animation.play).toHaveBeenCalledOnce();
+  });
+  it('keeps a touch target frozen during focus between pointerup and click', () => {
+    mount();
+    const listener = (type: string) => vi.mocked(document.addEventListener).mock.calls.find(([name]) => name === type)![1] as (event: unknown) => void;
+    listener('pointerdown')({ target: elements[0], pointerType: 'touch' });
+    listener('pointerup')({ type: 'pointerup', pointerType: 'touch' });
+    listener('focusin')({ target: elements[0] });
+    expect(elements[0].animation.cancel).not.toHaveBeenCalled();
+    expect(requestAnimationFrame).not.toHaveBeenCalled();
+    listener('click')({ type: 'click' });
+    expect(requestAnimationFrame).toHaveBeenCalledOnce();
   });
   it('releases completed animations without replaying them on later observer callbacks', () => {
     const cleanup = mount();

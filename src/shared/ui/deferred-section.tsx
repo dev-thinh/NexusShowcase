@@ -1,9 +1,13 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 
 /** Fetch each section independently after mount, without blocking route navigation. */
 export function DeferredSection({ name, load, fallback }: { name: string; load: (signal: AbortSignal) => Promise<ReactNode>; fallback: ReactNode }) {
+  const { t: tr } = useI18n();
+
   const active = useRef(false);
   const inFlight = useRef(false);
   const request = useRef<AbortController | null>(null);
@@ -34,8 +38,8 @@ export function DeferredSection({ name, load, fallback }: { name: string; load: 
   }, [start]);
   return <div data-deferred-section={name} data-state={state}>
     {state === 'ready' ? <div data-deferred-content>{content}</div> : state === 'error' ? <div role="alert" className="panel-public space-y-3">
-      <p>Không tải được nội dung.</p>
-      <button type="button" onClick={() => void start()} className="action-secondary-detail">Thử lại</button>
+      <p>{tr("Không tải được nội dung.")}</p>
+      <button type="button" onClick={() => void start()} className="action-secondary-detail">{tr("Thử lại")}</button>
     </div> : fallback}
   </div>;
 }

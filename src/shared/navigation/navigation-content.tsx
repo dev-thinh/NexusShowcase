@@ -2,8 +2,7 @@
 
 import { useLayoutEffect, useRef, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { LoadingCards, LoadingTitle } from '@/shared/ui/loading-content';
-import { SubmissionWorkspacePageLoading } from '@/shared/ui/submission-workspace-loading';
+import { RoutePageSkeleton } from '@/shared/ui/route-loading';
 import { useNavigationTransition } from './navigation-transition';
 
 export function NavigationContent({ children }: { children: ReactNode }) {
@@ -26,10 +25,7 @@ export function NavigationContent({ children }: { children: ReactNode }) {
     return () => animation.cancel();
   }, [pathname, destination, children]);
   return <>
-    {destination && (destination === '/my-works/new' || /^\/my-works\/[^/]+\/edit$/.test(destination) ? <div data-destination-loading={destination}><SubmissionWorkspacePageLoading /></div> : <main data-reveal="off" data-destination-loading={destination} className="navigation-loading container mx-auto max-w-7xl flex-1 space-y-8 px-4 py-10 sm:px-6 lg:px-8">
-      <LoadingTitle pathname={destination} fallback="Đang tải trang…" />
-      <LoadingCards members={destination.startsWith('/members')} />
-    </main>)}
+    {destination && <div data-destination-loading={destination} className="navigation-loading flex flex-1 flex-col"><RoutePageSkeleton pathname={destination} /></div>}
     <div ref={contentRef} hidden={!!destination} style={destination ? { display: 'none' } : undefined} className="flex flex-1 flex-col">{children}</div>
   </>;
 }

@@ -1,6 +1,28 @@
 import { expect, test } from './fixtures';
 test.use({ trace: 'retain-on-failure' });
 
+test('clicking the current tab cancels a pending destination without leaving its skeleton stuck', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#home-content')).toBeVisible();
+  let release!: () => void;
+  const held = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/research?*', async route => {
+    if (route.request().headers().rsc === '1') await held;
+    await route.continue();
+  });
+  await page.locator('#site-navbar nav a[href="/research"]').first().click();
+  try {
+    await expect(page.locator('[data-destination-loading="/research"]')).toBeVisible();
+    await page.locator('#site-navbar nav a[href="/"]').first().click();
+  } finally { release(); }
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.locator('[data-destination-loading]')).toHaveCount(0);
+  await expect(page.locator('#home-content')).toBeVisible();
+  await page.locator('#site-navbar nav a[href="/projects"]').first().click();
+  await expect(page).toHaveURL(/\/projects$/);
+  await expect(page.getByRole('heading', { name: 'Benchmark Robotics 0001', exact: true })).toBeVisible();
+});
+
 test('preserves navbar across route transitions', async ({ page }) => {
   await page.goto('/');
   await expect(page.locator('#home-content')).toBeVisible();

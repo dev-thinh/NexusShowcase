@@ -1,4 +1,5 @@
-import { LoadingCards, LoadingTitle } from '@/shared/ui/loading-content';
+import { RoutePageSkeleton } from '@/shared/ui/route-loading';
+import { MemberCardsSkeleton } from '@/shared/ui/content-skeletons';
 import fs from 'node:fs';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -15,17 +16,18 @@ describe('data loading boundaries', () => {
     expect(fs.existsSync('src/app/members/loading.tsx')).toBe(false);
     const category = fs.readFileSync('src/features/publications/components/category-page.tsx', 'utf8');
     const members = fs.readFileSync('src/app/(shell)/(site)/members/page.tsx', 'utf8');
-    expect(category).toContain('fallback={<LoadingCards />}><CategoryResults />');
+    expect(category).toContain("fallback={<PublicationSkeleton variant={slug === 'bai-bao-khoa-hoc' ? 'research' : 'projects'} />}");
     expect(members).toContain('<Suspense fallback=');
-    expect(members).toContain('home-member-avatar--loading');
+    expect(members).toContain('fallback={<MemberDirectorySkeleton />}');
     expect(members).toContain('<MemberResults />');
   });
   it('renders the destination title as text outside the busy data region', () => {
-    const title = renderToStaticMarkup(<LoadingTitle fallback="Danh sách" />);
-    expect(title).toContain('Quản lý thành viên</h1>');
+    const html = renderToStaticMarkup(<RoutePageSkeleton pathname="/research" />);
+    const title = html.match(/<h1[^>]*>.*?<\/h1>/)?.[0] ?? '';
+    expect(title).toContain('Nghiên cứu khoa học</h1>');
     expect(title).not.toContain('animate-pulse');
     expect(title).not.toContain('aria-busy');
-    expect(renderToStaticMarkup(<LoadingCards members />)).toContain('aria-busy="true"');
+    expect(renderToStaticMarkup(<MemberCardsSkeleton />)).toContain('aria-busy="true"');
   });
 
   it('keeps the current page visible while navigation is pending', () => {
