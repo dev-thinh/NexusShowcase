@@ -6,11 +6,11 @@ for (const width of [320, 390]) test(`publication cards share compact actions an
   await login(page, fixture.users[0], '/');
   for (const path of ['/', '/explore', '/research', '/projects']) {
     if (path !== '/') await page.goto(path);
-    const card = page.locator('.publication-card').first();
+    const card = page.locator('article.publication-card').first();
     await expect(card).toBeVisible();
     const footer = card.locator('.publication-card__footer');
     await expect(footer).toBeVisible();
-    expect((await footer.boundingBox())!.height).toBeLessThanOrEqual(42);
+    await expect(footer).toHaveCSS('height', '48px');
     await expect(footer.getByRole('button', { name: 'Trích dẫn công trình (Cite)' })).toHaveCSS('height', '32px');
     await expect(card.locator('.publication-card__media')).toHaveCSS('border-top-width', '0px');
     await expect(card.locator('.publication-card__media')).toHaveCSS('border-bottom-width', '0px');

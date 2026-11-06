@@ -1,6 +1,6 @@
 import { expect, login, test } from './fixtures';
 
-test('wide thumbnails remain complete and signed-in navigation stays on one row at intermediate widths', async ({ page, database, fixture }) => {
+test('wide thumbnails fill standard frames and signed-in navigation stays on one row at intermediate widths', async ({ page, database, fixture }) => {
   test.setTimeout(60_000);
   const original = await database.showcaseItem.findFirstOrThrow({ where: { isPinned: true } });
   const src = '/uploads/thumbnails/responsive-wide-logo.png';
@@ -33,7 +33,12 @@ test('wide thumbnails remain complete and signed-in navigation stays on one row 
       await section.scrollIntoViewIfNeeded();
       const image = section.locator(`img[src^="${src}"]`);
       await expect(image).toBeVisible();
-      await expect(image).toHaveCSS('object-fit', 'contain');
+      await expect(image).toHaveCSS('object-fit', 'cover');
+      const frame = section.locator('.home-featured-image-frame').first();
+      await expect.poll(async () => {
+        const bounds = (await frame.boundingBox())!;
+        return bounds.width / bounds.height;
+      }).toBeCloseTo(4 / 3, 2);
       await expect.poll(() => image.evaluate(element => (element as HTMLImageElement).naturalWidth / (element as HTMLImageElement).naturalHeight)).toBeCloseTo(5, 1);
       expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
       if (width === 1100) await page.screenshot({ path: '/tmp/nexus-responsive-1100.png' });
