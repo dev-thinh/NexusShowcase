@@ -41,7 +41,7 @@ test('author and admin filters preserve bounded server pages', async ({ page, fi
   await login(page, fixture.users[1]);
   await page.getByRole('combobox', { name: 'Lọc trạng thái bài đăng' }).click();
   await page.getByRole('option', { name: /^Đã xuất bản/ }).click();
-  await page.getByRole('search').getByRole('button', { name: 'Áp dụng', exact: true }).click();
+  await page.getByRole('search').getByRole('searchbox').press('Enter');
   await expect(page).toHaveURL(/filter=PUBLISHED/);
   await page.getByLabel('Tìm công trình', { exact: true }).fill('Research 0000');
   await page.getByLabel('Tìm công trình', { exact: true }).press('Enter');

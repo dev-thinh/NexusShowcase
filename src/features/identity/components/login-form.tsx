@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/shared/i18n/provider';
 import { ErrorNotice } from '@/shared/ui/error-notice';
 import { loginAction } from '@/features/identity/server/login-actions';
 import {
@@ -19,6 +20,8 @@ import { loginSchema } from '../model/login-input';
 import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
 export function LoginForm() {
+  const { t: tr } = useI18n();
+
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/my-works';
 
@@ -36,7 +39,7 @@ export function LoginForm() {
       passwordChangeNotified.current = true;
       void notifySuccess('Đã đổi mật khẩu. Vui lòng đăng nhập bằng mật khẩu mới.');
     }
-  }, [passwordChanged]);
+  }, [passwordChanged, tr]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -71,19 +74,17 @@ export function LoginForm() {
       <div className="panel-detail">
         <div className="flex items-center gap-3 pb-4 border-b border-slate-200">
           <LogIn aria-hidden="true" className="w-7 h-7 text-[#1F2937] shrink-0" />
-          <h1 className="text-2xl font-semibold text-[#1F2937] leading-tight">Đăng nhập</h1>
+          <h1 className="text-2xl font-semibold text-[#1F2937] leading-tight">{tr("Đăng nhập")}</h1>
         </div>
 
-        <ErrorNotice id="login-error" message={error} focus className="mt-4" />
+        <ErrorNotice id="login-error" message={error ? tr(error) : error} focus className="mt-4" />
 
         {success && (
           <div
             role="status"
             className="mt-4 p-3.5 rounded-lg bg-[#FFFFFF] border border-slate-200 text-[#1F2937] text-sm flex items-center gap-2.5 animate-in fade-in"
           >
-            <div className="font-semibold">
-              Đang chuyển trang…
-            </div>
+            <div className="font-semibold">{tr("Đang chuyển trang…")}</div>
           </div>
         )}
 
@@ -92,9 +93,7 @@ export function LoginForm() {
             <label
               htmlFor="identifier"
               className="block text-xs sm:text-sm font-semibold text-[#1F2937] uppercase tracking-wider mb-2"
-            >
-              Tài khoản hoặc Email
-            </label>
+            >{tr("Tài khoản hoặc Email")}</label>
             <div className="relative">
               <User aria-hidden="true" className="w-4 h-4 text-[#1F2937] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -109,7 +108,7 @@ export function LoginForm() {
                 aria-invalid={Boolean(error)}
                 value={identifier}
                 onChange={(e) => { setIdentifier(e.target.value); setError(null); }}
-                placeholder="Nhập tên đăng nhập hoặc email..."
+                placeholder={tr("Nhập tên đăng nhập hoặc email...")}
                 disabled={isPending}
                 className="w-full pl-10 pr-4 py-3 text-sm sm:text-base bg-white hover:border-slate-200 focus:bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#153D67]/15 focus:border-slate-200 text-[#1F2937] transition-all font-semibold disabled:opacity-50"
               />
@@ -120,9 +119,7 @@ export function LoginForm() {
             <label
               htmlFor="password"
               className="block text-xs sm:text-sm font-semibold text-[#1F2937] uppercase tracking-wider mb-2"
-            >
-              Mật khẩu
-            </label>
+            >{tr("Mật khẩu")}</label>
             <div className="relative">
               <Lock aria-hidden="true" className="w-4 h-4 text-[#1F2937] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
@@ -145,7 +142,7 @@ export function LoginForm() {
                 disabled={isPending}
                 aria-pressed={showPassword}
                 className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-[#1F2937] hover:text-[#1F2937] p-1 rounded-md transition-colors cursor-pointer"
-                aria-label={showPassword ? 'Ẩn mật khẩu' : 'Hiện mật khẩu'}
+                aria-label={showPassword ? tr("Ẩn mật khẩu") : tr("Hiện mật khẩu")}
               >
                 {showPassword ? <EyeOff aria-hidden="true" className="w-4 h-4" /> : <Eye aria-hidden="true" className="w-4 h-4" />}
               </button>
@@ -160,11 +157,11 @@ export function LoginForm() {
             {isPending ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Đang đăng nhập...</span>
+                <span>{tr("Đang đăng nhập...")}</span>
               </>
             ) : (
               <>
-                <span>Đăng nhập</span>
+                <span>{tr("Đăng nhập")}</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}
@@ -172,14 +169,11 @@ export function LoginForm() {
         </ValidatedForm>
 
         <div className="mt-6 pt-4 border-t border-slate-200 text-center text-xs sm:text-sm text-[#1F2937]">
-          <p className="mb-2">Quên mật khẩu hoặc tài khoản bị khóa? Liên hệ Ban chủ nhiệm qua <Link href="/contact" className="font-semibold underline">trang liên hệ</Link> và cung cấp tên đăng nhập để được hỗ trợ đặt lại mật khẩu.</p>
-          <span>Chưa có tài khoản? </span>
+          <span>{tr("Chưa có tài khoản? ")}</span>
           <Link
             href="/contact"
             className="font-semibold text-[#1F2937] hover:underline"
-          >
-            Liên hệ Ban chủ nhiệm
-          </Link>
+          >{tr("Liên hệ Ban chủ nhiệm")}</Link>
         </div>
       </div>
     </div>

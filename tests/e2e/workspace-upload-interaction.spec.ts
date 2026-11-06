@@ -61,18 +61,21 @@ test('keeps title editing and autosave responsive while a thumbnail upload is wa
   }
 });
 
-test('updates the profile and navbar avatar without a page refresh and keeps profile editing available during upload', async ({ page, fixture, database }) => {
+test('confirms the avatar crop before uploading and updates the profile and navbar without a page refresh', async ({ page, fixture, database }) => {
   // Fixture member 002 intentionally has a forced password change; use an eligible member.
   const member = fixture.users[3];
   await login(page, member, `/members/${member.id}`);
   let release!: () => void;
   const gate = new Promise<void>(resolve => { release = resolve; });
   let stored: string | undefined;
+  let uploadedBytes: Buffer | undefined;
   let pageRefreshes = 0;
   page.on('request', request => {
     if (request.method() === 'GET' && request.headers().rsc === '1' && new URL(request.url()).pathname.startsWith('/members/')) pageRefreshes++;
   });
   await page.route('**/api/upload?target=avatar', async route => {
+    const form = await new Response(new Uint8Array(route.request().postDataBuffer()!).buffer, { headers: { 'Content-Type': route.request().headers()['content-type'] } }).formData();
+    uploadedBytes = Buffer.from(await (form.get('file') as File).arrayBuffer());
     await gate;
     const response = await route.fetch();
     const result = await response.json();
@@ -82,10 +85,11 @@ test('updates the profile and navbar avatar without a page refresh and keeps pro
   try {
     await page.getByRole('button', { name: 'Tùy chọn ảnh đại diện', exact: true }).click();
     await page.getByLabel('Chọn ảnh đại diện mới', { exact: true }).setInputFiles({ name: 'member-avatar.png', mimeType: 'image/png', buffer: fixtureImage });
-    await expect(page.getByRole('status').filter({ hasText: 'Đang cập nhật ảnh đại diện' })).toBeAttached();
-    await page.getByRole('button', { name: 'Chỉnh sửa hồ sơ', exact: true }).click();
-    await expect(page.getByRole('dialog', { name: 'Chỉnh sửa hồ sơ' })).toBeVisible();
-    await page.getByRole('dialog', { name: 'Chỉnh sửa hồ sơ' }).getByRole('button', { name: 'Hủy', exact: true }).click();
+    const crop = page.getByRole('dialog', { name: 'Căn chỉnh ảnh đại diện', exact: true });
+    await expect(crop).toBeVisible();
+    await expect(crop.getByRole('button', { name: 'Lưu ảnh đại diện', exact: true })).toBeEnabled();
+    await crop.getByRole('button', { name: 'Lưu ảnh đại diện', exact: true }).click();
+    await expect(crop.getByRole('button', { name: 'Đang lưu...', exact: true })).toBeDisabled();
     release();
     await expect.poll(async () => (await database.user.findUniqueOrThrow({ where: { id: member.id } })).avatarUrl).toMatch(/^\/uploads\/thumbnails\//);
     await expect(page.getByRole('button', { name: 'Tùy chọn ảnh đại diện', exact: true }).locator('img')).toHaveAttribute('src', /\/uploads\/thumbnails\//);
@@ -98,9 +102,9 @@ test('updates the profile and navbar avatar without a page refresh and keeps pro
     await expect(page.locator('#site-navbar img')).toHaveCount(0);
   } finally {
     release();
-    if (stored && /^\/uploads\/thumbnails\/[a-f0-9-]+\.png$/.test(stored)) {
+    if (stored && /^\/uploads\/thumbnails\/[a-f0-9-]+\.(?:png|jpg)$/.test(stored)) {
       const target = path.resolve('storage/thumbnails', path.basename(stored));
-      if (!(await readFile(target)).equals(fixtureImage)) throw Error('Unexpected avatar fixture bytes');
+      if (!(await readFile(target)).equals(uploadedBytes!)) throw Error('Unexpected avatar fixture bytes');
       await unlink(target);
     }
   }

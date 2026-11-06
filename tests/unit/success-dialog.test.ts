@@ -14,3 +14,13 @@ it('does not leave standalone or unmounted actions pending', async () => {
   vi.stubGlobal('window', new EventTarget());
   await expect(notifySuccess('Đã lưu.')).resolves.toBeUndefined();
 });
+it('keeps the original message and interpolation values until the active locale renders them', async () => {
+  const target = new EventTarget(); vi.stubGlobal('window', target);
+  let request: SuccessRequest | undefined;
+  target.addEventListener(SUCCESS_EVENT, event => { event.preventDefault(); request = (event as CustomEvent<SuccessRequest>).detail; });
+  const notification = notifySuccess('Đã xóa tài khoản của {0}.', 'Nguyễn An');
+  await Promise.resolve();
+  expect(request?.message).toBe('Đã xóa tài khoản của {0}.');
+  expect(request?.values).toEqual(['Nguyễn An']);
+  request!.resolve(); await notification;
+});

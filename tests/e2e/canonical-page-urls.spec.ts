@@ -16,7 +16,7 @@ test('legacy page addresses redirect directly with filters preserved', async ({ 
 
 test('navigation, filtered detail return links and account links use canonical URLs', async ({ page,fixture }) => {
  await page.goto('/research?q=Benchmark');
- await expect(page.getByRole('heading',{level:1,name:'Benchmark Research',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{level:1,name:'Nghiên cứu khoa học',exact:true})).toBeVisible();
  const detail=page.locator('main a[href^="/works/"]').first();
  await detail.click(); await expect(page).toHaveURL(/\/works\/[^/]+/);
  const back=page.locator('[data-breadcrumbs] a[href^="/research"]');

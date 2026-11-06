@@ -1,7 +1,6 @@
-import type { PublicUser } from '@/features/identity/model/public-user';
 import type { CitationItem } from '@/features/publications/model/citation';
 import type { Prisma } from '@prisma/client';
-import type { publicationCardSelect, publicationDetailSelect } from '../server/selects';
+import type { publicationCardSelect } from '../server/selects';
 
 export type CitationDto = CitationItem;
 export function toCitationDto(item: CitationDto): CitationDto {
@@ -19,11 +18,3 @@ export function toCitationDto(item: CitationDto): CitationDto {
   };
 }
 export type PublicationCardDto = Prisma.ShowcaseItemGetPayload<{ select: typeof publicationCardSelect }>;
-export type PublicationDetailDto = Prisma.ShowcaseItemGetPayload<{ select: typeof publicationDetailSelect }>;
-export type PublicMemberDto = PublicUser & { _count: { contributions: number } };
-export type AuthorItemDto = PublicationCardDto & {
-  status: import('@prisma/client').ItemStatus;
-  reviewStatus: import('@prisma/client').ItemStatus | null;
-  reviewVersion: number;
-  rejectionReason: string | null;
-};

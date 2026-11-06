@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { setShowcasePinAction } from '@/features/publications/server/actions';
 import { Modal } from '@/shared/ui/modal';
@@ -11,6 +13,7 @@ import { pinReplacementSchema } from '../model/bulk-posts';
 import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
 export function usePinManagement(itemId: string, initialIsPinned: boolean) {
+
   const [isPinned, setIsPinned] = useState(initialIsPinned);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -70,18 +73,20 @@ export function usePinManagement(itemId: string, initialIsPinned: boolean) {
 }
 
 export function PinReplacementDialog({ pin, itemTitle }: { pin: ReturnType<typeof usePinManagement>; itemTitle?: string }) {
+  const { t: tr } = useI18n();
+
   const [selected, setSelected] = useState('');
   useEffect(() => setSelected(''), [pin.replacementOptions]);
   if (!pin.replacementOptions) return null;
   return createPortal(
-    <Modal isOpen onClose={pin.close} title="Thay thế công trình nổi bật" description="Đã đủ 3 vị trí ghim. Chọn một bài đang ghim để thay thế bằng bài mới.">
+    <Modal isOpen onClose={pin.close} title={tr("Thay thế công trình nổi bật")} description={tr("Đã đủ 3 vị trí ghim. Chọn một bài đang ghim để thay thế bằng bài mới.")}>
       <ValidatedForm schema={pinReplacementSchema} values={{ selected }} inlineErrors onSubmit={event => { event.preventDefault(); void pin.replace(selected); }}>
         <div className="mb-5 rounded-lg border border-slate-200 bg-[#FFFFFF] p-3">
-          <p className="text-xs font-semibold text-[#1F2937]">Bài sẽ được ghim</p>
-          <p className="mt-1 break-words text-sm font-semibold text-[#1F2937]">{itemTitle || 'Công trình đang chọn'}</p>
+          <p className="text-xs font-semibold text-[#1F2937]">{tr("Bài sẽ được ghim")}</p>
+          <p className="mt-1 break-words text-sm font-semibold text-[#1F2937]">{itemTitle || tr("Công trình đang chọn")}</p>
         </div>
         <fieldset disabled={pin.loading}>
-          <legend className="mb-3 text-sm font-semibold text-[#1F2937]">Chọn bài cần thay thế</legend>
+          <legend className="mb-3 text-sm font-semibold text-[#1F2937]">{tr("Chọn bài cần thay thế")}</legend>
           <div className="max-h-[35dvh] space-y-2 overflow-y-auto p-1">
             {pin.replacementOptions.map(item => (
               <label key={item.id} className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#153D67] ${selected === item.id ? 'border-slate-200 bg-[#FFFFFF]' : 'border-slate-200 hover:bg-[#FFFFFF]'}`}>
@@ -92,12 +97,12 @@ export function PinReplacementDialog({ pin, itemTitle }: { pin: ReturnType<typeo
             ))}
           </div>
         </fieldset>
-        {pin.error && <p role="alert" className="mt-3 text-sm text-[#1F2937]">{pin.error}</p>}
+        {pin.error && <p role="alert" className="mt-3 text-sm text-[#1F2937]">{tr(pin.error)}</p>}
         <div className="modal-footer">
-          <button type="button" onClick={pin.close} disabled={pin.loading} className="action-secondary-detail min-h-11 disabled:opacity-50">Hủy</button>
+          <button type="button" onClick={pin.close} disabled={pin.loading} className="action-secondary-detail min-h-11 disabled:opacity-50">{tr("Hủy")}</button>
           <button type="submit" disabled={!selected || pin.loading} className="action-primary-detail min-h-11 disabled:opacity-50">
             {pin.loading && <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />}
-            {pin.loading ? 'Đang thay thế…' : 'Thay thế'}
+            {pin.loading ? tr("Đang thay thế…") : tr("Thay thế")}
           </button>
         </div>
         <FieldError name="selected" />

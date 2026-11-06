@@ -8,6 +8,7 @@ export default defineConfig({
     env: { ASSET_STORAGE: 'local' },
     environment: 'node',
     globals: true,
+    setupFiles: ['./tests/setup/i18n.ts'],
     include: ['tests/unit/**/*.test.{ts,tsx}'],
   },
   resolve: {

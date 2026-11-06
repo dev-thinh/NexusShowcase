@@ -146,3 +146,17 @@ export async function submitDraftCommand(actor: Actor, input: SubmissionInput): 
 export async function withdrawDraftCommand(actor: Actor, itemId: string, reviewVersion: number) {
   try { return await withdrawDraftInternal(actor, itemId, reviewVersion); } catch (error) { return commandFailure('draft.withdraw', error, { itemId, actorId: actor.id }); }
 }
+
+export async function deleteDraftCommand(actor: Actor, itemId: string, reviewVersion: number) {
+  if (!cuidSchema.safeParse(itemId).success || !Number.isSafeInteger(reviewVersion) || reviewVersion < 0) {
+    return { success: false as const, code: 'VALIDATION' as const, error: 'Dữ liệu không hợp lệ.' };
+  }
+  try {
+    // Check ownership, state and version in the same write to prevent races with saves/submissions.
+    const deleted = await prisma.showcaseItem.deleteMany({ where: { id: itemId, creatorId: actor.id, status: 'DRAFT', reviewVersion } });
+    if (deleted.count !== 1) return { success: false as const, code: 'CONFLICT' as const, error: 'Bản nháp đã thay đổi, không còn tồn tại hoặc không thuộc tài khoản của bạn. Vui lòng tải lại trang.' };
+    return { success: true as const };
+  } catch (error) {
+    return commandFailure('draft.delete', error, { itemId, actorId: actor.id });
+  }
+}

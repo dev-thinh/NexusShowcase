@@ -40,8 +40,16 @@ beforeEach(() => {
 async function citationGroups(node: React.ReactNode): Promise<React.ReactElement[]> {
   if (Array.isArray(node)) return (await Promise.all(node.map(citationGroups))).flat();
   if (!React.isValidElement<{ children?: React.ReactNode }>(node)) return [];
-  if (typeof node.type === 'function' && node.type.constructor.name === 'AsyncFunction') {
-    return citationGroups(await (node.type as (props: object) => Promise<React.ReactNode>)(node.props));
+  if (typeof node.type === 'function' && node.type !== CitationModal) {
+    const Component = node.type as (props: object) => React.ReactNode | Promise<React.ReactNode>;
+    if (Component.constructor.name === 'AsyncFunction') return citationGroups(await Component(node.props));
+    // Evaluate synchronous wrappers under React's dispatcher so hooks remain valid.
+    let rendered: React.ReactNode;
+    renderToStaticMarkup(React.createElement(function CaptureComponent() {
+      rendered = Component(node.props) as React.ReactNode;
+      return null;
+    }));
+    return citationGroups(rendered);
   }
   const children = React.Children.toArray(node.props.children);
   if (children.some(child => React.isValidElement(child) && child.type === CitationModal)) return [node];

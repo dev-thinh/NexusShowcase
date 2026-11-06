@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useI18n } from '@/shared/i18n/provider';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { PaginationNavigation } from '@/shared/ui/pagination-navigation';
 import { PaginationJump } from '@/shared/ui/pagination-jump';
@@ -21,6 +25,8 @@ export function MemberPagination({
   ariaLabel?: string;
   pageParam?: string;
 }) {
+  const { t: tr } = useI18n();
+
   if (totalPages <= 1) {
     return null;
   }
@@ -35,27 +41,27 @@ export function MemberPagination({
 
   return (
     <PaginationNavigation page={page}
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ? tr(ariaLabel) : undefined}
       className="flex w-full max-w-full flex-wrap items-center justify-center gap-2"
     >
       {page === 1 ? (
         <span aria-disabled="true" className={disabledClass}>
-          <ChevronLeft aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang trước</span>
+          <ChevronLeft aria-hidden="true" className="h-4 w-4" /><span className="sr-only">{tr("Trang trước")}</span>
         </span>
       ) : (
         <Link href={hrefFor(page - 1)} scroll={false} className={inactivePageClass}>
-          <ChevronLeft aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang trước</span>
+          <ChevronLeft aria-hidden="true" className="h-4 w-4" /><span className="sr-only">{tr("Trang trước")}</span>
         </Link>
       )}
 
       <PaginationJump page={page} totalPages={totalPages} basePath={basePath} pageParam={pageParam} className="flex min-w-0" />
       {page === totalPages ? (
         <span aria-disabled="true" className={disabledClass}>
-          <ChevronRight aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang sau</span>
+          <ChevronRight aria-hidden="true" className="h-4 w-4" /><span className="sr-only">{tr("Trang sau")}</span>
         </span>
       ) : (
         <Link href={hrefFor(page + 1)} scroll={false} className={inactivePageClass}>
-          <ChevronRight aria-hidden="true" className="h-4 w-4" /><span className="sr-only">Trang sau</span>
+          <ChevronRight aria-hidden="true" className="h-4 w-4" /><span className="sr-only">{tr("Trang sau")}</span>
         </Link>
       )}
     </PaginationNavigation>
@@ -72,8 +78,10 @@ export function PaginationFooter({ page, totalPages, pageSize, basePath, ariaLab
   children?: import('react').ReactNode;
   itemLabel?: string;
 }) {
+  const { t: tr } = useI18n();
+
   return <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6" data-pagination-footer>
-    <p aria-live="polite" className="text-xs leading-6 text-[#1F2937]">Trang {page} / {totalPages} · {pageSize} {itemLabel} mỗi trang{children && <span className="ml-2">· {children}</span>}</p>
+    <p aria-live="polite" className="text-xs leading-6 text-[#1F2937]">{tr("Trang")} {page} / {totalPages} · {pageSize} {tr(itemLabel)}{tr(" mỗi trang")}{children && <span className="ml-2">· {children}</span>}</p>
     <MemberPagination page={page} totalPages={totalPages} basePath={basePath} ariaLabel={ariaLabel} />
   </div>;
 }

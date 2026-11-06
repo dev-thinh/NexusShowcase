@@ -38,11 +38,35 @@ export type HomeTextKey = typeof homeTextGroups[number]['fields'][number]['key']
 export type HomeText = Record<HomeTextKey, string>;
 const fields = homeTextGroups.flatMap(group => [...group.fields]);
 export const defaultHomeText = Object.fromEntries(fields.map(field => [field.key, field.value])) as HomeText;
+export const defaultEnglishHomeText: HomeText = {
+  "heroEyebrow": "CLB Robotics & IoT - HCMUS",
+  "heroTitle": "Research together.",
+  "heroAccent": "Create together.",
+  "heroDescription": "Explore robotics, IoT, and embedded systems through real-world projects.",
+  "heroAction": "Explore works",
+  "featuredEyebrow": "Research highlights",
+  "featuredTitle": "Featured works",
+  "featuredAction": "Explore research",
+  "researchEyebrow": "Research directions",
+  "researchTitle": "Research for real-world applications",
+  "researchOneTitle": "Artificial Intelligence & Computer Vision",
+  "researchOneDescription": "Apply machine learning to recognize images and understand data.",
+  "researchTwoTitle": "Autonomous Robots & Control",
+  "researchTwoDescription": "Help robots locate themselves, plan routes, and navigate autonomously.",
+  "researchThreeTitle": "Internet of Things & Embedded Systems",
+  "researchThreeDescription": "Connect sensors, monitor devices, and control them remotely.",
+  "momentsEyebrow": "Club activities",
+  "momentsTitle": "Creative moments",
+  "membersEyebrow": "Our team",
+  "membersTitle": "Members",
+  "membersAction": "View all members"
+};
 export const homeTextLimit = (key: HomeTextKey) => key.endsWith('Description') ? 1000 : ['researchOneTitle', 'researchTwoTitle', 'researchThreeTitle'].includes(key) ? 500 : 200;
 const shape = Object.fromEntries(fields.map(field => [field.key, z.string().trim().min(1).max(homeTextLimit(field.key))])) as Record<HomeTextKey, z.ZodString>;
 export const homeContentSchema = z.object({
   version: z.number().int().min(0).max(2_147_483_646),
   text: z.object(shape).strict(),
+  englishText: z.object(shape).strict(),
 }).strict();
 export type HomeContent = z.infer<typeof homeContentSchema>;
 export type HomeContentPayload = HomeContent & { isAdmin: boolean };

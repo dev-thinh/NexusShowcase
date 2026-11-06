@@ -48,7 +48,7 @@ for (const width of [320, 375, 390, 768, 900]) {
   });
 }
 
-test('touch phones animate the photo wall and can pause and open photos', async ({ browser, baseURL }) => {
+test('touch phones scroll the photo wall manually and can open photos', async ({ browser, baseURL }) => {
   const context = await browser.newContext({ baseURL, viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, reducedMotion: 'no-preference' });
   const page = await context.newPage();
   try {
@@ -56,16 +56,16 @@ test('touch phones animate the photo wall and can pause and open photos', async 
     await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
     const wall = page.locator('.moments-wall');
     const track = wall.locator('.moments-track').first();
-    await expect(track).toHaveCSS('animation-name', 'moments-drift');
-    const transform = await track.evaluate(element => getComputedStyle(element).transform);
-    await expect.poll(() => track.evaluate(element => getComputedStyle(element).transform)).not.toBe(transform);
-    await wall.getByRole('button', { name: 'Tạm dừng chuyển động' }).tap();
-    await expect(track).toHaveCSS('animation-play-state', 'paused');
+    await expect(track).toHaveCSS('animation-name', 'none');
+    const lane = wall.locator('.moments-lane').first();
+    await expect(lane).toHaveCSS('overflow-x', 'auto');
+    await lane.evaluate(element => { element.scrollLeft = 100; });
+    await expect.poll(() => lane.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+    await lane.evaluate(element => { element.scrollLeft = 0; });
     await wall.locator('.moment-photo').first().tap();
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('button', { name: 'Đóng hộp thoại' }).tap();
-    await wall.getByRole('button', { name: 'Tiếp tục chuyển động' }).tap();
-    await expect(track).toHaveCSS('animation-play-state', 'running');
+    await expect(track).toHaveCSS('animation-name', 'none');
   } finally { await context.close(); }
 });
 

@@ -1,10 +1,14 @@
+import { localizedMetadata } from '@/shared/i18n/metadata';
 import { DialogProvider } from '@/shared/dialogs/dialog-provider';
 import { NavigationTransitionProvider } from '@/shared/navigation/navigation-transition';
 import { ImeInputSupport } from '@/shared/ui/ime-input-support';
+import { NativeDragGuard } from '@/shared/ui/native-drag-guard';
 import { PageReveal } from '@/shared/ui/page-reveal';
-import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { LocaleProvider } from '@/shared/i18n/provider';
+import { getServerI18n } from '@/shared/i18n/server';
+import { LocaleRefresh } from '@/shared/i18n/locale-refresh';
 
 const inter = Inter({
   subsets: ['latin', 'vietnamese'],
@@ -21,30 +25,33 @@ const jetbrainsMono = JetBrains_Mono({
   display: 'swap',
 });
 
-export const metadata: Metadata = {
+export const generateMetadata = localizedMetadata({
   title: { default: 'Robotics & IoT HCMUS', template: '%s | Robotics & IoT HCMUS' },
   icons: {
     icon: { url: '/logo.svg', type: 'image/svg+xml' },
     shortcut: '/logo.svg',
   },
   description: 'Trưng bày công trình nghiên cứu khoa học, dự án công nghệ và sản phẩm Robotics & IoT',
-};
+});
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { locale } = await getServerI18n();
   return (
-    <html lang="vi" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang={locale} className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className={`${inter.className} min-h-screen text-[#1F2937] font-sans antialiased`}>
-        <NavigationTransitionProvider>
+        <LocaleProvider initialLocale={locale}><NavigationTransitionProvider>
+          <LocaleRefresh />
           <DialogProvider>
             <ImeInputSupport />
             <PageReveal />
+            <NativeDragGuard />
             {children}
           </DialogProvider>
-        </NavigationTransitionProvider>
+        </NavigationTransitionProvider></LocaleProvider>
       </body>
     </html>
   );

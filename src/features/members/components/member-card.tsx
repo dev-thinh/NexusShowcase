@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useI18n } from '@/shared/i18n/provider';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
 import {
 MEMBER_GROUP_LABELS,
@@ -29,6 +33,8 @@ export function MemberCard({
   member: MemberDirectoryEntry;
   group: PublicMemberRole;
 }) {
+  const { t: tr } = useI18n();
+
   const tone = tones[group];
 
   return (
@@ -53,7 +59,7 @@ export function MemberCard({
             </Link>
           </h3>
           <p className={`mt-2 inline-flex max-w-full rounded-md border px-1.5 py-0.5 text-[10px] font-semibold leading-4 ${tone.label}`}>
-            {MEMBER_GROUP_LABELS[group]}
+            {tr(MEMBER_GROUP_LABELS[group])}
           </p>
         </div>
       </header>
@@ -69,18 +75,15 @@ export function MemberCard({
           <FileText aria-hidden="true" className="h-4 w-4 shrink-0 text-foreground-muted" />
           <span>
             <span className="font-semibold tabular-nums text-[#1F2937]">{member._count.contributions}</span>
-            {' '}công trình
-          </span>
+            {' '}{tr("công trình")}</span>
         </div>
 
         <footer className="mt-4 flex flex-wrap items-center justify-between gap-x-3 gap-y-2 border-t border-border-subtle pt-3">
           <Link
             href={`/members/${member.id}`}
-            aria-label={`Xem hồ sơ của ${member.fullName}`}
+            aria-label={tr("Xem hồ sơ của {0}", member.fullName)}
             className="inline-flex min-h-10 items-center gap-2 rounded-md text-xs font-semibold text-[#1F2937] transition-colors hover:text-primary-hover hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-          >
-            Xem hồ sơ
-            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+          >{tr("Xem hồ sơ")}<ArrowRight aria-hidden="true" className="h-4 w-4" />
           </Link>
 
           {(member.githubUrl || member.linkedinUrl) && (
@@ -90,8 +93,8 @@ export function MemberCard({
                   href={member.githubUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`GitHub của ${member.fullName}`}
-                  title={`GitHub của ${member.fullName}`}
+                  aria-label={tr("GitHub của {0}", member.fullName)}
+                  title={tr("GitHub của {0}", member.fullName)}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-[#FFFFFF] hover:text-[#1F2937] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <Github aria-hidden="true" className="h-4 w-4" />
@@ -102,8 +105,8 @@ export function MemberCard({
                   href={member.linkedinUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  aria-label={`LinkedIn của ${member.fullName}`}
-                  title={`LinkedIn của ${member.fullName}`}
+                  aria-label={tr("LinkedIn của {0}", member.fullName)}
+                  title={tr("LinkedIn của {0}", member.fullName)}
                   className="inline-flex h-10 w-10 items-center justify-center rounded-md text-foreground-muted transition-colors hover:bg-[#FFFFFF] hover:text-[#1F2937] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <Linkedin aria-hidden="true" className="h-4 w-4" />

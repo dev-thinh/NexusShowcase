@@ -111,6 +111,26 @@ it('does not let completion of an older transition clear a newer navigation', ()
   expect(requestAnimationFrame).not.toHaveBeenCalled();
 });
 
+it('releases a fast redirect even when no render observes the intermediate pending state', () => {
+  render().navigate('/my-works', {});
+  // A cached/fast response can finish between renders, including a redirect
+  // back to the currently committed pathname.
+  state.pending = false;
+  render(); state.effects[0]();
+  expect(render().pathname).toBeNull();
+  vi.mocked(requestAnimationFrame).mock.calls[0][0](0);
+  expect(renderProvider().props.children[1].props.style).toBeUndefined();
+});
+
+it('does not strand the skeleton when clicking the current tab cancels an in-flight destination', () => {
+  render().navigate('/contact', {});
+  render(); state.effects[0]();
+  expect(render().begin('/members')).toBeNull();
+  state.pending = false;
+  render(); state.effects[0]();
+  expect(render().pathname).toBeNull();
+});
+
 it('uses instant destination scrolling after a redirect when reduced motion is requested', () => {
   vi.spyOn(window, 'matchMedia').mockImplementation(() => ({ matches: true }) as MediaQueryList);
   render().navigate('/my-works', { replace: true });

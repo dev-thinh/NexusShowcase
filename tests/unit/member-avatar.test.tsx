@@ -34,6 +34,21 @@ it('shows an uploaded image when provided', () => {
   expect(html).not.toContain('data-member-avatar-fallback');
 });
 
+it('requests a display-sized derivative for uploaded avatars with a responsive size hint', () => {
+  const html = renderToStaticMarkup(<MemberAvatar fullName="An" src="/uploads/thumbnails/avatar.jpg" width={24} height={24} />);
+  expect(html).toContain('/uploads/thumbnails/avatar.jpg?w=96');
+  expect(html).toContain('sizes="24px"');
+  expect(html).toContain('decoding="async"');
+});
+
+it('bounds avatars whose dimensions are supplied through CSS and preserves external URLs', () => {
+  const local = renderToStaticMarkup(<MemberAvatar fullName="An" src="/uploads/thumbnails/avatar.jpg" className="h-10 w-10" />);
+  expect(local).toContain('sizes="96px"');
+  expect(local).toContain('?w=96');
+  const external = renderToStaticMarkup(<MemberAvatar fullName="An" src="https://example.test/avatar.jpg" width={24} height={24} />);
+  expect(external).not.toContain('?w=');
+});
+
 it('renders a fixed member color immediately and keeps it after a fresh module load', async () => {
   const first = renderToStaticMarkup(<MemberAvatar fullName="Nguyễn Bảo Nhi" />);
   expect(first).toMatch(/background-color:hsl\(/);

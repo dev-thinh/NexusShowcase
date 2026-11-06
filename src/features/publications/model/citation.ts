@@ -1,3 +1,4 @@
+import { extractDoi } from './doi';
 import { readConference } from './conference';
 
 export interface CitationItem {
@@ -24,7 +25,7 @@ function normalizeAuthorNames(item: CitationItem): string[] {
     .map((c) => c.user?.fullName || c.externalName)
     .filter(Boolean) as string[];
 
-  if (rawNames.length === 0) return ['CLB Robotics & IoT - HCMUS'];
+  if (rawNames.length === 0) return [];
   return rawNames.map(cleanAcademicTitles);
 }
 
@@ -38,10 +39,10 @@ function removeDiacritics(str: string): string {
 
 export function getCitationKey(item: CitationItem): string {
   const authors = normalizeAuthorNames(item);
-  const firstAuthor = authors[0] || 'robotics';
+  const firstAuthor = authors[0] || 'paper';
   const firstWord = firstAuthor.split(' ')[0] || 'author';
   const cleanFirstWord = removeDiacritics(firstWord).toLowerCase().replace(/[^a-z0-9]/g, '');
-  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
+  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? 'nd';
 
   const titleWord = removeDiacritics(item.title.split(' ')[0] || 'paper')
     .toLowerCase()
@@ -53,18 +54,22 @@ export function getCitationKey(item: CitationItem): string {
 export function generateBibTeX(item: CitationItem): string {
   const key = getCitationKey(item);
   const authors = normalizeAuthorNames(item);
-  const authorsBib = authors.join(' and ');
-  const venue = readConference(item.conference)?.name || item.issuer || 'CLB Robotics & IoT - HCMUS';
-  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
-
-  return `@inproceedings{${key},
-  title = {{${item.title}}},
-  author = {${authorsBib}},
-  booktitle = {${venue}},
-  year = {${year}},
-  organization = {Trường Đại Học Khoa Học Tự Nhiên, ĐHQG-HCM},
-  url = {${readConference(item.conference)?.paperUrl || `https://robotics-iot.hcmus.edu.vn/works/${item.slug}`}}
-}`;
+  const conference = readConference(item.conference);
+  const venue = conference?.name || item.issuer;
+  const year = Number(conference?.publicationDate?.slice(0, 4)) || item.publishedYear;
+  const doi = extractDoi(conference?.paperUrl ?? '');
+  const journal = !!venue && /journal|tạp chí/i.test(venue);
+  const proceeding = !!venue && /conference|proceedings|hội nghị/i.test(venue);
+  const entry = journal ? 'article' : proceeding ? 'inproceedings' : 'misc';
+  const escape = (value: string) => value.replace(/[\\{}%&#_$]/g, char => char === '\\' ? '\\textbackslash{}' : `\\${char}`).replace(/[\r\n]+/g, ' ');
+  const fields = [
+    `title = {{${escape(item.title)}}}`,
+    ...(authors.length ? [`author = {${authors.map(name => { const [family, ...given] = name.split(/\s+/); return escape(given.length ? `${family}, ${given.join(' ')}` : name); }).join(' and ')}}`] : []),
+    ...(venue ? [`${journal ? 'journal' : proceeding ? 'booktitle' : 'howpublished'} = {${escape(venue)}}`] : []),
+    ...(year ? [`year = {${year}}`] : []),
+    ...(doi ? [`doi = {${doi}}`] : conference?.paperUrl ? [`url = {${conference.paperUrl}}`] : []),
+  ];
+  return `@${entry}{${key},\n  ${fields.join(',\n  ')}\n}`;
 }
 
 export function generateAPA(item: CitationItem): string {
@@ -78,7 +83,11 @@ export function generateAPA(item: CitationItem): string {
   });
 
   let authorString = '';
-  if (formattedAuthors.length === 1) {
+  if (formattedAuthors.length === 0) {
+    authorString = '';
+  } else if (formattedAuthors.length > 20) {
+    authorString = `${formattedAuthors.slice(0, 19).join(', ')}, … ${formattedAuthors.at(-1)}`;
+  } else if (formattedAuthors.length === 1) {
     authorString = formattedAuthors[0];
   } else if (formattedAuthors.length === 2) {
     authorString = `${formattedAuthors[0]}, & ${formattedAuthors[1]}`;
@@ -86,9 +95,9 @@ export function generateAPA(item: CitationItem): string {
     authorString = `${formattedAuthors.slice(0, -1).join(', ')}, & ${formattedAuthors[formattedAuthors.length - 1]}`;
   }
 
-  const venue = readConference(item.conference)?.name || item.issuer || 'CLB Robotics & IoT - HCMUS';
-  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
-  return `${authorString} (${year}). ${item.title}. ${venue}. ${readConference(item.conference)?.paperUrl || `https://robotics-iot.hcmus.edu.vn/works/${item.slug}`}`;
+  const venue = readConference(item.conference)?.name || item.issuer || '';
+  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? 'nd';
+  return [authorString ? `${authorString} (${year === 'nd' ? 'n.d.' : year}). ${item.title}.` : `${item.title}. (${year === 'nd' ? 'n.d.' : year}).`, venue ? `${venue}.` : '', readConference(item.conference)?.paperUrl || ''].filter(Boolean).join(' ');
 }
 
 export function generateIEEE(item: CitationItem): string {
@@ -100,11 +109,12 @@ export function generateIEEE(item: CitationItem): string {
     return `${initials} ${parts[0]}`;
   });
 
-  const authorStr = formattedAuthors.length === 1
+  const authorStr = !formattedAuthors.length ? '' : formattedAuthors.length > 6 ? `${formattedAuthors[0]} et al.` : formattedAuthors.length === 1
     ? formattedAuthors[0]
     : formattedAuthors.slice(0, -1).join(', ') + ' and ' + formattedAuthors[formattedAuthors.length - 1];
 
-  const venue = readConference(item.conference)?.name || item.issuer || 'CLB Robotics & IoT - HCMUS';
-  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? new Date().getFullYear();
-  return `${authorStr}, "${item.title}," ${venue}, ${year}.`;
+  const venue = readConference(item.conference)?.name || item.issuer || '';
+  const year = (Number(readConference(item.conference)?.publicationDate?.slice(0, 4)) || item.publishedYear) ?? 'nd';
+  const doi = extractDoi(readConference(item.conference)?.paperUrl ?? '');
+  return `${authorStr ? `${authorStr}, ` : ''}"${item.title}," ${[venue, year === 'nd' ? '' : String(year)].filter(Boolean).join(', ')}${doi ? `, doi: ${doi}` : ''}.`;
 }

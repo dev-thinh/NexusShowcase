@@ -7,6 +7,7 @@ vi.mock('next/navigation', async original => ({ ...await original<typeof import(
 vi.mock('@/features/identity/server/session', () => ({ getSession: async () => session.authenticated ? { user: { id: 'viewer', role: 'MEMBER' } } : null }));
 vi.mock('@/app/(shell)/_components/navbar', () => ({ Navbar: () => null }));
 vi.mock('@/shared/ui/academic-footer', () => ({ AcademicFooter: () => null }));
+vi.mock('@/shared/i18n/server', () => ({ getServerI18n: async () => ({ locale: 'vi', t: (text: string) => text }) }));
 
 describe('real member profile visibility boundary', () => {
   let userId: string;

@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import type { ActionResult } from '@/shared/lib/action-result';
 import { useDialog } from '@/shared/dialogs/dialog-provider';
@@ -12,6 +14,8 @@ import { reviewFeedbackSchema } from '../model/decision';
 import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 
 export function ApprovalControls({ itemId, reviewVersion, returnTo = '/admin/reviews' }: { itemId: string; reviewVersion: number; returnTo?: string }) {
+  const { t: tr } = useI18n();
+
   const dialog = useDialog();
   const router = useRouter();
   const [feedbackAction, setFeedbackAction] = useState<'REQUEST_REVISION' | 'REJECT' | null>(null);
@@ -28,7 +32,7 @@ export function ApprovalControls({ itemId, reviewVersion, returnTo = '/admin/rev
     deciding.current = true;
     let navigating = false;
     try {
-      if (action === 'PUBLISH' && !await dialog.confirm({ title: 'Duyệt và xuất bản?', message: visibility === 'PUBLIC' ? 'Bài đăng sẽ được công khai cho mọi người.' : 'Bài đăng sẽ được xuất bản trong phạm vi nội bộ CLB.', confirmLabel: 'Xuất bản' })) return;
+      if (action === 'PUBLISH' && !await dialog.confirm({ title: tr('Duyệt và xuất bản?'), message: tr(visibility === 'PUBLIC' ? 'Bài đăng sẽ được công khai cho mọi người.' : 'Bài đăng sẽ được xuất bản trong phạm vi nội bộ CLB.'), confirmLabel: tr('Xuất bản') })) return;
       if (!mounted.current) return;
       setError('');
       setPending(true);
@@ -45,41 +49,41 @@ export function ApprovalControls({ itemId, reviewVersion, returnTo = '/admin/rev
     finally { if (!navigating) { deciding.current = false; if (mounted.current) setPending(false); } }
   };
   return <section className="space-y-4 rounded-lg border border-slate-200 bg-white p-5 lg:sticky lg:top-32" aria-labelledby="approval-title">
-    <Link href={`/admin/reviews/${encodeURIComponent(itemId)}/preview`} target="_blank" rel="noopener noreferrer" className="action-secondary-detail min-h-11 w-full">Xem trước</Link>
-    <h2 id="approval-title" className="text-lg font-semibold text-[#1F2937]">Quyết định phê duyệt</h2>
+    <Link href={`/admin/reviews/${encodeURIComponent(itemId)}/preview`} target="_blank" rel="noopener noreferrer" className="action-secondary-detail min-h-11 w-full">{tr("Xem trước")}</Link>
+    <h2 id="approval-title" className="text-lg font-semibold text-[#1F2937]">{tr("Quyết định phê duyệt")}</h2>
 
-    {error && !feedbackAction && <p role="alert" className="text-sm text-[#1F2937]">{error}</p>}
+    {error && !feedbackAction && <p role="alert" className="text-sm text-[#1F2937]">{tr(error)}</p>}
     <div className="flex flex-col gap-3">
       <label className="flex cursor-pointer items-center justify-between gap-4 rounded-md border border-slate-200 bg-[#FFFFFF] px-3 py-1 has-[:disabled]:cursor-not-allowed has-[:disabled]:opacity-60">
         <span className="min-w-0">
-          <span className="block text-sm font-semibold text-[#1F2937]">Công khai</span>
+          <span className="block text-sm font-semibold text-[#1F2937]">{tr("Công khai")}</span>
         </span>
         <span className="relative inline-flex h-11 w-11 shrink-0 items-center">
-          <input type="checkbox" role="switch" aria-label="Công khai" checked={visibility === 'PUBLIC'} disabled={pending} onChange={event => setVisibility(event.target.checked ? 'PUBLIC' : 'PRIVATE')} className="peer absolute inset-0 z-10 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed" />
+          <input type="checkbox" role="switch" aria-label={tr("Công khai")} checked={visibility === 'PUBLIC'} disabled={pending} onChange={event => setVisibility(event.target.checked ? 'PUBLIC' : 'PRIVATE')} className="peer absolute inset-0 z-10 m-0 h-full w-full cursor-pointer opacity-0 disabled:cursor-not-allowed" />
           <span aria-hidden="true" className="pointer-events-none h-6 w-11 rounded-full bg-slate-300 transition-colors peer-checked:bg-[#153D67] peer-focus-visible:ring-2 peer-focus-visible:ring-[#153D67] peer-focus-visible:ring-offset-2 motion-reduce:transition-none" />
           <span aria-hidden="true" className="pointer-events-none absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-sm transition-transform peer-checked:translate-x-5 motion-reduce:transition-none" />
         </span>
       </label>
-      <button type="button" disabled={pending} className="action-primary-detail min-h-11 disabled:opacity-50" onClick={() => decide('PUBLISH')}>{pending ? 'Đang xử lý…' : 'Duyệt và xuất bản'}</button>
-      <button type="button" disabled={pending} className="action-secondary-detail min-h-11 disabled:opacity-50" onClick={() => { setError(''); setReason(''); setFeedbackAction('REQUEST_REVISION'); }}>Yêu cầu chỉnh sửa</button>
+      <button type="button" disabled={pending} className="action-primary-detail min-h-11 disabled:opacity-50" onClick={() => decide('PUBLISH')}>{pending ? tr("Đang xử lý…") : tr("Duyệt và xuất bản")}</button>
+      <button type="button" disabled={pending} className="action-secondary-detail min-h-11 disabled:opacity-50" onClick={() => { setError(''); setReason(''); setFeedbackAction('REQUEST_REVISION'); }}>{tr("Yêu cầu chỉnh sửa")}</button>
       <div className="border-t border-slate-200 pt-3">
-        <button type="button" disabled={pending} className="min-h-11 w-full rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#1F2937] hover:bg-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] disabled:opacity-50" onClick={() => { setError(''); setReason(''); setFeedbackAction('REJECT'); }}>Từ chối</button>
+        <button type="button" disabled={pending} className="min-h-11 w-full rounded-md border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-[#1F2937] hover:bg-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] disabled:opacity-50" onClick={() => { setError(''); setReason(''); setFeedbackAction('REJECT'); }}>{tr("Từ chối")}</button>
       </div>
     </div>
     {feedbackAction && createPortal(<Modal
       isOpen
       onClose={() => { if (!pending) { setFeedbackAction(null); setError(''); } }}
-      title={feedbackAction === 'REQUEST_REVISION' ? 'Yêu cầu chỉnh sửa' : 'Từ chối bài đăng'}
-      description={feedbackAction === 'REQUEST_REVISION' ? 'Nhập nội dung cần chỉnh sửa để gửi lại cho tác giả.' : 'Nhập lý do từ chối để thông báo cho tác giả.'}
+      title={feedbackAction === 'REQUEST_REVISION' ? tr("Yêu cầu chỉnh sửa") : tr("Từ chối bài đăng")}
+      description={feedbackAction === 'REQUEST_REVISION' ? tr("Nhập nội dung cần chỉnh sửa để gửi lại cho tác giả.") : tr("Nhập lý do từ chối để thông báo cho tác giả.")}
     >
       <ValidatedForm schema={reviewFeedbackSchema} values={{ reason }} inlineErrors className="space-y-4" onSubmit={event => { event.preventDefault(); decide(feedbackAction); }}>
-        <label htmlFor="approval-feedback" className="block text-sm font-semibold text-[#1F2937]">{feedbackAction === 'REQUEST_REVISION' ? 'Nội dung yêu cầu chỉnh sửa' : 'Lý do từ chối'} <span className="text-[#1F2937]">*</span></label>
-        <textarea id="approval-feedback" name="reason" value={reason} disabled={pending} required maxLength={2000} rows={5} onChange={e => setReason(e.target.value)} aria-invalid={!!error} aria-describedby={error ? 'approval-feedback-error' : undefined} placeholder={feedbackAction === 'REQUEST_REVISION' ? 'Mô tả cụ thể những nội dung tác giả cần bổ sung hoặc sửa…' : 'Nhập lý do từ chối bài đăng…'} className="w-full rounded-md border border-slate-200 p-3 text-sm font-normal" />
+        <label htmlFor="approval-feedback" className="block text-sm font-semibold text-[#1F2937]">{feedbackAction === 'REQUEST_REVISION' ? tr("Nội dung yêu cầu chỉnh sửa") : tr("Lý do từ chối")} <span className="text-[#1F2937]">*</span></label>
+        <textarea id="approval-feedback" name="reason" value={reason} disabled={pending} required maxLength={2000} rows={5} onChange={e => setReason(e.target.value)} aria-invalid={!!error} aria-describedby={error ? 'approval-feedback-error' : undefined} placeholder={feedbackAction === 'REQUEST_REVISION' ? tr("Mô tả cụ thể những nội dung tác giả cần bổ sung hoặc sửa…") : tr("Nhập lý do từ chối bài đăng…")} className="w-full rounded-md border border-slate-200 p-3 text-sm font-normal" />
         <FieldError name="reason" />
-        {error && <p id="approval-feedback-error" role="alert" className="text-sm text-[#1F2937]">{error}</p>}
+        {error && <p id="approval-feedback-error" role="alert" className="text-sm text-[#1F2937]">{tr(error)}</p>}
         <div className="flex flex-wrap justify-center gap-2">
-          <button type="button" disabled={pending} className="action-secondary-detail min-h-11 disabled:opacity-50" onClick={() => { setFeedbackAction(null); setError(''); }}>Hủy</button>
-          <button type="submit" disabled={pending || !reason.trim()} className="action-primary-detail min-h-11 disabled:opacity-50">{pending ? 'Đang gửi…' : feedbackAction === 'REQUEST_REVISION' ? 'Gửi yêu cầu chỉnh sửa' : 'Xác nhận từ chối'}</button>
+          <button type="button" disabled={pending} className="action-secondary-detail min-h-11 disabled:opacity-50" onClick={() => { setFeedbackAction(null); setError(''); }}>{tr("Hủy")}</button>
+          <button type="submit" disabled={pending || !reason.trim()} className="action-primary-detail min-h-11 disabled:opacity-50">{pending ? tr("Đang gửi…") : feedbackAction === 'REQUEST_REVISION' ? tr("Gửi yêu cầu chỉnh sửa") : tr("Xác nhận từ chối")}</button>
         </div>
       </ValidatedForm>
     </Modal>, document.body)}

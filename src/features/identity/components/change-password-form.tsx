@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/shared/i18n/provider';
 import { ErrorNotice } from '@/shared/ui/error-notice';
 import { changePasswordAction } from '@/features/identity/server/account-actions';
 import { ArrowRight, Loader2 } from 'lucide-react';
@@ -10,6 +11,8 @@ import { ValidatedForm, FieldError } from '@/shared/ui/validated-form';
 import { PasswordInput } from '@/shared/ui/password-input';
 
 export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedded?: boolean; onBusyChange?: (busy: boolean) => void } = {}) {
+  const { t: tr } = useI18n();
+
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -42,26 +45,20 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
       <div className={embedded ? '' : 'panel-detail sm:p-7'}>
         {!embedded && <div className="pb-4 border-b border-slate-200">
           <div className="min-w-0">
-            <h2 className="text-xl font-semibold text-[#1F2937] tracking-tight leading-tight">
-              Đổi Mật Khẩu
-            </h2>
-            <p className="text-xs sm:text-sm text-[#1F2937] truncate max-w-sm mt-0.5">
-              Cập nhật mật khẩu bảo mật cho tài khoản của bạn
-            </p>
+            <h2 className="text-xl font-semibold text-[#1F2937] tracking-tight leading-tight">{tr("Đổi Mật Khẩu")}</h2>
+            <p className="text-xs sm:text-sm text-[#1F2937] truncate max-w-sm mt-0.5">{tr("Cập nhật mật khẩu bảo mật cho tài khoản của bạn")}</p>
           </div>
         </div>}
 
-        <ErrorNotice message={error} focus className="mt-4" />
+        <ErrorNotice message={error ? tr(error) : error} focus className="mt-4" />
 
         <ValidatedForm schema={changePasswordFormSchema} values={{ currentPassword, newPassword, confirmPassword }} inlineErrors onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label htmlFor={`${id}-current`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
-              Mật khẩu hiện tại
-            </label>
+            <label htmlFor={`${id}-current`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">{tr("Mật khẩu hiện tại")}</label>
             <PasswordInput
               id={`${id}-current`}
               name="currentPassword"
-              visibilityLabel="mật khẩu hiện tại"
+              visibilityLabel={tr("mật khẩu hiện tại")}
               required
               autoComplete="current-password"
               value={currentPassword}
@@ -73,13 +70,11 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
           </div>
 
           <div>
-            <label htmlFor={`${id}-new`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
-              Mật khẩu mới
-            </label>
+            <label htmlFor={`${id}-new`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">{tr("Mật khẩu mới")}</label>
             <PasswordInput
               id={`${id}-new`}
               name="newPassword"
-              visibilityLabel="mật khẩu mới"
+              visibilityLabel={tr("mật khẩu mới")}
               required
               autoComplete="new-password"
               value={newPassword}
@@ -91,13 +86,11 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
           </div>
 
           <div>
-            <label htmlFor={`${id}-confirm`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">
-              Xác nhận mật khẩu mới
-            </label>
+            <label htmlFor={`${id}-confirm`} className="block text-sm font-semibold text-[#1F2937] mb-1.5">{tr("Xác nhận mật khẩu mới")}</label>
             <PasswordInput
               id={`${id}-confirm`}
               name="confirmPassword"
-              visibilityLabel="xác nhận mật khẩu mới"
+              visibilityLabel={tr("xác nhận mật khẩu mới")}
               required
               autoComplete="new-password"
               value={confirmPassword}
@@ -116,11 +109,11 @@ export function ChangePasswordForm({ embedded = false, onBusyChange }: { embedde
             {isPending ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Đang xử lý...</span>
+                <span>{tr("Đang xử lý...")}</span>
               </>
             ) : (
               <>
-                <span>Xác nhận đổi mật khẩu</span>
+                <span>{tr("Xác nhận đổi mật khẩu")}</span>
                 <ArrowRight className="w-4 h-4" />
               </>
             )}

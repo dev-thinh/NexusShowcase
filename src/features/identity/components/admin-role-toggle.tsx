@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/shared/i18n/provider';
 import { updateUserRoleAction } from '@/features/identity/server/member-actions';
 import { Tooltip } from '@/shared/ui/tooltip';
 import { Role } from '@prisma/client';
@@ -15,6 +16,8 @@ export function AdminRoleToggle({
   userId: string;
   currentRole: Role;
 }) {
+  const { t: tr } = useI18n();
+
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,19 +39,19 @@ export function AdminRoleToggle({
 
   if (currentRole === 'ADMIN') {
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFFFFF] text-[#1F2937] text-xs font-semibold border border-slate-200">
+      <span className="admin-role-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFFFFF] text-[#1F2937] text-xs font-semibold border border-slate-200">
         <ShieldCheck className="w-3.5 h-3.5 text-[#1F2937]" />
-        <span>Toàn quyền</span>
+        <span>{tr("Toàn quyền")}</span>
       </span>
     );
   }
 
   const isCore = currentRole === 'CORE_MEMBER';
-  const description = isCore ? 'Thành viên này hiện đang có quyền nộp bài và quản lý công trình đại diện nhóm.' : 'Cấp quyền đăng bài để thành viên có thể đăng công trình và gửi xét duyệt.';
+  const description = tr(isCore ? 'Đang có quyền đăng bài.' : 'Chưa có quyền đăng bài.');
 
   return (
     <div className="admin-role-control flex min-w-0 flex-none items-center gap-2">
-      {error && <p role="alert" className="text-xs text-rose-800">{error}</p>}
+      {error && <p role="alert" className="text-xs text-rose-800">{tr(error)}</p>}
       <button
         disabled={loading}
         onClick={toggleCoreMember}
@@ -67,7 +70,7 @@ export function AdminRoleToggle({
         ) : (
           <ArrowUpCircle className="w-3.5 h-3.5" />
         )}
-        <span>{isCore ? 'Thu quyền đăng bài' : 'Cấp quyền đăng bài'}</span>
+        <span>{isCore ? tr("Thu quyền đăng bài") : tr("Cấp quyền đăng bài")}</span>
       </button>
 
       <div className="hidden lg:block"><Tooltip content={description} /></div>

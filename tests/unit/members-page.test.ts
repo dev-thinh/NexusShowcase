@@ -8,16 +8,16 @@ describe('Members Directory Page', () => {
     expect(fs.existsSync(pagePath)).toBe(true);
 
     const content = fs.readFileSync(pagePath, 'utf-8');
-    expect(content).toContain('Thành viên CLB Robotics &amp; IoT');
-    expect(content).toContain('{totalMembers} thành viên');
+    expect(content).toContain('Thành viên CLB Robotics & IoT');
+    expect(content).toContain('{totalMembers}{tr(" thành viên")}');
     expect(content).not.toContain('Nhân sự &amp; Nghiên cứu viên');
     expect(content).not.toContain('Mạng lưới sinh viên');
     expect(content).not.toContain('Danh bạ');
     expect(content).not.toContain('heading-gutter-icon');
     expect(content).toContain('max-w-7xl');
-    expect(content).toContain('title="Ban chủ nhiệm"');
-    expect(content).toContain('title="Trưởng nhóm"');
-    expect(content).toContain('title="Thành viên"');
+    expect(content).toContain('title={tr("Ban chủ nhiệm")}');
+    expect(content).toContain('title={tr("Trưởng nhóm")}');
+    expect(content).toContain('title={tr("Thành viên")}');
     expect(content).toContain('<HomeMemberWall');
     expect(content).toContain(
       "pageSize: 'all'",
@@ -28,8 +28,8 @@ describe('Members Directory Page', () => {
 
   it('keeps the profile visible until the destination is ready', () => {
     const detail = fs.readFileSync(path.resolve(process.cwd(), 'src/app/(shell)/(site)/members/[id]/page.tsx'), 'utf-8');
-    expect(detail).toContain('aria-label="Thông tin thành viên"');
-    expect(detail).toContain('aria-label="Công trình của thành viên"');
+    expect(detail).toContain('aria-label={tr("Thông tin thành viên")}');
+    expect(detail).toContain('aria-label={tr("Công trình của thành viên")}');
     expect(fs.existsSync(path.resolve(process.cwd(), 'src/app/members/[id]/loading.tsx'))).toBe(false);
   });
 
@@ -43,8 +43,8 @@ describe('Members Directory Page', () => {
       'utf-8',
     );
 
-    expect(card).toContain('aria-label={`GitHub của ${member.fullName}`}');
-    expect(card).toContain('aria-label={`LinkedIn của ${member.fullName}`}');
+    expect(card).toContain('aria-label={tr("GitHub của {0}", member.fullName)}');
+    expect(card).toContain('aria-label={tr("LinkedIn của {0}", member.fullName)}');
     expect(card).toContain('h-full');
     expect(card).toContain('mt-auto');
     expect(card).toContain('công trình');

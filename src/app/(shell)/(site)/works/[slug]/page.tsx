@@ -1,3 +1,5 @@
+
+import { getServerI18n } from '@/shared/i18n/server';
 import { MobileArticleContents } from '@/features/submissions/components/mobile-article-contents';
 import { cache } from 'react';
 import type { Metadata } from 'next';
@@ -68,6 +70,8 @@ export default async function ShowcaseDetailPage({
   params: Promise<{ slug: string }>;
   searchParams?: Promise<{ returnTo?: string }>;
 }) {
+  const { t: tr } = await getServerI18n();
+
   const { slug } = await params;
   const { item, currentUser } = await getAuthorizedDetail(slug);
 
@@ -105,7 +109,7 @@ export default async function ShowcaseDetailPage({
       <main className="flex-1">
         <header className="border-b border-slate-200 bg-gradient-to-br from-[#FFFFFF] via-[#FFFFFF] to-white">
           <div className="container mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
-            <Breadcrumbs items={[...breadcrumbParents, { label: item.title }]} />
+            <Breadcrumbs items={[...breadcrumbParents, { label: item.title, translate: false }]} />
         {/* Preview Banner for Admin / Creator */}
         {item.status !== 'PUBLISHED' && (
           <div className="panel-callout mb-6 bg-[#FFFFFF] border-slate-200 text-[#1F2937] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xs">
@@ -113,17 +117,15 @@ export default async function ShowcaseDetailPage({
               <Clock className="w-5 h-5 text-[#1F2937] shrink-0 mt-0.5" />
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-semibold text-sm sm:text-base">
-                    Chế độ xem trước công trình nghiên cứu
-                  </span>
+                  <span className="font-semibold text-sm sm:text-base">{tr("Chế độ xem trước công trình nghiên cứu")}</span>
                   <StatusBadge status={item.status} />
                 </div>
                 <p className="text-xs sm:text-sm text-[#1F2937]">
                   {item.status === 'PENDING_REVIEW'
-                    ? 'Bài nộp đang chờ Admin phê duyệt.'
+                    ? tr("Bài nộp đang chờ Admin phê duyệt.")
                     : item.status === 'DRAFT'
-                    ? 'Bản nháp cá nhân. Chưa gửi yêu cầu xét duyệt xuất bản.'
-                    : `Công trình cần chỉnh sửa bổ sung: ${item.rejectionReason || 'Vui lòng cập nhật lại theo yêu cầu.'}`}
+                    ? tr("Bản nháp cá nhân. Chưa gửi yêu cầu xét duyệt xuất bản.")
+                    : tr("Công trình cần chỉnh sửa bổ sung: {0}", item.rejectionReason || 'Vui lòng cập nhật lại theo yêu cầu.')}
                 </p>
               </div>
             </div>
@@ -133,9 +135,7 @@ export default async function ShowcaseDetailPage({
               <Link
                 href={`/admin/reviews/${item.id}`}
                 className="px-4 py-2 bg-brand-button hover:brightness-110 text-white rounded-lg text-xs font-semibold transition-all shadow-xs"
-              >
-                Mở trang phê duyệt
-              </Link>
+              >{tr("Mở trang phê duyệt")}</Link>
             )}
             {(item.status === 'DRAFT' || item.status === 'REVISION_REQUESTED') && (
               ((currentUser?.id === item.creatorId && (currentUser?.role === 'CORE_MEMBER' || currentUser?.role === 'ADMIN')) || currentUser?.role === 'ADMIN') ? (
@@ -143,12 +143,10 @@ export default async function ShowcaseDetailPage({
                   href={`/my-works/${item.id}/edit`}
                   className="px-4 py-2 bg-brand-button hover:brightness-110 text-white rounded-lg text-xs font-semibold transition-all shadow-xs"
                 >
-                  {item.status === 'REVISION_REQUESTED' ? 'Sửa & Gửi lại duyệt' : 'Chỉnh sửa bài viết'}
+                  {item.status === 'REVISION_REQUESTED' ? tr("Sửa & Gửi lại duyệt") : tr("Chỉnh sửa bài viết")}
                 </Link>
               ) : currentUser?.id === item.creatorId && currentUser?.role === 'MEMBER' ? (
-                <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-[#FFFFFF] text-[#1F2937] border border-slate-200">
-                  Chỉ xem (Cần quyền Trưởng nhóm để sửa)
-                </span>
+                <span className="text-xs font-semibold px-3 py-1.5 rounded-md bg-[#FFFFFF] text-[#1F2937] border border-slate-200">{tr("Chỉ xem (Cần quyền Trưởng nhóm để sửa)")}</span>
               ) : null
             )}
             </div>
@@ -161,7 +159,7 @@ export default async function ShowcaseDetailPage({
                 <div className="mb-4 flex flex-wrap items-center gap-3 text-xs font-semibold text-[#1F2937]">
                   <TypeBadge type={item.type} variant="outline" />
                   {item.publishedYear && <span>{item.publishedYear}</span>}
-                  {item.isPinned && <span className="font-semibold text-[#1F2937]">Công trình tiêu biểu</span>}
+                  {item.isPinned && <span className="font-semibold text-[#1F2937]">{tr("Công trình tiêu biểu")}</span>}
                 </div>
                 <h1 className="page-title max-w-5xl break-words">{item.title}</h1>
                 {item.contributors.length > 0 && (
@@ -173,7 +171,7 @@ export default async function ShowcaseDetailPage({
               {item.thumbnailUrl && (
                 <MediaImage
                   src={item.thumbnailUrl}
-                  alt={`Hình minh họa: ${item.title}`}
+                  alt={tr("Hình minh họa: {0}", item.title)}
                   className="article-header-thumbnail"
                 />
               )}
@@ -187,12 +185,12 @@ export default async function ShowcaseDetailPage({
           <article className="min-w-0 space-y-8 sm:space-y-10">
             <ConferenceDetails value={item.conference} />
             <section id="abstract" aria-labelledby="abstract-title" className="scroll-mt-24">
-              <h2 id="abstract-title" className="mb-3 text-base font-semibold text-[#1F2937]">Tóm tắt</h2>
+              <h2 id="abstract-title" className="mb-3 text-base font-semibold text-[#1F2937]">{tr("Tóm tắt")}</h2>
               <p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{item.summary}</p>
             </section>
 
             <div className="space-y-4 lg:hidden">
-              {mobileResources.length > 0 && <section aria-label="Tài nguyên công trình" className="space-y-2">
+              {mobileResources.length > 0 && <section aria-label={tr("Tài nguyên công trình")} className="space-y-2">
                 <ResourceLinks resources={mobileResources} />
               </section>}
             </div>
@@ -201,13 +199,13 @@ export default async function ShowcaseDetailPage({
 
             {!structured && figures.length > 0 && (
               <section id="figures" aria-labelledby="figures-title" className="scroll-mt-24">
-                <h2 id="figures-title" className="mb-4 text-base font-semibold text-[#1F2937]">Hình ảnh &amp; Thực nghiệm</h2>
+                <h2 id="figures-title" className="mb-4 text-base font-semibold text-[#1F2937]">{tr("Hình ảnh & Thực nghiệm")}</h2>
                 <div className="space-y-6">
                   {figures.map((figure, index) => (
                     <figure key={figure.id} className="space-y-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <MediaImage src={figure.fileUrl} alt={figure.fileName} loading="lazy" className="mx-auto block h-auto max-h-[36rem] max-w-full rounded-md object-contain" />
-                      <figcaption className="text-center text-sm text-[#1F2937]">Hình {index + 1}. {figure.fileName}</figcaption>
+                      <figcaption className="text-center text-sm text-[#1F2937]">{tr("Hình ")}{index + 1}. {figure.fileName}</figcaption>
                     </figure>
                   ))}
                 </div>
@@ -216,14 +214,14 @@ export default async function ShowcaseDetailPage({
 
             {!structured && videoLink && (
               <section id="demo" aria-labelledby="demo-title" className="scroll-mt-24">
-                <h2 id="demo-title" className="mb-4 text-base font-semibold text-[#1F2937]">Video trình diễn</h2>
+                <h2 id="demo-title" className="mb-4 text-base font-semibold text-[#1F2937]">{tr("Video trình diễn")}</h2>
                 <VideoPlayer url={videoLink.url} title={item.title} />
               </section>
             )}
 
             {!structured && documents.length > 0 && (
               <section id="documents" aria-labelledby="documents-title" className="scroll-mt-24">
-                <h2 id="documents-title" className="mb-3 text-base font-semibold text-[#1F2937]">Toàn văn &amp; Tài liệu đính kèm</h2>
+                <h2 id="documents-title" className="mb-3 text-base font-semibold text-[#1F2937]">{tr("Toàn văn & Tài liệu đính kèm")}</h2>
                 <div className="divide-y divide-[#153D67] border-y border-slate-200">
                   {documents.map(document => (
                     <div key={document.id} className="flex flex-wrap items-center justify-between gap-3 py-4">
@@ -235,8 +233,8 @@ export default async function ShowcaseDetailPage({
                         </div>
                       </div>
                       <div className="flex shrink-0 items-center gap-3">
-                        <a href={document.fileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 text-xs font-semibold text-[#1F2937] hover:underline"><Eye className="h-3.5 w-3.5" aria-hidden="true" />Xem</a>
-                        <a href={document.fileUrl} download={document.fileName} className="inline-flex min-h-10 items-center gap-1.5 text-xs font-semibold text-[#1F2937] hover:underline"><Download className="h-3.5 w-3.5" aria-hidden="true" />Tải về</a>
+                        <a href={document.fileUrl} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 text-xs font-semibold text-[#1F2937] hover:underline"><Eye className="h-3.5 w-3.5" aria-hidden="true" />{tr("Xem")}</a>
+                        <a href={document.fileUrl} download={document.fileName} className="inline-flex min-h-10 items-center gap-1.5 text-xs font-semibold text-[#1F2937] hover:underline"><Download className="h-3.5 w-3.5" aria-hidden="true" />{tr("Tải về")}</a>
                       </div>
                     </div>
                   ))}
@@ -245,10 +243,10 @@ export default async function ShowcaseDetailPage({
             )}
           </article>
 
-          <aside className="min-w-0 space-y-7 border-t border-slate-200 pt-6 lg:sticky lg:top-24 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0" aria-label="Tài nguyên và nhóm thực hiện">
+          <aside className="min-w-0 space-y-7 border-t border-slate-200 pt-6 lg:sticky lg:top-24 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0" aria-label={tr("Tài nguyên và nhóm thực hiện")}>
             <div className="hidden lg:block"><ArticleTableOfContents content={item.content ?? ''} /></div>
             <section id="resources" className="scroll-mt-28" aria-labelledby="resources-title">
-              <h2 id="resources-title" className="mb-4 text-base font-semibold text-[#1F2937]">Tài nguyên</h2>
+              <h2 id="resources-title" className="mb-4 text-base font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2>
               <div className="flex flex-col items-stretch gap-2">
                 <CitationModal item={toCitationDto(item)} className="action-secondary-detail" />
                 <ResourceLinks resources={sidebarResources} />
@@ -258,7 +256,7 @@ export default async function ShowcaseDetailPage({
 
             {item.contributors.length > 0 && (
               <section className="border-t border-slate-200 pt-6" aria-labelledby="authors-title">
-                <h2 id="authors-title" className="mb-4 text-base font-semibold text-[#1F2937]">Nhóm thực hiện</h2>
+                <h2 id="authors-title" className="mb-4 text-base font-semibold text-[#1F2937]">{tr("Nhóm thực hiện")}</h2>
                 <ul className="space-y-4">
                   {item.contributors.map(contributor => {
                     const name = contributor.user?.fullName || contributor.externalName || 'Thành viên';
@@ -267,7 +265,7 @@ export default async function ShowcaseDetailPage({
                         <MemberAvatar fullName={name} className="h-9 w-9 shrink-0 rounded-full text-xs" />
                         <div className="min-w-0">
                           <span className="text-sm text-[#1F2937]"><ContributorName contributor={contributor} /></span>
-                          <p className="mt-1 text-xs leading-5 text-[#1F2937]">{contributor.customRoleTitle || contributorRoles[contributor.role]}</p>
+                          <p className="mt-1 text-xs leading-5 text-[#1F2937]">{contributor.customRoleTitle || tr(contributorRoles[contributor.role])}</p>
                           {contributor.externalAffiliation && <p className="mt-1 text-xs leading-5 text-[#1F2937]">{contributor.externalAffiliation}</p>}
                         </div>
                       </li>
@@ -281,8 +279,8 @@ export default async function ShowcaseDetailPage({
 
 
             {currentUser?.role === 'ADMIN' && (
-              <section className="border-t border-slate-200 pt-6" aria-label="Quản lý công trình">
-                <h2 className="mb-3 text-base font-semibold text-[#1F2937]">Quản lý</h2>
+              <section className="border-t border-slate-200 pt-6" aria-label={tr("Quản lý công trình")}>
+                <h2 className="mb-3 text-base font-semibold text-[#1F2937]">{tr("Quản lý")}</h2>
                 <div className="flex flex-wrap gap-2">
                   <CardAdminControls variant="detail" itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} showPin={item.status === 'PUBLISHED'} />
                 </div>

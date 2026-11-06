@@ -15,6 +15,12 @@ export async function getAssetAccess(url: string, authenticatedActor?: Actor): P
   assertAssetPath(url);
   const registered = await findRegisteredAsset(url);
   if (registered?.deletedAt || registered?.deletionToken) return denied;
+  // Avatars have a direct public placement: avoid loading article bodies and
+  // revision history for every small image in the member wall or navigation.
+  if (url.startsWith('/uploads/thumbnails/')) {
+    const avatar = await prisma.user.findFirst({ where: { avatarUrl: url, status: 'ACTIVE', deletedAt: null }, select: { id: true } });
+    if (avatar) return { allowed: true, public: true };
+  }
   const items = await prisma.$queryRaw<ItemReference[]>`
       SELECT i."creatorId", i.status::text, i.visibility::text,
         jsonb_build_array(i."thumbnailUrl", i.content, i."mediaDriveUrl",
@@ -28,11 +34,8 @@ export async function getAssetAccess(url: string, authenticatedActor?: Actor): P
   const references = items.map(item => ({ ...item, liveAsset: hasReference(item.live, url), draftAsset: hasReference(item.drafts, url) }));
   if (references.some(item => item.liveAsset && item.status === 'PUBLISHED' && item.visibility === 'PUBLIC')) return { allowed: true, public: true };
   if (url.startsWith('/uploads/thumbnails/')) {
-    const [galleries, avatar] = await Promise.all([
-      prisma.homeMomentsGallery.findMany({ select: { photos: true } }),
-      prisma.user.findFirst({ where: { avatarUrl: url, status: 'ACTIVE', deletedAt: null }, select: { id: true } }),
-    ]);
-    if (avatar || galleries.some(gallery => Array.isArray(gallery.photos) && gallery.photos.some(photo => photo && typeof photo === 'object' && !Array.isArray(photo) && photo.src === url && photo.visible === true && photo.slot !== null))) return { allowed: true, public: true };
+    const galleries = await prisma.homeMomentsGallery.findMany({ select: { photos: true } });
+    if (galleries.some(gallery => Array.isArray(gallery.photos) && gallery.photos.some(photo => photo && typeof photo === 'object' && !Array.isArray(photo) && photo.src === url && photo.visible === true && photo.slot !== null))) return { allowed: true, public: true };
   }
   const actor = authenticatedActor ?? await getActor();
   if (!actor) return denied;

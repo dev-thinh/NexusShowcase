@@ -1,5 +1,6 @@
 'use client';
 
+
 import { submissionValidationMessage, submissionFieldErrors } from '@/features/submissions/model/validation-result';
 
 import { articleFromLegacy, serializeArticle, standaloneResources } from '@/features/submissions/model/article';

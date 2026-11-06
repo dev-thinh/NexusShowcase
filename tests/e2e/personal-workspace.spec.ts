@@ -10,7 +10,6 @@ for(const width of [390,1440])test(`personal tabs, filters and breadcrumbs are v
  if(width<768)await page.getByRole('button',{name:/Bộ lọc/}).click();
  await filters.click();
  await page.getByRole('option',{name:/^Bản nháp/}).click();
- await page.getByRole('search').getByRole('button',{name:'Áp dụng',exact:true}).click();
  await expect(page).toHaveURL(/filter=DRAFT/);
  await expect(page.getByRole('search').locator('input[name="filter"]')).toHaveValue('DRAFT');
  await page.locator('#my-post-search').fill('Benchmark');await page.locator('#my-post-search').press('Enter');
@@ -44,7 +43,6 @@ test('admin member directory has ten rows per page and retains filters in pagina
  await expect(page).toHaveURL(/page=2/);await expect(rows).toHaveCount(10);
  await page.getByRole('combobox',{name:'Vai trò',exact:true}).click();
  await page.getByRole('option',{name:/^Thành viên/}).click();
- await page.getByRole('search').getByRole('button',{name:'Áp dụng',exact:true}).click();
  await expect(page).toHaveURL(url=>url.searchParams.get('role')==='MEMBER');await expect(rows).toHaveCount(10);
  await page.locator('#admin-member-search').fill('Benchmark');await page.locator('#admin-member-search').press('Enter');
  await expect(page).toHaveURL(url => url.searchParams.get('role') === 'MEMBER' && url.searchParams.get('q') === 'Benchmark');await expect(rows).toHaveCount(10);

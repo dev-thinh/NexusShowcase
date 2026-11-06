@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { ErrorNotice } from '@/shared/ui/error-notice';
 
@@ -14,11 +16,13 @@ import { ResearchSectionHeading } from './research-section-heading';
 import { notifySuccess } from '@/shared/dialogs/success';
 
 export function ResearchFlashcards({ initialGallery }: { initialGallery?: MomentsPayload }) {
+  const { t: tr } = useI18n();
+
   const text = useHomeText();
   const directions = [
-    { id: 'one', title: text.researchOneTitle, titleField: 'researchOneTitle', descriptionField: 'researchOneDescription', description: text.researchOneDescription, position: '50% 48%' },
-    { id: 'two', title: text.researchTwoTitle, titleField: 'researchTwoTitle', descriptionField: 'researchTwoDescription', description: text.researchTwoDescription, position: '54% 54%' },
-    { id: 'three', title: text.researchThreeTitle, titleField: 'researchThreeTitle', descriptionField: 'researchThreeDescription', description: text.researchThreeDescription, position: '50% 50%' },
+    { id: 'one', title: text.researchOneTitle, titleField: 'researchOneTitle', descriptionField: 'researchOneDescription', description: text.researchOneDescription },
+    { id: 'two', title: text.researchTwoTitle, titleField: 'researchTwoTitle', descriptionField: 'researchTwoDescription', description: text.researchTwoDescription },
+    { id: 'three', title: text.researchThreeTitle, titleField: 'researchThreeTitle', descriptionField: 'researchThreeDescription', description: text.researchThreeDescription },
   ] as const;
   const [gallery, setGallery] = useState<MomentsPayload>(initialGallery ?? { version: 0, photos: defaultResearchImages, isAdmin: false });
   const [editing, setEditing] = useState(false);
@@ -48,17 +52,17 @@ export function ResearchFlashcards({ initialGallery }: { initialGallery?: Moment
 
   return (
     <>
-      <ResearchSectionHeading>{gallery.isAdmin && !editing && <button ref={editButton} type="button" className="moments-edit-button" aria-label="Chỉnh sửa ảnh hướng nghiên cứu" title="Chỉnh sửa ảnh" disabled={opening} onClick={() => void startEditing()}>{opening ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}</button>}</ResearchSectionHeading>
+      <ResearchSectionHeading>{gallery.isAdmin && !editing && <button ref={editButton} type="button" className="moments-edit-button" aria-label={tr("Chỉnh sửa ảnh hướng nghiên cứu")} title={tr("Chỉnh sửa ảnh")} disabled={opening} onClick={() => void startEditing()}>{opening ? <Loader2 size={18} className="animate-spin" aria-hidden="true" /> : <Pencil size={18} aria-hidden="true" />}</button>}</ResearchSectionHeading>
       {editing && <MomentsEditor variant="research" gallery={gallery} sharedLibrary={gallery.library} onSave={finishEditing} onCancel={() => finishEditing()} />}
-      <ErrorNotice message={message} className="mt-3" />
+      <ErrorNotice message={tr(message)} className="mt-3" />
     <div className="research-directions">
       {directions.map((direction, index) => {
         const photo = gallery.photos.find(photo => photo.slot === index);
         return (
-        <article className="research-direction" key={direction.id} aria-labelledby={`research-direction-${index}`}>
+        <article className="research-direction" data-reveal-delay={index * 140} key={direction.id} aria-labelledby={`research-direction-${index}`}>
           <div className="research-direction__photo">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <MediaImage optimized src={photo?.src} alt={photo?.title || direction.title} width={1000} height={667} sizes="(max-width: 767px) calc(100vw - 32px), 400px" loading="eager" decoding="async" className="h-full w-full object-cover" style={{ objectPosition: direction.position }} />
+            <MediaImage optimized src={photo?.src} alt={photo?.title || tr(direction.title)} width={1000} height={667} sizes="(max-width: 767px) calc(100vw - 32px), 400px" loading="eager" decoding="async" className="h-full w-full object-cover" style={{ objectPosition: 'center' }} />
           </div>
           <div className="research-direction__body">
             <div className="research-direction__heading">

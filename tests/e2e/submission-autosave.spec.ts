@@ -3,6 +3,10 @@ import { expect, login, test } from './fixtures';
 test('creates an empty draft immediately and autosaves without blocking typing or duplicating preview', async ({ page, fixture, database }) => {
  const author = fixture.users.find(user => user.role === 'CORE_MEMBER')!;
  await login(page, author);
+ const editorNavigations: string[] = [];
+ page.on('request', request => {
+  if (request.method() === 'GET' && /\/my-works\/[^/]+\/edit(?:\?|$)/.test(request.url())) editorNavigations.push(request.url());
+ });
  await page.getByRole('link',{name:'Đăng bài mới',exact:true}).click();
  await expect(page).toHaveURL(/\/my-works\/[^/]+\/edit$/);
  const id = page.url().split('/').at(-2)!;
@@ -12,6 +16,7 @@ test('creates an empty draft immediately and autosaves without blocking typing o
  await page.locator('#submission-title').fill('Tự lưu công trình');
  await page.locator('#submission-summary').fill('Nội dung được giữ tự động');
  await expect(page.locator('#submission-title')).toBeEnabled();
+ expect(editorNavigations).toHaveLength(0);
  await expect.poll(async()=> (await database.showcaseItem.findUniqueOrThrow({where:{id}})).authorDraft).toMatchObject({title:'Tự lưu công trình',summary:'Nội dung được giữ tự động'});
  await page.reload();
  await expect(page.locator('#submission-title')).toHaveValue('Tự lưu công trình');

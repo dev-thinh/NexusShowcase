@@ -36,7 +36,6 @@ export const articleDocumentSchema = z.object({
 export type ArticleDocument = z.infer<typeof articleDocumentSchema>;
 export type ArticleSection = ArticleDocument['sections'][number];
 export type ArticleBlock = z.infer<typeof articleBlockSchema>;
-export type MediaBlock = Exclude<ArticleBlock, { kind: 'TEXT' }>;
 
 // Draft parsing checks structure without normalizing or rejecting in-progress input.
 const editingMedia = Object.fromEntries(Object.keys(media).map(key => [key, key === 'fileSize' ? z.number().optional() : ['fileName', 'mimeType'].includes(key) ? z.string().optional() : z.string()]));

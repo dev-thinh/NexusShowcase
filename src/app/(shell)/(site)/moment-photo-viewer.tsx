@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { Loader2, RefreshCw } from 'lucide-react';
 import { useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
@@ -33,6 +35,8 @@ export function MomentPhotoViewer({ src, alt, previewSrc, ratio = 4 / 3, origin,
   origin: MomentPhotoOrigin | null;
   onReady: () => void;
 }) {
+  const { t: tr } = useI18n();
+
   const stage = useRef<HTMLDivElement>(null);
   const image = useRef<HTMLImageElement>(null);
   const live = useRef(false);
@@ -79,7 +83,7 @@ export function MomentPhotoViewer({ src, alt, previewSrc, ratio = 4 / 3, origin,
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img key={attempt} ref={image} className="moments-viewer__image" src={enlargement(src)} alt={alt} decoding="async" loading="eager" fetchPriority="high" onLoad={event => void reveal(event.currentTarget)} onError={() => setStatus('error')} />
     </div>
-    {status === 'loading' && <div className="moments-viewer__feedback" role="status"><Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /><span>Đang tải ảnh rõ nét</span></div>}
-    {status === 'error' && <div className="moments-viewer__feedback moments-viewer__feedback--error" role="alert"><span>Không tải được ảnh rõ nét</span><button type="button" className="inline-flex min-h-11 items-center gap-2 underline underline-offset-2" onClick={() => { setStatus('loading'); setAttempt(value => value + 1); }}><RefreshCw className="h-4 w-4" aria-hidden="true" />Tải lại ảnh</button></div>}
+    {status === 'loading' && <div className="moments-viewer__feedback" role="status"><Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" /><span>{tr("Đang tải ảnh rõ nét")}</span></div>}
+    {status === 'error' && <div className="moments-viewer__feedback moments-viewer__feedback--error" role="alert"><span>{tr("Không tải được ảnh rõ nét")}</span><button type="button" className="inline-flex min-h-11 items-center gap-2 underline underline-offset-2" onClick={() => { setStatus('loading'); setAttempt(value => value + 1); }}><RefreshCw className="h-4 w-4" aria-hidden="true" />{tr("Tải lại ảnh")}</button></div>}
   </div>;
 }

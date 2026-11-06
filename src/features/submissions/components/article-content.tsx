@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useI18n } from '@/shared/i18n/provider';
 import { MediaImage } from '@/shared/ui/media-image';
 import type { ArticleBlock } from '@/features/submissions/model/article';
 import { isGithubUrl, parseArticleContent } from '@/features/submissions/model/article';
@@ -24,6 +28,8 @@ export function FormattedText({ text }: { text: string }) {
   })}</div>;
 }
 export function ArticleBlockView({ block }: { block: ArticleBlock }) {
+  const { t: tr } = useI18n();
+
   if (block.kind === 'TEXT') return <FormattedText text={block.text} />;
   if (!block.url) return null;
   if (block.kind === 'IMAGE') return <figure className="min-w-0 space-y-2">
@@ -31,20 +37,24 @@ export function ArticleBlockView({ block }: { block: ArticleBlock }) {
     <MediaImage src={block.url} alt={block.caption || block.alt} loading="lazy" className="mx-auto block h-auto max-h-[40rem] max-w-full rounded-md object-contain" />
     {block.caption && <figcaption className="text-center text-sm leading-6 text-[#1F2937]">{block.caption}</figcaption>}
   </figure>;
-  if (block.kind === 'VIDEO') return <figure className="space-y-3"><VideoPlayer url={block.url} title={block.caption || 'Video minh họa'} />{block.caption && <figcaption className="text-center text-sm text-[#1F2937]">{block.caption}</figcaption>}</figure>;
+  if (block.kind === 'VIDEO') return <figure className="space-y-3"><VideoPlayer url={block.url} title={block.caption || tr("Video minh họa")} />{block.caption && <figcaption className="text-center text-sm text-[#1F2937]">{block.caption}</figcaption>}</figure>;
   const github = isGithubUrl(block.url);
-  return <ResourceCard href={block.url} title={block.caption || block.fileName || (block.kind === 'DOCUMENT' ? 'Tài liệu PDF' : github ? 'Mã nguồn GitHub' : 'Mở liên kết')} kind={block.kind === 'DOCUMENT' ? 'document' : github ? 'github' : 'link'} fileSize={block.fileSize} />;
+  return <ResourceCard href={block.url} title={block.caption || block.fileName || (block.kind === 'DOCUMENT' ? tr('Tài liệu PDF') : github ? tr('Mã nguồn GitHub') : tr('Mở liên kết'))} kind={block.kind === 'DOCUMENT' ? 'document' : github ? 'github' : 'link'} fileSize={block.fileSize} />;
 }
 export function ArticleContent({ content }: { content: string }) {
+  const { t: tr } = useI18n();
+
   const doc = parseArticleContent(content);
-  if (!doc) return content ? <section id="overview" className="scroll-mt-28 space-y-4"><h2 className="text-xl font-semibold text-[#1F2937]">Nội dung công trình</h2><FormattedText text={content} /></section> : null;
+  if (!doc) return content ? <section id="overview" className="scroll-mt-28 space-y-4"><h2 className="text-xl font-semibold text-[#1F2937]">{tr("Nội dung công trình")}</h2><FormattedText text={content} /></section> : null;
   return <>{doc.sections.map((section, index) => <section key={section.id} id={`section-${index + 1}`} aria-labelledby={`section-title-${index + 1}`} className="scroll-mt-36 space-y-5">
     <h2 id={`section-title-${index + 1}`} className="break-words text-xl font-semibold tracking-tight text-[#1F2937]">{section.title}</h2>
     <div className="space-y-6">{section.blocks.map(block => <ArticleBlockView key={block.id} block={block} />)}</div>
   </section>)}</>;
 }
 export function ArticleTableOfContents({ content }: { content: string }) {
+  const { t: tr } = useI18n();
+
   const sections = parseArticleContent(content)?.sections ?? [];
   if (!sections.length) return null;
-  return <nav aria-label="Mục lục bài viết" className="space-y-3"><h2 className="text-base font-semibold text-[#1F2937]">Mục lục</h2><ol className="space-y-2 text-sm leading-6 text-[#1F2937]"><li><a href="#abstract" className="hover:text-[#1F2937]">Abstract / Tóm tắt</a></li>{sections.map((section, index) => <li key={section.id}><a href={`#section-${index + 1}`} className="block break-words hover:text-[#1F2937]">{index + 1}. {section.title}</a></li>)}</ol></nav>;
+  return <nav aria-label={tr("Mục lục bài viết")} className="space-y-3"><h2 className="text-base font-semibold text-[#1F2937]">{tr("Mục lục")}</h2><ol className="space-y-2 text-sm leading-6 text-[#1F2937]"><li><a href="#abstract" className="hover:text-[#1F2937]">{tr("Abstract / Tóm tắt")}</a></li>{sections.map((section, index) => <li key={section.id}><a href={`#section-${index + 1}`} className="block break-words hover:text-[#1F2937]">{index + 1}. {section.title}</a></li>)}</ol></nav>;
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/shared/i18n/provider';
 import NavigationForm from 'next/form';
 import { createContext, useContext, useEffect, useId, useRef, useState, type FormHTMLAttributes } from 'react';
 import type { z } from 'zod';
@@ -9,9 +10,11 @@ type Context = { errors: Record<string, string>; errorId: (name: string) => stri
 const ValidationContext = createContext<Context | null>(null);
 
 export function FieldError({ name }: { name: string }) {
+  const { t: tr } = useI18n();
+
   const context = useContext(ValidationContext);
   const message = context?.errors[name];
-  return message ? <p id={context!.errorId(name)} role="alert" className="mt-1.5 text-sm leading-5 text-rose-800">{message}</p> : null;
+  return message ? <p id={context!.errorId(name)} role="alert" className="mt-1.5 text-sm leading-5 text-rose-800">{tr(message)}</p> : null;
 }
 
 type Props = Omit<FormHTMLAttributes<HTMLFormElement>, 'action'> & {
@@ -24,7 +27,9 @@ type Props = Omit<FormHTMLAttributes<HTMLFormElement>, 'action'> & {
   prefetch?: false;
 };
 
-export function ValidatedForm({ schema, values, action, navigation = false, inlineErrors = false, onSubmit, onChange, children, scroll = false, prefetch = false, ...props }: Props) {
+export function ValidatedForm({ schema, values, action, navigation = false, inlineErrors = false, onSubmit, onChange, onReset, children, scroll = false, prefetch = false, ...props }: Props) {
+  const { t: tr } = useI18n();
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const root = useRef<HTMLFormElement>(null);
   const id = useId();
@@ -52,11 +57,12 @@ export function ValidatedForm({ schema, values, action, navigation = false, inli
     {children}
     {errors._form && <FieldError name="_form" />}
     {!inlineErrors && Object.keys(errors).some(name => name !== '_form') && <div className="col-span-full w-full space-y-1" role="alert">
-      {Object.entries(errors).filter(([name]) => name !== '_form').map(([name, message]) => <p key={name} id={errorId(name)} className="text-sm text-rose-800">{message}</p>)}
+      {Object.entries(errors).filter(([name]) => name !== '_form').map(([name, message]) => <p key={name} id={errorId(name)} className="text-sm text-rose-800">{tr(message)}</p>)}
     </div>}
   </ValidationContext.Provider>;
   const common = {
     ...props, ref: root, noValidate: true,
+    onReset: (event: React.FormEvent<HTMLFormElement>) => { setErrors({}); onReset?.(event); },
     onChange: (event: React.ChangeEvent<HTMLFormElement>) => {
       const name = event.target instanceof Element ? event.target.getAttribute('name') : null;
       if (name) setErrors(current => Object.fromEntries(Object.entries(current).filter(([path]) => path !== name && !path.startsWith(name + '.') && !name.startsWith(path + '.'))));

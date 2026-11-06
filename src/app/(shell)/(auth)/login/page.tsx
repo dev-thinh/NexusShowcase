@@ -1,24 +1,21 @@
+import { localizedMetadata } from '@/shared/i18n/metadata';
+
+import { getServerI18n } from '@/shared/i18n/server';
 import { ClubLogo } from '@/shared/ui/club-logo';
 import { LoginForm } from '@/features/identity/components/login-form';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { FormSkeleton } from '@/shared/ui/content-skeletons';
 import { ArrowLeft, Mail } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { Suspense } from 'react';
 
-function LoginFormFallback() {
-  return <div className="panel-detail max-w-lg mx-auto w-full space-y-5" aria-busy="true" aria-label="Đang tải biểu mẫu đăng nhập">
-    <h2 className="border-b border-slate-200 pb-4 text-2xl font-semibold text-[#1F2937]">Đăng nhập</h2>
-    {['Email', 'Mật khẩu'].map(label => <div key={label} className="space-y-2"><span className="block text-sm font-semibold text-[#1F2937]">{label}</span><Skeleton className="h-12 w-full rounded-lg" /></div>)}
-    <button disabled className="w-full rounded-lg bg-brand-button py-3 font-semibold text-white opacity-60">Đăng nhập</button>
-  </div>;
-}
-
-export const metadata = {
+export const generateMetadata = localizedMetadata({
   title: 'Đăng nhập',
   description: 'Đăng nhập để chia sẻ công trình và kết nối cùng CLB Robotics & IoT - HCMUS.',
-};
+});
 
 export default async function LoginPage() {
+  const { t: tr } = await getServerI18n();
+
   return <div className="flex flex-1 flex-col bg-background relative overflow-hidden selection:bg-[#153D67] selection:text-white">
 
     <div className="absolute top-16 left-0 w-96 h-96 bg-[#FFFFFF] rounded-full blur-3xl pointer-events-none -translate-x-1/4 -translate-y-1/4" />
@@ -28,21 +25,21 @@ export default async function LoginPage() {
       <div className="container w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 items-center">
           <aside className="hidden lg:block lg:col-span-7 xl:col-span-7 space-y-5">
-            <div data-brand-lockup="login" className="w-72 max-w-full py-1">
+            <div data-brand-lockup="login" className="w-[232px] max-w-full py-1">
               <ClubLogo />
             </div>
-            <h1 className="login-title text-[#1F2937]"><span>Cùng nghiên cứu.</span><span className="text-[#153D67]">Cùng sáng tạo.</span></h1>
-            <p className="login-copy text-base text-slate-600 leading-relaxed font-normal">Chia sẻ công trình, kết nối thành viên và phát triển ý tưởng Robotics &amp; IoT.</p>
+            <h1 className="login-title text-[#1F2937]"><span>{tr("Cùng nghiên cứu.")}</span><span className="text-[#153D67]">{tr("Cùng sáng tạo.")}</span></h1>
+            <p className="login-copy text-base text-slate-600 leading-relaxed font-normal">{tr("Chia sẻ công trình, kết nối thành viên và phát triển ý tưởng Robotics & IoT.")}</p>
             <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Link href="/" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-brand-button hover:brightness-110 text-white text-sm font-semibold shadow-xs transition-all active:scale-[0.98]"><ArrowLeft aria-hidden="true" className="w-4 h-4 text-white/80" /><span>Trang chủ</span></Link>
-              <Link href="/contact" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-white hover:bg-[#FFFFFF] text-[#1F2937] text-sm font-semibold border border-slate-200 shadow-2xs transition-all active:scale-[0.98]"><Mail className="w-4 h-4 text-[#1F2937]" /><span>Liên hệ</span></Link>
+              <Link href="/" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-brand-button hover:brightness-110 text-white text-sm font-semibold shadow-xs transition-all active:scale-[0.98]"><ArrowLeft aria-hidden="true" className="w-4 h-4 text-white/80" /><span>{tr("Trang chủ")}</span></Link>
+              <Link href="/contact" className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-lg bg-white hover:bg-[#FFFFFF] text-[#1F2937] text-sm font-semibold border border-slate-200 shadow-2xs transition-all active:scale-[0.98]"><Mail className="w-4 h-4 text-[#1F2937]" /><span>{tr("Liên hệ")}</span></Link>
             </div>
           </aside>
           <div className="lg:col-span-5 xl:col-span-5 w-full">
-            <Suspense fallback={<LoginFormFallback />}><LoginForm /></Suspense>
-            <nav aria-label="Điều hướng đăng nhập" className="mx-auto mt-5 flex max-w-lg items-center justify-center gap-6 text-sm text-slate-600 lg:hidden">
-              <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-sm hover:text-[#153D67]"><ArrowLeft className="h-4 w-4" aria-hidden="true" />Trang chủ</Link>
-              <Link href="/contact" className="inline-flex min-h-11 items-center gap-2 rounded-sm hover:text-[#153D67]"><Mail className="h-4 w-4" aria-hidden="true" />Liên hệ</Link>
+            <Suspense fallback={<FormSkeleton />}><LoginForm /></Suspense>
+            <nav aria-label={tr("Điều hướng đăng nhập")} className="mx-auto mt-5 flex max-w-lg items-center justify-center gap-6 text-sm text-slate-600 lg:hidden">
+              <Link href="/" className="inline-flex min-h-11 items-center gap-2 rounded-sm hover:text-[#153D67]"><ArrowLeft className="h-4 w-4" aria-hidden="true" />{tr("Trang chủ")}</Link>
+              <Link href="/contact" className="inline-flex min-h-11 items-center gap-2 rounded-sm hover:text-[#153D67]"><Mail className="h-4 w-4" aria-hidden="true" />{tr("Liên hệ")}</Link>
             </nav>
           </div>
         </div>

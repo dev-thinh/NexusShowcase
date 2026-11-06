@@ -68,5 +68,5 @@ export async function openPublicNavigation(page: Page) {
   const toggle = page.locator('.site-mobile-menu-toggle');
   await expect(toggle).toBeVisible();
   if (await toggle.getAttribute('aria-expanded') !== 'true') await toggle.click();
-  await expect(page.getByRole('navigation', { name: 'Điều hướng chính', exact: true })).toBeVisible();
+  await expect(page.getByRole('navigation', { name: /^(Điều hướng chính|Main navigation)$/ })).toBeVisible();
 }

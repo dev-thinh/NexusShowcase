@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { SubmissionField } from './submission-field';
 import { searchContributors } from '@/features/identity/server/member-search-action';
@@ -22,6 +24,8 @@ interface ContributorEditorProps {
 }
 
 export function ContributorEditor({ value, clubMembers, onChange, errors = {} }: ContributorEditorProps) {
+  const { t: tr } = useI18n();
+
   const [showDetailedRoles, setShowDetailedRoles] = useState(false);
   const [memberQuery, setMemberQuery] = useState('');
   const [isMemberSearchOpen, setIsMemberSearchOpen] = useState(false);
@@ -94,17 +98,14 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
             onClick={() => setIsMemberSearchOpen((current) => !current)}
             className="action-secondary-detail min-h-11 min-w-0 flex-1 whitespace-nowrap !px-3"
           >
-            <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />Thành viên
-          </button>
-          <button type="button" onClick={() => onChange([...value, { externalName: '', role: 'CONTRIBUTOR', displayOrder: value.length }])} className="action-secondary-detail min-h-11 min-w-0 flex-1 whitespace-nowrap !px-3"><Plus className="h-4 w-4 shrink-0" aria-hidden="true" />Thành viên khác</button>
+            <Plus className="h-4 w-4 shrink-0" aria-hidden="true" />{tr("Thành viên")}</button>
+          <button type="button" onClick={() => onChange([...value, { externalName: '', role: 'CONTRIBUTOR', displayOrder: value.length }])} className="action-secondary-detail min-h-11 min-w-0 flex-1 whitespace-nowrap !px-3"><Plus className="h-4 w-4 shrink-0" aria-hidden="true" />{tr("Thành viên khác")}</button>
         </div>
 
       </div>
 
       <label className="mt-2 inline-flex min-h-11 items-center gap-2 text-sm text-[#1F2937]">
-        <input type="checkbox" checked={showDetailedRoles} onChange={event => setShowDetailedRoles(event.target.checked)} />
-        Vai trò chi tiết
-      </label>
+        <input type="checkbox" checked={showDetailedRoles} onChange={event => setShowDetailedRoles(event.target.checked)} />{tr("Vai trò chi tiết")}</label>
 
       {isMemberSearchOpen && (
         <div
@@ -114,7 +115,7 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
             if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsMemberSearchOpen(false);
           }}
         >
-          <label className="sr-only" htmlFor="club-contributor">Thêm thành viên CLB</label>
+          <label className="sr-only" htmlFor="club-contributor">{tr("Thêm thành viên CLB")}</label>
           <input
             ref={memberSearchRef}
             id="club-contributor"
@@ -125,7 +126,7 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
             aria-activedescendant={memberResults[activeResult] ? `club-contributor-${memberResults[activeResult].id}` : undefined}
             value={memberQuery}
             maxLength={200}
-            placeholder="Tìm thành viên CLB"
+            placeholder={tr("Tìm thành viên CLB")}
             autoComplete="off"
             onFocus={() => setIsMemberSearchOpen(true)}
             onChange={(event) => {
@@ -153,11 +154,11 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
             className="min-h-11 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm text-[#1F2937] outline-none transition-colors placeholder:text-[#1F2937] hover:border-slate-200 focus:border-slate-200 focus:ring-2 focus:ring-[#153D67]"
           />
 
-            {searchError && <p role="alert" className="mt-2 text-sm text-[#1F2937]">{searchError}</p>}
-            {searchPending && <p role="status" className="mt-2 text-xs text-[#1F2937]">Đang tìm thành viên…</p>}
+            {searchError && <p role="alert" className="mt-2 text-sm text-[#1F2937]">{tr(searchError)}</p>}
+            {searchPending && <p role="status" className="mt-2 text-xs text-[#1F2937]">{tr("Đang tìm thành viên…")}</p>}
             <div id="club-contributor-results" role="listbox" aria-busy={searchPending} className="mt-2 max-h-64 w-full overflow-y-auto rounded-md border border-slate-200 bg-white p-1.5">
               {memberResults.length === 0 ? (
-                <p className="px-3 py-2.5 text-sm text-[#1F2937]">Không tìm thấy thành viên phù hợp</p>
+                <p className="px-3 py-2.5 text-sm text-[#1F2937]">{tr("Không tìm thấy thành viên phù hợp")}</p>
               ) : (
                 <>
                   {memberResults.map((member, index) => (
@@ -178,7 +179,7 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
                 </>
               )}
             </div>
-            {totalSearchPages > 1 && <div className="mt-2 flex items-center justify-between gap-2"><button type="button" onMouseDown={event => event.preventDefault()} disabled={searchPending || searchPage === 1} onClick={() => changeSearchPage(-1)} className="action-secondary-card">Trang trước</button><span className="text-xs text-[#1F2937]">{searchPage}/{totalSearchPages}</span><button type="button" onMouseDown={event => event.preventDefault()} disabled={searchPending || searchPage === totalSearchPages} onClick={() => changeSearchPage(1)} className="action-secondary-card">Trang sau</button></div>}
+            {totalSearchPages > 1 && <div className="mt-2 flex items-center justify-between gap-2"><button type="button" onMouseDown={event => event.preventDefault()} disabled={searchPending || searchPage === 1} onClick={() => changeSearchPage(-1)} className="action-secondary-card">{tr("Trang trước")}</button><span className="text-xs text-[#1F2937]">{searchPage}/{totalSearchPages}</span><button type="button" onMouseDown={event => event.preventDefault()} disabled={searchPending || searchPage === totalSearchPages} onClick={() => changeSearchPage(1)} className="action-secondary-card">{tr("Trang sau")}</button></div>}
         </div>
       )}
 
@@ -191,12 +192,12 @@ export function ContributorEditor({ value, clubMembers, onChange, errors = {} }:
               {member ? (
                 <p className="min-w-0 truncate text-sm font-semibold text-[#1F2937]" title={member.fullName}>{member.fullName}</p>
               ) : (
-                <SubmissionField name={`contributors.${index}.externalName`} errors={errors}><input value={contributor.externalName ?? ''} onChange={(event) => update(index, { externalName: event.target.value })} aria-label={`Tên người đóng góp ${index + 1}`} placeholder="Họ và tên" className="min-h-9 w-full rounded-md border border-slate-200 px-3 text-sm" /></SubmissionField>
+                <SubmissionField name={`contributors.${index}.externalName`} errors={errors}><input value={contributor.externalName ?? ''} onChange={(event) => update(index, { externalName: event.target.value })} aria-label={tr("Tên người đóng góp {0}", index + 1)} placeholder={tr("Họ và tên")} className="min-h-9 w-full rounded-md border border-slate-200 px-3 text-sm" /></SubmissionField>
               )}
               {(showDetailedRoles || errors[`contributors.${index}.customRoleTitle`]?.length || errors[`contributors.${index}.role`]?.length) ? (
-              <SubmissionField name={`contributors.${index}.customRoleTitle`} errors={{ ...errors, [`contributors.${index}.customRoleTitle`]: [...(errors[`contributors.${index}.customRoleTitle`] ?? []), ...(errors[`contributors.${index}.role`] ?? [])] }}><input value={contributor.customRoleTitle ?? (contributor.role === 'CONTRIBUTOR' || contributor.role === 'CUSTOM' ? '' : roleLabels[contributor.role])} maxLength={100} onChange={event => update(index, { role: event.target.value.trim() ? 'CUSTOM' : 'CONTRIBUTOR', customRoleTitle: event.target.value })} aria-label={`Vai trò của người đóng góp ${index + 1}`} placeholder="Vai trò (tùy chọn)" className="min-h-9 min-w-0 w-full rounded-md border border-slate-200 bg-white px-3 text-sm" /></SubmissionField>
-              ) : <span className="text-sm text-[#1F2937]">{contributor.customRoleTitle || roleLabels[contributor.role] || 'Thành viên đóng góp'}</span>}
-              <button type="button" onClick={() => onChange(value.filter((_, current) => current !== index).map((entry, order) => ({ ...entry, displayOrder: order })))} aria-label={`Xóa người đóng góp ${index + 1}`} className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-[#1F2937] transition-colors hover:border-slate-200 hover:bg-[#FFFFFF] hover:text-[#1F2937]"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
+              <SubmissionField name={`contributors.${index}.customRoleTitle`} errors={{ ...errors, [`contributors.${index}.customRoleTitle`]: [...(errors[`contributors.${index}.customRoleTitle`] ?? []), ...(errors[`contributors.${index}.role`] ?? [])] }}><input value={contributor.customRoleTitle ?? (contributor.role === 'CONTRIBUTOR' || contributor.role === 'CUSTOM' ? '' : roleLabels[contributor.role])} maxLength={100} onChange={event => update(index, { role: event.target.value.trim() ? 'CUSTOM' : 'CONTRIBUTOR', customRoleTitle: event.target.value })} aria-label={tr("Vai trò của người đóng góp {0}", index + 1)} placeholder={tr("Vai trò (tùy chọn)")} className="min-h-9 min-w-0 w-full rounded-md border border-slate-200 bg-white px-3 text-sm" /></SubmissionField>
+              ) : <span className="text-sm text-[#1F2937]">{contributor.customRoleTitle || tr(roleLabels[contributor.role]) || tr("Thành viên đóng góp")}</span>}
+              <button type="button" onClick={() => onChange(value.filter((_, current) => current !== index).map((entry, order) => ({ ...entry, displayOrder: order })))} aria-label={tr("Xóa người đóng góp {0}", index + 1)} className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-transparent text-[#1F2937] transition-colors hover:border-slate-200 hover:bg-[#FFFFFF] hover:text-[#1F2937]"><Trash2 className="h-4 w-4" aria-hidden="true" /></button>
             </SubmissionField>
           );
         })}

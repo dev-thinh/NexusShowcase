@@ -1,29 +1,33 @@
+
+'use client';
+
+import { useI18n } from '@/shared/i18n/provider';
 import { ClubLogo } from '@/shared/ui/club-logo';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
 const footerLink = 'inline-flex min-h-11 items-center gap-1.5 rounded-sm text-sm text-[#1F2937] transition-colors hover:text-[#1F2937] hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
 
 export function AcademicFooter() {
+  const { t: tr } = useI18n();
+
   return (
     <footer className="mt-auto border-t border-slate-200 bg-white font-sans">
       <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-x-10 gap-y-8 py-10 sm:grid-cols-[minmax(0,1fr)_auto] lg:py-12">
           <div className="min-w-0">
-            <Link href="/" aria-label="Trang chủ CLB Robotics & IoT - HCMUS" className="inline-flex w-72 max-w-full items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4">
+            <Link href="/" aria-label={tr("Trang chủ CLB Robotics & IoT - HCMUS")} className="inline-flex w-[232px] max-w-full items-center rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-4">
               <ClubLogo />
             </Link>
-            <p className="mt-4 max-w-md text-pretty text-sm leading-7 text-[#1F2937]">
-              Chia sẻ công trình nghiên cứu khoa học, dự án và sản phẩm <span className="whitespace-nowrap">sáng tạo</span> của thành viên CLB.
-            </p>
+            <p className="mt-4 max-w-md text-pretty text-sm leading-7 text-[#1F2937]">{tr("Chia sẻ công trình nghiên cứu khoa học, dự án và sản phẩm ")}<span className="whitespace-nowrap">{tr("sáng tạo")}</span>{tr(" của thành viên CLB.")}</p>
           </div>
 
-          <nav aria-label="Khám phá CLB" className="min-w-0 w-full justify-self-start text-left sm:w-auto sm:justify-self-end">
-            <h2 className="mb-3 text-sm font-semibold text-[#1F2937]">Khám phá</h2>
+          <nav aria-label={tr("Khám phá CLB")} className="min-w-0 w-full justify-self-start text-left sm:w-auto sm:justify-self-end">
+            <h2 className="mb-3 text-sm font-semibold text-[#1F2937]">{tr("Khám phá")}</h2>
             <ul className="grid grid-cols-2 gap-x-4 gap-y-1 sm:block">
-              <li><Link href="/research" className={footerLink}>Nghiên cứu khoa học</Link></li>
-              <li><Link href="/projects" className={footerLink}>Dự án &amp; Sản phẩm</Link></li>
-              <li><Link href="/members" className={footerLink}>Thành viên</Link></li>
-              <li><Link href="/contact" className={footerLink}>Liên hệ</Link></li>
+              <li><Link href="/research" className={footerLink}>{tr("Nghiên cứu khoa học")}</Link></li>
+              <li><Link href="/projects" className={footerLink}>{tr("Dự án & Sản phẩm")}</Link></li>
+              <li><Link href="/members" className={footerLink}>{tr("Thành viên")}</Link></li>
+              <li><Link href="/contact" className={footerLink}>{tr("Liên hệ")}</Link></li>
             </ul>
           </nav>
 

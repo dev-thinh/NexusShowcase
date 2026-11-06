@@ -14,7 +14,7 @@ for (const path of ['/research', '/projects']) {
     await form.getByLabel('Năm thực hiện').fill('2025');
     await expect(form.getByRole('combobox')).toBeVisible();
     await toggle.click();
-    await form.getByRole('button', { name: 'Áp dụng', exact: true }).click();
+    await form.getByRole('searchbox').press('Enter');
     await expect(page).toHaveURL(/year=2025/);
     await form.getByRole('button', { name: /Bộ lọc/ }).click();
     await expect(form.getByLabel('Năm thực hiện')).toHaveValue('2025');
@@ -31,4 +31,16 @@ test('desktop filters remain directly available', async ({ page }) => {
   await expect(form.getByLabel('Năm thực hiện')).toBeVisible();
   await expect(form.getByRole('combobox')).toBeVisible();
   await expect(form.getByRole('button', { name: /Bộ lọc/ })).toBeHidden();
+});
+
+
+test('sort applies immediately while retaining the search and year', async ({ page }) => {
+  await page.goto('/research?q=Benchmark&year=2026');
+  const form = page.getByRole('search');
+  await form.getByRole('combobox').click();
+  await page.getByRole('option', { name: 'Tiêu đề A–Z', exact: true }).click();
+  await expect(page).toHaveURL(/sort=title/);
+  await expect(page).toHaveURL(/q=Benchmark/);
+  await expect(page).toHaveURL(/year=2026/);
+  await expect(form.locator('.filter-actions').getByRole('link', { name: 'Xóa bộ lọc' })).toBeVisible();
 });

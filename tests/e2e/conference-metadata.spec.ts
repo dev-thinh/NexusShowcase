@@ -52,7 +52,7 @@ test('conference editor preserves both milestone dates and supports research pap
     await page.getByRole('combobox', { name: 'Trạng thái công bố', exact: true }).click();
     await page.getByRole('option', { name: 'Đã công bố', exact: true }).click();
     await expect(page.locator('#conference-paper-url')).toHaveAttribute('required', '');
-    await page.locator('#conference-paper-url').fill('https://doi.org/10.1234/conference-fixture');
+    await page.locator('#conference-paper-url').fill('10.1234/conference-fixture');
     await page.locator('#conference-publication-date').fill('2027-03-01');
     await page.locator('[data-submission-actions]').getByRole('button', { name: 'Xem trước', exact: true }).click();
     await expect(info).toContainText('Đã công bố');
@@ -64,7 +64,7 @@ test('conference editor preserves both milestone dates and supports research pap
     expect((await database.showcaseItem.findUniqueOrThrow({ where: { id: item.id } })).conference).toMatchObject({ status: 'PUBLISHED', acceptedDate: conference.acceptedDate, publicationDate: '2027-03-01', paperUrl: 'https://doi.org/10.1234/conference-fixture' });
     await page.goto(`/my-works/${item.id}/edit`);
     await expect(page.locator('#conference-publication-date')).toHaveValue('2027-03-01');
-    await expect(page.locator('#conference-paper-url')).toHaveValue('https://doi.org/10.1234/conference-fixture');
+    await expect(page.locator('#conference-paper-url')).toHaveValue('10.1234/conference-fixture');
     await page.getByRole('combobox', { name: 'Trạng thái công bố', exact: true }).click();
     await page.getByRole('option', { name: 'Đã chấp nhận', exact: true }).click();
     await expect(page.locator('#conference-accepted-date')).toHaveValue(conference.acceptedDate);
@@ -111,7 +111,9 @@ for (const type of ['RESEARCH_PAPER', 'PROJECT'] as const) test(`conference meta
           expect(titleBox.height).toBeLessThanOrEqual(28);
           const summaryBox = (await card.locator('[data-card-description]').boundingBox())!;
           const footerBox = (await card.locator('.publication-card__footer').boundingBox())!;
-          expect(footerBox.y - summaryBox.y - summaryBox.height).toBeLessThanOrEqual(12);
+          expect(footerBox.y - summaryBox.y - summaryBox.height).toBeGreaterThanOrEqual(0);
+          const cardBox = (await card.boundingBox())!;
+          expect(Math.abs(cardBox.y + cardBox.height - footerBox.y - footerBox.height)).toBeLessThan(2);
         }
         for (const card of cards) {
           await expect(card.locator('[data-card-description]')).toHaveCSS('height', '48px');

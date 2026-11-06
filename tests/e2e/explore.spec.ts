@@ -16,7 +16,7 @@ test('both homepage entry points open research after retiring the all-publicatio
 test('research search and reset stay within the category', async ({ page }) => {
   await page.goto(research);
   await page.getByRole('searchbox', { name: 'Từ khóa tìm kiếm' }).fill('library-no-matching-results');
-  await page.getByRole('button', { name: 'Áp dụng', exact: true }).click();
+  await page.getByRole('searchbox').press('Enter');
   await expect(page).toHaveURL(/\/research\?q=library-no-matching-results/);
   await expect(page.getByRole('heading', { name: 'Không tìm thấy công trình phù hợp' })).toBeVisible();
   await page.getByRole('link', { name: 'Xóa bộ lọc', exact: true }).click();

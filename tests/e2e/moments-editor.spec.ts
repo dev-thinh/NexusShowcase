@@ -83,9 +83,10 @@ test('admin uses modal slots and a reusable library without repeating photos bet
     await expect(preview.getByRole('img')).toHaveAttribute('alt', 'Ảnh mới được tái sử dụng');
     for (const value of ['wide', 'portrait', 'square']) {
       await shape.click();
-      await page.getByRole('option', { name: ({ wide: 'Ngang', portrait: 'Dọc', square: 'Vuông' } as Record<string, string>)[value], exact: true }).click();
+      await page.getByRole('option', { name: ({ wide: 'Ngang (4:3)', portrait: 'Dọc (3:4)', square: 'Vuông (1:1)' } as Record<string, string>)[value], exact: true }).click();
       await expect(preview).toHaveAttribute('data-preview-shape', value);
       const box = (await preview.boundingBox())!;
+      expect(Math.abs(box.width / box.height - ({ wide: 4 / 3, portrait: 3 / 4, square: 1 } as Record<string, number>)[value])).toBeLessThan(0.02);
       if (value === 'wide') expect(box.width).toBeGreaterThan(box.height);
       else if (value === 'portrait') expect(box.height).toBeGreaterThan(box.width);
       else expect(Math.abs(box.width - box.height)).toBeLessThan(1);

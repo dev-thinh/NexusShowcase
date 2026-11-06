@@ -8,7 +8,7 @@ test('admin restores an identity and reveals a single-use temporary password for
     await login(page, fixture.users[0], `/admin/members?q=${encodeURIComponent(user.fullName)}&status=DISABLED`);
     await expect(page).toHaveTitle(/^Quản lý thành viên/);
     await page.getByRole('button', { name: 'Khôi phục', exact: true }).click();
-    await page.getByRole('button', { name: 'Khôi phục tài khoản', exact: true }).click();
+    await page.getByRole('dialog', { name: 'Khôi phục tài khoản', exact: true }).getByRole('button', { name: 'Xác nhận', exact: true }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Đã khôi phục tài khoản' })).toBeVisible();
     const restoreDialog = page.getByRole('dialog', { name: 'Khôi phục tài khoản', exact: true });
     if (await restoreDialog.isVisible()) await restoreDialog.getByRole('button', { name: 'Đóng', exact: true }).click();
@@ -16,7 +16,7 @@ test('admin restores an identity and reveals a single-use temporary password for
     const row = page.locator('.admin-member-row');
     await row.getByRole('button', { name: `Quyền của ${user.fullName}`, exact: true }).click();
     await row.getByRole('button', { name: 'Đặt lại mật khẩu', exact: true }).click();
-    await page.getByRole('button', { name: 'Tạo mật khẩu tạm', exact: true }).click();
+    await page.getByRole('dialog', { name: 'Đặt lại mật khẩu', exact: true }).getByRole('button', { name: 'Xác nhận', exact: true }).click();
     const temporary = page.getByLabel('Mật khẩu tạm', { exact: true });
     await expect(temporary).toHaveAttribute('type', 'password');
     await page.getByRole('button', { name: 'Hiện mật khẩu', exact: true }).click();
@@ -41,4 +41,29 @@ test('admin restores an identity and reveals a single-use temporary password for
     await memberContext.close();
     await database.user.delete({ where: { id: user.id } });
   }
+});
+
+test('reset password action matches its adjacent badge and opens a concise confirmation', async ({ page, fixture, database }) => {
+  const member = await database.user.create({ data: { email: `${fixture.prefix}-compact-admin@example.test`, fullName: 'Quản trị viên kiểm tra', role: 'ADMIN', status: 'ACTIVE' } });
+  try {
+    await login(page, fixture.users[0], `/admin/members?q=${encodeURIComponent(member.fullName)}`);
+    const row = page.locator('.admin-member-row').filter({ hasText: member.fullName });
+    const trigger = row.getByRole('button', { name: 'Đặt lại mật khẩu', exact: true });
+    for (const width of [390, 1440]) {
+      await page.setViewportSize({ width, height: 900 });
+      await expect(trigger).toBeVisible();
+      const badge = await row.locator('.admin-role-badge').boundingBox();
+      const button = await trigger.boundingBox();
+      expect(Math.abs(button!.height - badge!.height)).toBeLessThan(1);
+    }
+    await trigger.click();
+    const modal = page.getByRole('dialog', { name: 'Đặt lại mật khẩu', exact: true });
+    await expect(modal).toContainText(`Đặt lại mật khẩu cho ${member.fullName}?`);
+    await expect(modal).not.toContainText('kênh riêng');
+    await expect(modal).not.toContainText('xác minh');
+    await expect(modal.getByRole('button', { name: 'Xác nhận', exact: true })).toBeVisible();
+    await modal.screenshot({ path: '/tmp/admin-reset-confirmation.png' });
+    await modal.getByRole('button', { name: 'Hủy', exact: true }).click();
+    expect((await database.user.findUniqueOrThrow({ where: { id: member.id } })).sessionVersion).toBe(member.sessionVersion);
+  } finally { await database.user.delete({ where: { id: member.id } }); }
 });

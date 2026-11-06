@@ -1,4 +1,7 @@
-export const metadata = { title: 'Liên hệ' };
+import { localizedMetadata } from '@/shared/i18n/metadata';
+
+import { getServerI18n } from '@/shared/i18n/server';
+export const generateMetadata = localizedMetadata({ title: 'Liên hệ' });
 
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import {
@@ -11,7 +14,9 @@ Phone,
 
 export const dynamic = 'force-dynamic';
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const { t: tr } = await getServerI18n();
+
   return (
     <>
 
@@ -22,12 +27,8 @@ export default function ContactPage() {
         <header className="mb-8 pb-6 border-b border-slate-200">
           <div>
             <div className="min-w-0">
-              <span className="page-eyebrow">
-                Kết nối &amp; Hợp tác
-              </span>
-              <h1 className="page-title">
-                Liên hệ Ban chủ nhiệm CLB Robotics &amp; IoT - HCMUS
-              </h1>
+              <span className="page-eyebrow">{tr("Kết nối & Hợp tác")}</span>
+              <h1 className="page-title">{tr("Liên hệ Ban chủ nhiệm CLB Robotics & IoT - HCMUS")}</h1>
             </div>
           </div>
         </header>
@@ -37,21 +38,15 @@ export default function ContactPage() {
             <div className="panel-detail contact-card">
               <div className="mb-3">
                 <div className="min-w-0">
-                  <span className="text-xs font-semibold uppercase text-[#1F2937] tracking-wider block">
-                    Cơ sở 1 (Trụ sở chính)
-                  </span>
-                  <h2 className="text-base sm:text-lg font-semibold text-[#1F2937] leading-snug">
-                    CLB Robotics - IoT, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM
-                  </h2>
+                  <span className="text-xs font-semibold uppercase text-[#1F2937] tracking-wider block">{tr("Cơ sở 1 (Trụ sở chính)")}</span>
+                  <h2 className="text-base sm:text-lg font-semibold text-[#1F2937] leading-snug">{tr("CLB Robotics - IoT, Trường Đại học Khoa học tự nhiên, ĐHQG-HCM")}</h2>
                 </div>
               </div>
 
               <div className="space-y-2.5 text-sm text-[#1F2937]">
                 <div className="contact-row">
                   <MapPin aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0 mt-0.5" />
-                  <span>
-                    Phòng i86, Tòa nhà i, 227 Nguyễn Văn Cừ, Phường Chợ Quán, TP.HCM
-                  </span>
+                  <span>{tr("Phòng i86, Tòa nhà i, 227 Nguyễn Văn Cừ, Phường Chợ Quán, TP.HCM")}</span>
                 </div>
                 <div className="contact-row">
                   <Mail aria-hidden="true" className="w-4 h-4 text-[#1F2937] shrink-0" />
@@ -71,12 +66,8 @@ export default function ContactPage() {
 
             {/* Academic Department Affiliation */}
             <div className="panel-detail contact-card">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1.5">
-                Đơn vị chủ quản:
-              </h3>
-              <p className="text-sm font-semibold text-[#1F2937]">
-                Phòng thí nghiệm Trí tuệ Nhân tạo (AILab), trường Đại học Khoa học tự nhiên, ĐHQG-HCM
-              </p>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#1F2937] mb-1.5">{tr("Đơn vị chủ quản:")}</h3>
+              <p className="text-sm font-semibold text-[#1F2937]">{tr("Phòng thí nghiệm Trí tuệ Nhân tạo (AILab), trường Đại học Khoa học tự nhiên, ĐHQG-HCM")}</p>
               <div className="mt-2.5 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#1F2937]">
                 <a
                   href="https://hcmus.edu.vn"

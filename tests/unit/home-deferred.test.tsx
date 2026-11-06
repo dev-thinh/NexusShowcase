@@ -1,6 +1,6 @@
 import React from 'react';
-import { defaultHomeText } from '@/features/publications/model/home-content';
-vi.mock('@/features/publications/server/home-content', () => ({ readHomeContent: async () => ({ version: 0, text: defaultHomeText }) }));
+import { defaultHomeText, defaultEnglishHomeText } from '@/features/publications/model/home-content';
+vi.mock('@/features/publications/server/home-content', () => ({ readHomeContent: async () => ({ version: 0, englishText: defaultEnglishHomeText, text: defaultHomeText }) }));
 vi.mock('@/features/identity/server/actor', () => ({ getActor: async () => null }));
 import { expect, it, vi } from 'vitest';
 const mocks = vi.hoisted(() => ({ publications: vi.fn().mockResolvedValue([]), members: vi.fn().mockResolvedValue([]), session: vi.fn().mockResolvedValue(null) }));
