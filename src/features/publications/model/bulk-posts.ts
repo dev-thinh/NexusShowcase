@@ -4,6 +4,7 @@ export const pinReplacementSchema = z.object({ selected: cuidSchema.min(1, 'Vui 
 export type BulkPostFilter = 'ALL' | 'PINNED' | 'UNPINNED' | 'PUBLIC' | 'PRIVATE';
 export type BulkPostCounts = Record<BulkPostFilter, number>;
 export type BulkPostEntry = {
+  reviewVersion?: number;
   id: string; title: string; slug: string; isPinned: boolean;
   type?: import('@prisma/client').ItemType;
   visibility: 'PUBLIC' | 'PRIVATE'; publishedYear: number | null;

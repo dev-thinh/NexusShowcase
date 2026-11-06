@@ -250,5 +250,11 @@
   "Trích dẫn": "Citation",
   "Đang tải trích dẫn…": "Loading citation…",
   "Chưa tải được trích dẫn DOI.": "Unable to load the DOI citation.",
-  "DOI hoặc định dạng trích dẫn không hợp lệ.": "Invalid DOI or citation format."
+  "DOI hoặc định dạng trích dẫn không hợp lệ.": "Invalid DOI or citation format.",
+  "Xóa bài đăng {0}": "Delete post {0}",
+  "Xóa bài đăng": "Delete post",
+  "Bài đăng và lịch sử xét duyệt sẽ bị xóa vĩnh viễn. Thao tác này không thể hoàn tác.": "The post and its review history will be permanently deleted. This action cannot be undone.",
+  "Thông tin bài đăng không hợp lệ.": "Invalid post information.",
+  "Chỉ quản trị viên được xóa bài đăng.": "Only administrators can delete posts.",
+  "Không tìm thấy bài đăng.": "Post not found."
 }
