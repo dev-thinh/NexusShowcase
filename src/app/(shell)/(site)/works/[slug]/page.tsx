@@ -1,3 +1,4 @@
+import { ContainedThumbnail } from '@/shared/ui/contained-thumbnail';
 
 import { getServerI18n } from '@/shared/i18n/server';
 import { MobileArticleContents } from '@/features/submissions/components/mobile-article-contents';
@@ -169,11 +170,7 @@ export default async function ShowcaseDetailPage({
                 )}
               </div>
               {item.thumbnailUrl && (
-                <MediaImage
-                  src={item.thumbnailUrl}
-                  alt={tr("Hình minh họa: {0}", item.title)}
-                  className="article-header-thumbnail"
-                />
+                <ContainedThumbnail src={item.thumbnailUrl} alt={tr("Hình minh họa: {0}", item.title)} />
               )}
             </div>
 

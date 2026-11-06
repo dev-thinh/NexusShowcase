@@ -1,4 +1,5 @@
 'use client';
+import { ContainedThumbnail } from '@/shared/ui/contained-thumbnail';
 import { useI18n } from '@/shared/i18n/provider';
 
 
@@ -7,7 +8,6 @@ import { submissionResourceSchema } from '../model/input';
 import { ConferenceDetails } from '@/features/publications/components/conference-details';
 
 import { focusFirstSubmissionError } from './submission-field';
-import { MediaImage } from '@/shared/ui/media-image';
 
 import { ArticleContent, ArticleTableOfContents } from '@/features/submissions/components/article-content';
 import { ResourceLinks } from '@/features/submissions/components/resource-links';
@@ -75,7 +75,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
             <h1 className="break-words text-3xl font-semibold text-[#1F2937]">{state.data.title || tr("Tiêu đề công trình")}</h1>
             <p className="mt-3 text-sm leading-7 text-[#1F2937]">{state.data.contributors?.map(c => clubMembers.find(member => member.id === c.userId)?.fullName || (c.userId === currentUser.id ? currentUser.fullName : c.externalName) || tr('Thành viên')).join(', ')}</p>
           </div>
-          {state.data.thumbnailUrl && <MediaImage src={state.data.thumbnailUrl} alt={tr("Hình minh họa: {0}", state.data.title || tr('Công trình'))} className="article-header-thumbnail" />}
+          {state.data.thumbnailUrl && <ContainedThumbnail src={state.data.thumbnailUrl} alt={tr("Hình minh họa: {0}", state.data.title || tr('Công trình'))} />}
         </header>
         <ConferenceDetails value={state.data.conference} />
         <ArticleTableOfContents content={content} />

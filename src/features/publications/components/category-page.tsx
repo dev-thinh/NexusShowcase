@@ -90,7 +90,7 @@ export default async function CategoryPage({
                       <ConferenceCardBanner value={item.conference} />
                       <div className="publication-card__content grid min-w-0 items-stretch gap-5 p-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-6 sm:p-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
                         <Link href={showcaseHref(item.slug, returnTo)} aria-label={tr("Xem công trình: {0}", item.title)} className="publication-card__media relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg">
-                          <MediaImage src={item.thumbnailUrl} alt={tr("Hình minh họa nghiên cứu: {0}", item.title)} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
+                          <MediaImage width={640} height={480} sizes="(max-width: 639px) calc(100vw - 72px), 256px" src={item.thumbnailUrl} alt={tr("Hình minh họa nghiên cứu: {0}", item.title)} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
                         </Link>
                         <div className="publication-card__body flex min-w-0 flex-col">
                           <PublicationCardMeta type={item.type} year={item.publishedYear}>
@@ -134,6 +134,7 @@ export default async function CategoryPage({
                       <div className="publication-card__media shrink-0 px-5 pt-5 sm:px-6 sm:pt-6">
                         <div className="publication-cover-frame relative aspect-[4/3] overflow-hidden rounded-lg">
                           <MediaImage
+                            width={640} height={480} sizes="(max-width: 639px) calc(100vw - 72px), (max-width: 1023px) 45vw, 400px"
                             src={item.thumbnailUrl}
                             alt={item.title}
                             loading="lazy" decoding="async" className="h-full w-full rounded-lg border-0 object-cover"
