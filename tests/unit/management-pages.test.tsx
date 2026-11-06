@@ -73,23 +73,28 @@ describe('management pages', () => {
     const query = mocks.items.mock.calls[0][0];
     expect(query.select).not.toHaveProperty('authorDraft');
     expect(query.select).not.toHaveProperty('content');
+    expect(mocks.userFind).toHaveBeenCalledWith({ where: { id: member.id }, select: { id: true, fullName: true, role: true, mustChangePassword: true } });
   });
 
   it('offers draft editing and locks pending submissions until they are withdrawn', () => {
-    const draft = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader />);
+    const draft = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader /></DialogProvider>);
     expect(draft).toContain(`/my-works/${post.id}/edit`);
+    expect(draft).toContain("Xóa bản nháp");
     const pending = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PENDING_REVIEW' }]} isUploader /></DialogProvider>);
     expect(pending).toContain('Rút bài để sửa');
+    expect(pending).not.toContain('Xóa bản nháp');
     expect(pending).toContain('Bản khôi phục');
-    const readOnly = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader={false} />);
+    const readOnly = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader={false} /></DialogProvider>);
     expect(readOnly).toContain('Chỉ đọc');
+    expect(readOnly).not.toContain('Xóa bản nháp');
     expect(readOnly).not.toContain(`/my-works/${post.id}/edit`);
   });
 
   it('shows contributor draft status without management actions or an inaccessible preview', () => {
-    const html = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, canManage: false }]} isUploader />);
+    const html = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 1, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[{ ...post, canManage: false }]} isUploader /></DialogProvider>);
     expect(html).toContain(post.title);
     expect(html).toContain('Chỉ theo dõi');
+    expect(html).not.toContain('Xóa bản nháp');
     expect(html).not.toContain(`/my-works/${post.id}/edit`);
     expect(html).not.toContain(`/works/${post.slug}`);
     expect(html).not.toContain('Rút bài để sửa');
@@ -126,7 +131,7 @@ describe('author list filters', () => {
 });
 
 it('uses the shared dropdown for post status while preserving the selected filter and search', () => {
-  const html = renderToStaticMarkup(<MyPosts query="robot" filter="DRAFT" counts={{ ALL: 2, DRAFT: 1, PENDING_REVIEW: 1, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader />);
+  const html = renderToStaticMarkup(<DialogProvider><MyPosts query="robot" filter="DRAFT" counts={{ ALL: 2, DRAFT: 1, PENDING_REVIEW: 1, REVISION_REQUESTED: 0, PUBLISHED: 0, REJECTED: 0 }} total={1} items={[post]} isUploader /></DialogProvider>);
   expect(html).toContain('role="combobox"');
   expect(html).toContain('aria-label="Lọc trạng thái bài đăng"');
   expect(html).toContain('name="filter" value="DRAFT"');
@@ -136,7 +141,7 @@ it('uses the shared dropdown for post status while preserving the selected filte
 });
 
 it('does not offer editing or withdrawal for a contributed work owned by someone else', () => {
-  const html = renderToStaticMarkup(<MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 0, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 1, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PUBLISHED', canManage: false }]} isUploader />);
+  const html = renderToStaticMarkup(<DialogProvider><MyPosts query="" filter="ALL" counts={{ ALL: 1, DRAFT: 0, PENDING_REVIEW: 0, REVISION_REQUESTED: 0, PUBLISHED: 1, REJECTED: 0 }} total={1} items={[{ ...post, status: 'PUBLISHED', canManage: false }]} isUploader /></DialogProvider>);
   expect(html).toContain('Xem bài');
   expect(html).not.toContain('Soạn bản cập nhật');
   expect(html).not.toContain(`/my-works/${post.id}/edit`);

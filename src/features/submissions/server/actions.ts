@@ -6,7 +6,15 @@ import { getActor } from '@/features/identity/server/actor';
 import { invalidatePublicationChange } from '@/features/publications/server/invalidation';
 import { validationFailure } from '../model/validation-result';
 import { saveDraftEnvelopeSchema, submissionEnvelopeSchema, type SaveDraftInput, type SubmissionInput } from '../model/versioned-input';
-import { saveDraftCommand, submitDraftCommand, withdrawDraftCommand } from './draft-commands';
+import { deleteDraftCommand, saveDraftCommand, submitDraftCommand, withdrawDraftCommand } from './draft-commands';
+
+export async function deleteShowcaseDraftAction(itemId: string, reviewVersion: number) {
+  const actor = await getActor(['CORE_MEMBER', 'ADMIN']);
+  if (!actor) return { success: false as const, code: 'UNAUTHORIZED' as const, error: 'Bạn không có quyền xóa bản nháp.' };
+  const result = await deleteDraftCommand(actor, itemId, reviewVersion);
+  if (result.success) invalidatePublicationChange({ slugs: [], memberIds: [], kind: 'SUBMISSION' });
+  return result;
+}
 
 export async function saveShowcaseDraftAction(input: SaveDraftInput) {
   const actor = await getActor(['CORE_MEMBER', 'ADMIN']);

@@ -1,4 +1,7 @@
-export const metadata = { title: 'Chỉnh sửa công trình' };
+import { localizedMetadata } from '@/shared/i18n/metadata';
+
+import { getServerI18n } from '@/shared/i18n/server';
+export const generateMetadata = localizedMetadata({ title: 'Chỉnh sửa công trình' });
 
 import { ReadOnlyDraftRecoveries } from '@/features/submissions/components/read-only-draft-recoveries';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
@@ -14,9 +17,11 @@ import { notFound, redirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 export default async function EditItemPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t: tr } = await getServerI18n();
+
   const session = await auth();
   if (!session?.user?.id) redirect('/login');
-  const user = await prisma.user.findUnique({ where: { id: session.user.id } });
+  const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { id: true, fullName: true, role: true, mustChangePassword: true } });
   if (!user || !canUserUpload(user)) redirect('/my-works');
   if (user.mustChangePassword) redirect('/account/change-password');
 
@@ -39,15 +44,16 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
   const editable = item.status === 'PUBLISHED' ? !['PENDING_REVIEW', 'READY_FOR_APPROVAL'].includes(item.reviewStatus ?? '') : ['DRAFT', 'REVISION_REQUESTED'].includes(item.status);
   if (!editable) return <main className="container mx-auto max-w-4xl flex-1 px-4 py-8 sm:px-6">
     <Breadcrumbs items={[{ label: 'Công trình của tôi', href: '/my-works' }, { label: 'Bản khôi phục' }]} />
-    <h1 className="page-title">Bản khôi phục trên thiết bị</h1>
-    <p className="my-4 text-sm">Công trình hiện không được chỉnh sửa. Bạn vẫn có thể lấy lại nội dung chưa đồng bộ trên thiết bị này.</p>
+    <h1 className="page-title">{tr("Bản khôi phục trên thiết bị")}</h1>
+    <p className="my-4 text-sm">{tr("Công trình hiện không được chỉnh sửa. Bạn vẫn có thể lấy lại nội dung chưa đồng bộ trên thiết bị này.")}</p>
     <ReadOnlyDraftRecoveries accountId={user.id} itemId={item.id} serverVersion={item.reviewVersion} />
   </main>;
 
   const draft = getAuthorDraft(item.authorDraft);
-  const members = await selectedContributors((draft?.contributors ?? item.contributors).flatMap(contributor => contributor.userId ? [contributor.userId] : []));
-
-  const categories = await prisma.category.findMany({ where: { slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } }, select: { id: true, name: true, slug: true } });
+  const [members, categories] = await Promise.all([
+    selectedContributors((draft?.contributors ?? item.contributors).flatMap(contributor => contributor.userId ? [contributor.userId] : [])),
+    prisma.category.findMany({ where: { slug: { in: ['bai-bao-khoa-hoc', 'robotics-iot'] } }, select: { id: true, name: true, slug: true } }),
+  ]);
 
   return (
     <>
@@ -56,10 +62,10 @@ export default async function EditItemPage({ params }: { params: Promise<{ id: s
       <Breadcrumbs items={[{ label: "Công trình của tôi", href: "/my-works" }, { label: "Chỉnh sửa công trình" }]} />
         <div className="w-full">
           <header className="mb-8 border-b border-slate-200 pb-5">
-            <span className="page-eyebrow">Quản lý công trình</span><h1 className="page-title">{item.status === 'PUBLISHED' ? 'Soạn bản cập nhật' : item.status === 'REVISION_REQUESTED' ? 'Chỉnh sửa theo phản hồi' : 'Soạn thảo công trình'}</h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#1F2937]">Nội dung được tự động lưu khi soạn thảo. Bản cập nhật bài đã xuất bản chỉ xuất hiện công khai sau khi được Admin duyệt.</p>
+            <span className="page-eyebrow">{tr("Quản lý công trình")}</span><h1 className="page-title">{item.status === 'PUBLISHED' ? tr("Soạn bản cập nhật") : item.status === 'REVISION_REQUESTED' ? tr("Chỉnh sửa theo phản hồi") : tr("Soạn thảo công trình")}</h1>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-[#1F2937]">{tr("Nội dung được tự động lưu khi soạn thảo. Bản cập nhật bài đã xuất bản chỉ xuất hiện công khai sau khi được duyệt.")}</p>
           </header>
-          <SubmissionEditor key={`${user.id}:${item.id}`} initialData={{ ...(draft ?? mapShowcaseItemToSubmission(item)), id: item.id, reviewVersion: item.reviewVersion, draftSnapshot: Boolean(draft) }} currentUser={{ id: user.id, fullName: user.fullName, role: user.role }} clubMembers={members} categories={categories} mode="edit" reviewComments={item.reviewComments} />
+          <SubmissionEditor key={`${user.id}:${item.id}`} initialData={{ ...(draft ?? mapShowcaseItemToSubmission(item)), id: item.id, reviewVersion: item.reviewVersion, draftSnapshot: Boolean(draft) }} currentUser={{ id: user.id, fullName: user.fullName, role: user.role }} clubMembers={members} categories={categories} reviewComments={item.reviewComments} />
         </div>
       </main>
 

@@ -49,5 +49,5 @@ export async function listAuthorItems(input: { actor: Actor; filter: PostFilter;
 
 export async function authorItemStats(actor: Actor) {
   const groups = await prisma.showcaseItem.groupBy({ by: ['status', 'reviewStatus'], where: { OR: [{ creatorId: actor.id }, { contributors: { some: { userId: actor.id } } }] }, _count: { _all: true } });
-  return Object.fromEntries(postFilters.map(filter => [filter.value, groups.reduce((sum, group) => sum + (matchesPostFilter({ ...group, title: '', summary: '' }, filter.value) ? group._count._all : 0), 0)])) as Record<PostFilter, number>;
+  return Object.fromEntries(postFilters.map(filter => [filter.value, groups.reduce((sum, group) => sum + (matchesPostFilter(group, filter.value) ? group._count._all : 0), 0)])) as Record<PostFilter, number>;
 }
