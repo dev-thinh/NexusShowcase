@@ -28,7 +28,7 @@ test('admin directly approves a submission and preserves live content until upda
   page.on('requestfailed', request => diagnostic.failedRequests.push({ method: request.method(), path: new URL(request.url()).pathname, error: request.failure()?.errorText ?? null }));
   async function approve(expectedTitle: string) {
     const started = Date.now();
-    await page.getByRole('switch').check();
+    await page.getByRole('switch', { name: 'Công khai', exact: true }).check();
     await page.getByRole('button', { name: 'Duyệt và xuất bản', exact: true }).click();
     await page.getByRole('dialog').getByRole('button', { name: 'Xuất bản', exact: true }).click();
     try {

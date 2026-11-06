@@ -42,7 +42,7 @@ describe('submission editor shell', () => {
     expect(resources).not.toContain('Tài liệu PDF');
 
     expect(resources).toContain('<FilePicker');
-    expect(resources).toContain('aria-label={`Xóa tài nguyên');
+    expect(resources).toContain('aria-label={tr("Xóa tài nguyên {0}", index + 1)}');
     expect(resources).toContain('panel-nested');
     expect(resources).not.toMatch(/onClick=.*<div/);
   });

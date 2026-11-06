@@ -1,4 +1,7 @@
-export const metadata = { title: 'Phê duyệt bài đăng' };
+import { localizedMetadata } from '@/shared/i18n/metadata';
+
+import { getServerI18n } from '@/shared/i18n/server';
+export const generateMetadata = localizedMetadata({ title: 'Phê duyệt bài đăng' });
 
 import { getActor } from '@/features/identity/server/actor';
 import { ManagementFilters } from '@/shared/ui/management-filters';
@@ -12,6 +15,8 @@ import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 import { redirect } from 'next/navigation';
 
 export default async function AdminReviewsPage({ searchParams }: { searchParams: Promise<{ page?: string; q?: string }> }) {
+  const { t: tr } = await getServerI18n();
+
   if (!await getActor(['ADMIN'])) redirect('/login?callbackUrl=/admin/reviews');
   const params = await searchParams;
   const query = (params.q ?? '').trim().slice(0, 200);
@@ -20,12 +25,12 @@ export default async function AdminReviewsPage({ searchParams }: { searchParams:
   const basePath = '/admin/reviews' + (query ? `?${new URLSearchParams({ q: query })}` : '');
   const returnTo = '/admin/reviews' + (query || params.page ? `?${new URLSearchParams({ ...(query ? { q: query } : {}), ...(params.page ? { page: params.page } : {}) })}` : '');
   return <section aria-labelledby="admin-reviews-title">
-    <div className="mb-4"><h2 id="admin-reviews-title" className="text-lg font-semibold text-slate-900">Phê duyệt</h2><p className="mt-1 text-sm text-slate-500">{result.total} bản nộp chờ duyệt.</p></div>
-    <ManagementFilters action="/admin/reviews" query={query} searchLabel="Tìm bản nộp chờ duyệt" placeholder="Tìm theo tiêu đề hoặc người nộp…" />
-    {!items.length ? <EmptyState icon={CheckCircle2} title="Không có bài chờ duyệt" description="Các bản nộp đã được xử lý." /> : <div className="panel-operational divide-y divide-slate-100 !p-0">{items.map(item => {
+    <div className="mb-4"><h2 id="admin-reviews-title" className="text-lg font-semibold text-slate-900">{tr("Phê duyệt")}</h2><p className="mt-1 text-sm text-slate-500">{result.total}{tr(" bản nộp chờ duyệt.")}</p></div>
+    <ManagementFilters action="/admin/reviews" query={query} searchLabel={tr("Tìm bản nộp chờ duyệt")} placeholder={tr("Tìm theo tiêu đề hoặc người nộp…")} />
+    {!items.length ? <EmptyState icon={CheckCircle2} title={tr("Không có bài chờ duyệt")} description={tr("Các bản nộp đã được xử lý.")} /> : <div className="panel-operational divide-y divide-slate-100 !p-0">{items.map(item => {
       const snapshot = item;
-      return <div key={item.id} className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center sm:p-6"><div className="min-w-0"><p className="mb-2 text-xs font-semibold text-[#1F2937]">{item.status === 'PUBLISHED' ? 'Bản cập nhật · Bài hiện tại vẫn đang hiển thị' : 'Chờ duyệt'}</p><Link href={`/admin/reviews/${item.id}?${new URLSearchParams({ returnTo })}`} scroll={false} className="break-words text-lg font-semibold text-[#1F2937] hover:underline">{snapshot.title}</Link><p className="mt-2 line-clamp-2 text-sm leading-6 text-[#1F2937]">{snapshot.summary}</p><p className="mt-2 text-xs text-[#1F2937]">Người nộp: {item.creatorName} · {snapshot.publishedYear}</p></div><Link href={`/admin/reviews/${item.id}?${new URLSearchParams({ returnTo })}`} scroll={false} className="action-primary-detail min-h-11 shrink-0">Xem và duyệt<ArrowRight aria-hidden="true" className="h-4 w-4" /></Link></div>;
+      return <div key={item.id} className="flex flex-col justify-between gap-4 p-5 sm:flex-row sm:items-center sm:p-6"><div className="min-w-0"><p className="mb-2 text-xs font-semibold text-[#1F2937]">{item.status === 'PUBLISHED' ? tr("Bản cập nhật · Bài hiện tại vẫn đang hiển thị") : tr("Chờ duyệt")}</p><Link href={`/admin/reviews/${item.id}?${new URLSearchParams({ returnTo })}`} scroll={false} className="break-words text-lg font-semibold text-[#1F2937] hover:underline">{snapshot.title}</Link><p className="mt-2 line-clamp-2 text-sm leading-6 text-[#1F2937]">{snapshot.summary}</p><p className="mt-2 text-xs text-[#1F2937]">{tr("Người nộp: ")}{item.creatorName} · {snapshot.publishedYear}</p></div><Link href={`/admin/reviews/${item.id}?${new URLSearchParams({ returnTo })}`} scroll={false} className="action-primary-detail min-h-11 shrink-0">{tr("Xem và duyệt")}<ArrowRight aria-hidden="true" className="h-4 w-4" /></Link></div>;
     })}</div>}
-    <PaginationFooter itemLabel="bản nộp" page={result.page} totalPages={result.totalPages} pageSize={20} basePath={basePath} ariaLabel="Phân trang bản nộp" />
+    <PaginationFooter itemLabel={tr("bản nộp")} page={result.page} totalPages={result.totalPages} pageSize={20} basePath={basePath} ariaLabel={tr("Phân trang bản nộp")} />
   </section>;
 }

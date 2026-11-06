@@ -38,4 +38,13 @@ describe('club member search', () => {
       '1', '3', '4', '5', '6', '7',
     ]);
   });
+
+  it('stops reading candidate names after filling the requested result set', () => {
+    const candidates = [members[0], members[1], { id: 'unused', get fullName(): string { throw Error('Unnecessary candidate scan'); } }];
+    expect(filterAvailableClubMembers(candidates, '', [], 2)).toEqual(members.slice(0, 2));
+  });
+
+  it.each([0, -1, 1.5, Number.NaN, Number.POSITIVE_INFINITY])('preserves array slice behavior for limit %s', limit => {
+    expect(filterAvailableClubMembers(members, '', [], limit)).toEqual(members.slice(0, limit));
+  });
 });

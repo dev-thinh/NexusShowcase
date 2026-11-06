@@ -1,5 +1,6 @@
 import { canReviewItem } from '@/features/submissions/model/workflow-state';
 import type { ItemStatus } from '@prisma/client';
+import { normalizeSearchText } from '@/shared/lib/search-text';
 
 export const postFilters = [
   { value: 'ALL', label: 'Tất cả' },
@@ -10,10 +11,10 @@ export const postFilters = [
   { value: 'REJECTED', label: 'Từ chối' },
 ] as const;
 export type PostFilter = typeof postFilters[number]['value'];
-type FilterablePost = { title: string; summary: string; status: ItemStatus; reviewStatus?: ItemStatus | null };
+type FilterablePost = { title?: string; summary?: string; status: ItemStatus; reviewStatus?: ItemStatus | null };
 export function matchesPostFilter(item: FilterablePost, filter: PostFilter, query = '') {
-  const normalize = (text: string) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/đ/gi, 'd').toLocaleLowerCase('vi');
-  if (!normalize(`${item.title} ${item.summary}`).includes(normalize(query.trim()))) return false;
+  const search = query.trim();
+  if (search && !normalizeSearchText(`${item.title ?? ''} ${item.summary ?? ''}`).includes(normalizeSearchText(search))) return false;
   if (filter === 'ALL') return true;
   if (filter === 'PENDING_REVIEW') return canReviewItem(item);
   if (filter === 'REVISION_REQUESTED' || filter === 'REJECTED') return item.status === filter || item.reviewStatus === filter;
