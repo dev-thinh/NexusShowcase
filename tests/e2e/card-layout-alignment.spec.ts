@@ -43,8 +43,11 @@ test('dashboard status/date columns align and content controls have no diagonal 
   await expect(page.locator('.admin-content-row').first()).toBeVisible();
   await expect(page.locator('.admin-content-row .lucide-arrow-up-right')).toHaveCount(0);
   const controls = page.locator('.admin-content-row').first().getByRole('group');
-  const buttons = await controls.getByRole('button').all();
-  const toggle = await controls.getByRole('switch').boundingBox();
-  const pin = await buttons[0].boundingBox();
-  expect(Math.abs(toggle!.y + toggle!.height / 2 - pin!.y - pin!.height / 2)).toBeLessThan(1);
+  // Read both positions in one frame while the card's entry animation runs.
+  const centerOffset = await controls.evaluate(element => {
+    const toggle = element.querySelector('[role="switch"]')!.getBoundingClientRect();
+    const pin = element.querySelector('button[aria-pressed]')!.getBoundingClientRect();
+    return Math.abs(toggle.y + toggle.height / 2 - pin.y - pin.height / 2);
+  });
+  expect(centerOffset).toBeLessThan(1);
 });
