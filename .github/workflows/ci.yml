@@ -1,9 +1,12 @@
 name: Repository checks
-on: [push, pull_request]
+on:
+  push:
+    branches: [dev, main]
 permissions:
   contents: read
 jobs:
   check:
+    if: ${{ github.ref == 'refs/heads/dev' }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest]
@@ -22,6 +25,7 @@ jobs:
       - run: npm run check
       - run: npm run build
   database-and-browser:
+    if: ${{ github.ref == 'refs/heads/dev' }}
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -67,8 +71,28 @@ jobs:
             test-results/navigation-*/trace.zip
             test-results/presentation-*/trace.zip
           if-no-files-found: ignore
+  verify-promotion:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          sparse-checkout: ops/production
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Verify merged tree and successful dev CI
+        run: node ops/production/promotion.mjs main "$GITHUB_SHA"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
   deploy:
-    needs: [check, database-and-browser]
+    needs: [verify-promotion]
     timeout-minutes: 45
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PRODUCTION_DEPLOY_ENABLED == 'true' }}
     runs-on: ubuntu-latest

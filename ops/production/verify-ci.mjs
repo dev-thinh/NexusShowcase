@@ -1,7 +1,9 @@
 import { parseEnv } from 'node:util';
 
-export const repository = 'dev-thinh/NexusShowcase';
-const requiredJobs = ['check (ubuntu-latest)', 'check (windows-latest)', 'database-and-browser'];
+import { githubGet, verifyMergedPromotion } from './promotion.mjs';
+export { repository } from './promotion.mjs';
+import { repository } from './promotion.mjs';
+const requiredJobs = ['verify-promotion'];
 
 export function assertDeploymentIdentity(sha, runId) {
   if (!/^[a-f0-9]{40}$/.test(sha) || !/^[1-9][0-9]{0,19}$/.test(runId)) throw new Error('Invalid deployment identity');
@@ -11,7 +13,8 @@ export function validateCiEvidence(run, jobs, sha, runId) {
   assertDeploymentIdentity(sha, runId);
   if (String(run.id) !== runId || run.event !== 'push' || run.head_branch !== 'main' || run.head_sha !== sha ||
       run.path !== '.github/workflows/ci.yml' || run.repository?.full_name !== repository ||
-      run.head_repository?.full_name !== repository || ['cancelled', 'timed_out', 'action_required', 'stale'].includes(run.conclusion)) {
+      run.head_repository?.full_name !== repository || !['in_progress', 'completed'].includes(run.status) ||
+      (run.conclusion !== null && run.conclusion !== 'success')) {
     throw new Error('CI evidence does not identify the requested main push');
   }
   for (const name of requiredJobs) {
@@ -37,18 +40,11 @@ export function validateDatabaseTargets(runtimeText, maintenanceText) {
 
 export async function verifyCi(sha, runId) {
   assertDeploymentIdentity(sha, runId);
-  const base = `https://api.github.com/repos/${repository}`;
-  const get = async suffix => {
-    const response = await fetch(`${base}${suffix}`, {
-      headers: { Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'roboticslab-production-deploy' },
-      signal: AbortSignal.timeout(30_000),
-    });
-    if (!response.ok) throw new Error('Cannot verify GitHub CI evidence');
-    return response.json();
-  };
+  const get = githubGet();
   const [run, jobs] = await Promise.all([get(`/actions/runs/${runId}`), get(`/actions/runs/${runId}/jobs?filter=latest&per_page=100`)]);
   if (!Array.isArray(jobs.jobs) || jobs.total_count > 100) throw new Error('Unexpected CI job inventory');
   validateCiEvidence(run, jobs.jobs, sha, runId);
+  await verifyMergedPromotion(get, sha);
 }
 
 export function validateFreshBackup(before, after) {

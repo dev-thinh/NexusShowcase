@@ -16,8 +16,8 @@ describe('production deployment workflow', () => {
     expect(deploy).not.toBe('');
     expect(extractDeploy(workflow.replace(/\r\n/g, '\n').replace(/\n/g, '\r\n'))).toBe(deploy);
   });
-  it('requires all CI jobs and permits only explicitly enabled main pushes', () => {
-    expect(deploy).toContain('needs: [check, database-and-browser]');
+  it('requires verified promotion and permits only explicitly enabled main pushes', () => {
+    expect(deploy).toContain('needs: [verify-promotion]');
     const condition = deploy.match(/    if: \$\{\{ (.*) \}\}/)?.[1];
     expect(condition).toBeDefined();
     for (const event of ['push', 'pull_request']) {
@@ -64,4 +64,17 @@ describe('production deployment workflow', () => {
       rmSync(directory, { recursive: true, force: true });
     }
   });
+});
+
+it('runs full CI only on dev pushes and only verifies evidence on main', () => {
+  expect(workflow).toContain('branches: [dev, main]');
+  expect(workflow).not.toContain('pull_request');
+  for (const job of ['check', 'database-and-browser']) {
+    const block = workflow.split(`\n  ${job}:\n`)[1].split(/\n  [a-z][a-z-]+:\n/)[0];
+    expect(block).toContain("if: ${{ github.ref == 'refs/heads/dev' }}");
+  }
+  const promotion = workflow.split('\n  verify-promotion:\n')[1].split('\n  deploy:\n')[0];
+  expect(promotion).toContain("if: ${{ github.ref == 'refs/heads/main' }}");
+  expect(promotion).toContain('node ops/production/promotion.mjs main');
+  expect(promotion).not.toMatch(/npm |test:e2e|test:integration/);
 });

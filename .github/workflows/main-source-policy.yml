@@ -5,25 +5,31 @@ on:
     branches: [main]
     types: [opened, reopened, synchronize, edited, ready_for_review]
 
-permissions: {}
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+
+concurrency:
+  group: main-promotion-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
 
 jobs:
   main-source-policy:
     name: main-source-policy
     runs-on: ubuntu-latest
-    timeout-minutes: 2
+    timeout-minutes: 55
     steps:
-      - name: Require dev from this repository
-        shell: node {0}
-        run: |
-          const fs = require('node:fs');
-          const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
-          const pr = event.pull_request;
-          const repository = process.env.GITHUB_REPOSITORY;
-          if (!repository || !pr || pr.base?.ref !== 'main' ||
-              pr.base?.repo?.full_name !== repository ||
-              pr.head?.ref !== 'dev' || pr.head?.repo?.full_name !== repository) {
-            console.error('::error::Only a pull request from this repository\'s dev branch may merge into main.');
-            process.exit(1);
-          }
-          console.log('Validated same-repository dev -> main promotion.');
+      # Pin policy code to the trusted workflow commit, never the PR branch.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.workflow_sha }}
+          persist-credentials: false
+          sparse-checkout: ops/production
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Require same-repository dev and wait for its exact CI
+        run: node ops/production/promotion.mjs pr
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
