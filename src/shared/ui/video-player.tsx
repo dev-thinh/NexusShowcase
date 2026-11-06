@@ -1,17 +1,20 @@
 'use client';
 
+import { useI18n } from '@/shared/i18n/provider';
 import { parseVideoEmbedUrl } from '@/shared/lib/video-parser';
 import { Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 export function VideoPlayer({ url, title }: { url: string; title: string }) {
+  const { t: tr } = useI18n();
+
   const [isLoaded, setIsLoaded] = useState(false);
   const embedUrl = parseVideoEmbedUrl(url);
 
   if (!embedUrl) {
     let safe = false;
     try { safe = ['http:', 'https:'].includes(new URL(url).protocol); } catch {}
-    return safe ? <a href={url} target="_blank" rel="noopener noreferrer" className="action-secondary-detail">Mở video: {title}</a> : null;
+    return safe ? <a href={url} target="_blank" rel="noopener noreferrer" className="action-secondary-detail">{tr("Mở video: ")}{title}</a> : null;
   }
 
   return (
@@ -19,7 +22,7 @@ export function VideoPlayer({ url, title }: { url: string; title: string }) {
       {!isLoaded && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#153D67] text-[#FFFFFF] gap-3">
           <Loader2 className="w-8 h-8 text-[#1F2937] animate-spin" />
-          <span className="text-xs font-semibold text-[#1F2937] font-sans">Đang tải video demo...</span>
+          <span className="text-xs font-semibold text-[#1F2937] font-sans">{tr("Đang tải video demo...")}</span>
         </div>
       )}
 

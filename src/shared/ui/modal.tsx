@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/shared/i18n/provider';
 import { X } from 'lucide-react';
 import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -18,6 +19,8 @@ interface ModalProps {
 }
 
 export function Modal({ isOpen, onClose, title, description, children, className = '', closeDisabled = false }: ModalProps) {
+  const { t: tr } = useI18n();
+
   const titleId = useId();
   const descriptionId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -144,7 +147,7 @@ export function Modal({ isOpen, onClose, title, description, children, className
             disabled={closeDisabled}
             onClick={requestClose}
             className="absolute right-1 top-1 inline-flex h-11 w-11 items-center justify-center rounded-lg sm:right-3 sm:top-3 sm:h-8 sm:w-8 text-[#1F2937] hover:text-[#1F2937] hover:bg-[#FFFFFF] transition-colors cursor-pointer ml-3 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]/20"
-            aria-label="Đóng hộp thoại"
+            aria-label={tr("Đóng hộp thoại")}
           >
             <X aria-hidden="true" className="w-5 h-5" />
           </button>

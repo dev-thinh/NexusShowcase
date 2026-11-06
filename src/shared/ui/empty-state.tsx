@@ -1,3 +1,4 @@
+import { LocalizedText } from '@/shared/i18n/text';
 import { Inbox, LucideIcon } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
@@ -26,10 +27,10 @@ export function EmptyState({
     >
       <Icon className="w-8 h-8 text-[#1F2937] mb-2.5" />
       <h3 className="text-sm sm:text-base font-semibold text-[#1F2937] tracking-tight">
-        {title}
+        <LocalizedText text={title} />
       </h3>
       <p className="text-xs text-[#1F2937] max-w-sm mx-auto mt-1 leading-relaxed">
-        {description}
+        <LocalizedText text={description} />
       </p>
 
       {actionLabel && (
@@ -39,7 +40,7 @@ export function EmptyState({
               href={actionHref}
               className="inline-flex min-h-11 items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm sm:min-h-0 sm:text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] bg-white hover:bg-[#FFFFFF] border border-slate-200 hover:border-slate-200 transition-all cursor-pointer shadow-2xs"
             >
-              <span>{actionLabel}</span>
+              <span><LocalizedText text={actionLabel} /></span>
             </Link>
           ) : onActionClick ? (
             <button
@@ -47,7 +48,7 @@ export function EmptyState({
               onClick={onActionClick}
               className="inline-flex min-h-11 items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-sm sm:min-h-0 sm:text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] bg-white hover:bg-[#FFFFFF] border border-slate-200 hover:border-slate-200 transition-all cursor-pointer shadow-2xs"
             >
-              <span>{actionLabel}</span>
+              <span><LocalizedText text={actionLabel} /></span>
             </button>
           ) : null}
         </div>
