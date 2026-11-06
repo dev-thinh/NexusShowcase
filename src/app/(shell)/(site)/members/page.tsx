@@ -1,4 +1,7 @@
-export const metadata = { title: 'Thành viên' };
+import { localizedMetadata } from '@/shared/i18n/metadata';
+
+import { getServerI18n } from '@/shared/i18n/server';
+export const generateMetadata = localizedMetadata({ title: 'Thành viên' });
 
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getSession } from '@/features/identity/server/session';
@@ -6,8 +9,11 @@ import { HomeMemberWall } from '@/features/members/components/home-member-wall';
 import { MemberSectionHeading } from '@/features/members/components/member-section-heading';
 import { listDirectory } from '@/features/members/server/queries';
 import { Suspense } from 'react';
+import { MemberDirectorySkeleton } from '@/shared/ui/content-skeletons';
 
 export default async function MembersDirectoryPage() {
+  const { t: tr } = await getServerI18n();
+
   async function MemberResults() {
     const session = await getSession();
     const authenticated = !!session?.user;
@@ -20,39 +26,39 @@ export default async function MembersDirectoryPage() {
     const totalMembers = advisoryPage.total + experiencedPage.total + regularPage.total;
 
     return <>
-        <p className="mb-5 text-sm font-semibold text-[#1F2937]">{totalMembers} thành viên</p>
+        <p className="mb-5 text-sm font-semibold text-[#1F2937]">{totalMembers}{tr(" thành viên")}</p>
           <section className="mb-10" aria-labelledby="leadership-heading">
             <div id="leadership-heading">
               <MemberSectionHeading
-                title="Ban chủ nhiệm"
+                title={tr("Ban chủ nhiệm")}
                 count={advisoryPage.total}
               />
             </div>
             {advisors.length > 0 ? (
               <HomeMemberWall members={advisors.map(({ id, publicSlug, fullName, avatarUrl, role }) => ({ id, publicSlug, fullName, avatarUrl, role }))} total={advisors.length} showMeta={false} />
             ) : (
-              <p className="text-sm text-slate-600">Chưa có thành viên nào</p>
+              <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>
             )}
 </section>
 
           <section className="mb-10" aria-labelledby="experienced-heading">
             <div id="experienced-heading">
               <MemberSectionHeading
-                title="Trưởng nhóm"
+                title={tr("Trưởng nhóm")}
                 count={experiencedPage.total}
               />
             </div>
             {experienced.length > 0 ? (
               <HomeMemberWall members={experienced.map(({ id, publicSlug, fullName, avatarUrl, role }) => ({ id, publicSlug, fullName, avatarUrl, role }))} total={experienced.length} showMeta={false} />
             ) : (
-              <p className="text-sm text-slate-600">Chưa có thành viên nào</p>
+              <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>
             )}
 </section>
 
         <section className="mb-8" aria-labelledby="members-heading">
           <div id="members-heading">
             <MemberSectionHeading
-              title="Thành viên"
+              title={tr("Thành viên")}
               count={regularPage.total}
             />
           </div>
@@ -62,7 +68,7 @@ export default async function MembersDirectoryPage() {
               <HomeMemberWall members={regularPage.items.map(({ id, publicSlug, fullName, avatarUrl, role }) => ({ id, publicSlug, fullName, avatarUrl, role }))} total={regularPage.items.length} showMeta={false} />
             </>
           ) : (
-            <p className="text-sm text-slate-600">Chưa có thành viên nào</p>
+            <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>
           )}
         </section>
     </>;
@@ -76,13 +82,11 @@ export default async function MembersDirectoryPage() {
       <Breadcrumbs items={[{ label: "Thành viên" }]} />
         <header className="mb-10 pb-7 border-b border-slate-200">
           <div className="min-w-0">
-              <span className="page-eyebrow">Con người của CLB</span><h1 className="page-title">
-                Thành viên CLB Robotics &amp; IoT - HCMUS
-              </h1>
+              <span className="page-eyebrow">{tr("Con người của CLB")}</span><h1 className="page-title">{tr("Thành viên CLB Robotics & IoT - HCMUS")}</h1>
           </div>
         </header>
 
-        <Suspense fallback={<div className="home-member-grid" role="status" aria-label="Đang tải thành viên">{Array.from({ length: 12 }, (_, index) => <span key={index} className="home-member-avatar home-member-avatar--loading" aria-hidden="true" />)}</div>}><MemberResults /></Suspense>
+        <Suspense fallback={<MemberDirectorySkeleton />}><MemberResults /></Suspense>
       </main>
 
 

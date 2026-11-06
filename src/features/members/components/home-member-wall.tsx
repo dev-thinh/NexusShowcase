@@ -1,4 +1,6 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { MEMBER_ROLE_LABELS } from '@/features/identity/model/member-role';
 import { MemberAvatar } from '@/shared/ui/member-avatar';
@@ -13,6 +15,8 @@ import type { PublicMemberRole } from '../model/directory';
 const labels: Record<PublicMemberRole, string> = MEMBER_ROLE_LABELS;
 
 export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersPayload & { showMeta?: boolean }) {
+  const { t: tr } = useI18n();
+
   const [active, setActive] = useState<{ member: HomeMember; x: number; y: number; below: boolean; viewport: number[] } | null>(null);
   const tooltipId = useId();
   const remaining = Math.max(0, total - members.length);
@@ -48,14 +52,14 @@ export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersP
     setActive({ member, x: Math.max(116, Math.min(window.innerWidth - 116, rect.left + rect.width / 2)), y: below ? rect.bottom + 10 : rect.top - 10, below, viewport: [window.scrollX, window.scrollY, window.innerWidth, window.innerHeight] });
   };
 
-  if (!members.length) return <p className="home-members-empty">Thông tin thành viên đang được cập nhật.</p>;
+  if (!members.length) return <p className="home-members-empty">{tr("Thông tin thành viên đang được cập nhật.")}</p>;
 
   return (
     <div className="home-members-wall">
       {showMeta && <div className="home-members-meta">
-        <p>{total} thành viên</p>
-        <div className="home-members-legend" aria-label="Vai trò thành viên">
-          {(['ADMIN', 'CORE_MEMBER', 'MEMBER'] as const).map(role => <span key={role}><i className={`home-member-dot home-member-dot--${role.toLowerCase()}`} aria-hidden="true" />{labels[role]}</span>)}
+        <p>{total}{tr(" thành viên")}</p>
+        <div className="home-members-legend" aria-label={tr("Vai trò thành viên")}>
+          {(['ADMIN', 'CORE_MEMBER', 'MEMBER'] as const).map(role => <span key={role}><i className={`home-member-dot home-member-dot--${role.toLowerCase()}`} aria-hidden="true" />{tr(labels[role])}</span>)}
         </div>
       </div>}
       <div className="home-member-grid">
@@ -68,7 +72,7 @@ export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersP
                 data-member-id={member.id}
                 data-role={member.role}
                 className={`home-member-avatar home-member-avatar--${member.role.toLowerCase()}`}
-                aria-label={`${member.fullName} · ${labels[member.role]}`}
+                aria-label={`${member.fullName} · ${tr(labels[member.role])}`}
                 aria-describedby={active?.member.id === member.id ? tooltipId : undefined}
                 onPointerEnter={event => { if (event.pointerType === 'mouse') show(member, event.currentTarget); }}
                 onPointerLeave={event => { if (event.pointerType === 'mouse') setActive(null); }}
@@ -81,14 +85,14 @@ export function HomeMemberWall({ members, total, showMeta = true }: HomeMembersP
             </div>
           );
         })}
-        {remaining > 0 && <Link href="/members" className="home-member-slot home-member-more" aria-label={`Xem tất cả ${total} thành viên, còn ${remaining} thành viên`}>
+        {remaining > 0 && <Link href="/members" className="home-member-slot home-member-more" aria-label={tr("Xem tất cả {0} thành viên, còn {1} thành viên", total, remaining)}>
           <span className="home-member-more__circle"><UserRound size={22} aria-hidden="true" /><strong>+{remaining}</strong></span>
-          <span className="home-member-more__label">Xem tất cả</span>
+          <span className="home-member-more__label">{tr("Xem tất cả")}</span>
         </Link>}
       </div>
       {active && createPortal(
         <div id={tooltipId} role="tooltip" className={`home-member-tooltip${active.below ? ' home-member-tooltip--below' : ''}`} style={{ left: active.x, top: active.y }}>
-          <strong>{active.member.fullName}</strong><span>{labels[active.member.role]}</span>
+          <strong>{active.member.fullName}</strong><span>{tr(labels[active.member.role])}</span>
         </div>, document.body,
       )}
     </div>

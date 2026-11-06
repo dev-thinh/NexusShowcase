@@ -1,5 +1,6 @@
 'use client';
 
+import { useI18n } from '@/shared/i18n/provider';
 import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, FileSpreadsheet, Loader2 } from 'lucide-react';
@@ -19,6 +20,8 @@ function downloadCsv(name: string, csv: string) {
 }
 
 export function AdminImportMembersModal() {
+  const { t: tr } = useI18n();
+
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [csv, setCsv] = useState('');
@@ -77,39 +80,38 @@ export function AdminImportMembersModal() {
     if (!results) return;
     try {
       downloadCsv('ket-qua-tao-tai-khoan.csv', exportMemberCsv([
-        ['Dòng', 'Họ tên', 'Tên đăng nhập/email', 'MSSV', 'Kết quả', 'Chi tiết', 'Mật khẩu tạm'],
-        ...results.map(row => [String(row.line), row.fullName, row.email, row.studentId, row.status === 'CREATED' ? 'Đã tạo' : row.status === 'SKIPPED' ? 'Bỏ qua' : 'Thất bại', row.message, row.temporaryPassword ?? '']),
+        ['Dòng', 'Họ tên', 'Tên đăng nhập/email', 'MSSV', 'Kết quả', 'Chi tiết', 'Mật khẩu tạm'].map(label => tr(label)),
+        ...results.map(row => [String(row.line), row.fullName, row.email, row.studentId, tr(row.status === 'CREATED' ? 'Đã tạo' : row.status === 'SKIPPED' ? 'Bỏ qua' : 'Thất bại'), tr(row.message), row.temporaryPassword ?? '']),
       ]));
       setDownloaded(true); setDiscard(false); setError('');
     } catch { setError('Không tải được kết quả. Vui lòng giữ hộp thoại mở và thử lại.'); }
   }
 
   return <>
-    <button type="button" className="action-secondary-detail" onClick={() => { setDownloaded(false); setUncertain(false); setOpen(true); }}><FileSpreadsheet aria-hidden="true" className="h-4 w-4" />Tạo từ CSV</button>
-    <Modal isOpen={open} onClose={close} closeDisabled={busy || unsavedCredentials} title="Tạo tài khoản từ CSV" description="Tải mẫu, điền dữ liệu rồi tải lên để kiểm tra trước khi tạo. Tất cả tài khoản mới đều là Thành viên." className="!max-w-4xl">
+    <button type="button" className="action-secondary-detail" onClick={() => { setDownloaded(false); setUncertain(false); setOpen(true); }}><FileSpreadsheet aria-hidden="true" className="h-4 w-4" />{tr("Tạo từ CSV")}</button>
+    <Modal isOpen={open} onClose={close} closeDisabled={busy || unsavedCredentials} title={tr("Tạo tài khoản từ CSV")} className="!max-w-4xl">
       <div className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center gap-3">
-          <button type="button" disabled={busy} className="action-secondary-detail min-h-11" onClick={() => downloadCsv('mau-tai-khoan.csv', MEMBER_CSV_TEMPLATE)}><Download aria-hidden="true" className="h-4 w-4" />Tải CSV mẫu</button>
-          {!results && <FilePicker label="Tải CSV lên" accept=".csv,text/csv" busy={busy} disabled={uncertain} onChange={event => void read(event.target.files?.[0])} />}
+          <button type="button" disabled={busy} className="action-secondary-detail min-h-11" onClick={() => downloadCsv('mau-tai-khoan.csv', MEMBER_CSV_TEMPLATE)}><Download aria-hidden="true" className="h-4 w-4" />{tr("Tải CSV mẫu")}</button>
+          {!results && <FilePicker label={tr("Tải CSV lên")} accept=".csv,text/csv" busy={busy} disabled={uncertain} onChange={event => void read(event.target.files?.[0])} />}
         </div>
-        {!results && <p className="text-xs leading-5 text-slate-500">Họ tên và Tên đăng nhập/email là bắt buộc; MSSV có thể để trống. Xóa dòng ví dụ trong mẫu trước khi điền. Lưu dạng CSV UTF-8, tối đa {MAX_MEMBER_IMPORT_ROWS} dòng và 128 KiB. Không cần nhập quyền hay mật khẩu.</p>}
-        {busy && <p role="status" className="flex items-center gap-2 text-sm"><Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />{rows.length ? 'Đang tạo tài khoản…' : 'Đang kiểm tra CSV…'}</p>}
+        {!results && <p className="text-xs leading-5 text-slate-500">{tr("CSV UTF-8 · Tối đa {0} dòng · 128 KiB", MAX_MEMBER_IMPORT_ROWS)}</p>}
+        {busy && <p role="status" className="flex items-center gap-2 text-sm"><Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />{rows.length ? tr("Đang tạo tài khoản…") : tr("Đang kiểm tra CSV…")}</p>}
         {rows.length > 0 && <>
-          <p role="status" className="text-sm font-semibold text-slate-700">{results ? `${created} đã tạo · ${results.filter(row => row.status === 'SKIPPED').length} bỏ qua · ${results.filter(row => row.status === 'FAILED').length} thất bại` : `${rows.length} dòng · ${valid} hợp lệ · ${rows.length - valid} cần sửa`}</p>
+          <p role="status" className="text-sm font-semibold text-slate-700">{results ? tr("{0} đã tạo · {1} bỏ qua · {2} thất bại", created, results.filter(row => row.status === 'SKIPPED').length, results.filter(row => row.status === 'FAILED').length) : tr("{0} dòng · {1} hợp lệ · {2} cần sửa", rows.length, valid, rows.length - valid)}</p>
           <MemberCsvTable rows={results ?? rows} />
         </>}
         {results && <div className="space-y-2">
-          <button type="button" className="action-secondary-detail min-h-11" onClick={exportResults}><Download aria-hidden="true" className="h-4 w-4" />Tải kết quả và mật khẩu tạm</button>
-          {created > 0 && <p className="text-xs leading-5 text-slate-500">Mật khẩu tạm chỉ có trong kết quả lần này. Tải kết quả trước khi đóng và chuyển cho từng thành viên; họ phải đổi mật khẩu ở lần đăng nhập đầu.</p>}
+          <button type="button" className="action-secondary-detail min-h-11" onClick={exportResults}><Download aria-hidden="true" className="h-4 w-4" />{tr("Tải kết quả và mật khẩu tạm")}</button>
         </div>}
-        {error && <p role="alert" className="text-sm leading-6 text-rose-700">{error}</p>}
+        {error && <p role="alert" className="text-sm leading-6 text-rose-700">{tr(error)}</p>}
         {discard && <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
-          <p>Bạn chưa tải mật khẩu tạm. Đóng sẽ bỏ kết quả đang giữ trong hộp thoại.</p>
-          <div className="mt-2 flex flex-wrap gap-3"><button type="button" className="min-h-11 font-semibold underline" onClick={finish}>Đóng và bỏ kết quả</button><button type="button" className="min-h-11 underline" onClick={() => setDiscard(false)}>Tiếp tục tải kết quả</button></div>
+          <p>{tr("Bạn chưa tải mật khẩu tạm. Đóng sẽ bỏ kết quả đang giữ trong hộp thoại.")}</p>
+          <div className="mt-2 flex flex-wrap gap-3"><button type="button" className="min-h-11 font-semibold underline" onClick={finish}>{tr("Đóng và bỏ kết quả")}</button><button type="button" className="min-h-11 underline" onClick={() => setDiscard(false)}>{tr("Tiếp tục tải kết quả")}</button></div>
         </div>}
         <div className="modal-footer">
-          <button type="button" disabled={busy} className="action-secondary-detail min-h-11" onClick={close}>Đóng</button>
-          {!results && <button type="button" disabled={busy || !valid || uncertain} className="action-primary-detail min-h-11 disabled:opacity-50" onClick={() => void create()}>{busy && rows.length ? 'Đang tạo…' : `Tạo ${valid} tài khoản hợp lệ`}</button>}
+          <button type="button" disabled={busy} className="action-secondary-detail min-h-11" onClick={close}>{tr("Đóng")}</button>
+          {!results && <button type="button" disabled={busy || !valid || uncertain} className="action-primary-detail min-h-11 disabled:opacity-50" onClick={() => void create()}>{busy && rows.length ? tr("Đang tạo…") : tr("Tạo {0} tài khoản hợp lệ", valid)}</button>}
         </div>
       </div>
     </Modal>

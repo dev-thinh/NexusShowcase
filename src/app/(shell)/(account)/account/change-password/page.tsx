@@ -1,10 +1,11 @@
+import { localizedMetadata } from '@/shared/i18n/metadata';
 import { getSession as auth } from '@/features/identity/server/session';
 import { prisma } from '@/server/db/prisma';
 import { redirect } from 'next/navigation';
 
-export const metadata = {
+export const generateMetadata = localizedMetadata({
   title: 'Đổi mật khẩu',
-};
+});
 
 export default async function ChangePasswordPage() {
   const session = await auth();
