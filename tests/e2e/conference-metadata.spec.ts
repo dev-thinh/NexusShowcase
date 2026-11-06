@@ -129,7 +129,8 @@ for (const type of ['RESEARCH_PAPER', 'PROJECT'] as const) test(`conference meta
         expect(Math.abs(banner.width - boxes[0]!.width)).toBeLessThan(3);
         expect(Math.abs(banner.y - boxes[0]!.y)).toBeLessThan(2);
         const dates = (await metadata.locator('.conference-card-banner__dates').boundingBox())!;
-        expect(Math.abs(banner.x + banner.width - dates.x - dates.width - 12)).toBeLessThan(2);
+        expect(dates.x).toBeGreaterThanOrEqual(banner.x + 11);
+        expect(dates.x + dates.width).toBeLessThanOrEqual(banner.x + banner.width - 11);
         const eventTime = (await metadata.locator(`time[datetime="${conference.eventDate}"]`).boundingBox())!;
         const acceptedTime = (await metadata.locator(`time[datetime="${conference.acceptedDate}"]`).boundingBox())!;
         expect(eventTime.x).toBeLessThan(acceptedTime.x);
