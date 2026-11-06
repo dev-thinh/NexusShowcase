@@ -21,7 +21,7 @@ afterEach(() => { for (const root of roots.splice(0)) rmSync(root, { recursive: 
 describe('i18n coverage audit', () => {
   it('reports literal missing keys with file context while preserving dynamic values', () => {
     const root = fixture({ 'Xin chào': 'Hello' }, 't("Xin chào"); tr("Thiếu"); tr(article.title);');
-    expect(auditI18n(root).missingKeys).toEqual([{ file: 'src/page.tsx', line: 1, key: 'Thiếu' }]);
+    expect(auditI18n(root).missingKeys).toEqual([{ file: path.join('src', 'page.tsx'), line: 1, key: 'Thiếu' }]);
   });
   it('normalizes whitespace for both dictionary keys and source literals', () => {
     const root = fixture({ ' Xin   chào ': 'Hello' }, 'tr("  Xin \\n chào  ");');
