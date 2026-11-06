@@ -109,7 +109,9 @@ for (const width of [320, 390, 768, 1440]) {
     await page.goto('/contact');
     await switchLanguage(page, 'en');
     const toggle = page.getByRole('switch', { name: /Switch language/ });
-    const account = page.locator('.site-account-navigation');
+    // Suspense may retain hidden streamed markup while locale refresh commits.
+    const account = page.locator('#site-navbar .site-account-navigation:visible');
+    await expect(account).toHaveCount(1);
     const brand = page.locator('#site-navbar .site-brand');
     const boxes = await Promise.all([brand.boundingBox(), toggle.boundingBox(), account.boundingBox()]);
     expect(boxes[0]!.x + boxes[0]!.width).toBeLessThanOrEqual(boxes[1]!.x + 1);
