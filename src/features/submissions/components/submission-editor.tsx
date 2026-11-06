@@ -79,7 +79,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
         </header>
         <ConferenceDetails value={state.data.conference} />
         <ArticleTableOfContents content={content} />
-        <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">{tr("Abstract / Tóm tắt")}</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{state.data.summary || tr("Chưa có tóm tắt.")}</p></section>
+        <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">{tr("Tóm tắt")}</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{state.data.summary || tr("Chưa có tóm tắt.")}</p></section>
         <ArticleContent content={content} />
         <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2><ResourceLinks resources={(state.data.resources ?? []).filter(resource => submissionResourceSchema.safeParse(resource).success)} /></section>
       </div> : <fieldset disabled={busy} className="min-w-0 disabled:opacity-70">
@@ -88,7 +88,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
 
           </section>
           <div className="min-w-0 border-t border-slate-200 bg-[#FFFFFF] p-4 sm:p-8 lg:border-t-0">
-            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">{tr("Tác giả và người đóng góp")}</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">{tr("Thêm người tham gia và xác nhận vai trò của từng người. Người đăng không bắt buộc phải là tác giả; chỉ giữ những người thực sự đóng góp.")}</p><ReviewComments comments={reviewComments} fieldKey="contributors" /><ContributorEditor errors={state.fieldErrors} value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
+            <section aria-labelledby="submission-contributors-title"><h2 id="submission-contributors-title" className="text-lg font-semibold text-[#1F2937]">{tr("Tác giả và người đóng góp")}</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">{tr("Thêm người tham gia và xác nhận vai trò của từng người.")}</p><ReviewComments comments={reviewComments} fieldKey="contributors" /><ContributorEditor errors={state.fieldErrors} value={state.data.contributors ?? []} clubMembers={clubMembers} onChange={contributors => updateField('contributors', contributors)} /></section>
             <section className="mt-7 border-t border-slate-200 pt-6" aria-labelledby="submission-resources-title">
               <h2 id="submission-resources-title" className="text-lg font-semibold text-[#1F2937]">{tr("Tài nguyên đính kèm")}</h2>
               <ReviewComments comments={reviewComments} fieldKey="resources" />

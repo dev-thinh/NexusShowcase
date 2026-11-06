@@ -22,7 +22,7 @@ it('preserves localized submission errors at their exact field paths', () => {
     code: 'VALIDATION',
     fieldErrors: {
       title: ['Vui lòng nhập tiêu đề.'],
-      summary: ['Vui lòng nhập abstract / tóm tắt.'],
+      summary: ['Vui lòng nhập tóm tắt.'],
       contributors: ['Vui lòng thêm ít nhất một người đóng góp.'],
       'resources.0.label': expect.any(Array),
       'resources.0.url': expect.any(Array),

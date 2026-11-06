@@ -102,7 +102,7 @@ export function articleSubmissionIssues(content: string): { path: (string | numb
   doc.sections.forEach((section, sectionIndex) => {
     const sectionPath = ['sections', sectionIndex];
     if (!section.title) errors.push({ path: [...sectionPath, 'title'], message: 'Mỗi section cần có tiêu đề.' });
-    if (['abstract', 'tóm tắt'].includes(section.title.toLocaleLowerCase('vi'))) errors.push({ path: [...sectionPath, 'title'], message: 'Abstract / Tóm tắt đã là phần cố định, không cần thêm section trùng.' });
+    if (['abstract', 'tóm tắt'].includes(section.title.toLocaleLowerCase('vi'))) errors.push({ path: [...sectionPath, 'title'], message: 'Tóm tắt đã là phần cố định, không cần thêm section trùng.' });
     if (!section.blocks.length) errors.push({ path: sectionPath, message: `Section “${section.title || 'chưa đặt tên'}” chưa có nội dung.` });
     section.blocks.forEach((block, blockIndex) => {
       const path = [...sectionPath, 'blocks', blockIndex, block.kind === 'TEXT' ? 'text' : 'url'];

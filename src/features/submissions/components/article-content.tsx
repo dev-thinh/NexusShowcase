@@ -56,5 +56,5 @@ export function ArticleTableOfContents({ content }: { content: string }) {
 
   const sections = parseArticleContent(content)?.sections ?? [];
   if (!sections.length) return null;
-  return <nav aria-label={tr("Mục lục bài viết")} className="space-y-3"><h2 className="text-base font-semibold text-[#1F2937]">{tr("Mục lục")}</h2><ol className="space-y-2 text-sm leading-6 text-[#1F2937]"><li><a href="#abstract" className="hover:text-[#1F2937]">{tr("Abstract / Tóm tắt")}</a></li>{sections.map((section, index) => <li key={section.id}><a href={`#section-${index + 1}`} className="block break-words hover:text-[#1F2937]">{index + 1}. {section.title}</a></li>)}</ol></nav>;
+  return <nav aria-label={tr("Mục lục bài viết")} className="space-y-3"><h2 className="text-base font-semibold text-[#1F2937]">{tr("Mục lục")}</h2><ol className="space-y-2 text-sm leading-6 text-[#1F2937]"><li><a href="#abstract" className="hover:text-[#1F2937]">{tr("Tóm tắt")}</a></li>{sections.map((section, index) => <li key={section.id}><a href={`#section-${index + 1}`} className="block break-words hover:text-[#1F2937]">{index + 1}. {section.title}</a></li>)}</ol></nav>;
 }

@@ -88,7 +88,7 @@ export function SectionEditor({ content, resources, onChange, onBusy, errors = {
     updateSection(section.id, { blocks: [...section.blocks, block] });
   };
   return <div className="space-y-5">
-    <div><h2 className="text-xl font-semibold text-[#1F2937]">{tr("Nội dung chi tiết")}</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">{tr("Thêm section và chèn nội dung theo thứ tự bạn muốn. Dự án có thể chỉ cần abstract.")}</p></div>
+    <div><h2 className="text-xl font-semibold text-[#1F2937]">{tr("Nội dung chi tiết")}</h2><p className="mt-2 text-sm leading-6 text-[#1F2937]">{tr("Thêm section và chèn nội dung theo thứ tự bạn muốn. Dự án có thể chỉ cần tóm tắt.")}</p></div>
     {errors.content?.length ? <SubmissionField name="content" errors={errors}><span /></SubmissionField> : null}
     {document.sections.map((section, index) => <section key={section.id} aria-label={`Section ${index + 1}`} className="relative space-y-4 before:pointer-events-none before:absolute before:inset-y-0 before:-left-3 before:w-0.5 before:rounded-full before:bg-[#153D67]/30">
       <div className="flex flex-wrap items-center gap-2 rounded-md border border-slate-200 bg-[#FFFFFF] p-3 sm:p-4">
