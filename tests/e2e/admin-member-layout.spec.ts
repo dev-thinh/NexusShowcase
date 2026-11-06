@@ -9,9 +9,9 @@ for (const width of [320, 390, 1440]) test(`member rows balance identity with da
   await expect(actions.getByRole('button', { name: 'Thêm thành viên', exact: true })).toBeVisible();
   expect((await actions.boundingBox())!.y).toBeGreaterThan((await panel.boundingBox())!.y + (await panel.boundingBox())!.height);
   await expect(panel.getByRole('button', { name: 'Thêm thành viên', exact: true })).toHaveCount(0);
-  const member = page.locator('.admin-member-row').filter({ has: page.getByRole('button', { name: /^Quyền của / }) }).first();
+  const member = page.locator('.admin-member-row').filter({ has: page.locator('[data-member-role="MEMBER"]') }).first();
   await expect(member).toBeVisible();
-  const trigger = member.getByRole('button', { name: /^Quyền của / });
+  const trigger = member.getByRole('button', { name: /^Quản lý tài khoản / });
   const name = (await member.locator('.admin-member-name').boundingBox())!;
   await expect(member.locator('.admin-member-name')).toHaveCSS('white-space', 'nowrap');
   await expect(member.locator('.admin-member-name')).toHaveCSS('text-overflow', 'ellipsis');
@@ -24,11 +24,12 @@ for (const width of [320, 390, 1440]) test(`member rows balance identity with da
   expect(Math.abs(date.x + date.width - button.x - button.width)).toBeLessThan(1);
   expect(button.y).toBeGreaterThanOrEqual(date.y + date.height);
   expect(button.width).toBeLessThan(110);
-  expect(Math.abs(button.height - role.height)).toBeLessThan(1);
+  expect(button.height).toBe(26);
+  expect(role.height).toBeGreaterThanOrEqual(button.height);
   await member.evaluate(element => element.scrollIntoView({ block: 'center' }));
   await member.screenshot({ path: `/tmp/nexus-mobile-audit/member-permissions-row-${width}.png` });
   await trigger.click();
-  const menu = member.getByRole('group', { name: /^Quản lý quyền của / });
+  const menu = member.getByRole('group', { name: /^Thao tác quản lý / });
   await expect(menu).toBeVisible();
   await expect(menu.getByRole('button', { name: /Cấp quyền đăng bài|Thu quyền đăng bài/ })).toBeVisible();
   await expect(menu.getByRole('button', { name: /^Xóa tài khoản / })).toBeVisible();
@@ -61,7 +62,7 @@ test('permissions menu grants and revokes publishing access', async ({ page, fix
     await login(page, fixture.users[0], `/admin/members?q=${encodeURIComponent(user.fullName)}`);
     const row = page.locator('.admin-member-row');
     for (const action of ['Cấp quyền đăng bài', 'Thu quyền đăng bài']) {
-      await row.getByRole('button', { name: `Quyền của ${user.fullName}`, exact: true }).click();
+      await row.getByRole('button', { name: `Quản lý tài khoản ${user.fullName}`, exact: true }).click();
       await row.getByRole('button', { name: action, exact: true }).click();
       await acknowledgeSuccess(page);
       await expect(row.locator('.admin-member-role')).toHaveText(action.startsWith('Cấp') ? 'Trưởng nhóm' : 'Thành viên');

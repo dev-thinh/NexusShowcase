@@ -4,7 +4,7 @@ import { useI18n } from '@/shared/i18n/provider';
 import { updateUserRoleAction } from '@/features/identity/server/member-actions';
 import { Tooltip } from '@/shared/ui/tooltip';
 import { Role } from '@prisma/client';
-import { ArrowDownCircle, ArrowUpCircle, Loader2, ShieldCheck } from 'lucide-react';
+import { ArrowDownCircle, ArrowUpCircle, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { notifySuccess } from '@/shared/dialogs/success';
@@ -37,14 +37,7 @@ export function AdminRoleToggle({
 
 
 
-  if (currentRole === 'ADMIN') {
-    return (
-      <span className="admin-role-badge inline-flex items-center gap-1 px-2.5 py-1 rounded-md bg-[#FFFFFF] text-[#1F2937] text-xs font-semibold border border-slate-200">
-        <ShieldCheck className="w-3.5 h-3.5 text-[#1F2937]" />
-        <span>{tr("Toàn quyền")}</span>
-      </span>
-    );
-  }
+  if (currentRole === 'ADMIN') return null;
 
   const isCore = currentRole === 'CORE_MEMBER';
   const description = tr(isCore ? 'Đang có quyền đăng bài.' : 'Chưa có quyền đăng bài.');

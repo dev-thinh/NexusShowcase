@@ -78,9 +78,9 @@ for (const width of [320, 1280]) test(`bulk grants keep selection across pages a
   for (let index = 1; index <= 12; index++) members.push(await database.user.create({ data: { email: `${fixture.prefix}-grant-${width}-${index}`, fullName: `${prefix} ${String(index).padStart(2, '0')}`, role: 'MEMBER', status: 'ACTIVE' } }));
   for (const [label, data] of [['hidden', { hiddenFromDirectory: true }], ['core', { role: 'CORE_MEMBER' as const }], ['disabled', { status: 'SUSPENDED' as const }]] as const) await database.user.create({ data: { email: `${fixture.prefix}-grant-${width}-${label}`, fullName: `${prefix} ${label}`, role: 'MEMBER', status: 'ACTIVE', ...data } });
   await login(page, fixture.users[0], '/admin/members');
-  await page.getByRole('button', { name: 'Cấp quyền hàng loạt', exact: true }).click();
-  const modal = page.getByRole('dialog', { name: 'Cấp quyền đăng bài hàng loạt', exact: true });
-  const search = modal.getByRole('searchbox', { name: 'Tìm thành viên để cấp quyền' });
+  await page.getByRole('button', { name: 'Quản lý hàng loạt', exact: true }).click();
+  const modal = page.getByRole('dialog', { name: 'Quản lý tài khoản hàng loạt', exact: true });
+  const search = modal.getByRole('searchbox', { name: 'Tìm tài khoản để quản lý' });
   await search.fill(prefix);
   await modal.getByRole('button', { name: 'Tìm kiếm', exact: true }).click();
   await expect(modal.getByText('12 thành viên · Trang 1/2', { exact: true })).toBeVisible();
@@ -88,12 +88,14 @@ for (const width of [320, 1280]) test(`bulk grants keep selection across pages a
   await modal.getByRole('checkbox', { name: `Chọn ${members[0].fullName}`, exact: true }).check();
   await modal.getByRole('button', { name: 'Trang sau', exact: true }).click();
   await modal.getByRole('checkbox', { name: `Chọn ${members[10].fullName}`, exact: true }).check();
+  await expect(modal.getByRole('region', { name: 'Thành viên đã chọn' })).toHaveCount(0);
+  await modal.getByRole('button', { name: 'Xem 2 thành viên đã chọn', exact: true }).click();
   await expect(modal.getByRole('region', { name: 'Thành viên đã chọn' })).toContainText(members[0].fullName);
   await search.fill(members[11].fullName);
   await modal.getByRole('button', { name: 'Tìm kiếm', exact: true }).click();
   await modal.getByRole('checkbox', { name: `Chọn ${members[11].fullName}`, exact: true }).check();
   await modal.getByRole('button', { name: 'Xem lại 3 thành viên', exact: true }).click();
-  await expect(modal.getByText('Xác nhận danh sách cấp quyền (3)', { exact: true })).toBeVisible();
+  await expect(modal.getByText('Xác nhận danh sách tài khoản (3)', { exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await modal.getByRole('button', { name: 'Xác nhận cấp quyền (3)', exact: true }).click();
   await acknowledgeSuccess(page, 'Đã cấp quyền đăng bài cho 3 thành viên.');
@@ -105,8 +107,8 @@ for (const width of [320, 1280]) test(`bulk grants keep selection across pages a
 test('a stale grant selection leaves the whole batch unchanged and offers reload', async ({ page, fixture, database }) => {
   const members = await Promise.all([1, 2].map(index => database.user.create({ data: { email: `${fixture.prefix}-stale-grant-${index}`, fullName: `Lô xung đột ${index}`, role: 'MEMBER', status: 'ACTIVE' } })));
   await login(page, fixture.users[0], '/admin/members');
-  await page.getByRole('button', { name: 'Cấp quyền hàng loạt', exact: true }).click();
-  const modal = page.getByRole('dialog', { name: 'Cấp quyền đăng bài hàng loạt' });
+  await page.getByRole('button', { name: 'Quản lý hàng loạt', exact: true }).click();
+  const modal = page.getByRole('dialog', { name: 'Quản lý tài khoản hàng loạt' });
   await modal.getByRole('searchbox').fill('Lô xung đột');
   await modal.getByRole('button', { name: 'Tìm kiếm', exact: true }).click();
   for (const member of members) await modal.getByRole('checkbox', { name: `Chọn ${member.fullName}`, exact: true }).check();
@@ -117,4 +119,25 @@ test('a stale grant selection leaves the whole batch unchanged and offers reload
   for (const member of members) expect((await database.user.findUniqueOrThrow({ where: { id: member.id } })).role).toBe('MEMBER');
   await modal.getByRole('button', { name: 'Tải lại danh sách', exact: true }).click();
   await expect(modal.getByRole('button', { name: 'Xem lại 0 thành viên', exact: true })).toBeDisabled();
+});
+
+test('bulk management consistently icons all modes and revokes publishing access for selected team leaders', async ({ page, fixture, database }) => {
+  const users = await Promise.all([1, 2].map(index => database.user.create({ data: { fullName: `Thu hồi hàng loạt ${index}`, email: `${fixture.prefix}-grant-revoke-${index}`, role: 'CORE_MEMBER', status: 'ACTIVE' } })));
+  await page.setViewportSize({ width: 390, height: 900 });
+  await login(page, fixture.users[0], '/admin/members');
+  await page.getByRole('button', { name: 'Quản lý hàng loạt', exact: true }).click();
+  const modal = page.getByRole('dialog', { name: 'Quản lý tài khoản hàng loạt', exact: true });
+  const modes = modal.getByRole('group', { name: 'Chọn thao tác hàng loạt', exact: true });
+  await expect(modes.getByRole('button')).toHaveCount(5);
+  for (const button of await modes.getByRole('button').all()) await expect(button.locator('svg')).toHaveCount(1);
+  await modal.getByRole('button', { name: 'Thu hồi quyền', exact: true }).click();
+  await modal.getByRole('searchbox').fill('Thu hồi hàng loạt');
+  await modal.getByRole('button', { name: 'Tìm kiếm', exact: true }).click();
+  await expect(modal.getByText('2 thành viên · Trang 1/1', { exact: true })).toBeVisible();
+  await modal.getByLabel('Chọn cả trang này', { exact: true }).check();
+  await modal.getByRole('button', { name: 'Xem lại 2 thành viên', exact: true }).click();
+  await expect(modal).toContainText('không còn quyền đăng bài');
+  await modal.getByRole('button', { name: 'Xác nhận (2)', exact: true }).click();
+  await acknowledgeSuccess(page, 'Đã thu hồi quyền đăng bài của 2 thành viên.');
+  for (const user of users) expect(await database.user.findUniqueOrThrow({ where: { id: user.id } })).toMatchObject({ role: 'MEMBER', sessionVersion: 2 });
 });
