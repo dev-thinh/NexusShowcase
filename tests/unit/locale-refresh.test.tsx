@@ -1,0 +1,20 @@
+import { beforeEach, expect, it, vi } from 'vitest';
+import { LocaleRefresh } from '@/shared/i18n/locale-refresh';
+const state = vi.hoisted(() => ({ revision: 0, destination: null as string | null, refresh: vi.fn(), last: { current: 0 }, effect: undefined as (() => void) | undefined }));
+vi.mock('@/shared/i18n/provider', () => ({ useI18n: () => ({ revision: state.revision }) }));
+vi.mock('@/shared/navigation/navigation-transition', () => ({ useNavigationTransition: () => ({ pathname: state.destination }) }));
+vi.mock('next/navigation', () => ({ useRouter: () => ({ refresh: state.refresh }) }));
+vi.mock('react', async original => ({ ...await original<typeof import('react')>(), useRef: () => state.last, useEffect: (effect: () => void) => { state.effect = effect; }, startTransition: (run: () => void) => run() }));
+beforeEach(() => { vi.clearAllMocks(); state.revision = 0; state.destination = null; state.last.current = 0; });
+it('refreshes server text only after a pending navigation commits, using the latest language selection', () => {
+  LocaleRefresh(); state.effect?.();
+  expect(state.refresh).not.toHaveBeenCalled();
+  state.destination = '/research'; state.revision = 1;
+  LocaleRefresh(); state.effect?.();
+  state.revision = 2; LocaleRefresh(); state.effect?.();
+  expect(state.refresh).not.toHaveBeenCalled();
+  state.destination = null; LocaleRefresh(); state.effect?.();
+  expect(state.refresh).toHaveBeenCalledOnce();
+  LocaleRefresh(); state.effect?.();
+  expect(state.refresh).toHaveBeenCalledOnce();
+});
