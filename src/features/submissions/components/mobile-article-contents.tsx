@@ -14,7 +14,9 @@ export function MobileArticleContents({ children }: { children: ReactNode }) {
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)');
     const dismiss = () => {
-      if (desktop.matches && panel.current?.matches(':popover-open')) panel.current.hidePopover();
+      // Either breakpoint transition invalidates the previous mobile open state.
+      // CSS can hide the panel before this queued event reaches the handler.
+      if (panel.current?.matches(':popover-open')) panel.current.hidePopover();
     };
     desktop.addEventListener('change', dismiss);
     return () => desktop.removeEventListener('change', dismiss);

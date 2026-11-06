@@ -1,6 +1,10 @@
 import { expect,test } from './fixtures';
 import { serializeArticle } from '../../src/features/submissions/model/article';
 
+test.afterEach(async ({ database }) => {
+ await database.showcaseItem.deleteMany({ where: { slug: 'approved-ux-review' } });
+});
+
 test('titles follow pages, detail highlights its parent and mobile contents floats beside the article',async({page,fixture,database})=>{
  const category=await database.category.findUniqueOrThrow({where:{slug:'bai-bao-khoa-hoc'}});
  const content=serializeArticle({version:1,sections:[{id:'method',title:'Phương pháp',blocks:[{id:'text',kind:'TEXT',text:'Nội dung phương pháp nghiên cứu. '.repeat(150)}]}]});
