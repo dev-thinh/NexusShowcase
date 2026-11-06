@@ -1,4 +1,5 @@
-export const metadata = { title: 'Nghiên cứu khoa học' };
+import { localizedMetadata } from '@/shared/i18n/metadata';
+export const generateMetadata = localizedMetadata({ title: 'Nghiên cứu khoa học' });
 
 import CategoryPage from '@/features/publications/components/category-page';
 

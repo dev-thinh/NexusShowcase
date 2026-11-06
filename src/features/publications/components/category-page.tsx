@@ -1,3 +1,5 @@
+
+import { getServerI18n } from '@/shared/i18n/server';
 import { categoryPagePath } from '@/shared/lib/page-urls';
 import { ConferenceCardBanner } from '@/features/publications/components/conference-card-banner';
 import { PublicationCardMeta } from '@/features/publications/components/publication-card-meta';
@@ -15,7 +17,7 @@ import { toCitationDto } from '@/features/publications/model/contracts';
 import { showcaseHref } from '@/features/publications/model/navigation';
 import { listPublications } from '@/features/publications/server/queries';
 import { prisma } from '@/server/db/prisma';
-import { LoadingCards } from '@/shared/ui/loading-content';
+import { PublicationSkeleton } from '@/shared/ui/content-skeletons';
 import { PaginationFooter } from '@/shared/ui/member-pagination';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
@@ -30,6 +32,8 @@ export default async function CategoryPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ page?: string; q?: string; year?: string; sort?: string }>;
 }) {
+  const { t: tr } = await getServerI18n();
+
   const { slug } = await params;
   if (slug === 'du-an-sang-tao') redirect('/projects');
   if (slug === 'thanh-tich') redirect('/research');
@@ -45,7 +49,7 @@ export default async function CategoryPage({
     notFound();
   }
 
-  const categoryName = slug === 'robotics-iot' ? 'Dự án & Sản phẩm' : category.name;
+  const categoryName = slug === 'robotics-iot' ? tr('Dự án & Sản phẩm') : slug === 'bai-bao-khoa-hoc' ? tr('Nghiên cứu khoa học') : category.name;
   const query = await searchParams;
   const categoryId = category.id;
   const pageSize = slug === 'bai-bao-khoa-hoc' ? 10 : 9;
@@ -69,9 +73,9 @@ export default async function CategoryPage({
         {items.length === 0 ? (
           <div className="text-center py-14 bg-white rounded-lg border border-dashed border-slate-200">
             <Sparkles className="w-7 h-7 text-[#1F2937] mx-auto mb-2.5" />
-            <h3 className="text-base font-semibold text-[#1F2937]">{hasFilters ? 'Không tìm thấy công trình phù hợp' : 'Chưa có công trình nào'}</h3>
+            <h3 className="text-base font-semibold text-[#1F2937]">{hasFilters ? tr("Không tìm thấy công trình phù hợp") : tr("Chưa có công trình nào")}</h3>
             <p className="text-sm text-[#1F2937] mt-1 max-w-md mx-auto">
-              {hasFilters ? 'Thử từ khóa khác hoặc bỏ điều kiện năm để xem thêm công trình.' : 'Chuyên mục này hiện chưa có bài viết xuất bản hoặc các bài viết đang được lưu hành nội bộ.'}
+              {hasFilters ? tr("Thử từ khóa khác hoặc bỏ điều kiện năm để xem thêm công trình.") : tr("Chuyên mục này hiện chưa có bài viết xuất bản hoặc các bài viết đang được lưu hành nội bộ.")}
             </p>
           </div>
         ) : (
@@ -85,8 +89,8 @@ export default async function CategoryPage({
                       <CardLink slug={item.slug} returnTo={returnTo} />
                       <ConferenceCardBanner value={item.conference} />
                       <div className="publication-card__content grid min-w-0 items-stretch gap-5 p-5 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-6 sm:p-6 lg:grid-cols-[16rem_minmax(0,1fr)]">
-                        <Link href={showcaseHref(item.slug, returnTo)} aria-label={`Xem công trình: ${item.title}`} className="publication-card__media relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg sm:aspect-auto">
-                          <MediaImage src={item.thumbnailUrl} alt={`Hình minh họa nghiên cứu: ${item.title}`} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
+                        <Link href={showcaseHref(item.slug, returnTo)} aria-label={tr("Xem công trình: {0}", item.title)} className="publication-card__media relative flex aspect-[4/3] min-w-0 items-center justify-center overflow-hidden rounded-lg">
+                          <MediaImage src={item.thumbnailUrl} alt={tr("Hình minh họa nghiên cứu: {0}", item.title)} loading="lazy" decoding="async" className="absolute inset-0 h-full w-full rounded-lg object-cover" />
                         </Link>
                         <div className="publication-card__body flex min-w-0 flex-col">
                           <PublicationCardMeta type={item.type} year={item.publishedYear}>
@@ -103,7 +107,7 @@ export default async function CategoryPage({
                           <div className="publication-card__footer -mb-5 flex flex-wrap items-center gap-x-5 gap-y-1 border-t border-slate-200 py-1 text-sm sm:-mb-6">
                             <CitationModal triggerVariant="icon" item={toCitationDto(item)} className="inline-flex min-h-9 items-center gap-1.5 text-sm font-semibold text-[#1F2937] hover:underline" />
                             <CardResourceLink links={item.links} detailHref={showcaseHref(item.slug, returnTo)} />
-                            <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline">Xem công trình <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
+                            <Link href={showcaseHref(item.slug, returnTo)} className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline">{tr("Xem công trình") + " "}<ArrowRight className="h-3.5 w-3.5" aria-hidden="true" /></Link>
                           </div>
                         </div>
                       </div>
@@ -128,7 +132,7 @@ export default async function CategoryPage({
                       <ConferenceCardBanner value={item.conference} />
                       <div className="publication-card__content flex min-w-0 flex-col">
                       <div className="publication-card__media shrink-0 px-5 pt-5 sm:px-6 sm:pt-6">
-                        <div className="relative aspect-video overflow-hidden rounded-lg">
+                        <div className="publication-cover-frame relative aspect-[4/3] overflow-hidden rounded-lg">
                           <MediaImage
                             src={item.thumbnailUrl}
                             alt={item.title}
@@ -166,7 +170,7 @@ export default async function CategoryPage({
                             href={showcaseHref(item.slug, returnTo)}
                             className="ml-auto inline-flex min-h-9 items-center gap-1.5 font-semibold text-[#1F2937] hover:underline"
                           >
-                            <span>Xem chi tiết</span>
+                            <span>{tr("Xem chi tiết")}</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                           </Link>
                         </div>
@@ -181,7 +185,7 @@ export default async function CategoryPage({
           </div>
         )}
         {totalItems > 0 && (
-          <PaginationFooter page={page} totalPages={totalPages} pageSize={pageSize} basePath={basePath} ariaLabel="Phân trang công trình" />
+          <PaginationFooter page={page} totalPages={totalPages} pageSize={pageSize} basePath={basePath} ariaLabel={tr("Phân trang công trình")} />
         )}
     </>;
   }
@@ -196,24 +200,22 @@ export default async function CategoryPage({
           <Breadcrumbs items={[{ label: categoryName }]} />
           <div>
             <div className="min-w-0">
-              <span className="page-eyebrow">
-                Chuyên mục công trình
-              </span>
+              <span className="page-eyebrow">{tr("Chuyên mục công trình")}</span>
               <h1 className="page-title">
                 {categoryName}
               </h1>
               {category.description && (
                 <p className="text-sm text-[#1F2937] truncate max-w-3xl mt-1">
-                  {category.description}
+                  {tr(category.description)}
                 </p>
               )}
             </div>
           </div>
         </header>
 
-        <PublicationFilters action={categoryPagePath(slug)} searchLabel="Tìm kiếm trong chuyên mục" searchQuery={searchQuery} year={year} sort={sort} defaultSort="featured" hasFilters={hasFilters} />
+        <PublicationFilters action={categoryPagePath(slug)} searchLabel={tr("Tìm kiếm trong chuyên mục")} searchQuery={searchQuery} year={year} sort={sort} defaultSort="featured" hasFilters={hasFilters} />
 
-        <Suspense key={returnToKey} fallback={<LoadingCards />}><CategoryResults /></Suspense>
+        <Suspense key={returnToKey} fallback={<PublicationSkeleton variant={slug === 'bai-bao-khoa-hoc' ? 'research' : 'projects'} />}><CategoryResults /></Suspense>
       </main>
 
 

@@ -1,3 +1,7 @@
+
+'use client';
+
+import { useI18n } from '@/shared/i18n/provider';
 import { getItemStatusLabel } from '@/features/publications/model/status';
 import { ItemStatus, ItemType } from '@prisma/client';
 import {
@@ -13,6 +17,8 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
+  const { t: tr } = useI18n();
+
   const configs = {
     PUBLISHED: {
       classes: 'bg-[#FFFFFF] text-[#1F2937] border-slate-200',
@@ -53,7 +59,7 @@ export function StatusBadge({ status, size = 'md' }: StatusBadgeProps) {
       className={`inline-flex items-center gap-1.5 rounded-full font-semibold border shadow-2xs transition-colors ${sizeClasses} ${config.classes}`}
     >
       <Icon className={size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5'} />
-      <span>{getItemStatusLabel(status)}</span>
+      <span>{tr(getItemStatusLabel(status))}</span>
     </span>
   );
 }
@@ -65,6 +71,8 @@ interface TypeBadgeProps {
 }
 
 export function TypeBadge({ type, size = 'sm', variant = 'subtle' }: TypeBadgeProps) {
+  const { t: tr } = useI18n();
+
   const isRobotics = type === 'PROJECT';
   const label = type === 'ACHIEVEMENT' ? 'Thành tích' : isRobotics ? 'Dự án & Sản phẩm' : 'Nghiên cứu khoa học';
   const classes = variant === 'outline'
@@ -76,7 +84,7 @@ export function TypeBadge({ type, size = 'sm', variant = 'subtle' }: TypeBadgePr
 
   return (
     <span className={`inline-flex shrink-0 items-center whitespace-nowrap rounded-md font-semibold border ${variant === 'subtle' ? 'shadow-2xs' : ''} ${sizeClasses} ${classes}`}>
-      {label}
+      {tr(label)}
     </span>
   );
 }

@@ -1,10 +1,12 @@
 'use client';
+import { useI18n } from '@/shared/i18n/provider';
+
 
 import { SearchForm } from '@/shared/ui/validated-form';
 import { type BulkPostCounts, type BulkPostEntry, type BulkPostFilter } from '@/features/publications/model/bulk-posts';
 import { saveBulkPostStatesAction, searchBulkPostsAction } from '@/features/publications/server/bulk-actions';
 import { Modal } from '@/shared/ui/modal';
-import { Skeleton } from '@/shared/ui/skeleton';
+import { SelectionRowsSkeleton } from '@/shared/ui/content-skeletons';
 import { Globe, Pin } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -12,11 +14,13 @@ import { createPortal } from 'react-dom';
 import { notifySuccess } from '@/shared/dialogs/success';
 
 export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
+  const { t: tr } = useI18n();
+
   const isPinMode = mode === 'pin';
   const title = isPinMode ? 'Quản lý ghim' : 'Phạm vi hiển thị';
   const filters: Array<{ value: BulkPostFilter; label: string }> = isPinMode
-    ? [{ value: 'PINNED', label: 'Đang ghim' }, { value: 'UNPINNED', label: 'Chưa ghim' }, { value: 'ALL', label: 'Tất cả' }]
-    : [{ value: 'PUBLIC', label: 'Công khai' }, { value: 'PRIVATE', label: 'Nội bộ' }, { value: 'ALL', label: 'Tất cả' }];
+    ? [{ value: 'PINNED', label: tr("Đang ghim") }, { value: 'UNPINNED', label: tr("Chưa ghim") }, { value: 'ALL', label: tr("Tất cả") }]
+    : [{ value: 'PUBLIC', label: tr("Công khai") }, { value: 'PRIVATE', label: tr("Nội bộ") }, { value: 'ALL', label: tr("Tất cả") }];
   const [filter, setFilter] = useState<BulkPostFilter>(isPinMode ? 'PINNED' : 'PUBLIC');
   const [counts, setCounts] = useState<BulkPostCounts | null>(null);
   const router = useRouter();
@@ -103,11 +107,11 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
 
   return <>
     <button type="button" className="action-secondary-detail admin-bulk-trigger" onClick={() => { setOpen(true); setLoading(true); setFilter(isPinMode ? 'PINNED' : 'PUBLIC'); setCounts(null); setSearch(''); setQuery(''); setPage(1); setReload(value => value + 1); }}>
-      {isPinMode ? <Pin aria-hidden="true" className="h-4 w-4" /> : <Globe aria-hidden="true" className="h-4 w-4" />}<span>{title}</span>
+      {isPinMode ? <Pin aria-hidden="true" className="h-4 w-4" /> : <Globe aria-hidden="true" className="h-4 w-4" />}<span>{tr(title)}</span>
     </button>
-    {open && createPortal(<Modal isOpen onClose={close} title={title} description={isPinMode ? 'Tick là ghim trang chủ, bỏ tick là không ghim. Chỉnh các bài rồi bấm Áp dụng thay đổi. Tối đa 3 bài ghim.' : 'Tick là công khai, bỏ tick là nội bộ. Chỉnh các bài rồi bấm Áp dụng thay đổi.'} className="!max-w-3xl">
+    {open && createPortal(<Modal isOpen onClose={close} title={tr(title)} description={isPinMode ? tr("Tick là ghim trang chủ, bỏ tick là không ghim. Chỉnh các bài rồi bấm Áp dụng thay đổi. Tối đa 3 bài ghim.") : tr("Tick là công khai, bỏ tick là nội bộ. Chỉnh các bài rồi bấm Áp dụng thay đổi.")} className="!max-w-3xl">
       <fieldset disabled={busy} className="min-w-0 space-y-4 disabled:opacity-60">
-        <div role="group" aria-label={isPinMode ? 'Lọc trạng thái ghim' : 'Lọc phạm vi hiển thị'} className="flex flex-wrap gap-2">
+        <div role="group" aria-label={isPinMode ? tr("Lọc trạng thái ghim") : tr("Lọc phạm vi hiển thị")} className="flex flex-wrap gap-2">
           {filters.map(option => <button key={option.value} type="button" aria-pressed={filter === option.value} onClick={() => {
             if (filter === option.value) return;
             setLoading(true); setFilter(option.value); setPage(1); clearReplacement();
@@ -116,8 +120,8 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
           </button>)}
         </div>
         <SearchForm onSubmit={event => { event.preventDefault(); setLoading(true); clearReplacement(); setQuery(search.trim()); setPage(1); setReload(value => value + 1); }} className="flex flex-wrap gap-2">
-          <input type="search" name="q" value={search} maxLength={200} onChange={event => setSearch(event.target.value)} aria-label="Tìm bài đăng để quản lý" placeholder="Tìm theo tiêu đề…" className="min-h-11 min-w-0 flex-1 rounded-md border border-slate-200 px-3 text-sm text-left" />
-          <button type="submit" disabled={loading} className="action-secondary-detail min-h-11">Tìm kiếm</button>
+          <input type="search" name="q" value={search} maxLength={200} onChange={event => setSearch(event.target.value)} aria-label={tr("Tìm bài đăng để quản lý")} placeholder={tr("Tìm theo tiêu đề…")} className="min-h-11 min-w-0 flex-1 rounded-md border border-slate-200 px-3 text-sm text-left" />
+          <button type="submit" disabled={loading} className="action-secondary-detail min-h-11">{tr("Tìm kiếm")}</button>
         </SearchForm>
 
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
@@ -128,36 +132,36 @@ export function AdminBulkPosts({ mode }: { mode: 'pin' | 'visibility' }) {
               for (const item of items) next = setDesiredState(next, item, !allChecked);
               return next;
             });
-          }} className="h-4 w-4 accent-[#153D67]" />{isPinMode ? 'Ghim toàn bộ trang này' : 'Công khai toàn bộ trang này'}</label>
-          <span role="status" className="text-xs text-[#1F2937]">{ids.length} thay đổi chưa lưu / tối đa 50 bài</span>
-          {ids.length > 0 && <button type="button" onClick={() => { setChanges({}); clearReplacement(); }} className="min-h-10 text-xs font-semibold text-[#1F2937] hover:underline">Hoàn tác thay đổi</button>}
+          }} className="h-4 w-4 accent-[#153D67]" />{isPinMode ? tr("Ghim toàn bộ trang này") : tr("Công khai toàn bộ trang này")}</label>
+          <span role="status" className="text-xs text-[#1F2937]">{ids.length}{" " + tr("thay đổi chưa lưu / tối đa 50 bài")}</span>
+          {ids.length > 0 && <button type="button" onClick={() => { setChanges({}); clearReplacement(); }} className="min-h-10 text-xs font-semibold text-[#1F2937] hover:underline">{tr("Hoàn tác thay đổi")}</button>}
         </div>
         <div aria-busy={loading} className="max-h-[35dvh] overflow-y-auto rounded-md border border-slate-200 text-left">
-          {loading ? <div role="status" aria-label="Đang tải bài đăng" className="space-y-4 p-4">{[1, 2, 3].map(i => <Skeleton key={i} className="h-12 w-full" />)}</div>
-            : !items.length ? <p className="p-6 text-center text-sm text-[#1F2937]">{query ? 'Không tìm thấy bài phù hợp trong nhóm này.' : filter === 'PINNED' ? 'Chưa có bài đang ghim. Chuyển sang “Chưa ghim” để chọn bài.' : filter === 'UNPINNED' ? 'Tất cả bài đã được ghim.' : filter === 'PUBLIC' ? 'Chưa có bài công khai. Chuyển sang “Nội bộ” để chọn bài.' : filter === 'PRIVATE' ? 'Không có bài nội bộ.' : 'Chưa có bài đã xuất bản.'}</p>
+          {loading ? <SelectionRowsSkeleton />
+            : !items.length ? <p className="p-6 text-center text-sm text-[#1F2937]">{query ? tr("Không tìm thấy bài phù hợp trong nhóm này.") : filter === 'PINNED' ? tr("Chưa có bài đang ghim. Chuyển sang “Chưa ghim” để chọn bài.") : filter === 'UNPINNED' ? tr("Tất cả bài đã được ghim.") : filter === 'PUBLIC' ? tr("Chưa có bài công khai. Chuyển sang “Nội bộ” để chọn bài.") : filter === 'PRIVATE' ? tr("Không có bài nội bộ.") : tr("Chưa có bài đã xuất bản.")}</p>
             : items.map(item => <label key={item.id} className={`flex cursor-pointer items-start gap-3 border-b border-slate-200 p-3 last:border-0 ${item.id in changes ? 'bg-[#FFFFFF]' : 'hover:bg-[#FFFFFF]'}`}>
-              <input type="checkbox" checked={desiredState(item)} disabled={!(item.id in changes) && ids.length >= 50} onChange={() => toggle(item)} aria-label={`${isPinMode ? 'Ghim trang chủ' : 'Công khai'}: ${item.title}`} className="mt-1 h-4 w-4 shrink-0 accent-[#153D67]" />
+              <input type="checkbox" checked={desiredState(item)} disabled={!(item.id in changes) && ids.length >= 50} onChange={() => toggle(item)} aria-label={`${tr(isPinMode ? 'Ghim trang chủ' : 'Công khai')}: ${item.title}`} className="mt-1 h-4 w-4 shrink-0 accent-[#153D67]" />
               <span className="min-w-0 flex-1"><span className="block break-words text-sm font-semibold leading-6 text-[#1F2937]">{item.title}</span>
                 <span className="mt-2 flex flex-wrap items-center gap-2 text-xs">
-                  <span className={`rounded-md border px-2 py-0.5 font-semibold ${item.isPinned ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]'}`}>{item.isPinned ? 'Đang ghim' : 'Chưa ghim'}</span>
-                  <span className={`rounded-md border px-2 py-0.5 font-semibold ${item.visibility === 'PUBLIC' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]'}`}>{item.visibility === 'PUBLIC' ? 'Công khai' : 'Nội bộ'}</span>
+                  <span className={`rounded-md border px-2 py-0.5 font-semibold ${item.isPinned ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]'}`}>{item.isPinned ? tr("Đang ghim") : tr("Chưa ghim")}</span>
+                  <span className={`rounded-md border px-2 py-0.5 font-semibold ${item.visibility === 'PUBLIC' ? 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]' : 'border-slate-200 bg-[#FFFFFF] text-[#1F2937]'}`}>{item.visibility === 'PUBLIC' ? tr("Công khai") : tr("Nội bộ")}</span>
                   {item.publishedYear && <span className="text-[#1F2937]">{item.publishedYear}</span>}
-                  {item.id in changes && <span className="font-semibold text-[#1F2937]">{isPinMode ? changes[item.id].enabled ? 'Sẽ ghim' : 'Sẽ bỏ ghim' : changes[item.id].enabled ? 'Sẽ công khai' : 'Sẽ chuyển nội bộ'}</span>}
+                  {item.id in changes && <span className="font-semibold text-[#1F2937]">{isPinMode ? changes[item.id].enabled ? tr("Sẽ ghim") : tr("Sẽ bỏ ghim") : changes[item.id].enabled ? tr("Sẽ công khai") : tr("Sẽ chuyển nội bộ")}</span>}
                 </span>
               </span>
             </label>)}
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-[#1F2937]">
-          <span>{total} bài · Trang {page}/{pages}</span><div className="flex gap-2"><button type="button" disabled={loading || page <= 1} onClick={() => setPage(value => value - 1)} className="action-secondary-card disabled:opacity-40">Trang trước</button><button type="button" disabled={loading || page >= pages} onClick={() => setPage(value => value + 1)} className="action-secondary-card disabled:opacity-40">Trang sau</button></div>
+          <span>{total}{" " + tr("bài · Trang") + " "}{page}/{pages}</span><div className="flex gap-2"><button type="button" disabled={loading || page <= 1} onClick={() => setPage(value => value - 1)} className="action-secondary-card disabled:opacity-40">{tr("Trang trước")}</button><button type="button" disabled={loading || page >= pages} onClick={() => setPage(value => value + 1)} className="action-secondary-card disabled:opacity-40">{tr("Trang sau")}</button></div>
         </div>
 
         {replacement && <div className="rounded-md border border-slate-200 bg-[#FFFFFF] p-3 text-left">
-          <p className="mb-2 text-sm font-semibold text-[#1F2937]">Chọn ít nhất {replacement.required} bài đang ghim để thay thế</p>
+          <p className="mb-2 text-sm font-semibold text-[#1F2937]">{tr("Chọn ít nhất") + " "}{replacement.required}{" " + tr("bài đang ghim để thay thế")}</p>
           {replacement.items.map(item => <label key={item.id} className="flex min-h-10 cursor-pointer items-start gap-2 py-2 text-sm"><input type="checkbox" checked={replaceIds.includes(item.id)} onChange={() => setReplaceIds(current => current.includes(item.id) ? current.filter(id => id !== item.id) : [...current, item.id])} className="mt-1 h-4 w-4 shrink-0 accent-[#153D67]" /><span className="break-words">{item.title}</span></label>)}
         </div>}
-        {tooManyPins && <p role="alert" className="text-sm text-[#1F2937]">Chọn tối đa 3 bài để ghim.</p>}
-        {error && <p role="alert" className="text-sm text-[#1F2937]">{error}</p>}
-        <div className="modal-footer"><button type="button" disabled={busy} onClick={close} className="action-secondary-detail min-h-11">Đóng</button><button type="button" disabled={busy || loading || !ids.length || tooManyPins || !!replacement && replaceIds.length < replacement.required} onClick={() => void apply()} className="action-primary-detail min-h-11 disabled:opacity-50">{busy ? 'Đang lưu…' : `Áp dụng thay đổi (${ids.length})`}</button></div>
+        {tooManyPins && <p role="alert" className="text-sm text-[#1F2937]">{tr("Chọn tối đa 3 bài để ghim.")}</p>}
+        {error && <p role="alert" className="text-sm text-[#1F2937]">{tr(error)}</p>}
+        <div className="modal-footer"><button type="button" disabled={busy} onClick={close} className="action-secondary-detail min-h-11">{tr("Đóng")}</button><button type="button" disabled={busy || loading || !ids.length || tooManyPins || !!replacement && replaceIds.length < replacement.required} onClick={() => void apply()} className="action-primary-detail min-h-11 disabled:opacity-50">{busy ? tr("Đang lưu…") : tr("Áp dụng thay đổi ({0})", ids.length)}</button></div>
       </fieldset>
     </Modal>, document.body)}
   </>;

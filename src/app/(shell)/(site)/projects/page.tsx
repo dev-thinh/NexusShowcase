@@ -1,4 +1,5 @@
-export const metadata = { title: 'Dự án & Sản phẩm' };
+import { localizedMetadata } from '@/shared/i18n/metadata';
+export const generateMetadata = localizedMetadata({ title: 'Dự án & Sản phẩm' });
 
 import CategoryPage from '@/features/publications/components/category-page';
 

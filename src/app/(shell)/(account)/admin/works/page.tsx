@@ -1,4 +1,7 @@
-export const metadata = { title: 'Quản lý công trình' };
+import { localizedMetadata } from '@/shared/i18n/metadata';
+
+import { getServerI18n } from '@/shared/i18n/server';
+export const generateMetadata = localizedMetadata({ title: 'Quản lý công trình' });
 
 import { getActor } from '@/features/identity/server/actor';
 import { ManagementFilters } from '@/shared/ui/management-filters';
@@ -8,7 +11,6 @@ import { CardAdminControls } from '@/features/publications/components/card-admin
 import type { BulkPostFilter } from '@/features/publications/model/bulk-posts';
 import { searchBulkPostsAction } from '@/features/publications/server/bulk-actions';
 import { PaginationFooter } from '@/shared/ui/member-pagination';
-import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 
@@ -18,6 +20,8 @@ const filters: { value: BulkPostFilter; label: string }[] = [
 ];
 
 export default async function AdminContentPage({ searchParams }: { searchParams: Promise<{ q?: string; filter?: string; page?: string }> }) {
+  const { t: tr } = await getServerI18n();
+
   if (!await getActor(['ADMIN'])) redirect('/login?callbackUrl=/admin/works');
   const params = await searchParams;
   const query = (params.q ?? '').trim().slice(0, 200);
@@ -28,11 +32,11 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
   if (!result.success) throw new Error(result.error);
   const baseParams = new URLSearchParams({ filter, ...(query ? { q: query } : {}) });
   return <section aria-labelledby="admin-content-title">
-    <div className="mb-4"><h2 id="admin-content-title" className="text-lg font-semibold text-slate-900">Nội dung</h2><p className="mt-1 text-sm text-slate-500">Quản lý ghim và phạm vi hiển thị của công trình đã xuất bản.</p></div>
-    <ManagementFilters action="/admin/works" query={query} searchLabel="Tìm công trình đã xuất bản" placeholder="Tìm theo tiêu đề…" filterName="filter" filterValue={filter} filterLabel="Lọc nội dung" options={filters.map(option => ({ ...option, count: result.counts[option.value] }))} actions={<div className="admin-bulk-actions"><AdminBulkPosts mode="pin" /><AdminBulkPosts mode="visibility" /></div>} />
-    <p className="mb-3 text-sm text-slate-500">{result.total} công trình{query ? ` phù hợp với “${query}”` : ''}</p>
+    <div className="mb-4"><h2 id="admin-content-title" className="text-lg font-semibold text-slate-900">{tr("Nội dung")}</h2><p className="mt-1 text-sm text-slate-500">{tr("Quản lý ghim và phạm vi hiển thị của công trình đã xuất bản.")}</p></div>
+    <ManagementFilters action="/admin/works" query={query} searchLabel={tr("Tìm công trình đã xuất bản")} placeholder={tr("Tìm theo tiêu đề…")} filterName="filter" filterValue={filter} filterLabel={tr("Lọc nội dung")} options={filters.map(option => ({ ...option, count: result.counts[option.value] }))} actions={<div className="admin-bulk-actions"><AdminBulkPosts mode="pin" /><AdminBulkPosts mode="visibility" /></div>} />
+    <p className="mb-3 text-sm text-slate-500">{result.total}{tr(" công trình")}{query ? tr(" phù hợp với “{0}”", query) : ''}</p>
     <div className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
-      {!result.items.length ? <p className="p-6 text-sm text-slate-500">{query ? 'Không tìm thấy công trình phù hợp.' : 'Chưa có công trình trong nhóm này.'}</p> : result.items.map(item => <article key={item.id} className="admin-content-row p-3 sm:p-4 sm:px-5">
+      {!result.items.length ? <p className="p-6 text-sm text-slate-500">{query ? tr("Không tìm thấy công trình phù hợp.") : tr("Chưa có công trình trong nhóm này.")}</p> : result.items.map(item => <article key={item.id} className="admin-content-row p-3 sm:p-4 sm:px-5">
         <div className="admin-content-row__meta flex items-center justify-between gap-2">
           <div className="flex min-w-0 items-center gap-1.5">
             <TypeBadge type={item.type ?? 'PROJECT'} size="sm" variant="outline" />
@@ -42,10 +46,9 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
         </div>
         <Link href={`/works/${item.slug}`} title={item.title} target="_blank" rel="noopener noreferrer" className="admin-content-row__title mt-1 flex min-w-0 items-start justify-between gap-2 text-sm font-semibold leading-5 text-slate-800 hover:underline">
           <span className="min-w-0 break-words">{item.title}</span>
-          <ArrowUpRight aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0" />
         </Link>
       </article>)}
     </div>
-    {result.total > 0 && <PaginationFooter page={result.page} totalPages={result.totalPages} pageSize={10} basePath={`/admin/works?${baseParams}`} ariaLabel="Phân trang nội dung" />}
+    {result.total > 0 && <PaginationFooter page={result.page} totalPages={result.totalPages} pageSize={10} basePath={`/admin/works?${baseParams}`} ariaLabel={tr("Phân trang nội dung")} />}
   </section>;
 }
