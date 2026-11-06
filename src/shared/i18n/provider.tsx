@@ -16,7 +16,10 @@ export function LocaleProvider({ initialLocale, children }: { initialLocale: Loc
   }, []);
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
   const context = useMemo(() => ({ locale, revision, setLocale }), [locale, revision, setLocale]);
-  return <LocaleContext.Provider value={context}>{children}</LocaleContext.Provider>;
+  return <LocaleContext.Provider value={context}>
+    {children}
+    {revision > 0 && <div key={revision} className="locale-sweep" aria-hidden="true" />}
+  </LocaleContext.Provider>;
 }
 
 export function useI18n() {

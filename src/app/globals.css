@@ -1404,6 +1404,22 @@ strong {
 .publication-card-meta__controls { flex-shrink: 0; }
 .publication-card-meta__controls [role='group'] { grid-template-columns: repeat(2, 2.5rem); gap: 0; padding-left: 0; border-left: 0; }
 .publication-card-meta__controls [role='switch'] > span:first-child { display: none; }
+/* A decorative language-change sweep stays outside the page's layout and hit targets. */
+.locale-sweep { display: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .locale-sweep { display: block; position: fixed; inset: 0; z-index: 100; overflow: hidden; pointer-events: none; animation: locale-sweep-lifetime 900ms linear both; }
+  .locale-sweep::before { content: ''; position: absolute; inset: 0; background: linear-gradient(105deg, transparent 20%, rgb(186 230 253 / .12) 40%, rgb(125 211 252 / .28) 50%, rgb(224 242 254 / .18) 60%, transparent 80%); animation: locale-sweep-pass 900ms cubic-bezier(.22, .61, .36, 1) both; }
+}
+@keyframes locale-sweep-pass {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+@keyframes locale-sweep-lifetime {
+  0% { opacity: 0; visibility: visible; }
+  15%, 75% { opacity: 1; visibility: visible; }
+  100% { opacity: 0; visibility: hidden; }
+}
+
 .conference-card-banner { min-width: 0; flex-shrink: 0; container-type: inline-size; border-bottom: 1px solid #c7dced; background: #eaf3fb; color: #153d67; }
 .conference-card-banner__content { display: grid; min-width: 0; gap: .375rem; padding: .5rem .75rem; }
 .conference-card-banner__name { display: -webkit-box; min-width: 0; overflow: hidden; -webkit-line-clamp: 2; -webkit-box-orient: vertical; line-height: 1.25rem; }
