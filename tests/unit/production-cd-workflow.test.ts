@@ -66,14 +66,21 @@ describe('production deployment workflow', () => {
   });
 });
 
-it('runs full CI only on dev pushes and only verifies evidence on main', () => {
-  expect(workflow).toContain('branches: [dev, main]');
-  expect(workflow).not.toContain('pull_request');
+function extractJob(source: string, name: string) {
+  const normalized = source.replace(/\r\n/g, '\n');
+  const section = normalized.split(`\n  ${name}:\n`)[1];
+  if (!section) throw new Error(`Missing workflow job: ${name}`);
+  return section.split(/\n  [a-z][a-z-]+:\n/)[0];
+}
+
+it.each(['LF', 'CRLF'])('runs full CI only on dev pushes and only verifies evidence on main (%s)', ending => {
+  const source = workflow.replace(/\r\n/g, '\n').replace(/\n/g, ending === 'CRLF' ? '\r\n' : '\n');
+  expect(source).toContain('branches: [dev, main]');
+  expect(source).not.toContain('pull_request');
   for (const job of ['check', 'database-and-browser']) {
-    const block = workflow.split(`\n  ${job}:\n`)[1].split(/\n  [a-z][a-z-]+:\n/)[0];
-    expect(block).toContain("if: ${{ github.ref == 'refs/heads/dev' }}");
+    expect(extractJob(source, job)).toContain("if: ${{ github.ref == 'refs/heads/dev' }}");
   }
-  const promotion = workflow.split('\n  verify-promotion:\n')[1].split('\n  deploy:\n')[0];
+  const promotion = extractJob(source, 'verify-promotion');
   expect(promotion).toContain("if: ${{ github.ref == 'refs/heads/main' }}");
   expect(promotion).toContain('node ops/production/promotion.mjs main');
   expect(promotion).not.toMatch(/npm |test:e2e|test:integration/);
