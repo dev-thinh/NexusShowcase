@@ -38,4 +38,10 @@ describe('i18n coverage audit', () => {
     writeFileSync(path.join(root, 'src/page.test.ts'), 't("Test only");');
     expect(auditI18n(root).missingKeys).toEqual([]);
   });
+  it('rejects conflicting translations of the same interface label across dictionaries', () => {
+    const root = fixture({ 'Quản lý': 'Manage' }, 'tr("Quản lý");');
+    writeFileSync(path.join(root, 'src/shared/i18n/messages/other.en.json'), JSON.stringify({ 'Quản lý': 'Management' }));
+    expect(auditI18n(root).translationConflicts).toEqual([expect.objectContaining({ key: 'Quản lý', previousValue: 'Manage', value: 'Management' })]);
+  });
+
 });

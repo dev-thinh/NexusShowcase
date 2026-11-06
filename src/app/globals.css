@@ -872,7 +872,7 @@ strong {
 .moments-editor__remove:hover:not(:disabled) { background: #ffe4e6; }
 .moments-editor__button svg, .moments-editor__icon svg { flex-shrink: 0; }
 .moments-editor__library-actions, .moments-editor__footer-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; width: 18.5rem; max-width: 100%; }
-.moments-editor__library-actions .moments-editor__button, .moments-editor__footer-actions .moments-editor__button { width: 100%; min-width: 0; }
+.moments-editor__library-actions [data-file-picker] > button, .moments-editor__library-actions .moments-editor__button, .moments-editor__footer-actions .moments-editor__button { width: 100%; min-width: 0; }
 .moments-editor__filter > [role='combobox'] { height: 2.5rem; min-height: 2.5rem; padding-block: 0; border-radius: 0.5rem; font-size: 0.75rem; font-weight: 600; }
 @media (min-width: 640px) {
   .moments-editor__filter > [role='combobox'] { font-size: 0.875rem; }
@@ -1538,3 +1538,27 @@ a, button, [role='button'] { user-select: text; }
 .publication-card .publication-card__footer > a,
 .publication-card .publication-card__footer .publication-cite { height: 2rem; min-height: 2rem; padding-block: .25rem; display: inline-flex; align-items: center; justify-content: center; }
 .publication-card .publication-card__footer [data-card-resources] a { height: 2rem; min-height: 2rem; padding-block: .25rem; display: inline-flex; align-items: center; justify-content: center; }
+/* Translated action labels stay inside their assigned toolbar columns. */
+.moments-editor__library-actions [data-file-picker] { width: 100%; }
+.moments-editor__library-actions [data-file-picker] > button { padding-inline: .625rem; }
+.member-permissions-trigger { min-width: 5.5rem; justify-content: space-between; white-space: nowrap; }
+/* Long role/status translations can wrap without squeezing adjacent member controls. */
+.admin-member-role { height: auto; }
+.admin-member-joined { min-width: 0; white-space: normal; }
+.admin-member-joined > .font-semibold { display: block; margin-right: 0; }
+@media (max-width: 639px) {
+  .admin-member-row { grid-template-columns: 2.5rem minmax(0, 1fr) 5.5rem; }
+}
+
+/* Action labels never wrap; toolbars wrap whole controls instead. */
+:where(button, [role='button'], .action-primary-detail, .action-secondary-detail, .action-secondary-card, .action-toggle-detail):not(:has(img, [role='img'])) { white-space: nowrap; }
+:is(.action-primary-detail, .action-secondary-detail, .action-secondary-card, .action-toggle-detail) { flex-shrink: 0; }
+.admin-navigation a { white-space: nowrap; text-wrap: nowrap; }
+@media (max-width: 374px) {
+  .admin-navigation { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+nav a.inline-flex { white-space: nowrap; }
+
+/* Translated labels must never squeeze an action icon out of view. */
+:is(.action-primary-detail, .action-secondary-detail, .action-secondary-card, .action-toggle-detail) > svg { flex-shrink: 0; }

@@ -19,7 +19,7 @@ export function FilePicker({ label = 'Chọn tệp', busy = false, showFileName 
   const input = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
   const fileName = selectedFiles.length > 1 ? tr('{0} tệp đã chọn', selectedFiles.length) : selectedFiles[0] ?? '';
-  return <div className={`flex min-w-0 flex-wrap items-center gap-2 ${className}`} data-file-picker="true">
+  return <div className={`flex min-w-0 max-w-full flex-wrap items-center gap-2 ${className}`} data-file-picker="true">
     <input {...props} id={id ?? generatedId} ref={input} type="file" className="hidden" aria-hidden="true" tabIndex={-1} disabled={disabled || busy} onChange={event => {
       const files = Array.from(event.currentTarget.files ?? []);
       if (!files.length) return;
@@ -27,8 +27,8 @@ export function FilePicker({ label = 'Chọn tệp', busy = false, showFileName 
       onChange?.(event);
       event.currentTarget.value = '';
     }} />
-    <button type="button" disabled={disabled || busy} aria-controls={id ?? generatedId} aria-describedby={props['aria-describedby']} aria-invalid={props['aria-invalid']} onClick={() => input.current?.click()} className={buttonClassName ?? 'action-secondary-detail min-h-10 shrink-0 disabled:cursor-not-allowed disabled:opacity-50'}>
-      {busy ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <Upload aria-hidden="true" className="h-4 w-4" />}{busy ? tr("Đang tải…") : tr(label)}
+    <button type="button" disabled={disabled || busy} aria-controls={id ?? generatedId} aria-describedby={props['aria-describedby']} aria-invalid={props['aria-invalid']} onClick={() => input.current?.click()} className={`min-w-0 max-w-full whitespace-nowrap [&>svg]:shrink-0 ${buttonClassName ?? 'action-secondary-detail min-h-10 disabled:cursor-not-allowed disabled:opacity-50'}`}>
+      {busy ? <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" /> : <Upload aria-hidden="true" className="h-4 w-4" />}<span className="min-w-0 whitespace-nowrap">{busy ? tr("Đang tải…") : tr(label)}</span>
     </button>
     {showFileName && fileName && <span className="min-w-0 max-w-full truncate text-sm text-slate-500" title={fileName} role="status">{fileName}</span>}
   </div>;

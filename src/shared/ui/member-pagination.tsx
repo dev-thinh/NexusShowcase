@@ -7,10 +7,10 @@ import { PaginationNavigation } from '@/shared/ui/pagination-navigation';
 import { PaginationJump } from '@/shared/ui/pagination-jump';
 import { NavigationLink as Link } from '@/shared/navigation/navigation-link';
 
-const baseControlClass =
+export const paginationControlClass =
   'h-11 min-w-11 px-3 sm:h-9 sm:min-w-9 rounded-lg inline-flex items-center justify-center text-sm font-semibold border transition-colors';
-const inactivePageClass = `${baseControlClass} bg-white text-[#1F2937] border-slate-200 hover:bg-[#FFFFFF] hover:border-slate-200`;
-const disabledClass = `${baseControlClass} bg-[#FFFFFF] text-[#1F2937] border-slate-200 cursor-not-allowed`;
+const inactivePageClass = `${paginationControlClass} bg-white text-[#1F2937] border-slate-200 hover:bg-[#FFFFFF] hover:border-slate-200`;
+const disabledClass = `${paginationControlClass} bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed`;
 
 export function MemberPagination({
   page,
