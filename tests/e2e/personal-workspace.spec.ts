@@ -51,10 +51,15 @@ test('admin member directory has ten rows per page and retains filters in pagina
 });
 
 
-test('public members shows all members without pagination',async({page,fixture})=>{
- await page.goto('/members?page=99&corePage=99&adminPage=99');
- await expect(page.getByRole('navigation',{name:'Phân trang thành viên'})).toHaveCount(0);
- const wall=page.locator('main .home-member-grid');
- await expect(wall).toHaveCount(3);
- await expect(page.locator('main .home-member-grid a')).toHaveCount(fixture.users.length);
+test('public members starts bounded and ignores stale page parameters', async ({ page, fixture }) => {
+  await page.goto('/members?page=99&corePage=99&adminPage=99');
+  await expect(page.getByRole('navigation', { name: 'Phân trang thành viên' })).toHaveCount(0);
+  await expect(page.locator('main .home-member-grid')).toHaveCount(3);
+  const leadership = fixture.users.filter(user => user.role === 'ADMIN' || user.role === 'CORE_MEMBER');
+  await expect(page.locator('main .home-member-grid a')).toHaveCount(leadership.length + 12);
+  const members = page.locator('[data-member-directory="MEMBER"]');
+  await expect(members.locator('[data-home-member-avatar]')).toHaveCount(12);
+  await members.locator('[data-member-load-more]').click();
+  await expect.poll(() => members.locator('[data-home-member-avatar]').count()).toBeGreaterThanOrEqual(24);
+  expect(await page.locator('main .home-member-grid a').count()).toBeLessThan(fixture.users.length);
 });

@@ -61,11 +61,27 @@ test('touch phones scroll the photo wall manually and can open photos', async ({
     await expect(lane).toHaveCSS('overflow-x', 'auto');
     await lane.evaluate(element => { element.scrollLeft = 100; });
     await expect.poll(() => lane.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
-    await lane.evaluate(element => { element.scrollLeft = 0; });
-    await wall.locator('.moment-photo').first().tap();
+    // Circular lanes display a repeated group; tap the visible photo rather
+    // than scrolling Playwright to an original copy outside the active period.
+    const target = await lane.evaluate(element => {
+      const lane = element.getBoundingClientRect();
+      for (const button of element.querySelectorAll<HTMLButtonElement>('.moment-photo')) {
+        const box = button.getBoundingClientRect();
+        const left = Math.max(0, lane.left, box.left), right = Math.min(innerWidth, lane.right, box.right);
+        const top = Math.max(0, lane.top, box.top), bottom = Math.min(innerHeight, lane.bottom, box.bottom);
+        if (right - left < 40 || bottom - top < 40) continue;
+        const x = (left + right) / 2, y = (top + bottom) / 2;
+        if (document.elementFromPoint(x, y)?.closest('.moment-photo') === button) return { x, y };
+      }
+      return null;
+    });
+    expect(target).not.toBeNull();
+    await page.touchscreen.tap(target!.x, target!.y);
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('button', { name: 'Đóng hộp thoại' }).tap();
     await expect(track).toHaveCSS('animation-name', 'none');
+    const resumed = await lane.evaluate(element => element.scrollLeft);
+    await expect.poll(() => lane.evaluate((element, initial) => Math.abs(element.scrollLeft - initial), resumed)).toBeGreaterThan(5);
   } finally { await context.close(); }
 });
 
