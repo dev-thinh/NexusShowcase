@@ -1,3 +1,4 @@
+import { normalizePaperUrl } from '@/features/publications/model/doi';
 import { conferenceSchema } from '@/features/publications/model/conference';
 import { isGithubUrl } from '@/shared/lib/github-url';
 import { articleSubmissionIssues, hasDetailedContent, articleContentIssues, draftArticleIssues } from '@/features/submissions/model/article';
@@ -74,7 +75,7 @@ export const showcaseDraftInputSchema = z.object({
   customProjectType: draftText(100).default(''),
   conference: z.object({
     name: draftText(240), status: z.enum(['ACCEPTED', 'PUBLISHED']).default('ACCEPTED'),
-    paperUrl: draftUrl.nullish(), publicationDate: draftDate, eventDate: draftDate, acceptedDate: draftDate,
+    paperUrl: z.string().transform(normalizePaperUrl).pipe(draftUrl).nullish(), publicationDate: draftDate, eventDate: draftDate, acceptedDate: draftDate,
     rankings: z.array(z.object({ system: draftText(80), rank: draftText(40) }).strict()).max(8).default([]),
   }).strict().nullish(),
   contributors: z.array(contributorInputSchema.extend({

@@ -22,8 +22,8 @@ describe('Academic Citation Generator', () => {
     const bib = generateBibTeX(samplePaper);
     expect(bib).toContain('@inproceedings{nguyen2026vimedseg,');
     expect(bib).toContain('title = {{ViMed-Seg: Deep Learning for Medical Image Segmentation}},');
-    expect(bib).toContain('author = {Nguyễn Hoàng Long and Trần Minh Triết},');
-    expect(bib).toContain('year = {2026},');
+    expect(bib).toContain('author = {Nguyễn, Hoàng Long and Trần, Minh Triết},');
+    expect(bib).toContain('year = {2026}');
     expect(bib).toContain('booktitle = {IEEE International Conference on Research 2026},');
   });
 
@@ -43,6 +43,8 @@ describe('Academic Citation Generator', () => {
 
 it('cites the published paper URL and venue instead of the showcase URL', () => {
   const paper = { title: 'Research', slug: 'research', contributors: [], conference: { name: 'Journal of Robotics', status: 'PUBLISHED', publicationDate: '2025-01-01', rankings: [], paperUrl: 'https://doi.org/10.1234/paper' } };
-  expect(generateBibTeX(paper)).toContain('url = {https://doi.org/10.1234/paper}');
-  expect(generateAPA(paper)).toContain('(2025). Research. Journal of Robotics. https://doi.org/10.1234/paper');
+  expect(generateBibTeX(paper)).toContain('doi = {10.1234/paper}');
+  expect(generateBibTeX(paper)).not.toContain('organization =');
+  expect(generateBibTeX(paper)).not.toContain('url =');
+  expect(generateAPA(paper)).toContain('Research. (2025). Journal of Robotics. https://doi.org/10.1234/paper');
 });
