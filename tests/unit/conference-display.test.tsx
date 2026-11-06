@@ -45,3 +45,16 @@ it('does not render absent metadata and supports a milestone whose date is not y
   expect(accepted).toContain('Đã chấp nhận');
   expect(accepted).not.toContain('<time');
 });
+
+it.each(['ACCEPTED', 'PUBLISHED'])('hides the %s milestone label when its date is missing', status => {
+  const card = renderToStaticMarkup(<ConferenceCardBanner value={{ ...conference, status, acceptedDate: null, publicationDate: null }} />);
+  expect(card).toContain('08/03/2027');
+  expect(card).not.toContain('Đã chấp nhận');
+  expect(card).not.toContain('Đã công bố');
+});
+it('omits the dates row when no dates are available', () => {
+  const card = renderToStaticMarkup(<ConferenceCardBanner value={{ name: 'Name only', status: 'PUBLISHED' }} />);
+  expect(card).toContain('Name only');
+  expect(card).not.toContain('conference-card-banner__dates');
+  expect(card).not.toContain('Đã công bố');
+});
