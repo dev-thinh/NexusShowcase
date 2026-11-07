@@ -112,7 +112,6 @@
   "Ví dụ: Mã nguồn GitHub": "Example: GitHub source code",
   "Mô tả ngắn nội dung minh họa…": "Briefly describe the illustration…",
   "Nội dung chi tiết": "Detailed content",
-  "Thêm section và chèn nội dung theo thứ tự bạn muốn. Dự án có thể chỉ cần abstract.": "Add sections and insert content in your preferred order. Projects may only need an abstract.",
   "Tên section {0}": "Section {0} name",
   "Đặt tên section…": "Name this section…",
   "Đưa section {0} lên": "Move section {0} up",
@@ -154,7 +153,7 @@
   "Tiêu đề công trình": "Work title",
   "Thông tin công trình": "Work information",
   "Tác giả và người đóng góp": "Authors and contributors",
-  "Thêm người tham gia và xác nhận vai trò của từng người. Người đăng không bắt buộc phải là tác giả; chỉ giữ những người thực sự đóng góp.": "Add participants and confirm each person's role. The submitter does not have to be an author; include only those who contributed.",
+  "Thêm người tham gia và xác nhận vai trò của từng người.": "Add participants and confirm each person's role. The submitter does not have to be an author; include only those who contributed.",
   "Tài nguyên đính kèm": "Attached resources",
   "Thử gửi lại": "Try submitting again",
   "Gửi bài duyệt": "Submit for review",
@@ -195,7 +194,6 @@
   "{0} không hợp lệ.": "{0} is invalid.",
   "Mỗi section cần có tiêu đề.": "Each section needs a title.",
   "tóm tắt": "abstract",
-  "Abstract / Tóm tắt đã là phần cố định, không cần thêm section trùng.": "The abstract is already a fixed section. Do not add a duplicate section.",
   "Section “{0}” chưa có nội dung.": "Section “{0}” has no content.",
   "chưa đặt tên": "untitled",
   "Hãy bổ sung hoặc xóa khối văn bản trống.": "Please fill in or remove the empty text block.",
@@ -208,7 +206,6 @@
   "Chỉ chấp nhận liên kết HTTP(S) hoặc tệp đã tải lên.": "Only HTTP(S) links or uploaded files are accepted.",
   "Vui lòng nhập link bài báo đã công bố.": "Please enter the published paper's link.",
   "Bài nghiên cứu cần nội dung chi tiết hoặc PDF/liên kết toàn văn.": "Research papers require detailed content or a full-text PDF/link.",
-  "Vui lòng nhập abstract / tóm tắt.": "Please enter an abstract.",
   "Vui lòng thêm ít nhất một người đóng góp.": "Please add at least one contributor.",
   "Người đóng góp": "Contributor",
   "Vui lòng kiểm tra lại thông tin bài viết.": "Please check the article details.",
@@ -240,5 +237,8 @@
   "{0} AND {1} AND regexp_replace(translate(normalize(lower(title || ' ' || summary), NFD), 'đ', 'd'), {2}, '', 'g') LIKE {3}": "{0} AND {1} AND regexp_replace(translate(normalize(lower(title || ' ' || summary), NFD), 'đ', 'd'), {2}, '', 'g') LIKE {3}",
   "JPG, PNG, WebP · Tối đa 5 MB · Nên dùng ảnh 4:3 (1200 × 900 px)": "JPG, PNG, WebP · Up to 5 MB · Recommended: 4:3 (1200 × 900 px)",
   "DOI / Link bài báo ": "DOI / Paper URL ",
-  "10.1234/article.567 hoặc https://...": "10.1234/article.567 or https://..."
+  "10.1234/article.567 hoặc https://...": "10.1234/article.567 or https://...",
+  "Vui lòng nhập tóm tắt.": "Please enter an abstract.",
+  "Tóm tắt đã là phần cố định, không cần thêm section trùng.": "The abstract is already a fixed section. Do not add a duplicate section.",
+  "Thêm section và chèn nội dung theo thứ tự bạn muốn. Dự án có thể chỉ cần tóm tắt.": "Add sections and insert content in your preferred order. Projects may only need an abstract."
 }

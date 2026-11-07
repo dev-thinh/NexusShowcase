@@ -2,8 +2,8 @@
 
 import { getActor } from './actor';
 import { invalidateIdentityChange } from './invalidation';
-import { previewBulkMembers, createBulkMembers, grantBulkMembers } from './bulk-member-commands';
-import { searchGrantMembers } from './bulk-member-queries';
+import { previewBulkMembers, createBulkMembers, grantBulkMembers, revokeBulkMembers } from './bulk-member-commands';
+import { searchGrantMembers, searchRevokeMembers } from './bulk-member-queries';
 import { memberGrantSearchSchema } from '../model/bulk-members';
 import { commandFailure } from '@/server/db/command-error';
 
@@ -32,6 +32,22 @@ export async function grantBulkMembersAction(input: unknown) {
   const actor = await getActor(['ADMIN']);
   if (!actor) return unauthorized();
   const result = await grantBulkMembers(actor, input);
+  if (result.success) invalidateIdentityChange(result.data.ids);
+  return result;
+}
+
+export async function searchRevokeMembersAction(input: unknown) {
+  const actor = await getActor(['ADMIN']);
+  if (!actor) return unauthorized();
+  const parsed = memberGrantSearchSchema.safeParse(input);
+  if (!parsed.success) return { success: false as const, code: 'VALIDATION' as const, error: 'Điều kiện tìm kiếm không hợp lệ.' };
+  try { return { success: true as const, data: await searchRevokeMembers(parsed.data) }; }
+  catch (error) { return commandFailure('member.bulk-revoke-search', error, { actorId: actor.id }); }
+}
+export async function revokeBulkMembersAction(input: unknown) {
+  const actor = await getActor(['ADMIN']);
+  if (!actor) return unauthorized();
+  const result = await revokeBulkMembers(actor, input);
   if (result.success) invalidateIdentityChange(result.data.ids);
   return result;
 }

@@ -9,18 +9,18 @@ const sha = 'a'.repeat(40);
 function evidence() {
   return {
     id: 123, event: 'push', head_branch: 'main', head_sha: sha,
-    path: '.github/workflows/ci.yml', conclusion: null,
+    path: '.github/workflows/ci.yml', status: 'in_progress', conclusion: null,
     repository: { full_name: 'dev-thinh/NexusShowcase' },
     head_repository: { full_name: 'dev-thinh/NexusShowcase' },
   };
 }
-const jobs = ['check (ubuntu-latest)', 'check (windows-latest)', 'database-and-browser'].map(name => ({ name, status: 'completed', conclusion: 'success' }));
-it('requires successful CI jobs for the exact main push while CD is still in progress', () => {
+const jobs = ['verify-promotion'].map(name => ({ name, status: 'completed', conclusion: 'success' }));
+it('requires successful promotion verification for the exact main push while CD is still in progress', () => {
   expect(() => validateCiEvidence(evidence(), jobs, sha, '123')).not.toThrow();
 });
 it.each([
   { event: 'pull_request' }, { head_branch: 'dev' }, { head_sha: 'b'.repeat(40) },
-  { path: '.github/workflows/untrusted.yml' }, { id: 456 }, { conclusion: 'cancelled' },
+  { path: '.github/workflows/untrusted.yml' }, { id: 456 }, { conclusion: 'cancelled' }, { conclusion: 'failure' },
   { repository: { full_name: 'other/project' } }, { head_repository: { full_name: 'fork/project' } },
 ])('rejects mismatched or cancelled CI evidence: %j', change => {
   expect(() => validateCiEvidence({ ...evidence(), ...change }, jobs, sha, '123')).toThrow();

@@ -53,7 +53,7 @@ export async function createBulkMembers(actor: Actor, input: unknown): Promise<A
   return { success: true, data: results };
 }
 
-export async function grantBulkMembers(actor: Actor, input: unknown): Promise<ActionResult<{ ids: string[] }>> {
+async function setBulkPublishingAccess(actor: Actor, input: unknown, grant: boolean): Promise<ActionResult<{ ids: string[] }>> {
   const parsed = memberGrantSchema.safeParse(input);
   if (!parsed.success) return { success: false, code: 'VALIDATION', error: 'Chọn từ 1 đến 50 thành viên, không trùng nhau.' };
   if (actor.role !== 'ADMIN' || actor.mustChangePassword) return forbidden();
@@ -62,14 +62,17 @@ export async function grantBulkMembers(actor: Actor, input: unknown): Promise<Ac
       const admin = await tx.user.findUnique({ where: { id: actor.id }, select: { role: true, status: true, deletedAt: true, mustChangePassword: true } });
       if (!admin || admin.role !== 'ADMIN' || admin.status !== 'ACTIVE' || admin.deletedAt || admin.mustChangePassword) return forbidden();
       const members = parsed.data.members;
-      const eligible = { role: 'MEMBER' as const, status: 'ACTIVE' as const, deletedAt: null, hiddenFromDirectory: false };
+      const eligible = { role: grant ? 'MEMBER' as const : 'CORE_MEMBER' as const, status: 'ACTIVE' as const, deletedAt: null, hiddenFromDirectory: false };
       const current = await tx.user.findMany({ where: { ...eligible, id: { in: members.map(member => member.id) } }, select: { id: true, sessionVersion: true } });
       if (current.length !== members.length || members.some(member => !current.some(user => user.id === member.id && user.sessionVersion === member.expectedVersion))) {
-        return { success: false, code: 'CONFLICT', error: 'Có tài khoản đã thay đổi hoặc không còn đủ điều kiện. Chưa cấp quyền cho ai; hãy tải lại danh sách và chọn lại.' } as const;
+        return { success: false, code: 'CONFLICT', error: grant ? 'Có tài khoản đã thay đổi hoặc không còn đủ điều kiện. Chưa cấp quyền cho ai; hãy tải lại danh sách và chọn lại.' : 'Có tài khoản đã thay đổi hoặc không còn đủ điều kiện. Chưa thu hồi quyền của ai; hãy tải lại danh sách và chọn lại.' } as const;
       }
-      const changed = await tx.user.updateMany({ where: { ...eligible, OR: members.map(member => ({ id: member.id, sessionVersion: member.expectedVersion })) }, data: { role: 'CORE_MEMBER', sessionVersion: { increment: 1 } } });
+      const changed = await tx.user.updateMany({ where: { ...eligible, OR: members.map(member => ({ id: member.id, sessionVersion: member.expectedVersion })) }, data: { role: grant ? 'CORE_MEMBER' : 'MEMBER', sessionVersion: { increment: 1 } } });
       if (changed.count !== members.length) throw new StateConflict();
       return { success: true, data: { ids: members.map(member => member.id) } } as const;
     }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable });
-  } catch (error) { return commandFailure('member.bulk-grant', error, { actorId: actor.id }); }
+  } catch (error) { return commandFailure(grant ? 'member.bulk-grant' : 'member.bulk-revoke', error, { actorId: actor.id }); }
 }
+
+export async function grantBulkMembers(actor: Actor, input: unknown) { return setBulkPublishingAccess(actor, input, true); }
+export async function revokeBulkMembers(actor: Actor, input: unknown) { return setBulkPublishingAccess(actor, input, false); }

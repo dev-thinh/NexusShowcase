@@ -2,6 +2,7 @@
 import { useI18n } from '@/shared/i18n/provider';
 
 
+import { useMomentsLoop } from '@/features/publications/components/use-moments-loop';
 import { ErrorNotice } from '@/shared/ui/error-notice';
 
 import { HomeText } from '@/features/publications/components/home-content-provider';
@@ -12,7 +13,7 @@ import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { createPortal } from 'react-dom';
 import { Modal } from '@/shared/ui/modal';
 import { MomentPhotoViewer, prefetchMomentPhoto, type MomentPhotoOrigin } from './moment-photo-viewer';
-import { defaultMoments, momentRows, momentsSaveSchema, type MomentsPayload, type MomentsGallery } from '@/features/publications/model/moments';
+import { defaultMoments, momentRows, momentPhotoPose, momentsSaveSchema, type MomentsPayload, type MomentsGallery } from '@/features/publications/model/moments';
 import { MomentsEditor } from '@/features/publications/components/moments-editor';
 import { notifySuccess } from '@/shared/dialogs/success';
 
@@ -52,6 +53,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
   const [paused, setPaused] = useState(false);
   const [keyboardBrowsing, setKeyboardBrowsing] = useState(false);
   const [selected, setSelected] = useState<number | null>(null);
+  useMomentsLoop(wallRef, paused || selected !== null || editing, keyboardBrowsing, gallery.version);
   const current = selected === null ? null : photos[selected];
   const [viewerOrigin, setViewerOrigin] = useState<MomentPhotoOrigin | null>(null);
 
@@ -136,14 +138,15 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
         {rows.map((row, laneIndex) => row.length > 0 && (
           <div className={`moments-lane${row.length < 3 ? ' moments-lane--static' : ''}`} key={laneIndex} data-row={laneIndex} data-motion={row.length >= 3 ? 'true' : 'false'} data-photo-count={row.length}>
             <div className={`moments-track${laneIndex === 1 ? ' moments-track--reverse' : ''}`}>
-              {(row.length >= 3 ? [false, true] : [false]).map(copy => (
-                <div className="moments-group" aria-hidden={copy || undefined} key={String(copy)}>
+              {(row.length >= 3 ? [0, 1, 2] : [0]).map(copy => (
+                <div className="moments-group" aria-hidden={copy > 0 || undefined} key={String(copy)}>
                   {row.map((photo, index) => {
+                    const pose = momentPhotoPose(photo, index);
                     const photoIndex = photos.findIndex(item => item.id === photo.id);
                     return (
-                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': photo.tilt, '--photo-offset': index % 2 ? '0.75rem' : '-0.5rem' } as CSSProperties} tabIndex={copy ? -1 : undefined} data-photo-id={photo.id} aria-label={tr("Xem ảnh: {0}", photo.title)} onPointerEnter={() => prefetchMomentPhoto(photo.src)} onFocus={() => prefetchMomentPhoto(photo.src)} onClick={event => openViewer(photoIndex, event.currentTarget)}>
+                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': pose.tilt, '--photo-offset': pose.offset } as CSSProperties} tabIndex={copy ? -1 : undefined} data-photo-id={photo.id} aria-label={tr("Xem ảnh: {0}", photo.title)} onPointerEnter={() => prefetchMomentPhoto(photo.src)} onFocus={() => prefetchMomentPhoto(photo.src)} onClick={event => openViewer(photoIndex, event.currentTarget)}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <MediaImage optimized src={photo.src} alt={copy ? '' : photo.alt} width={1000} height={750} sizes="(max-width: 767px) 240px, 304px" loading="eager" decoding="async" />
+                        <MediaImage optimized src={photo.src} alt={copy ? '' : photo.alt} width={1000} height={750} sizes="(max-width: 767px) 264px, 336px" loading={copy ? 'lazy' : 'eager'} decoding="async" />
                         <span className="moment-photo__caption"><span>{photo.title}</span><Expand size={16} aria-hidden="true" /></span>
                       </button>
                     );

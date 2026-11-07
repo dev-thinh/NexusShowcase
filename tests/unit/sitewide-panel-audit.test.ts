@@ -14,7 +14,8 @@ describe('sitewide public panel audit', () => {
 
   it('member directory reuses the compact homepage avatar wall', () => {
     const members = source('src/app/(shell)/(site)/members/page.tsx');
-    expect(members).toContain('<HomeMemberWall');
+    expect(members).toContain('<MemberDirectoryList');
+    expect(source('src/features/members/components/member-directory-list.tsx')).toContain('<HomeMemberWall');
     expect(members).not.toContain('<MemberCard');
   });
 

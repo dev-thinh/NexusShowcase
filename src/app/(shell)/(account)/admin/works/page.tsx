@@ -5,6 +5,7 @@ export const generateMetadata = localizedMetadata({ title: 'Quản lý công tr�
 
 import { getActor } from '@/features/identity/server/actor';
 import { ManagementFilters } from '@/shared/ui/management-filters';
+import { AdminDeletePost } from '@/features/publications/components/admin-delete-post';
 import { AdminBulkPosts } from '@/features/publications/components/admin-bulk-posts';
 import { TypeBadge } from '@/features/publications/components/badges';
 import { CardAdminControls } from '@/features/publications/components/card-admin-controls';
@@ -42,7 +43,7 @@ export default async function AdminContentPage({ searchParams }: { searchParams:
             <TypeBadge type={item.type ?? 'PROJECT'} size="sm" variant="outline" />
             {item.publishedYear && <span className="text-xs tabular-nums text-slate-500">{item.publishedYear}</span>}
           </div>
-          <CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} />
+          <div className="flex items-center gap-2"><CardAdminControls itemId={item.id} itemTitle={item.title} initialIsPinned={item.isPinned} initialVisibility={item.visibility} /><AdminDeletePost itemId={item.id} title={item.title} expectedVersion={item.reviewVersion ?? 0} /></div>
         </div>
         <Link href={`/works/${item.slug}`} title={item.title} target="_blank" rel="noopener noreferrer" className="admin-content-row__title mt-1 flex min-w-0 items-start justify-between gap-2 text-sm font-semibold leading-5 text-slate-800 hover:underline">
           <span className="min-w-0 break-words">{item.title}</span>

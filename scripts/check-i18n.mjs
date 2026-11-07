@@ -27,12 +27,18 @@ function walkFiles(directory) {
 export function auditI18n(root = process.cwd()) {
   const dictionaryDirectory = path.join(root, 'src/shared/i18n/messages');
   const keys = new Set();
+  const translations = new Map();
+  const translationConflicts = [];
   const placeholderMismatches = [];
   for (const filename of fs.readdirSync(dictionaryDirectory).filter(name => name.endsWith('.en.json')).sort()) {
     const file = path.join(dictionaryDirectory, filename);
     const dictionary = JSON.parse(fs.readFileSync(file, 'utf8'));
     for (const [key, value] of Object.entries(dictionary)) {
-      keys.add(normalize(key));
+      const normalizedKey = normalize(key);
+      keys.add(normalizedKey);
+      const previous = translations.get(normalizedKey);
+      if (previous && previous.value !== value) translationConflicts.push({ key: normalizedKey, file: path.relative(root, file), previousFile: previous.file, previousValue: previous.value, value });
+      translations.set(normalizedKey, { file: path.relative(root, file), value });
       if (typeof value !== 'string' || JSON.stringify(placeholders(key)) !== JSON.stringify(placeholders(value))) {
         placeholderMismatches.push({ file: path.relative(root, file), key, value });
       }
@@ -57,13 +63,14 @@ export function auditI18n(root = process.cwd()) {
     }
     visit(source);
   }
-  return { missingKeys, placeholderMismatches, filesScanned: files.length, dictionaryKeys: keys.size };
+  return { missingKeys, placeholderMismatches, translationConflicts, filesScanned: files.length, dictionaryKeys: keys.size };
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   const result = auditI18n();
   for (const item of result.missingKeys) console.error(`${item.file}:${item.line}: missing translation ${JSON.stringify(item.key)}`);
   for (const item of result.placeholderMismatches) console.error(`${item.file}: placeholder mismatch for ${JSON.stringify(item.key)}`);
-  console.log(`i18n: ${result.dictionaryKeys} keys, ${result.filesScanned} source files; ${result.missingKeys.length} missing keys, ${result.placeholderMismatches.length} placeholder mismatches.`);
-  if (process.argv.includes('--check') && (result.missingKeys.length || result.placeholderMismatches.length)) process.exitCode = 1;
+  for (const item of result.translationConflicts) console.error(`${item.file}: conflicting translation for ${JSON.stringify(item.key)} (also in ${item.previousFile})`);
+  console.log(`i18n: ${result.dictionaryKeys} keys, ${result.filesScanned} source files; ${result.missingKeys.length} missing keys, ${result.placeholderMismatches.length} placeholder mismatches, ${result.translationConflicts.length} translation conflicts.`);
+  if (process.argv.includes('--check') && (result.missingKeys.length || result.placeholderMismatches.length || result.translationConflicts.length)) process.exitCode = 1;
 }

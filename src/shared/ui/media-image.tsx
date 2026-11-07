@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type ImgHTMLAttributes, type ReactNode } f
 
 type MediaImageProps = Omit<ImgHTMLAttributes<HTMLImageElement>, 'src'> & { src?: string | null; optimized?: boolean; fallback?: ReactNode; showPlaceholderLabel?: boolean };
 
-export function MediaImage({ src, alt = '', className = '', style, width, height, onError, optimized = false, fallback, showPlaceholderLabel = true, ...props }: MediaImageProps) {
+export function MediaImage({ src, alt = '', className = '', style, width, height, onError, optimized, fallback, showPlaceholderLabel = true, ...props }: MediaImageProps) {
   const { t: tr } = useI18n();
 
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
@@ -22,7 +22,8 @@ export function MediaImage({ src, alt = '', className = '', style, width, height
       {showPlaceholderLabel && <span aria-hidden="true" className="max-w-full text-center text-xs leading-tight">{tr("Chưa có ảnh")}</span>}
     </span>;
   }
-  if (optimized && typeof width === 'number' && typeof height === 'number') {
+  const useThumbnail = optimized ?? src.startsWith('/uploads/thumbnails/');
+  if (useThumbnail && typeof width === 'number' && typeof height === 'number') {
     // Same-origin derivatives carry the reader's cookies, unlike /_next/image.
     const widths = [96, 128, 256, 384, 640, 1080];
     const thumbnail = (size: number) => `${src}${src.includes('?') ? '&' : '?'}w=${size}`;

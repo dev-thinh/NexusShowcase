@@ -1,126 +1,47 @@
 'use client';
 
 import { useI18n } from '@/shared/i18n/provider';
-import { deleteMemberAction } from '@/features/identity/server/member-actions';
-import { getMemberRoleLabel } from '@/features/identity/model/member-role';
-import { Role } from '@prisma/client';
-import { Loader2, Trash2 } from 'lucide-react';
+import { deleteMemberAction } from '../server/member-actions';
+import { manageMemberAccountsAction } from '../server/member-lifecycle-actions';
+import type { Role } from '@prisma/client';
+import { Loader2, Trash2, UserX } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Modal } from '@/shared/ui/modal';
 import { notifySuccess } from '@/shared/dialogs/success';
 
-interface AdminDeleteMemberModalProps {
-  member: {
-    id: string;
-    fullName: string;
-    email?: string;
-    role: Role;
-    studentId?: string | null;
-  };
-}
-
-export function AdminDeleteMemberModal({ member }: AdminDeleteMemberModalProps) {
+export function AdminDeleteMemberModal({ member, permanent = false }: { permanent?: boolean; member: { id: string; fullName: string; role: Role; sessionVersion?: number } }) {
   const { t: tr } = useI18n();
-
   const router = useRouter();
-  const [isOpen, setIsOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  if (member.role === 'ADMIN') {
-    return null;
-  }
-
-  const handleDelete = async () => {
-    setLoading(true);
-    setError(null);
-
-    const res = await deleteMemberAction(member.id);
-    if (!res.success) {
-      setError(res.error || 'Có lỗi xảy ra khi xóa tài khoản.');
-      setLoading(false);
-      return;
-    }
-
-    setLoading(false);
-    setIsOpen(false);
-    router.refresh();
-    await notifySuccess("Đã xóa tài khoản của {0}.", member.fullName);
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const locked = useRef(false);
+  const [confirmation, setConfirmation] = useState('');
+  const [error, setError] = useState('');
+  if (member.role === 'ADMIN') return null;
+  const apply = async () => {
+    if (locked.current || permanent && (confirmation !== 'DELETE' || !member.sessionVersion)) return;
+    locked.current = true; setBusy(true); setError('');
+    try {
+      const result = permanent
+        ? await manageMemberAccountsAction({ operation: 'DELETE', members: [{ id: member.id, expectedVersion: member.sessionVersion }] })
+        : await deleteMemberAction(member.id);
+      if (!result.success) { setError(result.error); return; }
+      setOpen(false); router.refresh();
+      await notifySuccess(permanent ? 'Đã xóa vĩnh viễn tài khoản của {0}.' : 'Đã vô hiệu hóa tài khoản của {0}.', member.fullName);
+    } catch { setError('Không kết nối được. Vui lòng thử lại.'); }
+    finally { locked.current = false; setBusy(false); }
   };
-
-  return (
-    <>
-      <button
-        onClick={() => {
-          setError(null);
-          setIsOpen(true);
-        }}
-        className="inline-flex items-center justify-center gap-1 min-h-11 min-w-11 px-2.5 sm:min-h-9 sm:min-w-0 py-1.5 rounded-md text-xs font-semibold text-[#1F2937] hover:text-[#1F2937] hover:bg-[#FFFFFF] border border-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] transition-colors cursor-pointer"
-        title={tr("Xóa tài khoản thành viên")}
-        aria-label={tr("Xóa tài khoản {0}", member.fullName)}
-      >
-        <Trash2 className="w-3.5 h-3.5" />
-        <span className="hidden sm:inline">{tr("Xóa")}</span>
-      </button>
-
-      <Modal
-        isOpen={isOpen}
-        closeDisabled={loading}
-        onClose={() => { if (!loading) setIsOpen(false); }}
-        title={tr("Xác nhận xóa tài khoản")}
-        description={tr("Bạn có chắc chắn muốn xóa tài khoản này khỏi hệ thống?")}
-        className="!max-w-md"
-      >
-            {/* Member Details Box */}
-            <div className="bg-[#FFFFFF] border border-slate-200 rounded-md p-3 mb-3 text-xs space-y-1.5">
-              <div className="flex justify-between">
-                <span className="text-[#1F2937]">{tr("Họ và tên:")}</span>
-                <span className="font-semibold text-[#1F2937]">{member.fullName}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-[#1F2937]">Email:</span>
-                <span className="text-[#1F2937]">{member.email}</span>
-              </div>
-              {member.studentId && (
-                <div className="flex justify-between">
-                  <span className="text-[#1F2937]">{tr("MSSV")}:</span>
-                  <span className="font-semibold text-[#1F2937]">{member.studentId}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-[#1F2937]">{tr("Vai trò:")}</span>
-                <span className="font-semibold text-[#1F2937]">{tr(getMemberRoleLabel(member.role))}</span>
-              </div>
-            </div>
-
-            <div className="p-3 bg-[#FFFFFF] border border-slate-200 rounded-md text-[11px] text-[#1F2937] mb-4 leading-relaxed">
-              <strong>{tr("Lưu ý:")}</strong>{tr(" Hành động này sẽ vô hiệu hóa tài khoản thành viên. Các công trình và bài báo liên quan vẫn được bảo lưu an toàn.")}</div>
-
-            {error && (
-              <div className="mb-4 p-3 rounded-md bg-[#FFFFFF] border border-slate-200 text-xs text-[#1F2937]">
-                {tr(error)}
-              </div>
-            )}
-
-            <div className="modal-footer">
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => setIsOpen(false)}
-                className="action-secondary-detail disabled:opacity-50"
-              >{tr("Hủy bỏ")}</button>
-              <button
-                type="button"
-                disabled={loading}
-                onClick={handleDelete}
-                className="action-primary-detail bg-[#153D67] hover:bg-[#153D67] disabled:opacity-50"
-              >
-                {loading ? <Loader2 aria-hidden="true" className="w-3.5 h-3.5 animate-spin" /> : <Trash2 aria-hidden="true" className="w-3.5 h-3.5" />}
-                <span>{tr("Xóa tài khoản")}</span>
-              </button>
-            </div>
-      </Modal>
-    </>
-  );
+  return <>
+    <button type="button" disabled={permanent && !member.sessionVersion} onClick={() => { setError(''); setConfirmation(''); setOpen(true); }} className="inline-flex min-h-11 min-w-11 items-center justify-center gap-1 rounded-md border border-slate-200 px-2.5 py-1.5 text-xs font-semibold text-[#1F2937] hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67] disabled:opacity-50 sm:min-h-9 sm:min-w-0" title={permanent ? tr('Xóa tài khoản') : tr('Vô hiệu hóa tài khoản')} aria-label={permanent ? tr('Xóa tài khoản {0}', member.fullName) : tr('Vô hiệu hóa tài khoản {0}', member.fullName)}>
+      {permanent ? <Trash2 aria-hidden="true" className="h-3.5 w-3.5" /> : <UserX aria-hidden="true" className="h-3.5 w-3.5" />}<span className="hidden sm:inline">{permanent ? tr('Xóa tài khoản') : tr('Vô hiệu hóa')}</span>
+    </button>
+    <Modal isOpen={open} closeDisabled={busy} onClose={() => { if (!locked.current) setOpen(false); }} title={permanent ? tr('Xác nhận xóa tài khoản') : tr('Vô hiệu hóa tài khoản')} className="!max-w-md">
+      <p className="mb-3 break-words text-left font-semibold">{member.fullName}</p>
+      <p className="mb-4 text-left text-sm leading-6 text-slate-600">{permanent ? tr('Tài khoản sẽ bị xóa vĩnh viễn và không thể khôi phục. Bài đăng được giữ lại; họ tên tác giả chuyển thành người đóng góp ngoài CLB.') : tr('Các tài khoản được chọn sẽ không thể đăng nhập. Bài đăng vẫn được giữ lại và có thể khôi phục tài khoản sau này.')}</p>
+      {permanent && <label className="block text-left text-sm">{tr('Nhập DELETE để xác nhận')}<input value={confirmation} onChange={event => setConfirmation(event.target.value)} disabled={busy} autoComplete="off" spellCheck={false} className="mt-2 min-h-11 w-full rounded-md border border-slate-300 px-3" /></label>}
+      {error && <p role="alert" className="mt-3 text-sm text-red-700">{tr(error)}</p>}
+      <div className="modal-footer"><button type="button" disabled={busy} onClick={() => setOpen(false)} className="action-secondary-detail">{tr('Hủy bỏ')}</button><button type="button" disabled={busy || permanent && confirmation !== 'DELETE'} onClick={() => void apply()} className="action-primary-detail">{busy && <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />}{busy ? tr('Đang xử lý…') : permanent ? tr('Xóa vĩnh viễn') : tr('Vô hiệu hóa')}</button></div>
+    </Modal>
+  </>;
 }

@@ -21,10 +21,10 @@ export function SubmissionActionBar({ saveState, onSave, onSubmit, disabled = fa
   return (
     <div data-submission-actions className="submission-actions sticky bottom-0 z-10 flex flex-col gap-2 border-t border-slate-200 bg-white px-3 py-3 backdrop-blur sm:flex-row sm:items-center sm:justify-between sm:px-8">
       <p className="text-sm font-semibold text-[#1F2937]" aria-live="polite">{tr(labels[saveState])}</p>
-      <div className="grid grid-cols-3 gap-2 sm:flex">
-        {onPreview && <button type="button" disabled={disabled} onClick={onPreview} aria-pressed={preview} className="action-secondary-detail min-h-11 px-2 sm:px-4">{preview ? <Pencil className="h-4 w-4 shrink-0" aria-hidden="true" /> : <Eye className="h-4 w-4 shrink-0" aria-hidden="true" />}{preview ? tr("Soạn thảo") : tr("Xem trước")}</button>}
-        <button type="button" disabled={busy || saveDisabled} onClick={onSave} aria-label={tr("Lưu bản nháp")} className="action-secondary-detail min-h-11 w-full px-2 sm:w-40 sm:px-4 disabled:cursor-not-allowed disabled:opacity-60"><Save className="hidden h-4 w-4 sm:block" aria-hidden="true" /><span className="sm:hidden">{tr("Lưu nháp")}</span><span className="hidden sm:inline">{tr("Lưu bản nháp")}</span></button>
-        <button type="button" disabled={busy} onClick={onSubmit} className="action-primary-detail min-h-11 w-full px-2 sm:w-40 sm:px-4 disabled:cursor-not-allowed disabled:opacity-60"><Send className="hidden h-4 w-4 sm:block" aria-hidden="true" />{tr(submitLabel)}</button>
+      <div className="flex flex-wrap gap-2 sm:justify-end">
+        {onPreview && <button type="button" disabled={disabled} onClick={onPreview} aria-pressed={preview} className="action-secondary-detail min-h-11 flex-1 px-2 sm:flex-none sm:px-4">{preview ? <Pencil className="h-4 w-4 shrink-0" aria-hidden="true" /> : <Eye className="h-4 w-4 shrink-0" aria-hidden="true" />}{preview ? tr("Soạn thảo") : tr("Xem trước")}</button>}
+        <button type="button" disabled={busy || saveDisabled} onClick={onSave} aria-label={tr("Lưu bản nháp")} className="action-secondary-detail min-h-11 flex-1 px-2 sm:min-w-40 sm:flex-none sm:px-4 disabled:cursor-not-allowed disabled:opacity-60"><Save className="h-4 w-4 shrink-0" aria-hidden="true" /><span className="sm:hidden">{tr("Lưu nháp")}</span><span className="hidden sm:inline">{tr("Lưu bản nháp")}</span></button>
+        <button type="button" disabled={busy} onClick={onSubmit} className="action-primary-detail min-h-11 flex-1 px-2 sm:min-w-40 sm:flex-none sm:px-4 disabled:cursor-not-allowed disabled:opacity-60"><Send className="h-4 w-4 shrink-0" aria-hidden="true" />{tr(submitLabel)}</button>
       </div>
     </div>
   );

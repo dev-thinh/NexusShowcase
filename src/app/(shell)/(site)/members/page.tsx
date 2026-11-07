@@ -5,9 +5,11 @@ export const generateMetadata = localizedMetadata({ title: 'Thành viên' });
 
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 import { getSession } from '@/features/identity/server/session';
-import { HomeMemberWall } from '@/features/members/components/home-member-wall';
+import { MemberDirectoryList } from '@/features/members/components/member-directory-list';
+import { MEMBER_DIRECTORY_PAGE_SIZE } from '@/features/members/model/directory-page';
 import { MemberSectionHeading } from '@/features/members/components/member-section-heading';
-import { listDirectory } from '@/features/members/server/queries';
+import { HomeMemberWall } from '@/features/members/components/home-member-wall';
+import { listDirectory, listLeadershipDirectory } from '@/features/members/server/queries';
 import { Suspense } from 'react';
 import { MemberDirectorySkeleton } from '@/shared/ui/content-skeletons';
 
@@ -17,13 +19,12 @@ export default async function MembersDirectoryPage() {
   async function MemberResults() {
     const session = await getSession();
     const authenticated = !!session?.user;
-    const [advisoryPage, experiencedPage, regularPage] = await Promise.all([
-      listDirectory({ authenticated, role: 'ADMIN', page: 1, pageSize: 'all' }),
-      listDirectory({ authenticated, role: 'CORE_MEMBER', page: 1, pageSize: 'all' }),
-      listDirectory({ authenticated, role: 'MEMBER', page: 1, pageSize: 'all' }),
+    const [advisors, experienced, regularPage] = await Promise.all([
+      listLeadershipDirectory({ authenticated, role: 'ADMIN' }),
+      listLeadershipDirectory({ authenticated, role: 'CORE_MEMBER' }),
+      listDirectory({ authenticated, role: 'MEMBER', page: 1, pageSize: MEMBER_DIRECTORY_PAGE_SIZE }),
     ]);
-    const advisors = advisoryPage.items, experienced = experiencedPage.items;
-    const totalMembers = advisoryPage.total + experiencedPage.total + regularPage.total;
+    const totalMembers = advisors.length + experienced.length + regularPage.total;
 
     return <>
         <p className="mb-5 text-sm font-semibold text-[#1F2937]">{totalMembers}{tr(" thành viên")}</p>
@@ -31,11 +32,11 @@ export default async function MembersDirectoryPage() {
             <div id="leadership-heading">
               <MemberSectionHeading
                 title={tr("Ban chủ nhiệm")}
-                count={advisoryPage.total}
+                count={advisors.length}
               />
             </div>
             {advisors.length > 0 ? (
-              <HomeMemberWall members={advisors.map(({ id, publicSlug, fullName, avatarUrl, role }) => ({ id, publicSlug, fullName, avatarUrl, role }))} total={advisors.length} showMeta={false} />
+              <HomeMemberWall members={advisors} total={advisors.length} showMeta={false} limitOnMobile={false} />
             ) : (
               <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>
             )}
@@ -45,11 +46,11 @@ export default async function MembersDirectoryPage() {
             <div id="experienced-heading">
               <MemberSectionHeading
                 title={tr("Trưởng nhóm")}
-                count={experiencedPage.total}
+                count={experienced.length}
               />
             </div>
             {experienced.length > 0 ? (
-              <HomeMemberWall members={experienced.map(({ id, publicSlug, fullName, avatarUrl, role }) => ({ id, publicSlug, fullName, avatarUrl, role }))} total={experienced.length} showMeta={false} />
+              <HomeMemberWall members={experienced} total={experienced.length} showMeta={false} limitOnMobile={false} />
             ) : (
               <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>
             )}
@@ -65,7 +66,7 @@ export default async function MembersDirectoryPage() {
 
           {regularPage.total > 0 ? (
             <>
-              <HomeMemberWall members={regularPage.items.map(({ id, publicSlug, fullName, avatarUrl, role }) => ({ id, publicSlug, fullName, avatarUrl, role }))} total={regularPage.items.length} showMeta={false} />
+              <MemberDirectoryList initialPage={regularPage} role="MEMBER" />
             </>
           ) : (
             <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>

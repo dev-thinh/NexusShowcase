@@ -44,7 +44,7 @@ export function BasicInformationFields({ value, errors, onChange, reviewComments
         <ReviewComments comments={reviewComments} fieldKey="thumbnailUrl" />
       </div>
       <div>
-        <label htmlFor="submission-summary" className="block text-sm font-semibold text-[#1F2937]">{tr("Abstract / Tóm tắt ")}<span className="text-[#1F2937]" aria-hidden="true">*</span><span className="sr-only">{tr(" (bắt buộc khi gửi)")}</span></label>
+        <label htmlFor="submission-summary" className="block text-sm font-semibold text-[#1F2937]">{tr("Tóm tắt ")}<span className="text-[#1F2937]" aria-hidden="true">*</span><span className="sr-only">{tr(" (bắt buộc khi gửi)")}</span></label>
         <p className="mt-1 text-sm text-[#1F2937]">{tr("Trình bày vấn đề, cách tiếp cận và đóng góp chính. Có thể bổ sung trước khi gửi duyệt.")}</p>
         <textarea id="submission-summary" rows={5} value={value.summary} onChange={(event) => onChange('summary', event.target.value)} aria-describedby={[errors.summary?.length ? 'submission-summary-error' : '', commentDescriptionId('summary')].filter(Boolean).join(' ') || undefined} aria-invalid={Boolean(errors.summary?.length)} aria-required="true" required className={inputClass} />
         <FieldError id="submission-summary-error" errors={errors.summary} />

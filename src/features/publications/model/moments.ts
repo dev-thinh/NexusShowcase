@@ -38,3 +38,11 @@ export function momentRows(photos: MomentPhoto[]): [MomentPhoto[], MomentPhoto[]
   const assigned = photos.filter(photo => photo.visible && photo.slot !== null).sort((a, b) => a.slot! - b.slot!);
   return [assigned.filter(photo => photo.slot! < 6), assigned.filter(photo => photo.slot! >= 6)];
 }
+
+/** Stable paper-photo poses: copies and re-renders keep the same natural arrangement. */
+export function momentPhotoPose(photo: Pick<MomentPhoto, 'id' | 'tilt'>, index: number) {
+  let seed = 0;
+  for (const char of photo.id) seed = (seed * 31 + char.charCodeAt(0)) >>> 0;
+  const angle = Math.min(3.5, Math.max(1.5, Math.abs(parseFloat(photo.tilt))) + (seed % 4) * .25);
+  return { tilt: `${index % 2 ? angle : -angle}deg`, offset: `${((seed >>> 3) % 7 - 3) * .1875}rem` };
+}

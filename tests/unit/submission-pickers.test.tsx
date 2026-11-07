@@ -126,7 +126,8 @@ describe('submission add controls', () => {
     expect(html).toContain('>Lưu nháp</span>');
     expect(html).toContain('>Lưu bản nháp</span>');
     expect(html).toContain('>Gửi duyệt</button>');
-    expect(html.match(/sm:w-40/g)).toHaveLength(2);
+    expect(html).toContain('lucide-send');
+    expect(html).toContain('lucide-save');
   });
 });
 

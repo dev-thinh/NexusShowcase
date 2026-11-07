@@ -18,6 +18,8 @@ describe('homepage member wall', () => {
   it('counts the hidden members from the actual number of avatars', () => {
     const html = renderToStaticMarkup(<HomeMemberWall members={Array.from({ length: 29 }, (_, index) => member(index))} total={50} />);
     expect(html).toContain('+21');
+    expect(html).toContain('+43');
+    expect(html.match(/home-member-slot--desktop-only/g)).toHaveLength(22);
     expect(html).toContain('href="/members"');
     expect(html).toContain('Xem tất cả');
   });
@@ -26,4 +28,11 @@ describe('homepage member wall', () => {
     expect(html).not.toContain('data-home-member-avatar');
     expect(html).toContain('đang được cập nhật');
   });
+});
+
+
+it('shows all eight members without a mobile remainder when the group fits', () => {
+  const html = renderToStaticMarkup(<HomeMemberWall members={Array.from({ length: 8 }, (_, index) => member(index))} total={8} />);
+  expect(html).not.toContain('home-member-slot--desktop-only');
+  expect(html).not.toContain('home-member-more');
 });

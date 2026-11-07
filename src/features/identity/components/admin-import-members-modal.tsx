@@ -102,7 +102,7 @@ export function AdminImportMembersModal() {
           <MemberCsvTable rows={results ?? rows} />
         </>}
         {results && <div className="space-y-2">
-          <button type="button" className="action-secondary-detail min-h-11" onClick={exportResults}><Download aria-hidden="true" className="h-4 w-4" />{tr("Tải kết quả và mật khẩu tạm")}</button>
+          <button type="button" className="action-secondary-detail min-h-11" aria-label={tr("Tải kết quả và mật khẩu tạm")} onClick={exportResults}><Download aria-hidden="true" className="h-4 w-4" />{tr("Tải mật khẩu tạm")}</button>
         </div>}
         {error && <p role="alert" className="text-sm leading-6 text-rose-700">{tr(error)}</p>}
         {discard && <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">

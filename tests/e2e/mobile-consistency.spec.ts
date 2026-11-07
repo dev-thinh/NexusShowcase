@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect, login, test } from './fixtures';
+import { auditControls } from './controls-layout';
 
 // The retired route streams a redirect; measure the destination document only.
 async function expectPageToFit(page: Page, path: string, destination = path === '/explore' ? '/research' : path) {
@@ -50,16 +51,22 @@ test('small phone editor has readable fields and actions', async ({ page, fixtur
   await expect(title).toHaveCSS('font-size', '16px');
   const bar = page.locator('[data-submission-actions]');
   await bar.scrollIntoViewIfNeeded();
-  const positions: number[] = [];
   for (const name of ['Xem trước', 'Lưu bản nháp', 'Gửi duyệt']) {
     const button = bar.getByRole('button', { name, exact: true });
     await expect(button).toBeInViewport();
     const bounds = (await button.boundingBox())!;
-    positions.push(bounds.y);
     expect(bounds.height).toBeGreaterThanOrEqual(44);
     expect(await button.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
   }
-  expect(Math.max(...positions) - Math.min(...positions)).toBeLessThan(2);
+  // Whole controls may occupy multiple rows; labels/icons must stay intact.
+  await auditControls(page, 'small phone submission actions');
+  const boxes = await bar.getByRole('button').evaluateAll(buttons => buttons.map(button => button.getBoundingClientRect().toJSON()));
+  for (let index = 0; index < boxes.length; index++) {
+    for (const other of boxes.slice(index + 1)) {
+      const box = boxes[index];
+      expect(box.right <= other.left + 1 || other.right <= box.left + 1 || box.bottom <= other.top + 1 || other.bottom <= box.top + 1).toBe(true);
+    }
+  }
 });
 
 test('small phone pagination stays on one row and dashboard uses shared filters', async ({ page, fixture }) => {

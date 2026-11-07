@@ -48,7 +48,7 @@ test('page navigation and scroll entries animate, and modal close waits for its 
 
 test('member management dialogs share the animation and release the scroll lock', async ({ page, fixture }) => {
   await login(page, fixture.users.find(user => user.role === 'ADMIN')!, '/admin/members');
-  await page.getByRole('button', { name: /^Quyền của / }).first().click();
+  await page.locator('[data-member-role="MEMBER"] .member-permissions-trigger').first().click();
   await page.getByRole('button', { name: /^Xóa tài khoản / }).first().click();
   const dialog = page.getByRole('dialog');
   await expect(dialog).toBeVisible();

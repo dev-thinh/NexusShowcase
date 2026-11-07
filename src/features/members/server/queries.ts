@@ -6,12 +6,17 @@ import { rankedMembers } from './ranking';
 import { Prisma } from '@prisma/client';
 import { homeMemberSlots, type HomeMember, type HomeMembersPayload } from '../model/home';
 
-export async function listDirectory(input: { authenticated: boolean; role: PublicMemberRole; page: unknown; pageSize: 6 | 12 | 'all' }): Promise<Page<MemberDirectoryEntry>> {
+export async function listDirectory(input: { authenticated: boolean; role: PublicMemberRole; page: unknown; pageSize: 6 | 12 }): Promise<Page<MemberDirectoryEntry>> {
   const total = await prisma.user.count({ where: { status: 'ACTIVE', deletedAt: null, hiddenFromDirectory: false, role: input.role } });
-  const { page, skip, take, totalPages } = pageBounds(input.pageSize === 'all' ? 1 : input.page, total, input.pageSize === 'all' ? Math.max(1, total) : input.pageSize);
+  const { page, skip, take, totalPages } = pageBounds(input.page, total, input.pageSize === 6 ? 6 : 12);
   const items = await rankedMembers({ ...input, skip, take });
   return { items, total, page, pageSize: take, totalPages };
 }
+export async function listLeadershipDirectory(input: { authenticated: boolean; role: 'ADMIN' | 'CORE_MEMBER' }): Promise<MemberDirectoryEntry[]> {
+  const total = await prisma.user.count({ where: { status: 'ACTIVE', deletedAt: null, hiddenFromDirectory: false, role: input.role } });
+  return rankedMembers({ ...input, take: total, skip: 0 });
+}
+
 export function getHomeMembers(): Promise<HomeMembersPayload> {
   return prisma.$transaction(async tx => {
     const roles = ['ADMIN', 'CORE_MEMBER', 'MEMBER'] as const;

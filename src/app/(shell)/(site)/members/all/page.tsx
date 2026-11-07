@@ -2,7 +2,8 @@ import { localizedMetadata } from '@/shared/i18n/metadata';
 
 import { getServerI18n } from '@/shared/i18n/server';
 import { getSession } from '@/features/identity/server/session';
-import { MemberCard } from '@/features/members/components/member-card';
+import { MemberDirectoryList } from '@/features/members/components/member-directory-list';
+import { MEMBER_DIRECTORY_PAGE_SIZE } from '@/features/members/model/directory-page';
 import { listDirectory } from '@/features/members/server/queries';
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs';
 
@@ -16,7 +17,7 @@ export default async function AllMembersPage() {
   const { t: tr } = await getServerI18n();
 
   const session = await getSession();
-  const memberPage = await listDirectory({ authenticated: !!session?.user, role: 'MEMBER', page: 1, pageSize: 'all' });
+  const memberPage = await listDirectory({ authenticated: !!session?.user, role: 'MEMBER', page: 1, pageSize: MEMBER_DIRECTORY_PAGE_SIZE });
   const members = memberPage.items;
 
   return (
@@ -36,15 +37,7 @@ export default async function AllMembersPage() {
 
         {members.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {memberPage.items.map((member) => (
-                <MemberCard
-                  key={member.id}
-                  member={member}
-                  group="MEMBER"
-                />
-              ))}
-            </div>
+            <MemberDirectoryList initialPage={memberPage} role="MEMBER" cards />
           </>
         ) : (
           <div className="panel-public p-6 text-sm text-[#1F2937]">{tr("Chưa có thành viên được công bố.")}</div>

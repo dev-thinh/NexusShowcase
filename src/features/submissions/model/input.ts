@@ -98,7 +98,7 @@ export const showcaseSubmissionInputSchema = z.object(showcaseWorkflowShape).str
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['content'], message: 'Bài nghiên cứu cần nội dung chi tiết hoặc PDF/liên kết toàn văn.' });
   }
   if (!value.summary) {
-    context.addIssue({ code: z.ZodIssueCode.custom, path: ['summary'], message: 'Vui lòng nhập abstract / tóm tắt.' });
+    context.addIssue({ code: z.ZodIssueCode.custom, path: ['summary'], message: 'Vui lòng nhập tóm tắt.' });
   }
   if (value.contributors.length === 0) {
     context.addIssue({ code: z.ZodIssueCode.custom, path: ['contributors'], message: 'Vui lòng thêm ít nhất một người đóng góp.' });

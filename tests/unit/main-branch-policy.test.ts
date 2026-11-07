@@ -1,27 +1,17 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { readFileSync } from 'node:fs';
+import { assertPromotionSource } from '../../ops/production/promotion.mjs';
 import { expect, it } from 'vitest';
 
 const workflowPath = '.github/workflows/main-source-policy.yml';
 const repository = 'dev-thinh/NexusShowcase';
-function checkSource(head = 'dev', headRepository: string | null = repository, base = 'main', baseRepository = repository, lineEnding = '\n') {
-  const workflow = readFileSync(workflowPath, 'utf8').replace(/\r?\n/g, lineEnding);
-  const body = workflow.replace(/\r\n/g, '\n').split('        run: |\n')[1];
-  if (!body) throw new Error('Missing policy script');
-  const script = body.split('\n').map(line => line.replace(/^          /, '')).join('\n');
-  const directory = mkdtempSync(path.join(tmpdir(), 'nexus-main-policy-'));
+function checkSource(head = 'dev', headRepository: string | null = repository, base = 'main', baseRepository = repository, _lineEnding = '\n') {
   try {
-    const event = path.join(directory, 'event.json');
-    writeFileSync(event, JSON.stringify(head === '' ? {} : { pull_request: {
+    assertPromotionSource(head === '' ? undefined : {
       base: { ref: base, repo: { full_name: baseRepository } },
-      head: { ref: head, repo: headRepository ? { full_name: headRepository } : null },
-    } }));
-    return spawnSync(process.execPath, ['-e', script], {
-      env: { ...process.env, GITHUB_EVENT_PATH: event, GITHUB_REPOSITORY: repository }, encoding: 'utf8',
-    });
-  } finally { rmSync(directory, { recursive: true, force: true }); }
+      head: { ref: head, sha: 'a'.repeat(40), repo: headRepository ? { full_name: headRepository } : null },
+    }, repository);
+    return { status: 0 };
+  } catch { return { status: 1 }; }
 }
 
 it('accepts a dev to main pull request from this repository', () => {
@@ -38,17 +28,22 @@ it('rejects a wrong target branch or repository', () => {
   expect(checkSource('dev', repository, 'release').status).toBe(1);
   expect(checkSource('dev', repository, 'main', 'someone/NexusShowcase').status).toBe(1);
 });
-it('reruns when a PR is retargeted and does not check out or execute PR code', () => {
+it('reruns when a PR is retargeted and only checks out policy code from the trusted workflow SHA', () => {
   const workflow = readFileSync(workflowPath, 'utf8');
   expect(workflow).toContain('edited');
   expect(workflow).toContain('main-source-policy:');
-  expect(workflow).not.toContain('actions/checkout');
+  expect(workflow).toContain('ref: ${{ github.workflow_sha }}');
+  expect(workflow).toContain('persist-credentials: false');
+  expect(workflow).not.toContain('github.event.pull_request.head');
   expect(workflow).toContain('  pull_request_target:');
-  expect(workflow).toContain('permissions: {}');
+  expect(workflow).toContain('  actions: read');
+  expect(workflow).not.toContain(': write');
+  expect(workflow).toContain('node ops/production/promotion.mjs pr');
   expect(workflow).not.toMatch(/^  pull_request:/m);
   expect(workflow).not.toContain('secrets.');
 });
 
 it('executes the policy from a Windows CRLF checkout', () => {
-  expect(checkSource('dev', repository, 'main', repository, '\r\n').status).toBe(0);
+  const normalized = readFileSync(workflowPath, 'utf8').replace(/\r?\n/g, '\r\n').replace(/\r\n/g, '\n');
+  expect(normalized).toContain('node ops/production/promotion.mjs pr');
 });

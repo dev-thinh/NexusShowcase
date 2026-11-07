@@ -1,9 +1,10 @@
-
 'use client';
+import { ContainedThumbnail } from '@/shared/ui/contained-thumbnail';
+
+
 
 import { useI18n } from '@/shared/i18n/provider';
 import { ConferenceDetails } from '@/features/publications/components/conference-details';
-import { MediaImage } from '@/shared/ui/media-image';
 import { ArticleContent, ArticleTableOfContents } from '@/features/submissions/components/article-content';
 import { ResourceLinks } from '@/features/submissions/components/resource-links';
 import { articleFromLegacy, serializeArticle, standaloneResources } from '@/features/submissions/model/article';
@@ -21,12 +22,12 @@ export function SubmissionPreview({ snapshot }: { snapshot: SubmissionSnapshot }
           <h1 className="break-words text-2xl font-semibold leading-snug text-[#1F2937] sm:text-3xl">{snapshot.title}</h1>
           <p className="mt-3 text-sm leading-7 text-[#1F2937]">{snapshot.contributors.map(c => c.displayName || c.externalName || tr('Thành viên')).join(', ')}</p>
         </div>
-        {snapshot.thumbnailUrl && <MediaImage src={snapshot.thumbnailUrl} alt={tr("Hình minh họa: {0}", snapshot.title)} className="article-header-thumbnail" />}
+        {snapshot.thumbnailUrl && <ContainedThumbnail src={snapshot.thumbnailUrl} alt={tr("Hình minh họa: {0}", snapshot.title)} />}
       </div>
     </header>
     <ConferenceDetails value={snapshot.conference} />
     <ArticleTableOfContents content={content} />
-    <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">{tr("Abstract / Tóm tắt")}</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{snapshot.summary}</p></section>
+    <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">{tr("Tóm tắt")}</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{snapshot.summary}</p></section>
     <ArticleContent content={content} />
     <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2><ResourceLinks resources={standaloneResources(snapshot.content, snapshot.resources)} /></section>
   </article>;

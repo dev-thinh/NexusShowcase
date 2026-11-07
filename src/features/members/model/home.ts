@@ -1,5 +1,7 @@
 import type { PublicMemberRole } from './directory';
 
+export const HOME_MEMBER_MOBILE_LIMIT = 8;
+
 export type HomeMember = { id: string; publicSlug: string; fullName: string; avatarUrl: string | null; role: PublicMemberRole };
 export type HomeMembersPayload = { members: HomeMember[]; total: number };
 
