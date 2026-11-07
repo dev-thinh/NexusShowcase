@@ -1,5 +1,5 @@
 import { randomBytes } from 'node:crypto';
-import { expect, login, test } from './fixtures';
+import { acknowledgeSuccess, expect, login, test } from './fixtures';
 
 test('admin restores an identity and reveals a single-use temporary password for forced change', async ({ page, fixture, database, browser }) => {
   const user = await database.user.create({ data: { email: `${fixture.prefix}-recovery@example.test`, fullName: 'Thành viên khôi phục', role: 'MEMBER', status: 'SUSPENDED', deletedAt: new Date() } });
@@ -10,7 +10,7 @@ test('admin restores an identity and reveals a single-use temporary password for
     await page.getByRole('button', { name: `Quản lý tài khoản ${user.fullName}`, exact: true }).click();
     await page.getByRole('button', { name: 'Khôi phục', exact: true }).click();
     await page.getByRole('dialog', { name: 'Khôi phục tài khoản', exact: true }).getByRole('button', { name: 'Xác nhận', exact: true }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Đã khôi phục tài khoản' })).toBeVisible();
+    await acknowledgeSuccess(page, 'Đã khôi phục tài khoản.');
     const restoreDialog = page.getByRole('dialog', { name: 'Khôi phục tài khoản', exact: true });
     if (await restoreDialog.isVisible()) await restoreDialog.getByRole('button', { name: 'Đóng', exact: true }).click();
     await page.goto(`/admin/members?q=${encodeURIComponent(user.fullName)}&status=ACTIVE`);
