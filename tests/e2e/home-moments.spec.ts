@@ -239,10 +239,27 @@ test('uniformly uploaded moments have stable mixed paper-photo poses across loop
   const gallery = await database.homeMomentsGallery.findUniqueOrThrow({ where: { id: 'home' } });
   const photos = gallery.photos as Array<Record<string, import('@prisma/client').Prisma.JsonValue>>;
   await database.homeMomentsGallery.update({ where: { id: 'home' }, data: { photos: photos.map(photo => ({ ...photo, tilt: '-2deg' })) } });
-  await page.goto('/');
-  await page.locator('[data-deferred-section="moments"]').scrollIntoViewIfNeeded();
+  // Hold the deferred response to exercise the slow-network path explicitly.
+  let release!: () => void;
+  const responseGate = new Promise<void>(resolve => { release = resolve; });
+  await page.route('**/api/home/moments', async route => {
+    await responseGate;
+    await route.continue();
+  });
+  const section = page.locator('[data-deferred-section="moments"]');
+  try {
+    await page.goto('/');
+    await section.scrollIntoViewIfNeeded();
+    await expect(section).not.toHaveAttribute('data-state', 'ready');
+  } finally { release(); }
+  await expect(section).toHaveAttribute('data-state', 'ready');
+  const expectedIds = photos.filter(photo => photo.visible === true && typeof photo.slot === 'number' && photo.slot < 6)
+    .sort((a, b) => Number(a.slot) - Number(b.slot)).map(photo => String(photo.id));
+  expect(expectedIds.length).toBeGreaterThanOrEqual(3);
   const lane = page.locator('.moments-lane').first();
+  await expect(lane.locator('.moments-group').first().locator('.moment-photo')).toHaveCount(expectedIds.length);
   const poses = await lane.locator('.moments-group').first().locator('.moment-photo').evaluateAll(elements => elements.map(element => ({ id: (element as HTMLElement).dataset.photoId, tilt: (element as HTMLElement).style.getPropertyValue('--photo-tilt'), offset: (element as HTMLElement).style.getPropertyValue('--photo-offset') })));
+  expect(poses.map(pose => pose.id)).toEqual(expectedIds);
   expect(poses.some(pose => parseFloat(pose.tilt) > 0)).toBe(true);
   expect(poses.some(pose => parseFloat(pose.tilt) < 0)).toBe(true);
   expect(new Set(poses.map(pose => pose.tilt)).size).toBeGreaterThan(2);
