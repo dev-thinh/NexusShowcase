@@ -1349,7 +1349,9 @@ strong {
 .admin-member-identity > :is(img, [role='img']) { grid-column: 1; grid-row: 1 / span 2; align-self: center; }
 .admin-member-name { grid-column: 2; grid-row: 1; align-self: start; }
 .admin-member-joined { grid-column: 3; grid-row: 1; margin-top: 0; align-self: start; white-space: nowrap; text-align: right; line-height: 1.25rem; color: #64748b; }
-.admin-member-role { grid-column: 2; grid-row: 2; min-width: 0; max-width: 100%; margin-left: 0; justify-self: start; align-self: center; }
+.admin-member-badges { grid-column: 2; grid-row: 2; display: grid; grid-template-columns: 8.75rem max-content; align-items: center; column-gap: .75rem; min-width: 0; }
+.admin-member-disabled { min-height: 1.625rem; line-height: 1rem; }
+.admin-member-role { min-width: 0; max-width: 100%; margin-left: 0; justify-self: start; align-self: center; }
 .admin-member-role > svg { flex-shrink: 0; }
 .admin-member-actions { grid-column: 3; grid-row: 2; justify-self: end; align-self: center; margin-top: 0; }
 .member-permissions-menu .admin-role-control { display: block; }
@@ -1555,9 +1557,12 @@ a, button, [role='button'] { user-select: text; }
 /* Long role/status translations can wrap without squeezing adjacent member controls. */
 .admin-member-role { height: auto; }
 .admin-member-joined { min-width: 0; white-space: normal; }
-.admin-member-joined > .font-semibold { display: block; margin-right: 0; }
 @media (max-width: 639px) {
   .admin-member-row { grid-template-columns: 2.5rem minmax(0, 1fr) 5.5rem; }
+  .admin-member-joined { grid-column: 2; grid-row: 2; text-align: left; }
+  .admin-member-actions { grid-row: 1 / span 2; }
+  .admin-member-badges { grid-column: 1 / -1; grid-row: 3; grid-template-columns: 8.25rem max-content; column-gap: .5rem; }
+  .admin-member-disabled { max-width: 100%; padding-inline: .25rem; }
 }
 
 /* Action labels never wrap; toolbars wrap whole controls instead. */
