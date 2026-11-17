@@ -147,9 +147,9 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                     return <button key={slot} type="button" className={`moments-editor__slot${photo ? '' : ' moments-editor__slot--empty'}`} data-moment-slot={slot} data-moment-drag={photo?.id} data-drag-source={drag?.photoId === photo?.id && !!photo ? 'true' : undefined} data-drop-target={drag?.over === slot ? 'true' : undefined} aria-label={`${slotLabel(slot)}: ${photo?.title ?? tr('Trống')}`} aria-pressed={selectedSlot === slot} onDragStart={event => event.preventDefault()} onClick={() => { setSelectedSlot(slot); setMobilePanel(photo ? 'details' : 'arrange'); }}>
                       {photo ? <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={135} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} draggable={false} />
+                        <MediaImage optimized showPlaceholderLabel={false} src={photo.src} alt={photo.alt} width={180} height={135} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} draggable={false} />
                         <span className="moments-editor__slot-title">{photo.title}</span>
-                      </> : <MediaImage className="h-full w-full" alt={tr("Vị trí ảnh trống")} />}
+                      </> : <MediaImage showPlaceholderLabel={false} className="h-full w-full" alt={tr("Vị trí ảnh trống")} />}
                       <span className="moments-editor__slot-number">{column + 1}</span>
                     </button>;
                   })}

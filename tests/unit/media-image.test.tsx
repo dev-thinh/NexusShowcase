@@ -10,10 +10,13 @@ it('serves responsive thumbnails instead of original uploads when optimization i
   expect(html).toContain('decoding="async"');
 });
 
-it('keeps the shared placeholder for an empty optimized image', () => {
-  const html = renderToStaticMarkup(<MediaImage optimized alt="Photo" width={180} height={120} />);
-  expect(html).toContain('data-media-placeholder="true"');
-  expect(html).not.toContain('<img');
+it('keeps the shared placeholder for an empty optimized image and hides the text label on compact frames', () => {
+  const compact = renderToStaticMarkup(<MediaImage optimized alt="Photo" width={180} height={120} />);
+  expect(compact).toContain('data-media-placeholder="true"');
+  expect(compact).not.toContain('>Chưa có ảnh</span>');
+  expect(compact).not.toContain('<img');
+  const large = renderToStaticMarkup(<MediaImage optimized alt="Photo" width={640} height={480} />);
+  expect(large).toContain('>Chưa có ảnh</span>');
 });
 
 it('automatically sizes stored thumbnails while retaining original external images', () => {
