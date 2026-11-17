@@ -14,6 +14,7 @@ export function SubmissionPreview({ snapshot }: { snapshot: SubmissionSnapshot }
   const { t: tr } = useI18n();
 
   const content = serializeArticle(articleFromLegacy(snapshot.content));
+  const previewResources = standaloneResources(snapshot.content, snapshot.resources);
   return <article className="min-w-0 space-y-8 rounded-lg border border-slate-200 bg-white p-5 sm:p-8">
     <header className="border-b border-slate-200 pb-6">
       <div className={snapshot.thumbnailUrl ? 'grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_15rem] lg:gap-8' : ''}>
@@ -29,6 +30,6 @@ export function SubmissionPreview({ snapshot }: { snapshot: SubmissionSnapshot }
     <ArticleTableOfContents content={content} />
     <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">{tr("Tóm tắt")}</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{snapshot.summary}</p></section>
     <ArticleContent content={content} />
-    <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2><ResourceLinks resources={standaloneResources(snapshot.content, snapshot.resources)} /></section>
+    {previewResources.length > 0 && <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2><ResourceLinks resources={previewResources} /></section>}
   </article>;
 }

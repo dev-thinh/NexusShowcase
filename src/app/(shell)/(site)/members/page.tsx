@@ -8,8 +8,7 @@ import { getSession } from '@/features/identity/server/session';
 import { MemberDirectoryList } from '@/features/members/components/member-directory-list';
 import { MEMBER_DIRECTORY_PAGE_SIZE } from '@/features/members/model/directory-page';
 import { MemberSectionHeading } from '@/features/members/components/member-section-heading';
-import { HomeMemberWall } from '@/features/members/components/home-member-wall';
-import { listDirectory, listLeadershipDirectory } from '@/features/members/server/queries';
+import { listDirectory } from '@/features/members/server/queries';
 import { Suspense } from 'react';
 import { MemberDirectorySkeleton } from '@/shared/ui/content-skeletons';
 
@@ -19,12 +18,12 @@ export default async function MembersDirectoryPage() {
   async function MemberResults() {
     const session = await getSession();
     const authenticated = !!session?.user;
-    const [advisors, experienced, regularPage] = await Promise.all([
-      listLeadershipDirectory({ authenticated, role: 'ADMIN' }),
-      listLeadershipDirectory({ authenticated, role: 'CORE_MEMBER' }),
+    const [advisorsPage, experiencedPage, regularPage] = await Promise.all([
+      listDirectory({ authenticated, role: 'ADMIN', page: 1, pageSize: MEMBER_DIRECTORY_PAGE_SIZE }),
+      listDirectory({ authenticated, role: 'CORE_MEMBER', page: 1, pageSize: MEMBER_DIRECTORY_PAGE_SIZE }),
       listDirectory({ authenticated, role: 'MEMBER', page: 1, pageSize: MEMBER_DIRECTORY_PAGE_SIZE }),
     ]);
-    const totalMembers = advisors.length + experienced.length + regularPage.total;
+    const totalMembers = advisorsPage.total + experiencedPage.total + regularPage.total;
 
     return <>
         <p className="mb-5 text-sm font-semibold text-[#1F2937]">{totalMembers}{tr(" thành viên")}</p>
@@ -32,11 +31,11 @@ export default async function MembersDirectoryPage() {
             <div id="leadership-heading">
               <MemberSectionHeading
                 title={tr("Ban chủ nhiệm")}
-                count={advisors.length}
+                count={advisorsPage.total}
               />
             </div>
-            {advisors.length > 0 ? (
-              <HomeMemberWall members={advisors} total={advisors.length} showMeta={false} limitOnMobile={false} />
+            {advisorsPage.total > 0 ? (
+              <MemberDirectoryList initialPage={advisorsPage} role="ADMIN" />
             ) : (
               <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>
             )}
@@ -46,11 +45,11 @@ export default async function MembersDirectoryPage() {
             <div id="experienced-heading">
               <MemberSectionHeading
                 title={tr("Trưởng nhóm")}
-                count={experienced.length}
+                count={experiencedPage.total}
               />
             </div>
-            {experienced.length > 0 ? (
-              <HomeMemberWall members={experienced} total={experienced.length} showMeta={false} limitOnMobile={false} />
+            {experiencedPage.total > 0 ? (
+              <MemberDirectoryList initialPage={experiencedPage} role="CORE_MEMBER" />
             ) : (
               <p className="text-sm text-slate-600">{tr("Chưa có thành viên nào")}</p>
             )}

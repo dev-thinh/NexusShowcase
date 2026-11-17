@@ -46,6 +46,7 @@ export function HomeHero() {
   }, []);
 
   const moveSpotlight = (event: React.PointerEvent<HTMLElement>) => {
+    if (event.pointerType !== 'mouse') return;
     const bounds = event.currentTarget.getBoundingClientRect();
     event.currentTarget.style.setProperty('--hero-pointer-x', `${event.clientX - bounds.left}px`);
     event.currentTarget.style.setProperty('--hero-pointer-y', `${event.clientY - bounds.top}px`);

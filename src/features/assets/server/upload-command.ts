@@ -4,6 +4,7 @@ import path from 'node:path';
 import type { UploadKind, UploadResult } from '../model/contracts';
 import { detectFileType, verifiedFileTypes } from '../model/file-signatures';
 import { writeStoredAsset } from './storage';
+import { warmOriginalAsset } from './thumbnail';
 export async function uploadAsset(file: File, type: UploadKind, ownerId: string): Promise<UploadResult> {
 
   if (!file || typeof file === 'string' || file.size === 0) {
@@ -101,6 +102,7 @@ export async function uploadAsset(file: File, type: UploadKind, ownerId: string)
   const safeStoredFileName = `${crypto.randomUUID()}.${verified.extension}`;
   try {
     const fileUrl = await writeStoredAsset(isThumbnail ? 'thumbnail' : 'pdf', safeStoredFileName, Buffer.from(arrayBuffer), ownerId);
+    if (isThumbnail) warmOriginalAsset(fileUrl, bytes);
 
     return { success: true, data: { url: fileUrl, fileName: clientFileName, fileSize: file.size, mimeType: verified.mimeType } };
   } catch (error) {

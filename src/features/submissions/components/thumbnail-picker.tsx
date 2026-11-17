@@ -47,7 +47,7 @@ export function ThumbnailPicker({ value, images = [], errors = [], onChange, onB
     <div className="flex flex-wrap items-center gap-3">
       {<div className="relative shrink-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <MediaImage width={128} height={96} sizes="128px" src={value} alt={tr("Ảnh đại diện đã chọn")} className="aspect-[4/3] w-32 rounded-md border border-slate-200 bg-slate-50 object-cover" />
+        <MediaImage showPlaceholderLabel={false} width={128} height={96} sizes="128px" src={value} alt={tr("Ảnh đại diện đã chọn")} className="aspect-[4/3] w-32 rounded-md border border-slate-200 bg-slate-50 object-cover" />
         {value && <button type="button" disabled={uploading} onClick={() => { setError(''); onChange(null); }} aria-label={tr("Bỏ ảnh đại diện")} className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full border border-slate-200 bg-white text-[#1F2937] shadow-sm hover:bg-[#FFFFFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#153D67]"><X aria-hidden="true" className="h-4 w-4" /></button>}
       </div>}
       <div className="space-y-1.5">

@@ -20,7 +20,12 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
         let remainder = 0;
         let touching = false;
         let resumeAt = 0;
-        const period = () => group.getBoundingClientRect().width;
+        let cachedWidth = group.getBoundingClientRect().width;
+        const resizeObserver = typeof ResizeObserver !== 'undefined'
+          ? new ResizeObserver(() => { cachedWidth = group.getBoundingClientRect().width; })
+          : null;
+        resizeObserver?.observe(group);
+        const period = () => cachedWidth || group.getBoundingClientRect().width;
         if (lane.scrollLeft <= 0) lane.scrollLeft = period();
         const wrap = () => {
           const width = period();
@@ -37,8 +42,10 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
           if (!paused && !touching && now >= resumeAt && !document.hidden) {
             remainder += elapsed * (lane.dataset.row === '1' ? -0.025 : 0.03);
             const step = Math.trunc(remainder);
-            lane.scrollLeft += step;
-            remainder -= step;
+            if (step !== 0) {
+              lane.scrollLeft += step;
+              remainder -= step;
+            }
           }
           wrap();
           frame = requestAnimationFrame(tick);
@@ -51,6 +58,7 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
         frame = requestAnimationFrame(tick);
         return () => {
           cancelAnimationFrame(frame);
+          resizeObserver?.disconnect();
           lane.removeEventListener('pointerdown', down);
           window.removeEventListener('pointerup', up);
           window.removeEventListener('pointercancel', up);

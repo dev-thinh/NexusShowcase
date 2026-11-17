@@ -12,16 +12,23 @@ export async function GET(request: Request, { params }: { params: Promise<{ file
   if (!/^[a-zA-Z0-9_-]+\.(?:jpg|jpeg|png|webp)$/.test(filename)) return new Response('Không tìm thấy ảnh.', { status: 404 });
   try {
     const localUrl = `/uploads/thumbnails/${filename}`;
-    if (!(await getAssetAccess(localUrl)).allowed) return new Response('Không tìm thấy ảnh.', { status: 404, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' } });
+    const access = await getAssetAccess(localUrl);
+    if (!access.allowed) return new Response('Không tìm thấy ảnh.', { status: 404, headers: { 'Cache-Control': 'private, no-store', Vary: 'Cookie' } });
     const requestedWidth = new URL(request.url).searchParams.get('w');
     const width = requestedWidth === null ? null : Number(requestedWidth);
     if (width !== null && ![96, 128, 256, 384, 640, 1080].includes(width)) return new Response('Kích thước không hợp lệ.', { status: 400 });
+    const etag = `"${filename}:${width ?? 'orig'}"`;
+    const cacheControl = access.public ? 'private, max-age=300, stale-while-revalidate=86400' : 'private, no-cache';
+    if (request.headers.get('if-none-match') === etag) {
+      return new Response(null, { status: 304, headers: { ETag: etag, 'Cache-Control': cacheControl, Vary: 'Cookie' } });
+    }
     const bytes = width === null ? await readStoredAsset(localUrl) : await readThumbnail(localUrl, width);
     const extension = path.extname(filename).slice(1);
     return new Response(new Uint8Array(bytes), { headers: {
       'Content-Type': width === null ? `image/${extension === 'jpg' ? 'jpeg' : extension}` : 'image/webp',
       'X-Content-Type-Options': 'nosniff',
-      'Cache-Control': 'private, no-store', Vary: 'Cookie',
+      ETag: etag,
+      'Cache-Control': cacheControl, Vary: 'Cookie',
     } });
   } catch (error) {
     return new Response('Không đọc được ảnh.', { status: (error as NodeJS.ErrnoException).code === 'ENOENT' ? 404 : 500 });

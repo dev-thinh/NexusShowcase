@@ -12,10 +12,6 @@ export async function listDirectory(input: { authenticated: boolean; role: Publi
   const items = await rankedMembers({ ...input, skip, take });
   return { items, total, page, pageSize: take, totalPages };
 }
-export async function listLeadershipDirectory(input: { authenticated: boolean; role: 'ADMIN' | 'CORE_MEMBER' }): Promise<MemberDirectoryEntry[]> {
-  const total = await prisma.user.count({ where: { status: 'ACTIVE', deletedAt: null, hiddenFromDirectory: false, role: input.role } });
-  return rankedMembers({ ...input, take: total, skip: 0 });
-}
 
 export function getHomeMembers(): Promise<HomeMembersPayload> {
   return prisma.$transaction(async tx => {

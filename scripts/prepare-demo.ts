@@ -4,6 +4,7 @@ import {existsSync,readFileSync,writeFileSync,chmodSync} from 'node:fs';
 import {parseEnv} from 'node:util';
 import {spawnSync} from 'node:child_process';
 import {readDemoEnvironment,validateDemoEnvironment} from './demo-environment';
+import {grantDemoRuntimePrivileges} from './demo-schema';
 
 async function main(){
  if(process.env.NODE_ENV==='production')throw new Error('Demo preparation is disabled in production.');
@@ -42,16 +43,9 @@ async function main(){
   if(!demoDb.exists)await catalog.$executeRawUnsafe('CREATE DATABASE nexus_showcase_demo');
   const migrated=spawnSync(process.execPath,['node_modules/prisma/build/index.js','migrate','deploy'],{env:{...process.env,DATABASE_URL:expectedAdmin.href},encoding:'utf8'});
   if(migrated.status!==0)throw new Error('Demo migration failed; inspect private configuration.');
-  const admin=new PrismaClient({datasources:{db:{url:expectedAdmin.href}},log:[]});
   const role=decodeURIComponent(runtimeUrl.username);
   if(role!=='nexus_demo_runtime')throw new Error('Unexpected demo runtime role.');
-  try{
-   await admin.$executeRawUnsafe('GRANT CONNECT ON DATABASE nexus_showcase_demo TO nexus_demo_runtime');
-   await admin.$executeRawUnsafe('GRANT USAGE ON SCHEMA public TO nexus_demo_runtime');
-   const tables=await admin.$queryRaw<Array<{tablename:string}>>`SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename <> '_prisma_migrations'`;
-   for(const {tablename}of tables)await admin.$executeRawUnsafe(`GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE public."${tablename.replaceAll('"','""')}" TO nexus_demo_runtime`);
-   await admin.$executeRawUnsafe('GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO nexus_demo_runtime');
-  }finally{await admin.$disconnect();}
+  await grantDemoRuntimePrivileges(env, expectedAdmin.href);
   const seeded=spawnSync(process.execPath,['--import','tsx','prisma/seed-full-demo.ts'],{env,encoding:'utf8'});
   if(seeded.status!==0)throw new Error('Demo content seed failed; no runtime database was targeted.');
   console.log(seeded.stdout.trim());

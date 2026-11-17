@@ -66,11 +66,11 @@ export function ResearchFlashcards({ initialGallery }: { initialGallery?: Moment
           </div>
           <div className="research-direction__body">
             <div className="research-direction__heading">
-              <h3 id={`research-direction-${index}`} className="research-direction__title whitespace-pre-line [overflow-wrap:anywhere]">
+              <h3 id={`research-direction-${index}`} className="research-direction__title whitespace-pre-line [overflow-wrap:break-word]">
                 <HomeText field={direction.titleField} />
               </h3>
             </div>
-            <p className="research-direction__description whitespace-pre-line [overflow-wrap:anywhere]"><HomeText field={direction.descriptionField} /></p>
+            <p className="research-direction__description whitespace-pre-line [overflow-wrap:break-word]"><HomeText field={direction.descriptionField} /></p>
 
           </div>
         </article>

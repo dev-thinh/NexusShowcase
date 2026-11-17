@@ -60,6 +60,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
   }, [state.formError, state.fieldErrors]);
   const content = state.data.content ?? '';
   const images = articleFromLegacy(content, state.data.resources ?? []).sections.flatMap(section => section.blocks).filter((block): block is Extract<ArticleBlock, { kind: 'IMAGE' }> => block.kind === 'IMAGE' && !!block.url);
+  const validResources = (state.data.resources ?? []).filter(resource => submissionResourceSchema.safeParse(resource).success);
   return (
     <form ref={formRef} className="submission-form panel-detail w-full !p-0" onSubmit={event => event.preventDefault()} noValidate>
       {recoveries.length > 0 && <div className="border-b border-amber-300 bg-amber-50 px-4 py-3 text-sm sm:px-8"><p>{tr("Bài đã được sửa ở tab khác. Nội dung chưa lưu vẫn được giữ lại.")}</p><details className="mt-2"><summary className="cursor-pointer">{tr("Xem nội dung đang giữ")}</summary><DraftRecoveryPanel records={recoveries} serverVersion={initialData.reviewVersion ?? 0} onRestore={restoreRecovery} onDiscard={discardRecovery} /></details></div>}
@@ -81,7 +82,7 @@ export function SubmissionEditor({ initialData, currentUser, clubMembers, catego
         <ArticleTableOfContents content={content} />
         <section id="abstract" className="scroll-mt-36"><h2 className="mb-3 text-xl font-semibold text-[#1F2937]">{tr("Tóm tắt")}</h2><p className="whitespace-pre-line break-words text-justify text-base leading-8 text-[#1F2937]">{state.data.summary || tr("Chưa có tóm tắt.")}</p></section>
         <ArticleContent content={content} />
-        <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2><ResourceLinks resources={(state.data.resources ?? []).filter(resource => submissionResourceSchema.safeParse(resource).success)} /></section>
+        {validResources.length > 0 && <section><h2 className="mb-4 text-lg font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2><ResourceLinks resources={validResources} /></section>}
       </div> : <fieldset disabled={busy} className="min-w-0 disabled:opacity-70">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,7fr)_minmax(18rem,4fr)] lg:divide-x lg:divide-[#153D67]">
           <section className="p-4 sm:p-8"><h2 className="text-xl font-semibold text-[#1F2937]">{tr("Thông tin công trình")}</h2><div className="mt-6"><BasicInformationFields value={state.data} errors={state.fieldErrors} onChange={updateField} reviewComments={reviewComments} categories={categories} thumbnailImages={images} onBusy={value => setUploads(count => Math.max(0, count + (value ? 1 : -1)))} /></div>

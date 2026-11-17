@@ -10,6 +10,7 @@ test('research cards align on desktop and stack photos above centered text on mo
     await page.goto('/');
     const section = page.locator('[data-deferred-section="research"]');
     await section.scrollIntoViewIfNeeded();
+    await expect(section).toHaveAttribute('data-state', 'ready');
     const articles = section.locator('.research-direction');
     await expect(articles).toHaveCount(3);
     for (const article of await articles.all()) {

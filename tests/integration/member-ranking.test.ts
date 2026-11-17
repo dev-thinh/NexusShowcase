@@ -1,6 +1,6 @@
 import { searchContributors } from '@/features/identity/server/member-search-action';
 import { selectedContributors } from '@/features/identity/server/selected-contributors';
-import { listDirectory, listLeadershipDirectory } from '@/features/members/server/queries';
+import { listDirectory } from '@/features/members/server/queries';
 import { beforeAll, expect, it, vi } from 'vitest';
 import { prisma } from '../fixtures/database';
 const session = vi.hoisted(() => ({ allowed: true }));
@@ -61,9 +61,8 @@ it('excludes hidden admins from empty/name searches, counts and selected contrib
 it('returns only twelve rows per directory batch for larger groups', async () => {
   await prisma.user.createMany({ data: Array.from({ length: 25 }, (_, index) => ({ email: `bounded-${index}@nexus.test`, fullName: `Bounded ${String(index).padStart(2, '0')}`, role: 'CORE_MEMBER' as const, status: 'ACTIVE' as const })) });
   try {
-    const leadership = await listLeadershipDirectory({ authenticated: false, role: 'CORE_MEMBER' });
-    expect(leadership).toHaveLength(25);
     const pages = await Promise.all([1, 2, 3].map(page => listDirectory({ authenticated: false, role: 'CORE_MEMBER', page, pageSize: 12 })));
+    expect(pages[0].total).toBe(25);
     expect(pages.map(page => page.items.length)).toEqual([12, 12, 1]);
     expect(pages.map(page => page.totalPages)).toEqual([3, 3, 3]);
     const members = pages.flatMap(page => page.items);

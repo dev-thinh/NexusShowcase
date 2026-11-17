@@ -22,3 +22,13 @@ it('handles missing files without exposing disk details', async () => {
   expect(response.status).toBe(404);
   expect(await response.text()).not.toContain('private');
 });
+it('returns ETag and honors If-None-Match with 304 after access verification', async () => {
+  const first = await read('cached-photo.webp');
+  const etag = first.headers.get('ETag');
+  expect(etag).toBe('"cached-photo.webp:orig"');
+  expect(first.headers.get('Cache-Control')).toContain('private, max-age=300');
+  mocks.read.mockClear();
+  const second = await GET(new Request('http://localhost/uploads/thumbnails/cached-photo.webp', { headers: { 'If-None-Match': etag! } }), { params: Promise.resolve({ filename: 'cached-photo.webp' }) });
+  expect(second.status).toBe(304);
+  expect(mocks.read).not.toHaveBeenCalled();
+});

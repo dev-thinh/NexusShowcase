@@ -147,9 +147,9 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                     return <button key={slot} type="button" className={`moments-editor__slot${photo ? '' : ' moments-editor__slot--empty'}`} data-moment-slot={slot} data-moment-drag={photo?.id} data-drag-source={drag?.photoId === photo?.id && !!photo ? 'true' : undefined} data-drop-target={drag?.over === slot ? 'true' : undefined} aria-label={`${slotLabel(slot)}: ${photo?.title ?? tr('Trống')}`} aria-pressed={selectedSlot === slot} onDragStart={event => event.preventDefault()} onClick={() => { setSelectedSlot(slot); setMobilePanel(photo ? 'details' : 'arrange'); }}>
                       {photo ? <>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={135} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} draggable={false} />
+                        <MediaImage optimized showPlaceholderLabel={false} src={photo.src} alt={photo.alt} width={180} height={135} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} draggable={false} />
                         <span className="moments-editor__slot-title">{photo.title}</span>
-                      </> : <MediaImage className="h-full w-full" alt={tr("Vị trí ảnh trống")} />}
+                      </> : <MediaImage showPlaceholderLabel={false} className="h-full w-full" alt={tr("Vị trí ảnh trống")} />}
                       <span className="moments-editor__slot-number">{column + 1}</span>
                     </button>;
                   })}
@@ -192,7 +192,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
                 {library.map(photo => <div key={photo.id} className="moments-editor__asset">
                   <button type="button" className="moments-editor__asset-select" data-moment-drag={photo.id} data-drag-source={drag?.photoId === photo.id ? 'true' : undefined} aria-label={tr("Chọn ảnh: {0}", photo.title || tr('Ảnh chưa có tiêu đề'))} onDragStart={event => event.preventDefault()} onClick={() => choose(photo)}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={135} sizes="(max-width: 767px) 30vw, 200px" loading="lazy" draggable={false} />
+                    <MediaImage optimized src={photo.src} alt={photo.alt} width={180} height={135} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} loading="lazy" draggable={false} />
                     {photo.slot !== null && <span className="moments-editor__used"><Check size={12} aria-hidden="true" />{research ? tr("Ảnh") : photo.slot < 6 ? tr("Trên") : tr("Dưới")} {photo.slot % 6 + 1}</span>}
                     <span className="moments-editor__asset-title">{photo.title || tr("Ảnh chưa có tiêu đề")}</span>
                   </button>
@@ -208,7 +208,7 @@ export function MomentsEditor({ gallery, onSave, onCancel, variant = 'moments', 
         </div></div>
         {drag && draggedPhoto && createPortal(<div className="moments-drag-preview" style={{ left: drag.x - drag.offsetX, top: drag.y - drag.offsetY, width: drag.width, height: drag.height }} aria-hidden="true">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <MediaImage optimized src={draggedPhoto.src} alt="" width={180} height={135} sizes="(max-width: 767px) 30vw, 200px" draggable={false} />
+          <MediaImage optimized src={draggedPhoto.src} alt="" width={180} height={135} sizes={research ? '(max-width: 767px) 30vw, 260px' : '130px'} draggable={false} />
         </div>, document.body)}
       </div>
     </Modal>
