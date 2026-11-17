@@ -11,10 +11,12 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
     const setup = () => {
       cleanup();
       if (!mobile.matches || reduced.matches || keyboardBrowsing) return;
-      const lanes = [...(wall.current?.querySelectorAll<HTMLElement>('.moments-lane[data-motion="true"]') ?? [])];
-      const disposers = lanes.map(lane => {
+      const root = wall.current;
+      const lanes = [...(root?.querySelectorAll<HTMLElement>('.moments-lane[data-motion="true"]') ?? [])];
+      let inView = true;
+      const controllers = lanes.map(lane => {
         const group = lane.querySelector<HTMLElement>('.moments-group');
-        if (!group) return () => {};
+        if (!group) return { sync: () => {}, dispose: () => {} };
         let frame = 0;
         let last = 0;
         let remainder = 0;
@@ -37,6 +39,8 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
         const up = () => { touching = false; resumeAt = performance.now() + 1200; };
         const wheel = () => { resumeAt = performance.now() + 1200; };
         const tick = (now: number) => {
+          frame = 0;
+          if (!inView) return;
           const elapsed = last ? Math.min(now - last, 50) : 0;
           last = now;
           if (!paused && !touching && now >= resumeAt && !document.hidden) {
@@ -50,23 +54,46 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
           wrap();
           frame = requestAnimationFrame(tick);
         };
+        const sync = () => {
+          if (inView && !frame) {
+            last = 0;
+            frame = requestAnimationFrame(tick);
+          } else if (!inView && frame) {
+            cancelAnimationFrame(frame);
+            frame = 0;
+          }
+        };
         lane.addEventListener('pointerdown', down, { passive: true });
         window.addEventListener('pointerup', up, { passive: true });
         window.addEventListener('pointercancel', up, { passive: true });
         lane.addEventListener('wheel', wheel, { passive: true });
         lane.addEventListener('scroll', wrap, { passive: true });
-        frame = requestAnimationFrame(tick);
-        return () => {
-          cancelAnimationFrame(frame);
-          resizeObserver?.disconnect();
-          lane.removeEventListener('pointerdown', down);
-          window.removeEventListener('pointerup', up);
-          window.removeEventListener('pointercancel', up);
-          lane.removeEventListener('wheel', wheel);
-          lane.removeEventListener('scroll', wrap);
+        sync();
+        return {
+          sync,
+          dispose: () => {
+            if (frame) cancelAnimationFrame(frame);
+            resizeObserver?.disconnect();
+            lane.removeEventListener('pointerdown', down);
+            window.removeEventListener('pointerup', up);
+            window.removeEventListener('pointercancel', up);
+            lane.removeEventListener('wheel', wheel);
+            lane.removeEventListener('scroll', wrap);
+          },
         };
       });
-      cleanup = () => disposers.forEach(dispose => dispose());
+      const visibilityObserver = root && typeof IntersectionObserver !== 'undefined'
+        ? new IntersectionObserver(([entry]) => {
+            if (!entry) return;
+            inView = entry.isIntersecting;
+            controllers.forEach(controller => controller.sync());
+          })
+        : null;
+      if (root) visibilityObserver?.observe(root);
+      cleanup = () => {
+        visibilityObserver?.disconnect();
+        controllers.forEach(controller => controller.dispose());
+      };
     };
     setup();
     mobile.addEventListener('change', setup);

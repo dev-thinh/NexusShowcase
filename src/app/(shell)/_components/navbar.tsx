@@ -14,7 +14,7 @@ export async function SiteNavbar() {
 
 
   return (
-    <header id="site-navbar" className="sticky top-0 z-40 bg-white backdrop-blur-md border-b border-slate-200 transition-all shadow-2xs w-full">
+    <header id="site-navbar" className="sticky top-0 z-40 bg-white border-b border-slate-200 transition-all shadow-2xs w-full">
       <div className="site-navbar-grid relative w-full px-4 sm:px-6 lg:px-8 xl:px-10 min-h-16 py-3 xl:py-0 gap-y-2 grid grid-cols-[minmax(0,1fr)_auto_auto] xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center">
         {/* Góc trên bên trái: Brand Logo */}
         <div className="site-brand-container col-start-1 row-start-1 flex items-center justify-self-start min-w-0">

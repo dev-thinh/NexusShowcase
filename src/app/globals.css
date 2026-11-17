@@ -698,8 +698,17 @@ strong {
   .home-hero::before,
   .home-hero__text-aurora,
   .home-hero__glow--one,
-  .home-hero__glow--two {
+  .home-hero__glow--two,
+  .home-hero__title-accent,
+  .home-hero__ambient-particle {
     animation: none;
+  }
+  .home-hero__cursor-glow {
+    display: none;
+  }
+  .home-hero__art,
+  .home-hero__heart-sculpture img {
+    filter: none;
   }
   .home-hero__glow {
     filter: blur(40px);
