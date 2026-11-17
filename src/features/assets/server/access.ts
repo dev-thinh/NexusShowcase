@@ -9,6 +9,16 @@ import type { Actor } from '@/features/identity/model/session';
 type ItemReference = { creatorId: string; status: string; visibility: string; live: unknown; drafts: unknown };
 const denied = { allowed: false, public: false } as const;
 const hasReference = (value: unknown, url: string) => inspectAssetReferences(value).urls.has(url);
+let galleriesInFlight: Promise<Array<{ photos: unknown }>> | null = null;
+
+function readGalleriesInFlight() {
+  if (!galleriesInFlight) {
+    galleriesInFlight = prisma.homeMomentsGallery.findMany({ select: { photos: true } }).finally(() => {
+      galleriesInFlight = null;
+    });
+  }
+  return galleriesInFlight;
+}
 
 /** Public placement grants public reads; drafts and history never grant anonymous reads. */
 export async function getAssetAccess(url: string, authenticatedActor?: Actor): Promise<{ allowed: boolean; public: boolean }> {
@@ -31,10 +41,10 @@ export async function getAssetAccess(url: string, authenticatedActor?: Actor): P
       FROM showcase_items i LEFT JOIN editorial_drafts e ON e."itemId" = i.id
       WHERE i.id IN (SELECT "itemId" FROM asset_item_references WHERE url = ${url})
   `;
-  const references = items.map(item => ({ ...item, liveAsset: hasReference(item.live, url), draftAsset: hasReference(item.drafts, url) }));
+  const references = items.map(item => ({ ...item, liveAsset: hasReference(item.live, url) }));
   if (references.some(item => item.liveAsset && item.status === 'PUBLISHED' && item.visibility === 'PUBLIC')) return { allowed: true, public: true };
   if (url.startsWith('/uploads/thumbnails/')) {
-    const galleries = await prisma.homeMomentsGallery.findMany({ select: { photos: true } });
+    const galleries = await readGalleriesInFlight();
     if (galleries.some(gallery => Array.isArray(gallery.photos) && gallery.photos.some(photo => photo && typeof photo === 'object' && !Array.isArray(photo) && photo.src === url && photo.visible === true && photo.slot !== null))) return { allowed: true, public: true };
   }
   const actor = authenticatedActor ?? await getActor();
@@ -44,6 +54,6 @@ export async function getAssetAccess(url: string, authenticatedActor?: Actor): P
   // A user-controlled draft cannot override the registry's owner, including
   // references persisted before write-time authorization was introduced.
   if (registered && actor.role !== 'EDITOR') return denied;
-  if (references.some(item => (item.liveAsset || item.draftAsset) && (item.creatorId === actor.id || actor.role === 'EDITOR'))) return { allowed: true, public: false };
+  if (references.some(item => (item.creatorId === actor.id || actor.role === 'EDITOR') && (item.liveAsset || hasReference(item.drafts, url)))) return { allowed: true, public: false };
   return denied;
 }
