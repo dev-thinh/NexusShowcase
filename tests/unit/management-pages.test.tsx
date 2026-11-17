@@ -58,10 +58,12 @@ describe('management pages', () => {
     await expect(AdminDashboardPage()).rejects.toThrow('redirect:/');
   });
 
-  it('keeps private member fields out of client row queries', async () => {
+  it('keeps private member fields out of client row queries and renders member avatars', async () => {
+    mocks.members.mockResolvedValue([{ ...member, avatarUrl: '/uploads/thumbnails/nguyen-an.webp' }]);
     const html = renderToStaticMarkup(await AdminMembersPage({ searchParams: Promise.resolve({}) }));
     expect(mocks.members).toHaveBeenCalledWith(expect.objectContaining({ select: adminMemberClientSelect }));
     expect(html).toContain('Nguyễn An');
+    expect(html).toContain('/uploads/thumbnails/nguyen-an.webp');
     expect(html).toContain('Thu quyền đăng bài');
     expect(html).toContain('Tìm thành viên theo họ tên');
   });

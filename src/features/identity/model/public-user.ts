@@ -21,6 +21,7 @@ export const adminMemberClientSelect = {
   id: true,
   publicSlug: true,
   fullName: true,
+  avatarUrl: true,
   role: true,
   createdAt: true,
 } satisfies Prisma.UserSelect;

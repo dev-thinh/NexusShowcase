@@ -30,6 +30,7 @@ describe('public user data boundary', () => {
       id: true,
       publicSlug: true,
       fullName: true,
+      avatarUrl: true,
       role: true,
       createdAt: true,
       status: true,
