@@ -23,12 +23,13 @@ export function MediaImage({ src, alt = '', className = '', style, width, height
     </span>;
   }
   const useThumbnail = optimized ?? src.startsWith('/uploads/thumbnails/');
-  if (useThumbnail && typeof width === 'number' && typeof height === 'number') {
+  if (useThumbnail) {
     // Same-origin derivatives carry the reader's cookies, unlike /_next/image.
     const widths = [96, 128, 256, 384, 640, 1080];
+    const targetWidth = typeof width === 'number' ? width : 1080;
     const thumbnail = (size: number) => `${src}${src.includes('?') ? '&' : '?'}w=${size}`;
     // eslint-disable-next-line @next/next/no-img-element
-    return <img {...props} draggable={false} ref={imageRef} src={thumbnail(widths.find(size => size >= width) ?? 1080)} srcSet={widths.map(size => `${thumbnail(size)} ${size}w`).join(', ')} alt={alt} className={className} style={style} width={width} height={height} decoding="async" onError={event => { setFailedSrc(src); onError?.(event); }} />;
+    return <img {...props} draggable={false} ref={imageRef} src={thumbnail(widths.find(size => size >= targetWidth) ?? 1080)} srcSet={widths.map(size => `${thumbnail(size)} ${size}w`).join(', ')} sizes={props.sizes ?? (typeof width === 'number' ? undefined : '(max-width: 1024px) 100vw, 896px')} alt={alt} className={className} style={style} width={width} height={height} decoding="async" onError={event => { setFailedSrc(src); onError?.(event); }} />;
   }
   // eslint-disable-next-line @next/next/no-img-element
   return <img {...props} draggable={false} ref={imageRef} src={src} alt={alt} className={className} style={style} width={width} height={height} onError={event => { setFailedSrc(src); onError?.(event); }} />;

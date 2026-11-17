@@ -144,7 +144,7 @@ export function HomeMoments({ initialGallery = { photos: defaultMoments, version
                     const pose = momentPhotoPose(photo, index);
                     const photoIndex = photos.findIndex(item => item.id === photo.id);
                     return (
-                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': pose.tilt, '--photo-offset': pose.offset } as CSSProperties} tabIndex={copy ? -1 : undefined} data-photo-id={photo.id} aria-label={tr("Xem ảnh: {0}", photo.title)} onPointerEnter={() => prefetchMomentPhoto(photo.src)} onFocus={() => prefetchMomentPhoto(photo.src)} onClick={event => openViewer(photoIndex, event.currentTarget)}>
+                      <button type="button" className={`moment-photo moment-photo--${photo.shape}`} key={photo.src} style={{ '--photo-tilt': pose.tilt, '--photo-offset': pose.offset } as CSSProperties} tabIndex={copy ? -1 : undefined} data-photo-id={photo.id} aria-label={tr("Xem ảnh: {0}", photo.title)} onPointerDown={() => prefetchMomentPhoto(photo.src)} onFocus={() => prefetchMomentPhoto(photo.src)} onClick={event => openViewer(photoIndex, event.currentTarget)}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <MediaImage optimized src={photo.src} alt={copy ? '' : photo.alt} width={1000} height={750} sizes="(max-width: 767px) 264px, 336px" loading={copy ? 'lazy' : 'eager'} decoding="async" />
                         <span className="moment-photo__caption"><span>{photo.title}</span><Expand size={16} aria-hidden="true" /></span>
