@@ -36,7 +36,6 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
         const down = () => { touching = true; };
         const up = () => { touching = false; resumeAt = performance.now() + 1200; };
         const wheel = () => { resumeAt = performance.now() + 1200; };
-        const onScroll = () => { if (touching) wrap(); };
         const tick = (now: number) => {
           const elapsed = last ? Math.min(now - last, 50) : 0;
           last = now;
@@ -46,16 +45,16 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
             if (step !== 0) {
               lane.scrollLeft += step;
               remainder -= step;
-              wrap();
             }
           }
+          wrap();
           frame = requestAnimationFrame(tick);
         };
         lane.addEventListener('pointerdown', down, { passive: true });
         window.addEventListener('pointerup', up, { passive: true });
         window.addEventListener('pointercancel', up, { passive: true });
         lane.addEventListener('wheel', wheel, { passive: true });
-        lane.addEventListener('scroll', onScroll, { passive: true });
+        lane.addEventListener('scroll', wrap, { passive: true });
         frame = requestAnimationFrame(tick);
         return () => {
           cancelAnimationFrame(frame);
@@ -64,7 +63,7 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
           window.removeEventListener('pointerup', up);
           window.removeEventListener('pointercancel', up);
           lane.removeEventListener('wheel', wheel);
-          lane.removeEventListener('scroll', onScroll);
+          lane.removeEventListener('scroll', wrap);
         };
       });
       cleanup = () => disposers.forEach(dispose => dispose());
