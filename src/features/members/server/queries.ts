@@ -6,9 +6,9 @@ import { rankedMembers } from './ranking';
 import { Prisma } from '@prisma/client';
 import { homeMemberSlots, type HomeMember, type HomeMembersPayload } from '../model/home';
 
-export async function listDirectory(input: { authenticated: boolean; role: PublicMemberRole; page: unknown; pageSize: 6 | 12 }): Promise<Page<MemberDirectoryEntry>> {
+export async function listDirectory(input: { authenticated: boolean; role: PublicMemberRole; page: unknown; pageSize: 6 | 12 | 30 }): Promise<Page<MemberDirectoryEntry>> {
   const total = await prisma.user.count({ where: { status: 'ACTIVE', deletedAt: null, hiddenFromDirectory: false, role: input.role } });
-  const { page, skip, take, totalPages } = pageBounds(input.page, total, input.pageSize === 6 ? 6 : 12);
+  const { page, skip, take, totalPages } = pageBounds(input.page, total, input.pageSize === 6 ? 6 : input.pageSize === 30 ? 30 : 12);
   const items = await rankedMembers({ ...input, skip, take });
   return { items, total, page, pageSize: take, totalPages };
 }

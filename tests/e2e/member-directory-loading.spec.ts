@@ -7,7 +7,7 @@ test('directory starts bounded, loads all remaining members on click, and collap
   await page.goto('/members');
   const members = page.locator('[data-member-directory="MEMBER"]');
   const avatars = members.locator('[data-home-member-avatar]');
-  await expect(avatars).toHaveCount(12);
+  await expect(avatars).toHaveCount(30);
   await expect(page.getByText(/Đã hiển thị/)).toHaveCount(0);
   expect(requests).toHaveLength(0);
   await expect(page.locator('[data-member-load-more]')).toHaveCount(1);
@@ -16,7 +16,7 @@ test('directory starts bounded, loads all remaining members on click, and collap
   await expect(page.locator('[aria-labelledby=experienced-heading] [data-home-member-avatar]')).toHaveCount(1);
   await members.locator('[data-member-load-more]').scrollIntoViewIfNeeded();
   expect(requests).toHaveLength(0);
-  await expect(avatars).toHaveCount(12);
+  await expect(avatars).toHaveCount(30);
   await members.locator('[data-member-load-more]').click();
   await expect.poll(() => avatars.count()).toBe(98);
   expect(requests.some(url => url.includes('page=2'))).toBe(true);
@@ -27,7 +27,7 @@ test('directory starts bounded, loads all remaining members on click, and collap
   expect(await members.locator('[data-home-member-avatar]:visible').count()).toBe(ids.length);
   expect(new Set(requests).size).toBe(requests.length);
   await members.locator('[data-member-collapse]').click();
-  await expect(avatars).toHaveCount(12);
+  await expect(avatars).toHaveCount(30);
   await expect(members.locator('[data-member-collapse]')).toHaveCount(0);
   await expect(members.locator('[data-member-load-more]')).toHaveCount(1);
   const requestCountAfterCollapse = requests.length;
@@ -41,7 +41,7 @@ test('card directory retains loaded members after a failed request and supports 
   await page.route('**/api/members?**', route => fail ? route.fulfill({ status: 500, json: { error: 'Unavailable' } }) : route.continue());
   await page.goto('/members/all');
   const members = page.locator('[data-member-directory="MEMBER"]');
-  await expect(members.locator('article')).toHaveCount(12);
+  await expect(members.locator('article')).toHaveCount(30);
   await expect(page.getByText(/Đã hiển thị/)).toHaveCount(0);
   await members.locator('[data-member-load-more]').click();
   await expect(members.getByRole('alert')).toBeVisible();
@@ -52,5 +52,5 @@ test('card directory retains loaded members after a failed request and supports 
   await expect(members.getByRole('alert')).toHaveCount(0);
   await expect(members.locator('[data-member-collapse]')).toHaveCount(1);
   await members.locator('[data-member-collapse]').click();
-  await expect(members.locator('article')).toHaveCount(12);
+  await expect(members.locator('article')).toHaveCount(30);
 });

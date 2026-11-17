@@ -56,11 +56,11 @@ test('public members starts bounded and ignores stale page parameters', async ({
   await expect(page.getByRole('navigation', { name: 'Phân trang thành viên' })).toHaveCount(0);
   await expect(page.locator('main .home-member-grid')).toHaveCount(3);
   const leadership = fixture.users.filter(user => user.role === 'ADMIN' || user.role === 'CORE_MEMBER');
-  await expect(page.locator('main .home-member-grid a')).toHaveCount(leadership.length + 12);
+  await expect(page.locator('main .home-member-grid a')).toHaveCount(leadership.length + 30);
   const members = page.locator('[data-member-directory="MEMBER"]');
-  await expect(members.locator('[data-home-member-avatar]')).toHaveCount(12);
+  await expect(members.locator('[data-home-member-avatar]')).toHaveCount(30);
   await members.locator('[data-member-load-more]').click();
   await expect.poll(() => members.locator('[data-home-member-avatar]').count()).toBe(fixture.users.length - leadership.length);
   await members.locator('[data-member-collapse]').click();
-  await expect(members.locator('[data-home-member-avatar]')).toHaveCount(12);
+  await expect(members.locator('[data-home-member-avatar]')).toHaveCount(30);
 });
