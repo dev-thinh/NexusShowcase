@@ -248,6 +248,10 @@ strong {
   background: rgb(255 255 255 / 0.1);
   border-color: rgb(255 255 255 / 0.3);
 }
+#site-navbar[data-banner-top='true']:not(:has(.site-public-navigation[data-open='true'])) .site-account-role-badge {
+  color: #fff;
+  background: rgb(255 255 255 / 0.18);
+}
 #site-navbar[data-banner-top='true'] :focus-visible { outline-color: #a5f3fc; }
 @media (prefers-reduced-motion: reduce) {
   #site-navbar,
