@@ -60,6 +60,7 @@ test('public members starts bounded and ignores stale page parameters', async ({
   const members = page.locator('[data-member-directory="MEMBER"]');
   await expect(members.locator('[data-home-member-avatar]')).toHaveCount(12);
   await members.locator('[data-member-load-more]').click();
-  await expect.poll(() => members.locator('[data-home-member-avatar]').count()).toBeGreaterThanOrEqual(24);
-  expect(await page.locator('main .home-member-grid a').count()).toBeLessThan(fixture.users.length);
+  await expect.poll(() => members.locator('[data-home-member-avatar]').count()).toBe(fixture.users.length - leadership.length);
+  await members.locator('[data-member-collapse]').click();
+  await expect(members.locator('[data-home-member-avatar]')).toHaveCount(12);
 });

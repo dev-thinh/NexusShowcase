@@ -18,7 +18,9 @@ describe('Members Directory Page', () => {
     expect(content).toContain('title={tr("Ban chủ nhiệm")}');
     expect(content).toContain('title={tr("Trưởng nhóm")}');
     expect(content).toContain('title={tr("Thành viên")}');
-    expect(content).toContain('<MemberDirectoryList');
+    expect(content).toContain('<MemberDirectoryList initialPage={advisorsPage} role="ADMIN" />');
+    expect(content).toContain('<MemberDirectoryList initialPage={experiencedPage} role="CORE_MEMBER" />');
+    expect(content).toContain('<MemberDirectoryList initialPage={regularPage} role="MEMBER" />');
     expect(content).toContain(
       "pageSize: MEMBER_DIRECTORY_PAGE_SIZE",
     );
@@ -68,5 +70,17 @@ describe('Members Directory Page', () => {
     expect(content).toContain('Tất cả thành viên');
     expect(content).not.toContain("role: 'ADMIN'");
     expect(content).not.toContain("role: 'CORE_MEMBER'");
+  });
+
+  it('loads additional members only on click and provides a collapse button', () => {
+    const listSource = fs.readFileSync(
+      path.resolve(process.cwd(), 'src/features/members/components/member-directory-list.tsx'),
+      'utf-8',
+    );
+    expect(listSource).not.toContain('IntersectionObserver');
+    expect(listSource).toContain('data-member-load-more={role}');
+    expect(listSource).toContain('data-member-collapse={role}');
+    expect(listSource).toContain("tr('Xem thêm')");
+    expect(listSource).toContain("tr('Ẩn bớt')");
   });
 });
