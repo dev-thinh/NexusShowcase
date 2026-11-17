@@ -113,7 +113,11 @@ export function NavbarNav({ user }: NavbarNavProps) {
               <span className="hidden xl:block truncate xl:max-w-[110px] font-semibold">
                 {user.name || tr("Thành viên")}
               </span>
-              <span className="hidden xl:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md bg-[#FFFFFF] text-[#1F2937]">
+              <span className={`site-account-role-badge hidden xl:inline text-[10px] font-semibold px-1.5 py-0.5 rounded-md transition-colors ${
+                isAdminActive || isProfileActive || isDashboardActive
+                  ? 'bg-white/20 text-white'
+                  : 'bg-slate-100 text-[#1F2937]'
+              }`}>
                 {tr(getMemberRoleLabel(user.role))}
               </span>
               <ChevronDown aria-hidden="true" className={`hidden xl:block w-3.5 h-3.5 shrink-0 transition-transform motion-reduce:transition-none ${isProfileMenuOpen ? 'rotate-180' : ''}`} />
