@@ -261,7 +261,7 @@ export default async function ShowcaseDetailPage({
                     const name = contributor.user?.fullName || contributor.externalName || 'Thành viên';
                     return (
                       <li key={contributor.id} className="flex items-start gap-3">
-                        <MemberAvatar fullName={name} className="h-9 w-9 shrink-0 rounded-full text-xs" />
+                        <MemberAvatar fullName={name} src={contributor.user?.avatarUrl} className="h-9 w-9 shrink-0 rounded-full object-cover text-xs" />
                         <div className="min-w-0">
                           <span className="text-sm text-[#1F2937]"><ContributorName contributor={contributor} /></span>
                           <p className="mt-1 text-xs leading-5 text-[#1F2937]">{contributor.customRoleTitle || tr(contributorRoles[contributor.role])}</p>
