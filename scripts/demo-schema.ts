@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import { spawn } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
@@ -25,9 +26,28 @@ const run: Runner = (args, env) => new Promise((resolve, reject) => {
   child.once('exit', code => resolve(code ?? 1));
 });
 
+export async function grantDemoRuntimePrivileges(demo: NodeJS.ProcessEnv, maintenanceUrl?: string) {
+  const maintenance = maintenanceUrl ?? process.env.MIGRATION_DATABASE_URL ?? parseEnv(readFileSync('.env.database.local', 'utf8')).MIGRATION_DATABASE_URL;
+  const env = demoMigrationEnvironment(demo, maintenance ?? '');
+  const admin = new PrismaClient({ datasources: { db: { url: env.DATABASE_URL } }, log: [] });
+  try {
+    await admin.$executeRawUnsafe('GRANT CONNECT ON DATABASE nexus_showcase_demo TO nexus_demo_runtime');
+    await admin.$executeRawUnsafe('GRANT USAGE ON SCHEMA public TO nexus_demo_runtime');
+    const tables = await admin.$queryRaw<Array<{ tablename: string }>>`SELECT tablename FROM pg_tables WHERE schemaname='public' AND tablename <> '_prisma_migrations'`;
+    for (const { tablename } of tables) {
+      await admin.$executeRawUnsafe(`GRANT SELECT,INSERT,UPDATE,DELETE ON TABLE public."${tablename.replaceAll('"', '""')}" TO nexus_demo_runtime`);
+    }
+    await admin.$executeRawUnsafe('GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO nexus_demo_runtime');
+    await admin.$executeRawUnsafe('ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT,INSERT,UPDATE,DELETE ON TABLES TO nexus_demo_runtime');
+  } finally {
+    await admin.$disconnect();
+  }
+}
+
 export async function syncDemoSchema(demo: NodeJS.ProcessEnv, maintenanceUrl?: string, runner: Runner = run) {
   const maintenance = maintenanceUrl ?? process.env.MIGRATION_DATABASE_URL ?? parseEnv(readFileSync('.env.database.local', 'utf8')).MIGRATION_DATABASE_URL;
   const env = demoMigrationEnvironment(demo, maintenance ?? '');
   if (await runner(['generate'], demo)) throw new Error('Could not generate Prisma Client; demo was not started.');
   if (await runner(['migrate', 'deploy'], env)) throw new Error('Demo database migrations failed; demo was not started.');
+  if (runner === run) await grantDemoRuntimePrivileges(demo, maintenance);
 }
