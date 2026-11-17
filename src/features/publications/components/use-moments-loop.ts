@@ -20,7 +20,12 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
         let remainder = 0;
         let touching = false;
         let resumeAt = 0;
-        const period = () => group.getBoundingClientRect().width;
+        let cachedWidth = group.getBoundingClientRect().width;
+        const resizeObserver = typeof ResizeObserver !== 'undefined'
+          ? new ResizeObserver(() => { cachedWidth = group.getBoundingClientRect().width; })
+          : null;
+        resizeObserver?.observe(group);
+        const period = () => cachedWidth || group.getBoundingClientRect().width;
         if (lane.scrollLeft <= 0) lane.scrollLeft = period();
         const wrap = () => {
           const width = period();
@@ -31,31 +36,35 @@ export function useMomentsLoop(wall: RefObject<HTMLElement | null>, paused: bool
         const down = () => { touching = true; };
         const up = () => { touching = false; resumeAt = performance.now() + 1200; };
         const wheel = () => { resumeAt = performance.now() + 1200; };
+        const onScroll = () => { if (touching) wrap(); };
         const tick = (now: number) => {
           const elapsed = last ? Math.min(now - last, 50) : 0;
           last = now;
           if (!paused && !touching && now >= resumeAt && !document.hidden) {
             remainder += elapsed * (lane.dataset.row === '1' ? -0.025 : 0.03);
             const step = Math.trunc(remainder);
-            lane.scrollLeft += step;
-            remainder -= step;
+            if (step !== 0) {
+              lane.scrollLeft += step;
+              remainder -= step;
+              wrap();
+            }
           }
-          wrap();
           frame = requestAnimationFrame(tick);
         };
         lane.addEventListener('pointerdown', down, { passive: true });
         window.addEventListener('pointerup', up, { passive: true });
         window.addEventListener('pointercancel', up, { passive: true });
         lane.addEventListener('wheel', wheel, { passive: true });
-        lane.addEventListener('scroll', wrap, { passive: true });
+        lane.addEventListener('scroll', onScroll, { passive: true });
         frame = requestAnimationFrame(tick);
         return () => {
           cancelAnimationFrame(frame);
+          resizeObserver?.disconnect();
           lane.removeEventListener('pointerdown', down);
           window.removeEventListener('pointerup', up);
           window.removeEventListener('pointercancel', up);
           lane.removeEventListener('wheel', wheel);
-          lane.removeEventListener('scroll', wrap);
+          lane.removeEventListener('scroll', onScroll);
         };
       });
       cleanup = () => disposers.forEach(dispose => dispose());

@@ -38,8 +38,8 @@ export default async function HomePage({ searchParams }: {
                 <p className="home-section-eyebrow"><HomeText field="featuredEyebrow">{tr("Dấu ấn nghiên cứu")}</HomeText></p>
                 <h2 id="featured-works-title" className="home-section-title"><HomeText field="featuredTitle">{tr("Công trình nổi bật")}</HomeText></h2>
               </div>
-              <Link href="/research" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
-                <HomeText field="featuredAction">{tr("Xem nghiên cứu khoa học")}</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <Link href="/research" className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-slate-50">
+                <HomeText field="featuredAction">{tr("Xem nghiên cứu khoa học")}</HomeText> <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
               </Link>
             </div>
             <div className="mt-6 grid gap-5">
@@ -63,8 +63,8 @@ export default async function HomePage({ searchParams }: {
                 <p className="home-section-eyebrow"><HomeText field="membersEyebrow">{tr("Đội ngũ CLB")}</HomeText></p>
                 <h2 id="home-members-title" className="home-section-title"><HomeText field="membersTitle">{tr("Thành viên")}</HomeText></h2>
               </div>
-              <Link href="/members" className="ml-auto inline-flex min-h-11 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
-                <HomeText field="membersAction">{tr("Xem tất cả thành viên")}</HomeText> <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <Link href="/members" className="ml-auto inline-flex min-h-11 shrink-0 items-center gap-2 rounded-lg border border-slate-200 px-4 text-sm font-semibold text-[#1F2937] transition-colors hover:bg-[#FFFFFF]">
+                <HomeText field="membersAction">{tr("Xem tất cả thành viên")}</HomeText> <ArrowRight className="h-4 w-4 shrink-0" aria-hidden="true" />
               </Link>
             </div>
             <HomeMembersSection />

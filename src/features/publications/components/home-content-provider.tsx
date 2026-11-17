@@ -38,7 +38,7 @@ export function HomeText({ field, children }: { field: HomeTextKey; children?: R
     observer.observe(control);
     return () => observer.disconnect();
   }, [editing, text[field]]);
-  if (!editing) return <span className="whitespace-pre-line [overflow-wrap:anywhere]">{text[field] ?? children}</span>;
+  if (!editing) return <span className="whitespace-pre-line [overflow-wrap:break-word]">{text[field] ?? children}</span>;
   return <span className="home-inline-field">
     <textarea ref={input} data-home-field={field} aria-label={tr(homeTextLabel(field))} aria-invalid={!!errors[field]} aria-describedby={errors[field] ? `${id}-error` : undefined} rows={1} required maxLength={homeTextLimit(field)} disabled={busy} value={text[field]} onChange={event => change(field, event.target.value)} className="home-inline-input" />
     {errors[field] && <span id={`${id}-error`} role="alert" className="block rounded bg-white px-2 py-1 text-sm font-normal tracking-normal text-red-700">{tr(errors[field] ?? '')}</span>}
