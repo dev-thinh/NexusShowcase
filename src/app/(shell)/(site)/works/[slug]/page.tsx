@@ -242,13 +242,15 @@ export default async function ShowcaseDetailPage({
 
           <aside className="min-w-0 space-y-7 border-t border-slate-200 pt-6 lg:sticky lg:top-24 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0" aria-label={tr("Tài nguyên và nhóm thực hiện")}>
             <div className="hidden lg:block"><ArticleTableOfContents content={item.content ?? ''} /></div>
-            <section id="resources" className="scroll-mt-28" aria-labelledby="resources-title">
-              <h2 id="resources-title" className="mb-4 text-base font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2>
-              <div className="flex flex-col items-stretch gap-2">
-                <CitationModal item={toCitationDto(item)} className="action-secondary-detail" />
-                <ResourceLinks resources={sidebarResources} />
-              </div>
-            </section>
+            {(item.citationEnabled !== false || sidebarResources.length > 0) && (
+              <section id="resources" className="scroll-mt-28" aria-labelledby="resources-title">
+                <h2 id="resources-title" className="mb-4 text-base font-semibold text-[#1F2937]">{tr("Tài nguyên")}</h2>
+                <div className="flex flex-col items-stretch gap-2">
+                  <CitationModal item={toCitationDto(item)} className="action-secondary-detail" />
+                  <ResourceLinks resources={sidebarResources} />
+                </div>
+              </section>
+            )}
 
 
             {item.contributors.length > 0 && (
