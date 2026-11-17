@@ -26,6 +26,7 @@ describe('Showcase Detail Page Visibility Protection', () => {
     expect(content).not.toContain('aria-label="Mục lục công trình"');
     expect(content).toContain('aria-labelledby="resources-title"');
     expect(content).toContain('object-contain');
+    expect(content).toContain('src={contributor.user?.avatarUrl}');
     expect(content).toContain('ResourceLinks resources={sidebarResources}');
     expect(content).toContain('action-secondary-detail');
   });

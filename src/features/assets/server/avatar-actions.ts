@@ -10,6 +10,8 @@ import { consumeRateLimit } from '@/features/identity/server/rate-limit';
 
 function refreshAvatar() {
   revalidatePath('/members/[id]', 'page');
+  revalidatePath('/works/[slug]', 'page');
+  revalidatePath('/admin/members');
   revalidatePath('/members');
   revalidatePath('/members/all');
   revalidatePath('/');
