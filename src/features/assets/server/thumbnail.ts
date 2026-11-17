@@ -91,6 +91,12 @@ export async function readThumbnail(url: string, width: number) {
       cache.delete(oldest);
     }
     if (bytes.byteLength <= maxCacheBytes) { cache.set(key, { bytes, expires: Date.now() + cacheTtlMs }); cachedBytes += bytes.byteLength; }
+    if (process.env.VITEST !== 'true' && width >= 256 && width < 1080) {
+      const zoomKey = `${url}:1080`;
+      if (!cache.has(zoomKey) && !inFlight.has(zoomKey)) {
+        setImmediate(() => { void readThumbnail(url, 1080).catch(() => undefined); });
+      }
+    }
     return bytes;
   })();
   inFlight.set(key, work);
